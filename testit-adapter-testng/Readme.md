@@ -1,7 +1,5 @@
-# Test IT TMS adapters for Java
+# Test IT TMS adapter for TestNG
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
-
-# TestNG
 
 ## Getting Started
 
@@ -176,15 +174,13 @@ Annotations can be used to specify information about autotest.
 
 Description of Annotations (\* - required):
 - `WorkItemID` - linking an autotest to a test case
-- \*`displayName` - name of the autotest in the Test IT system (can be replaced with documentation strings)
+- \*`DisplayName` - name of the autotest in the Test IT system
 - \*`ExternalID` - ID of the autotest within the project in the Test IT System
-- `Title` - title in the autotest card
-- `Description` - description in the autotest card
-- `Labels` - tags in the work item
+- `Title` - title in the autotest card and the step card
+- `Description` - description in the autotest card and the step card
+- `Labels` - tags in the autotest card
 - `Link` - links in the autotest card
-- `Step` - the designation of the step called in the body of the test or other step
-
-All decorators support the use of parameterization attributes
+- `Step` - the designation of the step
 
 Description of methods:
 - `AddLink` - links in the autotest result
