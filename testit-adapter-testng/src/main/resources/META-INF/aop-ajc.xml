@@ -1,0 +1,6 @@
+<aspectj>
+    <aspects>
+        <aspect name="ru.testit.aspects.StepAspect"/>
+    </aspects>
+    <weaver options="-Xlint:ignore -warn:none"/>
+</aspectj>
