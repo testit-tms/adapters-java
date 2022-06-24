@@ -51,12 +51,6 @@ Copy the contents of the **"packages"** folder to to `{%HOME_FOLDER%}/.m2/reposi
                     <complianceLevel>${maven.compiler.source}</complianceLevel>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.source}</target>
-                    <weaveDependencies>
-                        <weaveDependency>
-                            <groupId>ru.testit</groupId>
-                            <artifactId>adapters-java-testng</artifactId>
-                        </weaveDependency>
-                    </weaveDependencies>
                 </configuration>
                 <executions>
                     <execution>
@@ -240,12 +234,12 @@ public class SampleTests {
 
 You can help to develop the project. Any contributions are **greatly appreciated**.
 
-* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/testit-tms/adapters-java-testng/issues/new) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
+* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/testit-tms/adapters-java/issues/new) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
 * Please make sure you check your spelling and grammar.
 * Create individual PR for each suggestion.
-* Please also read through the [Code Of Conduct](https://github.com/testit-tms/adapters-java-testng/blob/master/CODE_OF_CONDUCT.md) before posting your first idea as well.
+* Please also read through the [Code Of Conduct](https://github.com/testit-tms/adapters-java/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
 
 # License
 
-Distributed under the Apache-2.0 License. See [LICENSE](https://github.com/testit-tms/adapters-java-testng/blob/master/LICENSE.md) for more information.
+Distributed under the Apache-2.0 License. See [LICENSE](https://github.com/testit-tms/adapters-java/blob/main/LICENSE.md) for more information.
 
