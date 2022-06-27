@@ -2,8 +2,11 @@ package ru.testit.listener;
 
 import org.testng.*;
 import ru.testit.services.ItemStatus;
+import ru.testit.models.TestMethod;
 import ru.testit.services.TestItService;
 import ru.testit.services.TestMethodType;
+
+import java.lang.reflect.Method;
 
 public class BaseTestNgListener implements IExecutionListener, ITestListener, IClassListener {
     private final TestItService testItService;
@@ -25,7 +28,10 @@ public class BaseTestNgListener implements IExecutionListener, ITestListener, IC
     @Override
     public void onBeforeClass(ITestClass testClass) {
         for (final org.testng.ITestNGMethod testMethod : testClass.getBeforeClassMethods()) {
-            testItService.startUtilMethod(TestMethodType.BEFORE_CLASS, testMethod.getConstructorOrMethod().getMethod());
+            Method method = testMethod.getConstructorOrMethod().getMethod();
+            TestMethod testItMethod = Converter.ConvertMethod(method);
+
+            testItService.startUtilMethod(TestMethodType.BEFORE_CLASS, testItMethod);
             testItService.finishUtilMethod(TestMethodType.BEFORE_CLASS, null);
         }
     }
@@ -33,29 +39,34 @@ public class BaseTestNgListener implements IExecutionListener, ITestListener, IC
     @Override
     public void onAfterClass(ITestClass testClass) {
         for (final org.testng.ITestNGMethod testMethod : testClass.getAfterClassMethods()) {
-            testItService.startUtilMethod(TestMethodType.AFTER_CLASS, testMethod.getConstructorOrMethod().getMethod());
+            Method method = testMethod.getConstructorOrMethod().getMethod();
+            TestMethod testItMethod = Converter.ConvertMethod(method);
+
+            testItService.startUtilMethod(TestMethodType.AFTER_CLASS, testItMethod);
             testItService.finishUtilMethod(TestMethodType.AFTER_CLASS, null);
         }
     }
 
     @Override
     public void onTestStart(ITestResult testResult) {
-        testItService.startTestMethod(testResult);
+        TestMethod method = Converter.ConvertTestResult(testResult);
+
+        testItService.startTestMethod(method);
     }
 
     @Override
     public void onTestSuccess(ITestResult testResult) {
-        testItService.finishTestMethod(ItemStatus.PASSED, testResult);
+        finishTestMethod(ItemStatus.PASSED, testResult);
     }
 
     @Override
     public void onTestFailure(ITestResult testResult) {
-        testItService.finishTestMethod(ItemStatus.FAILED, testResult);
+        finishTestMethod(ItemStatus.FAILED, testResult);
     }
 
     @Override
     public void onTestSkipped(ITestResult testResult) {
-        testItService.finishTestMethod(ItemStatus.SKIPPED, testResult);
+        finishTestMethod(ItemStatus.SKIPPED, testResult);
     }
 
     @Override
@@ -71,5 +82,10 @@ public class BaseTestNgListener implements IExecutionListener, ITestListener, IC
     // not implemented
     @Override
     public void onFinish(ITestContext testContext) {
+    }
+
+    private void finishTestMethod(ItemStatus status, ITestResult testResult) {
+        TestMethod method = Converter.ConvertTestResult(testResult);
+        testItService.finishTestMethod(status, method);
     }
 }
