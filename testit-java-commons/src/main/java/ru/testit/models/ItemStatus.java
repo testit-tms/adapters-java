@@ -19,8 +19,8 @@ public enum ItemStatus {
 
     private final String value;
 
-    ItemStatus(final String v) {
-        value = v;
+    ItemStatus(final String s) {
+        value = s;
     }
 
     /**
