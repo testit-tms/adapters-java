@@ -6,7 +6,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.testit.annotations.*;
 import ru.testit.models.LinkItem;
-import ru.testit.testit.client.TestITClient;
+import ru.testit.tms.client.TMSClient;
 
 public class SampleTest {
 
@@ -22,7 +22,7 @@ public class SampleTest {
     @Title("doSecond")
     @Description("doSecondDesc")
     private void doSecond() {
-        TestITClient.addLink(new LinkItem("doSecondLink", "www.test.com", "testDesc", LinkType.RELATED));
+        TMSClient.addLink(new LinkItem("doSecondLink", "www.test.com", "testDesc", LinkType.RELATED));
         doThird();
     }
 

@@ -1,4 +1,4 @@
-package ru.testit.testit.models.request;
+package ru.testit.tms.models.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

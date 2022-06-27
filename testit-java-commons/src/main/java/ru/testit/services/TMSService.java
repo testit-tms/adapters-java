@@ -1,21 +1,18 @@
 package ru.testit.services;
 
-import org.testng.ITestResult;
-import ru.testit.annotations.Description;
-import ru.testit.annotations.ExternalId;
-import ru.testit.annotations.Title;
 import ru.testit.aspects.StepAspect;
 import ru.testit.models.Outcome;
 import ru.testit.models.StepNode;
+import ru.testit.models.TestMethod;
 import ru.testit.properties.AppProperties;
-import ru.testit.testit.client.TestITClient;
-import ru.testit.testit.models.config.ClientConfiguration;
+import ru.testit.tms.client.ITMSClient;
+import ru.testit.tms.client.TMSClient;
+import ru.testit.tms.models.config.ClientConfiguration;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
-public class TestItService {
-    private TestITClient testITClient;
+public class TMSService {
+    private ITMSClient tmsClient;
     private CreateTestItemRequestFactory createTestItemRequestFactory;
     private TestResultRequestFactory testResultRequestFactory;
     private LinkedHashMap<TestMethodType, StepNode> utilsMethodSteps;
@@ -23,7 +20,7 @@ public class TestItService {
     private List<String> alreadyFinished;
     private AppProperties appProperties;
 
-    public TestItService() {
+    public TMSService() {
         this.createTestItemRequestFactory = new CreateTestItemRequestFactory();
         this.testResultRequestFactory = new TestResultRequestFactory();
         this.utilsMethodSteps = new LinkedHashMap<TestMethodType, StepNode>();
@@ -35,68 +32,50 @@ public class TestItService {
                 appProperties.getUrl(),
                 appProperties.getConfigurationId(),
                 appProperties.getTestRunId());
-        this.testITClient = new TestITClient(config);
+        this.tmsClient = new TMSClient(config);
     }
 
     public void startLaunch() {
         if (this.appProperties.getTestRunId() != "null") {
             return;
         }
-        this.testITClient.startLaunch();
+        this.tmsClient.startLaunch();
     }
 
     public void finishLaunch() {
         this.createTestItemRequestFactory.processFinishLaunch(this.utilsMethodSteps, this.includedTests);
-        this.testITClient.sendTestItems(this.createTestItemRequestFactory.getCreateTestRequests());
+        this.tmsClient.sendTestItems(this.createTestItemRequestFactory.getCreateTestRequests());
         this.testResultRequestFactory.processFinishLaunch(this.utilsMethodSteps, this.includedTests);
-        this.testITClient.finishLaunch(this.testResultRequestFactory.getTestResultRequest());
+        this.tmsClient.finishLaunch(this.testResultRequestFactory.getTestResultRequest());
     }
 
-    public void startTestMethod(ITestResult testResult) {
-        Method m = testResult.getMethod().getConstructorOrMethod().getMethod();
-        this.createTestItemRequestFactory.processTest(m);
+    public void startTestMethod(final TestMethod method) {
+        this.createTestItemRequestFactory.processTest(method);
         final StepNode parentStep = new StepNode();
-        parentStep.setTitle(this.extractTitle(m));
-        parentStep.setDescription(this.extractDescription(m));
+        parentStep.setTitle(method.getTitle());
+        parentStep.setDescription(method.getDescription());
         parentStep.setStartedOn(new Date());
-        this.includedTests.put(this.extractExternalID(m), parentStep);
+        this.includedTests.put(method.getExternalId(), parentStep);
         StepAspect.setStepNodes(parentStep);
     }
 
-    public void finishTestMethod(ItemStatus status, ITestResult testResult) {
-        Method m = testResult.getMethod().getConstructorOrMethod().getMethod();
-        final String externalId = this.extractExternalID(m);
-        if (this.alreadyFinished.contains(externalId)) {
+    public void finishTestMethod(ItemStatus status, final TestMethod method) {
+        if (this.alreadyFinished.contains(method.getExternalId())) {
             return;
         }
-        final StepNode parentStep = this.includedTests.get(externalId);
+        final StepNode parentStep = this.includedTests.get(method.getExternalId());
         if (parentStep != null) {
             parentStep.setOutcome((status == ItemStatus.PASSED) ? Outcome.PASSED.getValue() : Outcome.FAILED.getValue());
-            parentStep.setFailureReason(testResult.getThrowable());
+            parentStep.setFailureReason(method.getThrowable());
             parentStep.setCompletedOn(new Date());
         }
-        this.alreadyFinished.add(externalId);
+        this.alreadyFinished.add(method.getExternalId());
     }
 
-    private String extractDescription(final Method currentTest) {
-        final Description annotation = currentTest.getAnnotation(Description.class);
-        return (annotation != null) ? annotation.value() : null;
-    }
-
-    private String extractTitle(final Method currentTest) {
-        final Title annotation = currentTest.getAnnotation(Title.class);
-        return (annotation != null) ? annotation.value() : null;
-    }
-
-    private String extractExternalID(final Method currentTest) {
-        final ExternalId annotation = currentTest.getAnnotation(ExternalId.class);
-        return (annotation != null) ? annotation.value() : null;
-    }
-
-    public void startUtilMethod(final TestMethodType currentMethod, final Method method) {
+    public void startUtilMethod(final TestMethodType currentMethod, final TestMethod method) {
         final StepNode parentStep = new StepNode();
-        parentStep.setTitle(this.extractTitle(method));
-        parentStep.setDescription(this.extractDescription(method));
+        parentStep.setTitle(method.getTitle());
+        parentStep.setDescription(method.getDescription());
         parentStep.setStartedOn(new Date());
         this.utilsMethodSteps.putIfAbsent(currentMethod, parentStep);
         StepAspect.setStepNodes(parentStep);

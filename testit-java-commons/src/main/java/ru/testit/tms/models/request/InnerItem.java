@@ -1,4 +1,4 @@
-package ru.testit.testit.models.request;
+package ru.testit.tms.models.request;
 
 import java.util.LinkedList;
 import java.util.List;

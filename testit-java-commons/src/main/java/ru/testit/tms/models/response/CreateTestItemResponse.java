@@ -1,9 +1,9 @@
-package ru.testit.testit.models.response;
+package ru.testit.tms.models.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StartLaunchResponse
+public class CreateTestItemResponse
 {
     private String id;
     
