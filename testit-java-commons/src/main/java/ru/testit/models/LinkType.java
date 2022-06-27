@@ -1,4 +1,4 @@
-package ru.testit.annotations;
+package ru.testit.models;
 
 public enum LinkType
 {

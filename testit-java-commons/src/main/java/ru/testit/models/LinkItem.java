@@ -1,7 +1,5 @@
 package ru.testit.models;
 
-import ru.testit.annotations.LinkType;
-
 public class LinkItem
 {
     private String title;
