@@ -5,13 +5,14 @@ import ru.testit.models.Outcome;
 import ru.testit.models.StepNode;
 import ru.testit.models.TestMethod;
 import ru.testit.properties.AppProperties;
-import ru.testit.testit.client.TestITClient;
-import ru.testit.testit.models.config.ClientConfiguration;
+import ru.testit.tms.client.ITMSClient;
+import ru.testit.tms.client.TMSClient;
+import ru.testit.tms.models.config.ClientConfiguration;
 
 import java.util.*;
 
-public class TestItService {
-    private TestITClient testITClient;
+public class TMSService {
+    private ITMSClient tmsClient;
     private CreateTestItemRequestFactory createTestItemRequestFactory;
     private TestResultRequestFactory testResultRequestFactory;
     private LinkedHashMap<TestMethodType, StepNode> utilsMethodSteps;
@@ -19,7 +20,7 @@ public class TestItService {
     private List<String> alreadyFinished;
     private AppProperties appProperties;
 
-    public TestItService() {
+    public TMSService() {
         this.createTestItemRequestFactory = new CreateTestItemRequestFactory();
         this.testResultRequestFactory = new TestResultRequestFactory();
         this.utilsMethodSteps = new LinkedHashMap<TestMethodType, StepNode>();
@@ -31,21 +32,21 @@ public class TestItService {
                 appProperties.getUrl(),
                 appProperties.getConfigurationId(),
                 appProperties.getTestRunId());
-        this.testITClient = new TestITClient(config);
+        this.tmsClient = new TMSClient(config);
     }
 
     public void startLaunch() {
         if (this.appProperties.getTestRunId() != "null") {
             return;
         }
-        this.testITClient.startLaunch();
+        this.tmsClient.startLaunch();
     }
 
     public void finishLaunch() {
         this.createTestItemRequestFactory.processFinishLaunch(this.utilsMethodSteps, this.includedTests);
-        this.testITClient.sendTestItems(this.createTestItemRequestFactory.getCreateTestRequests());
+        this.tmsClient.sendTestItems(this.createTestItemRequestFactory.getCreateTestRequests());
         this.testResultRequestFactory.processFinishLaunch(this.utilsMethodSteps, this.includedTests);
-        this.testITClient.finishLaunch(this.testResultRequestFactory.getTestResultRequest());
+        this.tmsClient.finishLaunch(this.testResultRequestFactory.getTestResultRequest());
     }
 
     public void startTestMethod(final TestMethod method) {

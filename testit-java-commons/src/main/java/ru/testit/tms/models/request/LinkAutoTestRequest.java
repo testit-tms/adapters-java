@@ -1,4 +1,4 @@
-package ru.testit.testit.models.request;
+package ru.testit.tms.models.request;
 
 public class LinkAutoTestRequest
 {

@@ -1,4 +1,4 @@
-package ru.testit.testit.models.config;
+package ru.testit.tms.models.config;
 
 public class ClientConfiguration {
     private String privateToken;

@@ -1,7 +1,7 @@
 package ru.testit.models;
 
-import ru.testit.testit.models.request.InnerLink;
-import ru.testit.testit.models.request.Label;
+import ru.testit.tms.models.request.InnerLink;
+import ru.testit.tms.models.request.Label;
 
 import java.util.List;
 

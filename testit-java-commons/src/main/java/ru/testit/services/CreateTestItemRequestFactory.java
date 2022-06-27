@@ -3,9 +3,9 @@ package ru.testit.services;
 import ru.testit.models.Outcome;
 import ru.testit.models.StepNode;
 import ru.testit.models.TestMethod;
-import ru.testit.testit.client.TestITClient;
-import ru.testit.testit.models.request.CreateTestItemRequest;
-import ru.testit.testit.models.request.InnerItem;
+import ru.testit.tms.client.TMSClient;
+import ru.testit.tms.models.request.CreateTestItemRequest;
+import ru.testit.tms.models.request.InnerItem;
 
 import java.util.*;
 
@@ -21,7 +21,7 @@ public class CreateTestItemRequestFactory
         final CreateTestItemRequest createTestItemRequest = new CreateTestItemRequest();
 
         createTestItemRequest.setExternalId(method.getExternalId());
-        createTestItemRequest.setProjectId(TestITClient.getProjectID());
+        createTestItemRequest.setProjectId(TMSClient.getProjectID());
         createTestItemRequest.setName(method.getDisplayName());
         createTestItemRequest.setClassName(method.getClassName());
         createTestItemRequest.setNameSpace(method.getSpaceName());

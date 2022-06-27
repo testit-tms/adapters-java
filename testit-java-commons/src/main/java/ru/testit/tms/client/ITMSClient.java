@@ -1,12 +1,12 @@
-package ru.testit.testit.client;
+package ru.testit.tms.client;
 
-import ru.testit.testit.models.request.CreateTestItemRequest;
-import ru.testit.testit.models.request.TestResultsRequest;
-import ru.testit.testit.models.response.GetTestItemResponse;
+import ru.testit.tms.models.request.CreateTestItemRequest;
+import ru.testit.tms.models.request.TestResultsRequest;
+import ru.testit.tms.models.response.GetTestItemResponse;
 
 import java.util.Collection;
 
-public interface ITestITClient {
+public interface ITMSClient {
     void startLaunch();
     void finishLaunch(final TestResultsRequest request);
     void createTestItem(final CreateTestItemRequest createTestItemRequest);

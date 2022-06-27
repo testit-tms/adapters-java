@@ -1,8 +1,8 @@
 package ru.testit.listener;
 
 import ru.testit.annotations.*;
-import ru.testit.testit.models.request.InnerLink;
-import ru.testit.testit.models.request.Label;
+import ru.testit.tms.models.request.InnerLink;
+import ru.testit.tms.models.request.Label;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;

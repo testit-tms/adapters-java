@@ -1,11 +1,11 @@
-package ru.testit.testit.models.response;
+package ru.testit.tms.models.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.testit.models.Outcome;
-import ru.testit.testit.models.request.InnerItem;
-import ru.testit.testit.models.request.Label;
+import ru.testit.tms.models.request.InnerItem;
+import ru.testit.tms.models.request.Label;
 
 import java.util.List;
 

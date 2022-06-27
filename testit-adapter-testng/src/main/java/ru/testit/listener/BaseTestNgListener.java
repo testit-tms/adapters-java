@@ -3,47 +3,43 @@ package ru.testit.listener;
 import org.testng.*;
 import ru.testit.services.ItemStatus;
 import ru.testit.models.TestMethod;
-import ru.testit.services.TestItService;
+import ru.testit.services.TMSService;
 import ru.testit.services.TestMethodType;
 
-import java.lang.reflect.Method;
-
 public class BaseTestNgListener implements IExecutionListener, ITestListener, IClassListener {
-    private final TestItService testItService;
+    private final TMSService tmsService;
 
     public BaseTestNgListener() {
-        testItService = new TestItService();
+        tmsService = new TMSService();
     }
 
     @Override
     public void onExecutionStart() {
-        testItService.startLaunch();
+        tmsService.startLaunch();
     }
 
     @Override
     public void onExecutionFinish() {
-        testItService.finishLaunch();
+        tmsService.finishLaunch();
     }
 
     @Override
     public void onBeforeClass(ITestClass testClass) {
-        for (final org.testng.ITestNGMethod testMethod : testClass.getBeforeClassMethods()) {
-            Method method = testMethod.getConstructorOrMethod().getMethod();
-            TestMethod testItMethod = Converter.ConvertMethod(method);
+        for (final org.testng.ITestNGMethod method : testClass.getBeforeClassMethods()) {
+            TestMethod testMethod = Converter.ConvertMethod(method.getConstructorOrMethod().getMethod());
 
-            testItService.startUtilMethod(TestMethodType.BEFORE_CLASS, testItMethod);
-            testItService.finishUtilMethod(TestMethodType.BEFORE_CLASS, null);
+            tmsService.startUtilMethod(TestMethodType.BEFORE_CLASS, testMethod);
+            tmsService.finishUtilMethod(TestMethodType.BEFORE_CLASS, null);
         }
     }
 
     @Override
     public void onAfterClass(ITestClass testClass) {
-        for (final org.testng.ITestNGMethod testMethod : testClass.getAfterClassMethods()) {
-            Method method = testMethod.getConstructorOrMethod().getMethod();
-            TestMethod testItMethod = Converter.ConvertMethod(method);
+        for (final org.testng.ITestNGMethod method : testClass.getAfterClassMethods()) {
+            TestMethod testMethod = Converter.ConvertMethod(method.getConstructorOrMethod().getMethod());
 
-            testItService.startUtilMethod(TestMethodType.AFTER_CLASS, testItMethod);
-            testItService.finishUtilMethod(TestMethodType.AFTER_CLASS, null);
+            tmsService.startUtilMethod(TestMethodType.AFTER_CLASS, testMethod);
+            tmsService.finishUtilMethod(TestMethodType.AFTER_CLASS, null);
         }
     }
 
@@ -51,7 +47,7 @@ public class BaseTestNgListener implements IExecutionListener, ITestListener, IC
     public void onTestStart(ITestResult testResult) {
         TestMethod method = Converter.ConvertTestResult(testResult);
 
-        testItService.startTestMethod(method);
+        tmsService.startTestMethod(method);
     }
 
     @Override
@@ -86,6 +82,6 @@ public class BaseTestNgListener implements IExecutionListener, ITestListener, IC
 
     private void finishTestMethod(ItemStatus status, ITestResult testResult) {
         TestMethod method = Converter.ConvertTestResult(testResult);
-        testItService.finishTestMethod(status, method);
+        tmsService.finishTestMethod(status, method);
     }
 }

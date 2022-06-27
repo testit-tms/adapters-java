@@ -3,11 +3,11 @@ package ru.testit.services;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ru.testit.models.LinkItem;
 import ru.testit.models.StepNode;
-import ru.testit.testit.client.TestITClient;
-import ru.testit.testit.models.request.InnerLink;
-import ru.testit.testit.models.request.InnerResult;
-import ru.testit.testit.models.request.TestResultRequest;
-import ru.testit.testit.models.request.TestResultsRequest;
+import ru.testit.tms.client.TMSClient;
+import ru.testit.tms.models.request.InnerLink;
+import ru.testit.tms.models.request.InnerResult;
+import ru.testit.tms.models.request.TestResultRequest;
+import ru.testit.tms.models.request.TestResultsRequest;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public class TestResultRequestFactory
     }
     
     public void processTestSteps(final TestResultRequest testResult, final StepNode parentStep) {
-        testResult.setConfigurationId(TestITClient.getConfigurationId());
+        testResult.setConfigurationId(TMSClient.getConfigurationId());
         final Date startedOn = parentStep.getStartedOn();
         final Date completedOn = parentStep.getCompletedOn();
         testResult.setStartedOn(startedOn);

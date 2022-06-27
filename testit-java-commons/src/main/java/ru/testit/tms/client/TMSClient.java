@@ -1,4 +1,4 @@
-package ru.testit.testit.client;
+package ru.testit.tms.client;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,26 +17,26 @@ import org.slf4j.LoggerFactory;
 import ru.testit.annotations.AddLink;
 import ru.testit.models.LinkItem;
 import ru.testit.models.Outcome;
-import ru.testit.testit.models.config.ClientConfiguration;
-import ru.testit.testit.models.request.CreateTestItemRequest;
-import ru.testit.testit.models.request.LinkAutoTestRequest;
-import ru.testit.testit.models.request.StartTestRunRequest;
-import ru.testit.testit.models.request.TestResultsRequest;
-import ru.testit.testit.models.response.CreateTestItemResponse;
-import ru.testit.testit.models.response.GetTestItemResponse;
-import ru.testit.testit.models.response.StartLaunchResponse;
+import ru.testit.tms.models.config.ClientConfiguration;
+import ru.testit.tms.models.request.CreateTestItemRequest;
+import ru.testit.tms.models.request.LinkAutoTestRequest;
+import ru.testit.tms.models.request.StartTestRunRequest;
+import ru.testit.tms.models.request.TestResultsRequest;
+import ru.testit.tms.models.response.CreateTestItemResponse;
+import ru.testit.tms.models.response.GetTestItemResponse;
+import ru.testit.tms.models.response.StartLaunchResponse;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-public class TestITClient implements ITestITClient{
+public class TMSClient implements ITMSClient {
     private static final Logger log;
     private final ObjectMapper objectMapper;
     private StartLaunchResponse startLaunchResponse;
     private static ClientConfiguration clientConfiguration;
 
-    public TestITClient(ClientConfiguration clientConfiguration) {
+    public TMSClient(ClientConfiguration clientConfiguration) {
         this.clientConfiguration = clientConfiguration;
         this.objectMapper = new ObjectMapper();
     }
@@ -88,7 +88,7 @@ public class TestITClient implements ITestITClient{
             }
         }
         catch (IOException e) {
-            TestITClient.log.error("Exception while starting test run", (Throwable)e);
+            TMSClient.log.error("Exception while starting test run", (Throwable)e);
         }
     }
 
@@ -167,7 +167,7 @@ public class TestITClient implements ITestITClient{
             }
         }
         catch (IOException e) {
-            TestITClient.log.error("Exception while sending test item", (Throwable)e);
+            TMSClient.log.error("Exception while sending test item", (Throwable)e);
         }
         return getTestItemResponse;
     }
@@ -217,7 +217,7 @@ public class TestITClient implements ITestITClient{
             }
         }
         catch (IOException e) {
-            TestITClient.log.error("Exception while sending test item", (Throwable)e);
+            TMSClient.log.error("Exception while sending test item", (Throwable)e);
         }
         if (createTestItemResponse != null && StringUtils.isNotBlank((CharSequence)createTestItemResponse.getId())) {
             this.linkAutoTestWithTestCase(createTestItemResponse.getId(), new LinkAutoTestRequest(createTestItemRequest.getTestPlanId()));
@@ -267,7 +267,7 @@ public class TestITClient implements ITestITClient{
             }
         }
         catch (IOException e) {
-            TestITClient.log.error("Exception while sending test item", (Throwable)e);
+            TMSClient.log.error("Exception while sending test item", (Throwable)e);
         }
         if (StringUtils.isNotBlank((CharSequence)createTestItemRequest.getTestPlanId())) {
             this.linkAutoTestWithTestCase(testId, new LinkAutoTestRequest(createTestItemRequest.getTestPlanId()));
@@ -320,7 +320,7 @@ public class TestITClient implements ITestITClient{
             }
         }
         catch (IOException e) {
-            TestITClient.log.error("Exception while sending test result", (Throwable)e);
+            TMSClient.log.error("Exception while sending test result", (Throwable)e);
         }
     }
     private void sendCompleteTestRun() {
@@ -363,7 +363,7 @@ public class TestITClient implements ITestITClient{
             }
         }
         catch (IOException e) {
-            TestITClient.log.error("Exception while sending complete test run", (Throwable)e);
+            TMSClient.log.error("Exception while sending complete test run", (Throwable)e);
         }
     }
     private void linkAutoTestWithTestCase(final String autoTestId, final LinkAutoTestRequest linkAutoTestRequest) {
@@ -406,7 +406,7 @@ public class TestITClient implements ITestITClient{
             }
         }
         catch (IOException e) {
-            TestITClient.log.error("Exception while linking auto test", (Throwable)e);
+            TMSClient.log.error("Exception while linking auto test", (Throwable)e);
         }
     }
 
@@ -422,6 +422,6 @@ public class TestITClient implements ITestITClient{
     }
 
     static {
-        log = LoggerFactory.getLogger((Class)TestITClient.class);
+        log = LoggerFactory.getLogger((Class) TMSClient.class);
     }
 }
