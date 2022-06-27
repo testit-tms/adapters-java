@@ -1,6 +1,7 @@
 package ru.testit.services;
 
 import ru.testit.aspects.StepAspect;
+import ru.testit.models.ItemStatus;
 import ru.testit.models.Outcome;
 import ru.testit.models.StepNode;
 import ru.testit.models.TestMethod;
@@ -12,13 +13,13 @@ import ru.testit.tms.models.config.ClientConfiguration;
 import java.util.*;
 
 public class TMSService {
-    private ITMSClient tmsClient;
-    private CreateTestItemRequestFactory createTestItemRequestFactory;
-    private TestResultRequestFactory testResultRequestFactory;
-    private LinkedHashMap<TestMethodType, StepNode> utilsMethodSteps;
-    private HashMap<String, StepNode> includedTests;
-    private List<String> alreadyFinished;
-    private AppProperties appProperties;
+    private final ITMSClient tmsClient;
+    private final CreateTestItemRequestFactory createTestItemRequestFactory;
+    private final TestResultRequestFactory testResultRequestFactory;
+    private final LinkedHashMap<TestMethodType, StepNode> utilsMethodSteps;
+    private final HashMap<String, StepNode> includedTests;
+    private final List<String> alreadyFinished;
+    private final AppProperties appProperties;
 
     public TMSService() {
         this.createTestItemRequestFactory = new CreateTestItemRequestFactory();
@@ -36,7 +37,7 @@ public class TMSService {
     }
 
     public void startLaunch() {
-        if (this.appProperties.getTestRunId() != "null") {
+        if (!Objects.equals(this.appProperties.getTestRunId(), "null")) {
             return;
         }
         this.tmsClient.startLaunch();

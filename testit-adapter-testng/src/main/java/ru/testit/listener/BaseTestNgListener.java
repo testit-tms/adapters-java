@@ -1,7 +1,7 @@
 package ru.testit.listener;
 
 import org.testng.*;
-import ru.testit.services.ItemStatus;
+import ru.testit.models.ItemStatus;
 import ru.testit.models.TestMethod;
 import ru.testit.services.TMSService;
 import ru.testit.services.TestMethodType;
