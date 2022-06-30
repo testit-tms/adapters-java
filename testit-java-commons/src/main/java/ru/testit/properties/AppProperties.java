@@ -8,42 +8,30 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Properties;
+import java.io.InputStream;
 
 public class AppProperties {
-    private static final Logger log;
-    private Properties appProps;
+    private static final String PROPERTIES_FILE = "testit.properties";
+    private static final Logger log = LoggerFactory.getLogger(AppProperties.class);
 
     public AppProperties() {
-        final String appConfigPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("testit.properties")).getPath();
-        this.appProps = new Properties();
-        try {
-            this.appProps.load(new FileInputStream(appConfigPath));
+    }
+
+    public static Properties loadProperties() {
+        Properties properties = new Properties();
+        //properties.putAll(System.getProperties());
+        loadPropertiesFrom(Thread.currentThread().getContextClassLoader(), properties);
+        loadPropertiesFrom(ClassLoader.getSystemClassLoader(), properties);
+        return properties;
+    }
+
+    private static void loadPropertiesFrom(final ClassLoader classLoader, final Properties properties) {
+        try (InputStream stream = classLoader.getResourceAsStream(PROPERTIES_FILE)) {
+            if (stream != null) {
+                properties.load(stream);
+            }
         } catch (IOException e) {
-            AppProperties.log.error("Exception while read properties", (Throwable) e);
+            log.error("Exception while read properties: {}", e.getMessage());
         }
-    }
-
-    public String getProjectID() {
-        return String.valueOf(this.appProps.get("ProjectId"));
-    }
-
-    public String getUrl() {
-        return String.valueOf(this.appProps.get("URL"));
-    }
-
-    public String getPrivateToken() {
-        return String.valueOf(this.appProps.get("PrivateToken"));
-    }
-
-    public String getConfigurationId() {
-        return String.valueOf(this.appProps.get("ConfigurationId"));
-    }
-
-    public String getTestRunId() {
-        return String.valueOf(this.appProps.get("TestRunId"));
-    }
-
-    static {
-        log = LoggerFactory.getLogger((Class) AppProperties.class);
     }
 }

@@ -43,6 +43,7 @@ public class TMSClient implements ITMSClient {
 
     @Override
     public void startLaunch() {
+        System.out.println("startLaunch");
         final HttpPost post = new HttpPost(clientConfiguration.getUrl() + "/api/v2/testRuns");
         post.addHeader("Authorization", "PrivateToken " + clientConfiguration.getPrivateToken());
         try {

@@ -1,8 +1,10 @@
 package ru.testit.services;
 
+import java.lang.annotation.Annotation;
 
 public enum TestMethodType {
     //@formatter:off
+    TEST,
     STEP,
     BEFORE_CLASS,
     BEFORE_GROUPS,
