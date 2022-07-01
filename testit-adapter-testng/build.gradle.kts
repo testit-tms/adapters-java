@@ -26,6 +26,7 @@ tasks.getByName<Test>("test")  {
         suites("src/test/resources/testng.xml")
     })
     exclude("**/samples/*")
+
     doFirst {
         jvmArgs("-javaagent:${agent.singleFile}")
     }

@@ -13,13 +13,13 @@ import ru.testit.tms.models.config.ClientConfiguration;
 import java.util.*;
 
 public class TMSService {
-    private final ITMSClient tmsClient;
-    private final CreateTestItemRequestFactory createTestItemRequestFactory;
-    private final TestResultRequestFactory testResultRequestFactory;
-    private final LinkedHashMap<TestMethodType, StepNode> utilsMethodSteps;
-    private final HashMap<String, StepNode> includedTests;
-    private final List<String> alreadyFinished;
-    private final AppProperties appProperties;
+    private ITMSClient tmsClient;
+    private CreateTestItemRequestFactory createTestItemRequestFactory;
+    private TestResultRequestFactory testResultRequestFactory;
+    private LinkedHashMap<TestMethodType, StepNode> utilsMethodSteps;
+    private HashMap<String, StepNode> includedTests;
+    private List<String> alreadyFinished;
+    private ClientConfiguration config;
 
     public TMSService() {
         this.createTestItemRequestFactory = new CreateTestItemRequestFactory();
@@ -27,17 +27,13 @@ public class TMSService {
         this.utilsMethodSteps = new LinkedHashMap<TestMethodType, StepNode>();
         this.includedTests = new HashMap<String, StepNode>();
         this.alreadyFinished = new LinkedList<String>();
-        this.appProperties = new AppProperties();
-        ClientConfiguration config = new ClientConfiguration(appProperties.getPrivateToken(),
-                appProperties.getProjectID(),
-                appProperties.getUrl(),
-                appProperties.getConfigurationId(),
-                appProperties.getTestRunId());
+        Properties appProperties = AppProperties.loadProperties();
+        this.config = new ClientConfiguration(appProperties);
         this.tmsClient = new TMSClient(config);
     }
 
     public void startLaunch() {
-        if (!Objects.equals(this.appProperties.getTestRunId(), "null")) {
+        if (this.config.getTestRunId() != "null") {
             return;
         }
         this.tmsClient.startLaunch();

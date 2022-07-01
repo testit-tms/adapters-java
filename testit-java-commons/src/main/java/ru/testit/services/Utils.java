@@ -1,4 +1,4 @@
-package ru.testit.listener;
+package ru.testit.services;
 
 import ru.testit.annotations.*;
 import ru.testit.models.Label;

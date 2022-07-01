@@ -1,5 +1,7 @@
 package ru.testit.tms.models.config;
 
+import java.util.Properties;
+
 public class ClientConfiguration {
     private String privateToken;
     private String projectId;
@@ -7,12 +9,12 @@ public class ClientConfiguration {
     private String configurationId;
     private String testRunId;
 
-    public ClientConfiguration(String privateToken, String projectId, String url, String configurationId, String testRunId) {
-        this.privateToken = privateToken;
-        this.projectId = projectId;
-        this.url = url;
-        this.configurationId = configurationId;
-        this.testRunId = testRunId;
+    public ClientConfiguration(Properties properties) {
+        this.privateToken = String.valueOf(properties.get("PrivateToken"));
+        this.projectId = String.valueOf(properties.get("ProjectId"));
+        this.url = String.valueOf(properties.get("URL"));
+        this.configurationId = String.valueOf(properties.get("ConfigurationId"));
+        this.testRunId = String.valueOf(properties.get("TestRunId"));
     }
 
     public String getPrivateToken() {
