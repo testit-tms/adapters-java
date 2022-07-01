@@ -15,6 +15,6 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
 }
 
-//tasks.getByName<Test>("test") {
-//    useJUnitPlatform()
-//}
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
+}
