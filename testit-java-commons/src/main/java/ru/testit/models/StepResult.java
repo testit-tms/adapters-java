@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The model object that stores information about test steps that was run.
+ * Model describes step.
  */
 
-public class StepResult {
+public class StepResult implements ResultWithSteps {
     private String name;
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
-    private List<StepResult> steps = new ArrayList<>();
+    private List<String> steps = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
+    private Throwable throwable;
     private Long start;
     private Long stop;
 
@@ -30,9 +31,11 @@ public class StepResult {
      * Sets name.
      *
      * @param name the value
+     * @return self for method chaining
      */
-    public void setName(String name) {
+    public StepResult setName(String name) {
         this.name = name;
+        return this;
     }
 
     /**
@@ -48,9 +51,11 @@ public class StepResult {
      * Sets item status.
      *
      * @param itemStatus the value
+     * @return self for method chaining
      */
-    public void setItemStatus(ItemStatus itemStatus) {
+    public StepResult setItemStatus(ItemStatus itemStatus) {
         this.itemStatus = itemStatus;
+        return this;
     }
 
     /**
@@ -66,9 +71,11 @@ public class StepResult {
      * Sets item stage.
      *
      * @param itemStage the value
+     * @return self for method chaining
      */
-    public void setItemStage(ItemStage itemStage) {
+    public StepResult setItemStage(ItemStage itemStage) {
         this.itemStage = itemStage;
+        return this;
     }
 
     /**
@@ -84,9 +91,11 @@ public class StepResult {
      * Sets description.
      *
      * @param description the value
+     * @return self for method chaining
      */
-    public void setDescription(String description) {
+    public StepResult setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     /**
@@ -94,7 +103,7 @@ public class StepResult {
      *
      * @return the steps
      */
-    public List<StepResult> getSteps() {
+    public List<String> getSteps() {
         return steps;
     }
 
@@ -102,9 +111,11 @@ public class StepResult {
      * Sets steps.
      *
      * @param steps the steps
+     * @return self for method chaining
      */
-    public void setSteps(List<StepResult> steps) {
+    public StepResult setSteps(List<String> steps) {
         this.steps = steps;
+        return this;
     }
 
     /**
@@ -120,9 +131,11 @@ public class StepResult {
      * Sets links.
      *
      * @param linkItems the steps
+     * @return self for method chaining
      */
-    public void setLinkItems(List<LinkItem> linkItems) {
+    public StepResult setLinkItems(List<LinkItem> linkItems) {
         this.linkItems = linkItems;
+        return this;
     }
 
     /**
@@ -138,9 +151,11 @@ public class StepResult {
      * Sets start.
      *
      * @param start the value
+     * @return self for method chaining
      */
-    public void setStart(Long start) {
+    public StepResult setStart(Long start) {
         this.start = start;
+        return this;
     }
 
     /**
@@ -156,8 +171,30 @@ public class StepResult {
      * Sets stop.
      *
      * @param stop the value
+     * @return self for method chaining
      */
-    public void setStop(Long stop) {
+    public StepResult setStop(Long stop) {
         this.stop = stop;
+        return this;
+    }
+
+    /**
+     * Gets throwable.
+     *
+     * @return the throwable
+     */
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    /**
+     * Sets throwable.
+     *
+     * @param throwable the value
+     * @return self for method chaining
+     */
+    public StepResult setThrowable(Throwable throwable) {
+        this.throwable = throwable;
+        return this;
     }
 }

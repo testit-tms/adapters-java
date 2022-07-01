@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The model object that stores information about executed test fixtures (set up and tear down methods).
- * In order to link test fixture to test result {@link TestResultContainer} is used.
+ * Model describes fixture.
  */
 
-public class FixtureResult {
+public class FixtureResult implements ResultWithSteps {
     private String name;
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
-    private List<StepResult> steps = new ArrayList<>();
+    private List<String> steps = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
     private Long start;
     private Long stop;
@@ -31,9 +30,11 @@ public class FixtureResult {
      * Sets name.
      *
      * @param name the value
+     * @return self for method chaining
      */
-    public void setName(String name) {
+    public FixtureResult setName(String name) {
         this.name = name;
+        return this;
     }
 
     /**
@@ -49,9 +50,11 @@ public class FixtureResult {
      * Sets item status.
      *
      * @param itemStatus the value
+     * @return self for method chaining
      */
-    public void setItemStatus(ItemStatus itemStatus) {
+    public FixtureResult setItemStatus(ItemStatus itemStatus) {
         this.itemStatus = itemStatus;
+        return this;
     }
 
     /**
@@ -67,9 +70,11 @@ public class FixtureResult {
      * Sets item stage.
      *
      * @param itemStage the value
+     * @return self for method chaining
      */
-    public void setItemStage(ItemStage itemStage) {
+    public FixtureResult setItemStage(ItemStage itemStage) {
         this.itemStage = itemStage;
+        return this;
     }
 
     /**
@@ -85,9 +90,11 @@ public class FixtureResult {
      * Sets description.
      *
      * @param description the value
+     * @return self for method chaining
      */
-    public void setDescription(String description) {
+    public FixtureResult setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     /**
@@ -95,7 +102,7 @@ public class FixtureResult {
      *
      * @return the steps
      */
-    public List<StepResult> getSteps() {
+    public List<String> getSteps() {
         return steps;
     }
 
@@ -103,9 +110,11 @@ public class FixtureResult {
      * Sets steps.
      *
      * @param steps the steps
+     * @return self for method chaining
      */
-    public void setSteps(List<StepResult> steps) {
+    public FixtureResult setSteps(List<String> steps) {
         this.steps = steps;
+        return this;
     }
 
     /**
@@ -121,9 +130,11 @@ public class FixtureResult {
      * Sets links.
      *
      * @param linkItems the steps
+     * @return self for method chaining
      */
-    public void setLinkItems(List<LinkItem> linkItems) {
+    public FixtureResult setLinkItems(List<LinkItem> linkItems) {
         this.linkItems = linkItems;
+        return this;
     }
 
     /**
@@ -139,9 +150,11 @@ public class FixtureResult {
      * Sets start.
      *
      * @param start the value
+     * @return self for method chaining
      */
-    public void setStart(Long start) {
+    public FixtureResult setStart(Long start) {
         this.start = start;
+        return this;
     }
 
     /**
@@ -157,8 +170,10 @@ public class FixtureResult {
      * Sets stop.
      *
      * @param stop the value
+     * @return self for method chaining
      */
-    public void setStop(Long stop) {
+    public FixtureResult setStop(Long stop) {
         this.stop = stop;
+        return this;
     }
 }

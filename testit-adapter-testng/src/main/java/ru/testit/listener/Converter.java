@@ -14,8 +14,8 @@ public class Converter {
         testMethod.setSpaceName((method.getDeclaringClass().getPackage() == null)
                 ? null : method.getDeclaringClass().getPackage().getName());
         testMethod.setWorkItemId(Utils.extractWorkItemId(method));
-        testMethod.setLinks(Utils.extractLinks(method));
-        testMethod.setLabels(Utils.extractLabels(method));
+//        testMethod.setLinks(Utils.extractLinks(method));
+//        testMethod.setLabels(Utils.extractLabels(method));
         testMethod.setTitle(Utils.extractTitle(method));
         testMethod.setDescription(Utils.extractDescription(method));
 

@@ -4,58 +4,72 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import ru.testit.annotations.AddLink;
+import ru.testit.annotations.Description;
 import ru.testit.annotations.Step;
-import ru.testit.models.LinkItem;
-import ru.testit.models.Outcome;
-import ru.testit.models.StepNode;
-import ru.testit.models.StepUtils;
+import ru.testit.annotations.Title;
+import ru.testit.models.*;
+import ru.testit.services.TmsFactory;
+import ru.testit.services.TmsProxyService;
 
-import java.util.Date;
+import java.lang.reflect.Method;
+import java.util.UUID;
 
 @Aspect
-public class StepAspect
-{
+public class StepAspect {
+    private static final InheritableThreadLocal<TmsProxyService> tmsService
+            = new InheritableThreadLocal<TmsProxyService>() {
+        @Override
+        protected TmsProxyService initialValue() {
+            return TmsFactory.getLifecycle();
+        }
+    };
+
     private static final InheritableThreadLocal<StepNode> currentStep;
     private static final InheritableThreadLocal<StepNode> previousStep;
 
     @Pointcut("@annotation(step)")
     public void withStepAnnotation(final Step step) {
     }
-    
+
     @Pointcut("execution(* *.*(..))")
     public void anyMethod() {
     }
-    
+
     @Before("anyMethod() && withStepAnnotation(step)")
-    public void startNestedStep(final JoinPoint joinPoint, final Step step) {
-        final MethodSignature signature = (MethodSignature)joinPoint.getSignature();
-        final StepNode currStep = StepAspect.currentStep.get();
-        if (currStep != null) {
-            final StepNode newStep = StepUtils.makeStepNode(signature, currStep);
-            newStep.setStartedOn(new Date());
-            currStep.getChildren().add(newStep);
-            StepAspect.currentStep.set(newStep);
-        }
+    public void startNestedStep(final JoinPoint joinPoint) {
+        final MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        final String uuid = UUID.randomUUID().toString();
+
+        final StepResult result = new StepResult()
+                .setName(extractTitle(signature.getMethod()))
+                .setDescription(extractDescription(signature.getMethod()));
+
+        tmsService.get().startStep(uuid, result);
     }
-    
-    @AfterReturning(value = "anyMethod() && withStepAnnotation(step)", argNames = "step")
-    public void finishNestedStep(final Step step) {
-        final StepNode currStep = StepAspect.currentStep.get();
-        if (currStep != null) {
-            currStep.setCompletedOn(new Date());
-            currStep.setOutcome(Outcome.PASSED.getValue());
-            StepAspect.currentStep.set(currStep.getParent());
-        }
+
+    public static String extractTitle(final Method currentTest) {
+        final Title annotation = currentTest.getAnnotation(Title.class);
+        return (annotation != null) ? annotation.value() : null;
     }
-    
-    @AfterThrowing(value = "anyMethod() && withStepAnnotation(step)", throwing = "throwable", argNames = "step,throwable")
-    public void failedNestedStep(final Step step, final Throwable throwable) {
-        final StepNode currStep = StepAspect.currentStep.get();
-        if (currStep != null) {
-            currStep.setCompletedOn(new Date());
-            currStep.setOutcome(Outcome.FAILED.getValue());
-            StepAspect.currentStep.set(currStep.getParent());
-        }
+
+    public static String extractDescription(final Method currentTest) {
+        final Description annotation = currentTest.getAnnotation(Description.class);
+        return (annotation != null) ? annotation.value() : null;
+    }
+
+    @AfterReturning(value = "anyMethod() && withStepAnnotation(step)")
+    public void finishNestedStep() {
+        tmsService.get().updateStep(s -> s.setItemStatus(ItemStatus.PASSED));
+        tmsService.get().stopStep();
+    }
+
+    @AfterThrowing(value = "anyMethod() && withStepAnnotation(step)", throwing = "throwable")
+    public void failedNestedStep(final Throwable throwable) {
+        tmsService.get().updateStep(s ->
+                s.setItemStatus(ItemStatus.FAILED)
+                        .setThrowable(throwable)
+        );
+        tmsService.get().stopStep();
     }
 
     @Pointcut("@annotation(addLink)")
@@ -69,7 +83,9 @@ public class StepAspect
     @Before(value = "withAddLinkAnnotation(addLink) && hasLinkArg(linkItem) && anyMethod()", argNames = "addLink,linkItem")
     public void startAddLink(final AddLink addLink, final LinkItem linkItem) {
         final StepNode stepNode = StepAspect.currentStep.get();
-        if (stepNode == null) {return;}
+        if (stepNode == null) {
+            return;
+        }
         stepNode.getLinkItems().add(linkItem);
     }
 

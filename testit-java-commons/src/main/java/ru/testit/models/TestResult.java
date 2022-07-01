@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * The model object that stores information about test that was run.
  */
-public class TestResult {
+public class TestResult implements ResultWithSteps {
     private String uuid;
     private String externalId;
     private String workItemId;
@@ -18,9 +18,10 @@ public class TestResult {
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
-    private List<StepResult> steps = new ArrayList<>();
+    private List<String> steps = new ArrayList<>();
     private Long start;
     private Long stop;
+    private Throwable throwable;
 
     /**
      * Gets uuid.
@@ -35,9 +36,11 @@ public class TestResult {
      * Sets uuid.
      *
      * @param uuid the value
+     * @return self for method chaining
      */
-    public void setUuid(String uuid) {
+    public TestResult setUuid(String uuid) {
         this.uuid = uuid;
+        return this;
     }
 
     /**
@@ -53,9 +56,11 @@ public class TestResult {
      * Sets external id.
      *
      * @param externalId the value
+     * @return self for method chaining
      */
-    public void setExternalId(String externalId) {
+    public TestResult setExternalId(String externalId) {
         this.externalId = externalId;
+        return this;
     }
 
     /**
@@ -71,9 +76,11 @@ public class TestResult {
      * Sets work item id.
      *
      * @param workItemId the value
+     * @return self for method chaining
      */
-    public void setWorkItemId(String workItemId) {
+    public TestResult setWorkItemId(String workItemId) {
         this.workItemId = workItemId;
+        return this;
     }
 
     /**
@@ -89,9 +96,11 @@ public class TestResult {
      * Sets class name.
      *
      * @param className the value
+     * @return self for method chaining
      */
-    public void setClassName(String className) {
+    public TestResult setClassName(String className) {
         this.className = className;
+        return this;
     }
 
     /**
@@ -107,9 +116,11 @@ public class TestResult {
      * Sets space name.
      *
      * @param spaceName the value
+     * @return self for method chaining
      */
-    public void setSpaceName(String spaceName) {
+    public TestResult setSpaceName(String spaceName) {
         this.spaceName = spaceName;
+        return this;
     }
 
     /**
@@ -125,9 +136,11 @@ public class TestResult {
      * Sets labels.
      *
      * @param labels the labels
+     * @return self for method chaining
      */
-    public void setLabels(List<Label> labels) {
+    public TestResult setLabels(List<Label> labels) {
         this.labels = labels;
+        return this;
     }
 
     /**
@@ -143,9 +156,11 @@ public class TestResult {
      * Sets links.
      *
      * @param linkItems the steps
+     * @return self for method chaining
      */
-    public void setLinkItems(List<LinkItem> linkItems) {
+    public TestResult setLinkItems(List<LinkItem> linkItems) {
         this.linkItems = linkItems;
+        return this;
     }
 
 
@@ -162,9 +177,11 @@ public class TestResult {
      * Sets name.
      *
      * @param name the value
+     * @return self for method chaining
      */
-    public void setName(String name) {
+    public TestResult setName(String name) {
         this.name = name;
+        return this;
     }
 
     /**
@@ -180,9 +197,11 @@ public class TestResult {
      * Sets item status.
      *
      * @param itemStatus the value
+     * @return self for method chaining
      */
-    public void setItemStatus(ItemStatus itemStatus) {
+    public TestResult setItemStatus(ItemStatus itemStatus) {
         this.itemStatus = itemStatus;
+        return this;
     }
 
     /**
@@ -198,9 +217,11 @@ public class TestResult {
      * Sets item stage.
      *
      * @param itemStage the value
+     * @return self for method chaining
      */
-    public void setItemStage(ItemStage itemStage) {
+    public TestResult setItemStage(ItemStage itemStage) {
         this.itemStage = itemStage;
+        return this;
     }
 
     /**
@@ -216,9 +237,11 @@ public class TestResult {
      * Sets description.
      *
      * @param description the value
+     * @return self for method chaining
      */
-    public void setDescription(String description) {
+    public TestResult setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     /**
@@ -226,7 +249,7 @@ public class TestResult {
      *
      * @return the steps
      */
-    public List<StepResult> getSteps() {
+    public List<String> getSteps() {
         return steps;
     }
 
@@ -234,9 +257,11 @@ public class TestResult {
      * Sets steps.
      *
      * @param steps the steps
+     * @return self for method chaining
      */
-    public void setSteps(List<StepResult> steps) {
+    public TestResult setSteps(List<String> steps) {
         this.steps = steps;
+        return this;
     }
 
     /**
@@ -252,9 +277,11 @@ public class TestResult {
      * Sets start.
      *
      * @param start the value
+     * @return self for method chaining
      */
-    public void setStart(Long start) {
+    public TestResult setStart(Long start) {
         this.start = start;
+        return this;
     }
 
     /**
@@ -270,8 +297,30 @@ public class TestResult {
      * Sets stop.
      *
      * @param stop the value
+     * @return self for method chaining
      */
-    public void setStop(Long stop) {
+    public TestResult setStop(Long stop) {
         this.stop = stop;
+        return this;
+    }
+
+    /**
+     * Gets throwable.
+     *
+     * @return the stop
+     */
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    /**
+     * Sets throwable.
+     *
+     * @param throwable the value
+     * @return self for method chaining
+     */
+    public TestResult setThrowable(Throwable throwable) {
+        this.throwable = throwable;
+        return this;
     }
 }
