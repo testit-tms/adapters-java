@@ -8,7 +8,6 @@ import ru.testit.annotations.*;
 import ru.testit.models.LinkItem;
 import ru.testit.tms.client.TMSClient;
 
-
 public class SampleTest {
 
     @Step
