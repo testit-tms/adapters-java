@@ -195,20 +195,21 @@ Description of methods:
 ### Examples
 
 ```java
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import ru.testit.annotations.*;
 import ru.testit.models.LinkItem;
 import ru.testit.tms.client.TMSClient;
 
-public class SampleTests {
+public class SimpleTest {
 
-    @Test
-    @ExternalId("Simple_test_1")
-    @DisplayName("Simple test 1")
-    public void simpleTest1() {
-        Assert.assertTrue(true);
-    }
-    
+   @Test
+   @ExternalId("Simple_test_1")
+   @DisplayName("Simple test 1")
+   public void simpleTest1() {
+      Assertions.assertTrue(true);
+   }
+
    @Test
    @ExternalId("Simple_test_2")
    @WorkItemId("1")
@@ -220,24 +221,24 @@ public class SampleTests {
            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
    public void itsTrueReallyTrue() {
       step1();
-      TestITClient.addLink(new LinkItem("doSecondLink", "www.test.com", "testDesc", LinkType.RELATED));
-      Assert.assertTrue(true);
+      TMSClient.addLink(new LinkItem("doSecondLink", "www.test.com", "testDesc", LinkType.RELATED));
+      Assertions.assertTrue(true);
    }
 
-    @Step
-    @Title("Step 1")
-    @Description("Step 1 description")
-    private void step1() {
-        step2();
-        Assert.assertTrue(true);
-    }
+   @Step
+   @Title("Step 1")
+   @Description("Step 1 description")
+   private void step1() {
+      step2();
+      Assertions.assertTrue(true);
+   }
 
-    @Step
-    @Title("Step 2")
-    @Description("Step 2 description")
-    private void step2() {
-        Assert.assertTrue(true);
-    }
+   @Step
+   @Title("Step 2")
+   @Description("Step 2 description")
+   private void step2() {
+      Assertions.assertTrue(true);
+   }
 }
 ```
 

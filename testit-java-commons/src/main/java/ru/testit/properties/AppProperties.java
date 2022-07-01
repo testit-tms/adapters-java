@@ -4,9 +4,7 @@ package ru.testit.properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Properties;
 import java.io.InputStream;
 
@@ -19,7 +17,7 @@ public class AppProperties {
 
     public static Properties loadProperties() {
         Properties properties = new Properties();
-        //properties.putAll(System.getProperties());
+        properties.putAll(System.getenv());
         loadPropertiesFrom(Thread.currentThread().getContextClassLoader(), properties);
         loadPropertiesFrom(ClassLoader.getSystemClassLoader(), properties);
         return properties;
