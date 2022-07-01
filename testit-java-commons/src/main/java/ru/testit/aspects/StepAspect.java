@@ -4,14 +4,12 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import ru.testit.annotations.AddLink;
-import ru.testit.annotations.Description;
 import ru.testit.annotations.Step;
-import ru.testit.annotations.Title;
 import ru.testit.models.*;
 import ru.testit.services.TmsFactory;
 import ru.testit.services.TmsProxyService;
+import ru.testit.services.Utils;
 
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 @Aspect
@@ -41,20 +39,10 @@ public class StepAspect {
         final String uuid = UUID.randomUUID().toString();
 
         final StepResult result = new StepResult()
-                .setName(extractTitle(signature.getMethod()))
-                .setDescription(extractDescription(signature.getMethod()));
+                .setName(Utils.extractTitle(signature.getMethod()))
+                .setDescription(Utils.extractDescription(signature.getMethod()));
 
         tmsService.get().startStep(uuid, result);
-    }
-
-    public static String extractTitle(final Method currentTest) {
-        final Title annotation = currentTest.getAnnotation(Title.class);
-        return (annotation != null) ? annotation.value() : null;
-    }
-
-    public static String extractDescription(final Method currentTest) {
-        final Description annotation = currentTest.getAnnotation(Description.class);
-        return (annotation != null) ? annotation.value() : null;
     }
 
     @AfterReturning(value = "anyMethod() && withStepAnnotation(step)")
