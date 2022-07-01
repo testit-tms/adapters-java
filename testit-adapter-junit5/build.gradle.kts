@@ -1,0 +1,44 @@
+description = "TestIT JUnit 5 Integration"
+
+plugins {
+    id("java")
+}
+
+val junitVersion = "5.8.2"
+val aspectjVersion = "1.9.7"
+val agent: Configuration by configurations.creating
+
+dependencies {
+    agent("org.aspectj:aspectjweaver:$aspectjVersion")
+
+    implementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    implementation(project(":testit-java-commons"))
+
+    testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
+    testImplementation("org.aspectj:aspectjweaver:$aspectjVersion");
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
+}
+
+tasks.jar {
+    manifest {
+        attributes(mapOf(
+                "Automatic-Module-Name" to "ru.testit.junit5"
+        ))
+    }
+    from("src/main/services") {
+        into("META-INF/services")
+    }
+}
+
+tasks.compileTestJava {
+    options.encoding = "UTF-8"
+}
+
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
+    systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+    doFirst {
+        jvmArgs("-javaagent:${agent.singleFile}")
+    }
+}

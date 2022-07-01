@@ -1,6 +1,6 @@
 package ru.testit.listener;
 
-import org.testng.ITestResult;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import ru.testit.models.TestMethod;
 import ru.testit.services.Utils;
 import java.lang.reflect.Method;
@@ -23,10 +23,13 @@ public class Converter {
         return testMethod;
     }
 
-    public static TestMethod ConvertTestResult(ITestResult testResult) {
-        Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
+    public static TestMethod ConvertTestResult(
+            ExtensionContext testResult,
+            Throwable throwable
+    ) {
+        Method method = testResult.getRequiredTestMethod();
         TestMethod testMethod = Converter.ConvertMethod(method);
-        testMethod.setThrowable(testResult.getThrowable());
+        testMethod.setThrowable(throwable);
 
         return testMethod;
     }

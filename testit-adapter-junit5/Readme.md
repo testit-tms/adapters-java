@@ -1,4 +1,4 @@
-# Test IT TMS adapter for TestNG
+# Test IT TMS adapter for JUnit 5
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
 ## Getting Started
@@ -18,13 +18,23 @@ Copy the contents of the **"packages"** folder to to `{%HOME_FOLDER%}/.m2/reposi
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>7.5</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.7.0</version>
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
-            <artifactId>testit-adapter-testng</artifactId>
+            <artifactId>testit-java-commons</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-adapter-junit5</artifactId>
             <version>0.1</version>
         </dependency>
         <dependency>
@@ -111,14 +121,17 @@ repositories {
 
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation 'ru.testit:testit-adapter-testng:0.1'
+    testImplementation 'ru.testit:testit-adapter-junit:0.1'
     testImplementation 'ru.testit:testit-java-commons:0.1'
-    testImplementation 'org.testng:testng:7.5'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"
     aspectConfig "org.aspectj:aspectjweaver:1.9.7"
 }
 
 test {
-    useTestNG()
+    useJUnitPlatform()
+    systemProperty 'junit.jupiter.extensions.autodetection.enabled', true
     doFirst {
         def weaver = configurations.aspectConfig.find { it.name.contains("aspectjweaver") }
         jvmArgs += "-javaagent:$weaver"
@@ -182,51 +195,50 @@ Description of methods:
 ### Examples
 
 ```java
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import ru.testit.annotations.*;
 import ru.testit.models.LinkItem;
-import org.testng.Assert;
-import org.testng.annotations.*;
+import ru.testit.tms.client.TMSClient;
 
-@Test()
-public class SampleTests {
+public class SimpleTest {
 
-    @Test
-    @ExternalId("Simple_test_1")
-    @DisplayName("Simple test 1")
-    public void simpleTest1() {
-        Assert.assertTrue(true);
-    }
+   @Test
+   @ExternalId("Simple_test_1")
+   @DisplayName("Simple test 1")
+   public void simpleTest1() {
+      Assertions.assertTrue(true);
+   }
 
-    @Step
-    @Title("Step 1")
-    @Description("Step 1 description")
-    private void step1() {
-        step2();
-        Assert.assertTrue(true);
-    }
+   @Test
+   @ExternalId("Simple_test_2")
+   @WorkItemId("1")
+   @DisplayName("Simple test 2")
+   @Title("test №2")
+   @Description("Description")
+   @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
+           @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
+           @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
+   public void itsTrueReallyTrue() {
+      step1();
+      TMSClient.addLink(new LinkItem("doSecondLink", "www.test.com", "testDesc", LinkType.RELATED));
+      Assertions.assertTrue(true);
+   }
 
-    @Step
-    @Title("Step 2")
-    @Description("Step 2 description")
-    private void step2() {
-        Assert.assertTrue(true);
-    }
+   @Step
+   @Title("Step 1")
+   @Description("Step 1 description")
+   private void step1() {
+      step2();
+      Assertions.assertTrue(true);
+   }
 
-    @Test
-    @ExternalId("Simple_test_2")
-    @DisplayName("Simple test 2")
-    @WorkItemId("12345")
-    @Title("Simple test 2")
-    @Description("Simple test 2 description")
-    @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
-                @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
-                @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
-
-    public void simpleTest2() {
-        step1();
-        TestITClient.addLink(new LinkItem("doSecondLink", "www.test.com", "testDesc", LinkType.RELATED));
-        Assert.assertTrue(true);
-    }
+   @Step
+   @Title("Step 2")
+   @Description("Step 2 description")
+   private void step2() {
+      Assertions.assertTrue(true);
+   }
 }
 ```
 
