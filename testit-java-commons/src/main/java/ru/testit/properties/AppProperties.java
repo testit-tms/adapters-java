@@ -17,9 +17,9 @@ public class AppProperties {
 
     public static Properties loadProperties() {
         Properties properties = new Properties();
-        properties.putAll(System.getenv());
         loadPropertiesFrom(Thread.currentThread().getContextClassLoader(), properties);
         loadPropertiesFrom(ClassLoader.getSystemClassLoader(), properties);
+        properties.putAll(System.getenv());
         return properties;
     }
 

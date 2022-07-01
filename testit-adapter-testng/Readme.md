@@ -129,7 +129,7 @@ test {
 
 ### Configuration
 
-Create **testit.properties** file in the resource directory of the project:
+Create **testit.properties** file in the resource directory of the project or set environment variables (environment variables take precedence over file variables):
 ``` 
 URL={%URL%}
 PrivateToken={%USER_PRIVATE_TOKEN%} 
