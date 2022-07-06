@@ -13,6 +13,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
+    implementation("ru.testit:testit-api-client:0.1")
 }
 
 tasks.getByName<Test>("test") {

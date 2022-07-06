@@ -36,6 +36,7 @@ public class ResultStorage {
     public Optional<MainContainer> getTestsContainer(final String uuid) {
         return get(uuid, MainContainer.class);
     }
+
     public Optional<ClassContainer> getClassContainer(final String uuid) {
         return get(uuid, ClassContainer.class);
     }

@@ -7,16 +7,23 @@ public enum ItemStatus {
     /**
      * Marks passed tests.
      */
-    PASSED("passed"),
+    PASSED("Passed"),
     /**
      * Marks tests that have some failed checks.
      */
-    FAILED("failed"),
+    FAILED("Failed"),
     /**
      * Marks skipped tests.
      */
-    SKIPPED("skipped");
-
+    SKIPPED("Skipped"),
+    /**
+     * Marks in progress tests.
+     */
+    INPROGRESS("InProgress"),
+    /**
+     * Marks in blocked tests.
+     */
+    BLOCKED("Blocked");
     private final String value;
 
     ItemStatus(final String s) {

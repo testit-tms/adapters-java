@@ -14,6 +14,7 @@ public class FixtureResult implements ResultWithSteps {
     private String description;
     private List<String> steps = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
+    private String parent;
     private Long start;
     private Long stop;
 
@@ -134,6 +135,26 @@ public class FixtureResult implements ResultWithSteps {
      */
     public FixtureResult setLinkItems(List<LinkItem> linkItems) {
         this.linkItems = linkItems;
+        return this;
+    }
+
+    /**
+     * Gets parent.
+     *
+     * @return the parent
+     */
+    public String getParent() {
+        return parent;
+    }
+
+    /**
+     * Sets parent.
+     *
+     * @param parent the value
+     * @return self for method chaining
+     */
+    public FixtureResult setParent(String parent) {
+        this.parent = parent;
         return this;
     }
 

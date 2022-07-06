@@ -15,6 +15,7 @@ public class TestResult implements ResultWithSteps {
     private List<Label> labels = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
     private String name;
+    private String title;
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
@@ -163,6 +164,25 @@ public class TestResult implements ResultWithSteps {
         return this;
     }
 
+    /**
+     * Gets title.
+     *
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * Sets title.
+     *
+     * @param title the value
+     * @return self for method chaining
+     */
+    public TestResult setTitle(String title) {
+        this.title = title;
+        return this;
+    }
 
     /**
      * Gets name.

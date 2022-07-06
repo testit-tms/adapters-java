@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import ru.testit.models.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
+import ru.testit.writer.TmsWriter;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -13,23 +15,24 @@ import java.util.function.Consumer;
 /**
  * This class manages data from a test framework.
  */
-public class TmsProxyService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TmsProxyService.class);
-
+public class TmsManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TmsManager.class);
     private final ThreadContext threadContext;
     private final ResultStorage storage;
+    private final TmsWriter writer;
 
-    public TmsProxyService() {
-        storage = new ResultStorage();
+    public TmsManager() {
+        storage = TmsFactory.getResultStorage();
         threadContext = new ThreadContext();
+        writer = new TmsWriter();
     }
 
     public void startTests(){
-        // TODO create test run
+        writer.startLaunch();
     }
 
     public void stopTests(){
-        // TODO finish test run
+        writer.finishLaunch();
     }
 
     /**
@@ -55,6 +58,7 @@ public class TmsProxyService {
         }
         final MainContainer container = found.get();
         container.setStop(System.currentTimeMillis());
+        writer.writeTests(container);
     }
 
     /**
@@ -86,6 +90,7 @@ public class TmsProxyService {
         }
         final ClassContainer container = found.get();
         container.setStop(System.currentTimeMillis());
+        writer.writeClass(container);
     }
 
     /**
@@ -168,6 +173,7 @@ public class TmsProxyService {
                 .setStop(System.currentTimeMillis());
 
         threadContext.clear();
+        writer.writeTest(testResult);
     }
 
     /**
@@ -318,7 +324,6 @@ public class TmsProxyService {
         fixture.setItemStage(ItemStage.FINISHED)
                 .setStop(System.currentTimeMillis());
 
-        //storage.remove(uuid);
         threadContext.clear();
     }
 
@@ -425,7 +430,6 @@ public class TmsProxyService {
         step.setItemStage(ItemStage.FINISHED);
         step.setStop(System.currentTimeMillis());
 
-        //storage.remove(uuid);
         threadContext.stop();
     }
 }

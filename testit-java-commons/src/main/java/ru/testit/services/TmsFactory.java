@@ -3,11 +3,18 @@ package ru.testit.services;
 import java.util.Objects;
 
 public final class TmsFactory {
-    private static TmsProxyService tmsProxyService;
-    public static TmsProxyService getLifecycle() {
-        if (Objects.isNull(tmsProxyService)) {
-            tmsProxyService = new TmsProxyService();
+    private static TmsManager tmsManager;
+    private static ResultStorage storage;
+    public static TmsManager getTmsManager() {
+        if (Objects.isNull(tmsManager)) {
+            tmsManager = new TmsManager();
         }
-        return tmsProxyService;
+        return tmsManager;
+    }
+    public static ResultStorage getResultStorage() {
+        if (Objects.isNull(storage)) {
+            storage = new ResultStorage();
+        }
+        return storage;
     }
 }

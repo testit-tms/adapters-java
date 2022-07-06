@@ -1,7 +1,9 @@
 package ru.testit.tms.client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -18,15 +20,14 @@ import ru.testit.annotations.AddLink;
 import ru.testit.models.LinkItem;
 import ru.testit.models.Outcome;
 import ru.testit.tms.models.config.ClientConfiguration;
-import ru.testit.tms.models.request.CreateTestItemRequest;
-import ru.testit.tms.models.request.LinkAutoTestRequest;
-import ru.testit.tms.models.request.StartTestRunRequest;
-import ru.testit.tms.models.request.TestResultsRequest;
+import ru.testit.tms.models.request.*;
 import ru.testit.tms.models.response.CreateTestItemResponse;
 import ru.testit.tms.models.response.GetTestItemResponse;
 import ru.testit.tms.models.response.StartLaunchResponse;
+import ru.testit.writer.Converter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class TMSClient implements ITMSClient {
     }
 
     @Override
-    public void startLaunch() {
+    public String startLaunch() {
         final HttpPost post = new HttpPost(clientConfiguration.getUrl() + "/api/v2/testRuns");
         post.addHeader("Authorization", "PrivateToken " + clientConfiguration.getPrivateToken());
         try {
@@ -90,38 +91,45 @@ public class TMSClient implements ITMSClient {
         catch (IOException e) {
             TMSClient.log.error("Exception while starting test run", (Throwable)e);
         }
+
+        return clientConfiguration.getTestRunId();
     }
 
     @Override
     public void sendTestItems(final Collection<CreateTestItemRequest> createTestRequests) {
         for (final CreateTestItemRequest createTestRequest : createTestRequests) {
-            final GetTestItemResponse getTestItemResponse = this.getTestItem(createTestRequest);
-            if (getTestItemResponse == null || StringUtils.isBlank((CharSequence)getTestItemResponse.getId())) {
-                this.createTestItem(createTestRequest);
-            }
-            else {
-                if (createTestRequest.getOutcome().equals(Outcome.FAILED)) {
-                    createTestRequest.setId(getTestItemResponse.getId());
-                    createTestRequest.setName(getTestItemResponse.getName());
-                    createTestRequest.setExternalId(getTestItemResponse.getExternalId());
-                    createTestRequest.setDescription(getTestItemResponse.getDescription());
-                    createTestRequest.setNameSpace(getTestItemResponse.getNameSpace());
-                    createTestRequest.setClassName(getTestItemResponse.getClassName());
-                    createTestRequest.setLabels(getTestItemResponse.getLabels());
-                    createTestRequest.setSetUp(getTestItemResponse.getSetUp());
-                    createTestRequest.setSteps(getTestItemResponse.getSteps());
-                    createTestRequest.setTearDown(getTestItemResponse.getTearDown());
-                    createTestRequest.setProjectId(getTestItemResponse.getProjectId());
-                    createTestRequest.setTitle(getTestItemResponse.getTitle());
-                }
-                this.updatePostItem(createTestRequest, getTestItemResponse.getId());
-            }
+            sendTestItem(createTestRequest);
         }
     }
 
     @Override
-    public GetTestItemResponse getTestItem(final CreateTestItemRequest createTestItemRequest) {
-        final HttpGet get = new HttpGet(clientConfiguration.getUrl() + "/api/v2/autoTests?projectId=" + clientConfiguration.getProjectId() + "&externalId=" + createTestItemRequest.getExternalId());
+    public void sendTestItem(CreateTestItemRequest createTestRequest) {
+        final GetTestItemResponse getTestItemResponse = this.getTestItem(createTestRequest.getExternalId());
+        if (getTestItemResponse == null || StringUtils.isBlank((CharSequence)getTestItemResponse.getId())) {
+            this.createTestItem(createTestRequest);
+        }
+        else {
+            if (createTestRequest.getOutcome().equals(Outcome.FAILED)) {
+                createTestRequest.setId(getTestItemResponse.getId());
+                createTestRequest.setName(getTestItemResponse.getName());
+                createTestRequest.setExternalId(getTestItemResponse.getExternalId());
+                createTestRequest.setDescription(getTestItemResponse.getDescription());
+                createTestRequest.setNameSpace(getTestItemResponse.getNameSpace());
+                createTestRequest.setClassName(getTestItemResponse.getClassName());
+                createTestRequest.setLabels(getTestItemResponse.getLabels());
+                createTestRequest.setSetUp(getTestItemResponse.getSetUp());
+                createTestRequest.setSteps(getTestItemResponse.getSteps());
+                createTestRequest.setTearDown(getTestItemResponse.getTearDown());
+                createTestRequest.setProjectId(getTestItemResponse.getProjectId());
+                createTestRequest.setTitle(getTestItemResponse.getTitle());
+            }
+            this.updatePostItem(createTestRequest, getTestItemResponse.getId());
+        }
+    }
+
+    @Override
+    public GetTestItemResponse getTestItem(final String externalId) {
+        final HttpGet get = new HttpGet(clientConfiguration.getUrl() + "/api/v2/autoTests?projectId=" + clientConfiguration.getProjectId() + "&externalId=" + externalId);
         get.addHeader("Authorization", "PrivateToken " + clientConfiguration.getPrivateToken());
         GetTestItemResponse getTestItemResponse = null;
         try {
@@ -280,15 +288,20 @@ public class TMSClient implements ITMSClient {
         this.sendCompleteTestRun();
     }
 
-    private void sendTestResult(final TestResultsRequest request) {
+    @Override
+    public List<String> sendTestResult(final TestResultsRequest request) {
         final HttpPost post = new HttpPost(clientConfiguration.getUrl() + "/api/v2/testRuns/" + clientConfiguration.getTestRunId() + "/testResults");
         post.addHeader("Authorization", "PrivateToken " + clientConfiguration.getPrivateToken());
+        List<String> ids = null;
         try {
             final StringEntity requestEntity = new StringEntity(this.objectMapper.writeValueAsString((Object)request.getTestResults()), ContentType.APPLICATION_JSON);
             post.setEntity((HttpEntity)requestEntity);
             final CloseableHttpClient httpClient = HttpClients.createDefault();
             try {
                 final CloseableHttpResponse response = httpClient.execute((HttpUriRequest)post);
+                CollectionLikeType collectionLikeType = objectMapper.getTypeFactory()
+                        .constructCollectionLikeType(List.class, String.class);
+                ids = this.objectMapper.readValue(EntityUtils.toString(response.getEntity()), collectionLikeType);
                 final Throwable t2 = null;
                 if (response != null) {
                     if (t2 != null) {
@@ -322,8 +335,11 @@ public class TMSClient implements ITMSClient {
         catch (IOException e) {
             TMSClient.log.error("Exception while sending test result", (Throwable)e);
         }
+
+        return ids;
     }
-    private void sendCompleteTestRun() {
+    @Override
+    public void sendCompleteTestRun() {
         final HttpPost post = new HttpPost(clientConfiguration.getUrl() + "/api/v2/testRuns/" + clientConfiguration.getTestRunId() + "/complete");
         post.addHeader("Authorization", "PrivateToken " + clientConfiguration.getPrivateToken());
         try {

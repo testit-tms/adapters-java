@@ -5,7 +5,7 @@ import ru.testit.models.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
 import ru.testit.services.TmsFactory;
-import ru.testit.services.TmsProxyService;
+import ru.testit.services.TmsManager;
 import ru.testit.services.Utils;
 
 import java.lang.reflect.Method;
@@ -46,21 +46,21 @@ public class TestNgListener implements
     private final Map<ITestClass, String> classContainers = new ConcurrentHashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    private final TmsProxyService tmsProxyService;
+    private final TmsManager tmsManager;
 
     public TestNgListener() {
-        tmsProxyService = TmsFactory.getLifecycle();
+        tmsManager = TmsFactory.getTmsManager();
     }
 
     // ISuiteListener
     @Override
     public void onStart(final ISuite suite) {
-        tmsProxyService.startTests();
+        tmsManager.startTests();
     }
 
     @Override
     public void onFinish(final ISuite suite) {
-        tmsProxyService.stopTests();
+        tmsManager.stopTests();
     }
 
     // ITestListener
@@ -69,14 +69,12 @@ public class TestNgListener implements
         final MainContainer container = new MainContainer()
                 .setUuid(launcherUUID);
 
-        tmsProxyService.startMainContainer(container);
+        tmsManager.startMainContainer(container);
     }
 
     @Override
     public void onFinish(final ITestContext context) {
-        tmsProxyService.stopMainContainer(launcherUUID);
-        // TODO
-        //tmsProxyService.writeTestContainer(uuid);
+        tmsManager.stopMainContainer(launcherUUID);
     }
 
     @Override
@@ -105,25 +103,24 @@ public class TestNgListener implements
                 .setLabels(Utils.extractLabels(method))
                 .setExternalId(Utils.extractExternalID(method))
                 .setWorkItemId(Utils.extractWorkItemId(method))
-                .setName(Utils.extractTitle(method))
+                .setTitle(Utils.extractTitle(method))
+                .setName(Utils.extractDisplayName(method))
                 .setClassName(method.getDeclaringClass().getSimpleName())
                 .setSpaceName((method.getDeclaringClass().getPackage() == null)
                         ? null : method.getDeclaringClass().getPackage().getName())
                 .setLinkItems(Utils.extractLinks(method))
                 .setDescription(Utils.extractDescription(method));
 
-        tmsProxyService.scheduleTestCase(result);
-        tmsProxyService.startTestCase(uuid);
+        tmsManager.scheduleTestCase(result);
+        tmsManager.startTestCase(uuid);
     }
 
     @Override
     public void onTestSuccess(final ITestResult testResult) {
         final ExecutableTest executableTest = this.executableTest.get();
         executableTest.setAfterStatus();
-        tmsProxyService.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
-        tmsProxyService.stopTestCase(executableTest.getUuid());
-        // TODO
-        //tmsProxyService.writeTestCase(executableTest.getUuid());
+        tmsManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
+        tmsManager.stopTestCase(executableTest.getUuid());
     }
 
     @Override
@@ -176,7 +173,7 @@ public class TestNgListener implements
                 .setUuid(uuid)
                 .setName(testClass.getName());
 
-        tmsProxyService.startClassContainer(launcherUUID, container);
+        tmsManager.startClassContainer(launcherUUID, container);
 
         setClassContainer(testClass, uuid);
     }
@@ -184,9 +181,7 @@ public class TestNgListener implements
     @Override
     public void onAfterClass(ITestClass testClass) {
         getClassContainer(testClass).ifPresent(uuid -> {
-            tmsProxyService.stopClassContainer(uuid);
-            // TODO
-            //tmsProxyService.writeTestContainer(uuid);
+            tmsManager.stopClassContainer(uuid);
         });
     }
 
@@ -204,11 +199,11 @@ public class TestNgListener implements
     private void ifTestFixtureStarted(final ITestNGMethod testMethod) {
         if (testMethod.isBeforeTestConfiguration()) {
             final String uuid = executableFixture.get();
-            tmsProxyService.startPrepareFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
+            tmsManager.startPrepareFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
         }
         if (testMethod.isAfterTestConfiguration()) {
             final String uuid = executableFixture.get();
-            tmsProxyService.startTearDownFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
+            tmsManager.startTearDownFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
         }
     }
 
@@ -217,14 +212,14 @@ public class TestNgListener implements
             getClassContainer(testMethod.getTestClass())
                     .ifPresent(parentUuid -> {
                         final String uuid = executableFixture.get();
-                        tmsProxyService.startPrepareFixture(parentUuid, uuid, getFixtureResult(testMethod));
+                        tmsManager.startPrepareFixture(parentUuid, uuid, getFixtureResult(testMethod));
                     });
         }
         if (testMethod.isAfterClassConfiguration()) {
             getClassContainer(testMethod.getTestClass())
                     .ifPresent(parentUuid -> {
                         final String uuid = executableFixture.get();
-                        tmsProxyService.startTearDownFixture(parentUuid, uuid, getFixtureResult(testMethod));
+                        tmsManager.startTearDownFixture(parentUuid, uuid, getFixtureResult(testMethod));
                     });
         }
     }
@@ -235,12 +230,22 @@ public class TestNgListener implements
 
         getClassContainer(testMethod.getTestClass())
                 .ifPresent(parentUuid -> {
-                    if (testMethod.isBeforeMethodConfiguration()) {
-                        tmsProxyService.startPrepareFixtureEachTest(parentUuid, uuid, fixture);
+                    ExecutableTest test = executableTest.get();
+
+                    if (testMethod.isBeforeMethodConfiguration())
+                    {
+                        if (test.isStarted()){
+                            executableTest.remove();
+                            test = executableTest.get();
+                        }
+
+                        fixture.setParent(test.getUuid());
+                        tmsManager.startPrepareFixtureEachTest(parentUuid, uuid, fixture);
                     }
 
                     if (testMethod.isAfterMethodConfiguration()) {
-                        tmsProxyService.startTearDownFixtureEachTest(parentUuid, uuid, fixture);
+                        fixture.setParent(test.getUuid());
+                        tmsManager.startTearDownFixtureEachTest(parentUuid, uuid, fixture);
                     }
                 });
     }
@@ -262,12 +267,12 @@ public class TestNgListener implements
             final String executableUuid = executableFixture.get();
             executableFixture.remove();
             if (testResult.isSuccess()) {
-                tmsProxyService.updateFixture(executableUuid, result -> result.setItemStatus(ItemStatus.PASSED));
+                tmsManager.updateFixture(executableUuid, result -> result.setItemStatus(ItemStatus.PASSED));
             } else {
-                tmsProxyService.updateFixture(executableUuid, result -> result
+                tmsManager.updateFixture(executableUuid, result -> result
                         .setItemStatus(ItemStatus.FAILED));
             }
-            tmsProxyService.stopFixture(executableUuid);
+            tmsManager.stopFixture(executableUuid);
         }
     }
 
@@ -279,7 +284,7 @@ public class TestNgListener implements
         lock.writeLock().lock();
         try {
             if (nonNull(containerUuid)) {
-                tmsProxyService.updateClassContainer(
+                tmsManager.updateClassContainer(
                         containerUuid,
                         container -> container.getChildren().add(childUuid)
                 );
@@ -328,10 +333,8 @@ public class TestNgListener implements
     }
 
     private void stopTestCase(final String uuid, final Throwable throwable, final ItemStatus status) {
-        tmsProxyService.updateTestCase(uuid, setStatus(status, throwable));
-        tmsProxyService.stopTestCase(uuid);
-        // TODO
-        //tmsProxyService.writeTestCase(uuid);
+        tmsManager.updateTestCase(uuid, setStatus(status, throwable));
+        tmsManager.stopTestCase(uuid);
     }
 
     private ExecutableTest refreshContext() {

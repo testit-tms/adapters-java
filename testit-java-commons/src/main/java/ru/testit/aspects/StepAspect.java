@@ -7,18 +7,18 @@ import ru.testit.annotations.AddLink;
 import ru.testit.annotations.Step;
 import ru.testit.models.*;
 import ru.testit.services.TmsFactory;
-import ru.testit.services.TmsProxyService;
+import ru.testit.services.TmsManager;
 import ru.testit.services.Utils;
 
 import java.util.UUID;
 
 @Aspect
 public class StepAspect {
-    private static final InheritableThreadLocal<TmsProxyService> tmsService
-            = new InheritableThreadLocal<TmsProxyService>() {
+    private static final InheritableThreadLocal<TmsManager> tmsService
+            = new InheritableThreadLocal<TmsManager>() {
         @Override
-        protected TmsProxyService initialValue() {
-            return TmsFactory.getLifecycle();
+        protected TmsManager initialValue() {
+            return TmsFactory.getTmsManager();
         }
     };
 
@@ -34,7 +34,7 @@ public class StepAspect {
     }
 
     @Before("anyMethod() && withStepAnnotation(step)")
-    public void startNestedStep(final JoinPoint joinPoint) {
+    public void startNestedStep(final JoinPoint joinPoint, Step step) {
         final MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         final String uuid = UUID.randomUUID().toString();
 
@@ -46,13 +46,13 @@ public class StepAspect {
     }
 
     @AfterReturning(value = "anyMethod() && withStepAnnotation(step)")
-    public void finishNestedStep() {
+    public void finishNestedStep(Step step) {
         tmsService.get().updateStep(s -> s.setItemStatus(ItemStatus.PASSED));
         tmsService.get().stopStep();
     }
 
     @AfterThrowing(value = "anyMethod() && withStepAnnotation(step)", throwing = "throwable")
-    public void failedNestedStep(final Throwable throwable) {
+    public void failedNestedStep(final Throwable throwable, Step step) {
         tmsService.get().updateStep(s ->
                 s.setItemStatus(ItemStatus.FAILED)
                         .setThrowable(throwable)
