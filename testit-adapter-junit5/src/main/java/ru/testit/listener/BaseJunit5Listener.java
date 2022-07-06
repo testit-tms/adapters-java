@@ -1,28 +1,61 @@
 package ru.testit.listener;
 
 import org.junit.jupiter.api.extension.*;
-import ru.testit.models.TestMethod;
-import ru.testit.services.TMSService;
-import ru.testit.services.TestMethodType;
-import ru.testit.models.ItemStatus;
+import ru.testit.models.*;
+import ru.testit.services.*;
 
 import java.lang.reflect.*;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import static java.util.Objects.nonNull;
 
 public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAllCallback, InvocationInterceptor, TestWatcher {
-    private final TMSService tmsService;
+    private final TmsManager tmsManager;
+    /**
+     * Store uuid for current executable fixture.
+     */
+    private final ThreadLocal<String> executableFixture = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
+    /**
+     * Store current executable test.
+     */
+    private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
+
+    /**
+     * Store current executable context of tests.
+     */
+    private final String launcherUUID = UUID.randomUUID().toString();
+
+    /**
+     * Store current executable context of tests.
+     */
+    private final String classUUID = UUID.randomUUID().toString();
+
 
     public BaseJunit5Listener() {
-        tmsService = new TMSService();
+        tmsManager = TmsFactory.getTmsManager();
     }
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        tmsService.startLaunch();
+        tmsManager.startTests();
+
+        final MainContainer mainContainer = new MainContainer()
+                .setUuid(launcherUUID);
+
+        tmsManager.startMainContainer(mainContainer);
+
+        final ClassContainer classContainer = new ClassContainer()
+                .setUuid(classUUID);
+
+        tmsManager.startClassContainer(launcherUUID, classContainer);
     }
 
     @Override
     public void afterAll(ExtensionContext context) {
-        tmsService.finishLaunch();
+        tmsManager.stopClassContainer(classUUID);
+        tmsManager.stopMainContainer(launcherUUID);
+        tmsManager.stopTests();
     }
 
     @Override
@@ -31,8 +64,29 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        startUtilMethod(TestMethodType.BEFORE_CLASS, invocationContext);
-        finishUtilMethod(TestMethodType.BEFORE_CLASS, invocation);
+        final String uuid = executableFixture.get();
+        FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
+        tmsManager.startPrepareFixtureAll(launcherUUID, uuid, fixture);
+
+        try {
+            invocation.proceed();
+            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
+        } catch (Throwable throwable) {
+            tmsManager.updateFixture(uuid, result -> result
+                    .setItemStatus(ItemStatus.FAILED));
+        }
+
+        tmsManager.stopFixture(uuid);
+        executableFixture.remove();
+    }
+
+    private FixtureResult getFixtureResult(final Method method) {
+
+        return new FixtureResult()
+                .setName(Utils.extractTitle(method))
+                .setDescription(Utils.extractDescription(method))
+                .setStart(System.currentTimeMillis())
+                .setItemStage(ItemStage.RUNNING);
     }
 
     @Override
@@ -41,8 +95,25 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        startUtilMethod(TestMethodType.BEFORE_METHOD, invocationContext);
-        finishUtilMethod(TestMethodType.BEFORE_METHOD, invocation);
+        final String uuid = executableFixture.get();
+        FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
+        tmsManager.startPrepareFixtureEachTest(classUUID, uuid, fixture);
+        ExecutableTest test = executableTest.get();
+        if (test.isStarted()){
+            executableTest.remove();
+            test = executableTest.get();
+        }
+        fixture.setParent(test.getUuid());
+        try {
+            invocation.proceed();
+            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
+        } catch (Throwable throwable) {
+            tmsManager.updateFixture(uuid, result -> result
+                    .setItemStatus(ItemStatus.FAILED));
+        }
+
+        tmsManager.stopFixture(uuid);
+        executableFixture.remove();
     }
 
     @Override
@@ -51,30 +122,90 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) throws Exception {
-        TestMethod method = Converter.ConvertMethod(extensionContext.getRequiredTestMethod());
-        tmsService.startTestMethod(method);
+        ExecutableTest executableTest = this.executableTest.get();
+        if (executableTest.isStarted()) {
+            executableTest = refreshContext();
+        }
+        executableTest.setTestStatus();
+
+        final String uuid = executableTest.getUuid();
+        startTestCase(extensionContext.getRequiredTestMethod(), uuid);
+
+        tmsManager.updateClassContainer(classUUID,
+                container -> container.getChildren().add(uuid));
+
         try {
             invocation.proceed();
+        } catch (Throwable throwable) {
+            stopTestCase(executableTest.getUuid(), throwable, ItemStatus.FAILED);
         }
-        catch (Throwable throwable) {
-            finishTestMethod(ItemStatus.FAILED, extensionContext, throwable);
-            throw new Exception(throwable.getMessage());
-        }
+    }
+
+    protected void startTestCase(Method method, final String uuid) {
+        final TestResult result = new TestResult()
+                .setUuid(uuid)
+                .setLabels(Utils.extractLabels(method))
+                .setExternalId(Utils.extractExternalID(method))
+                .setWorkItemId(Utils.extractWorkItemId(method))
+                .setTitle(Utils.extractTitle(method))
+                .setName(Utils.extractDisplayName(method))
+                .setClassName(method.getDeclaringClass().getSimpleName())
+                .setSpaceName((method.getDeclaringClass().getPackage() == null)
+                        ? null : method.getDeclaringClass().getPackage().getName())
+                .setLinkItems(Utils.extractLinks(method))
+                .setDescription(Utils.extractDescription(method));
+
+        tmsManager.scheduleTestCase(result);
+        tmsManager.startTestCase(uuid);
     }
 
     @Override
     public void testSuccessful(ExtensionContext context) {
-        finishTestMethod(ItemStatus.PASSED, context, null);
+        final ExecutableTest executableTest = this.executableTest.get();
+        executableTest.setAfterStatus();
+        tmsManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
+        tmsManager.stopTestCase(executableTest.getUuid());
+    }
+
+    private Consumer<TestResult> setStatus(final ItemStatus status, final Throwable throwable) {
+        return result -> {
+            result.setItemStatus(status);
+            if (nonNull(throwable)) {
+                result.setThrowable(throwable);
+            }
+        };
     }
 
     @Override
     public void testAborted(ExtensionContext context, Throwable cause) {
-        finishTestMethod(ItemStatus.SKIPPED, context, cause);
+        ExecutableTest executableTest = this.executableTest.get();
+
+        //testng is being skipped as dependent on failed testng, closing context for previous testng here
+        if (executableTest.isAfter()) {
+            executableTest = refreshContext();
+        }
+
+        executableTest.setAfterStatus();
+
+        stopTestCase(executableTest.getUuid(), cause, ItemStatus.SKIPPED);
     }
 
     @Override
     public void testFailed(ExtensionContext context, Throwable cause) {
-        finishTestMethod(ItemStatus.FAILED, context, cause);
+        ExecutableTest executableTest = this.executableTest.get();
+
+        if (executableTest.isAfter()) {
+            executableTest = refreshContext();
+        }
+
+        executableTest.setAfterStatus();
+
+        stopTestCase(executableTest.getUuid(), cause, ItemStatus.FAILED);
+    }
+
+    private void stopTestCase(final String uuid, final Throwable throwable, final ItemStatus status) {
+        tmsManager.updateTestCase(uuid, setStatus(status, throwable));
+        tmsManager.stopTestCase(uuid);
     }
 
     @Override
@@ -83,8 +214,21 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        startUtilMethod(TestMethodType.AFTER_METHOD, invocationContext);
-        finishUtilMethod(TestMethodType.AFTER_METHOD, invocation);
+        final String uuid = executableFixture.get();
+        FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
+        tmsManager.startTearDownFixtureEachTest(classUUID, uuid, fixture);
+        ExecutableTest test = executableTest.get();
+        fixture.setParent(test.getUuid());
+        try {
+            invocation.proceed();
+            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
+        } catch (Throwable throwable) {
+            tmsManager.updateFixture(uuid, result -> result
+                    .setItemStatus(ItemStatus.FAILED));
+        }
+
+        tmsManager.stopFixture(uuid);
+        executableFixture.remove();
     }
 
     @Override
@@ -93,33 +237,24 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        startUtilMethod(TestMethodType.AFTER_CLASS, invocationContext);
-        finishUtilMethod(TestMethodType.AFTER_CLASS, invocation);
-    }
+        final String uuid = executableFixture.get();
+        FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
+        tmsManager.startTearDownFixtureAll(launcherUUID, uuid, fixture);
 
-    private void startUtilMethod(
-            TestMethodType methodType,
-            ReflectiveInvocationContext<Method> context
-    ) {
-        TestMethod method = Converter.ConvertMethod(context.getExecutable());
-        tmsService.startUtilMethod(methodType, method);
-    }
-
-    private void finishUtilMethod(
-            TestMethodType methodType,
-            InvocationInterceptor.Invocation<Void> invocation
-    ) {
         try {
             invocation.proceed();
-            tmsService.finishUtilMethod(methodType, null);
+            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
+        } catch (Throwable throwable) {
+            tmsManager.updateFixture(uuid, result -> result
+                    .setItemStatus(ItemStatus.FAILED));
         }
-        catch (Throwable throwable) {
-            tmsService.finishUtilMethod(methodType, throwable);
-        }
+
+        tmsManager.stopFixture(uuid);
+        executableFixture.remove();
     }
 
-    private void finishTestMethod(ItemStatus status, ExtensionContext testResult, Throwable throwable) {
-        TestMethod method = Converter.ConvertTestResult(testResult, throwable);
-        tmsService.finishTestMethod(status, method);
+    private ExecutableTest refreshContext() {
+        executableTest.remove();
+        return executableTest.get();
     }
 }
