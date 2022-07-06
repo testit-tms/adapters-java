@@ -4,7 +4,7 @@ import org.junit.jupiter.api.extension.*;
 import ru.testit.models.TestMethod;
 import ru.testit.services.TMSService;
 import ru.testit.services.TestMethodType;
-import ru.testit.services.ItemStatus;
+import ru.testit.models.ItemStatus;
 
 import java.lang.reflect.*;
 
