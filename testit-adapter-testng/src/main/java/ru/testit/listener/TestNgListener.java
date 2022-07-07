@@ -4,6 +4,7 @@ import org.testng.*;
 import ru.testit.models.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
+import ru.testit.services.ExecutableTest;
 import ru.testit.services.TmsFactory;
 import ru.testit.services.TmsManager;
 import ru.testit.services.Utils;
@@ -180,9 +181,7 @@ public class TestNgListener implements
 
     @Override
     public void onAfterClass(ITestClass testClass) {
-        getClassContainer(testClass).ifPresent(uuid -> {
-            tmsManager.stopClassContainer(uuid);
-        });
+        getClassContainer(testClass).ifPresent(tmsManager::stopClassContainer);
     }
 
     // IInvokedMethodListener

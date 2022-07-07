@@ -28,21 +28,6 @@ public enum ItemStage {
     }
 
     /**
-     * From value stage.
-     *
-     * @param s the s
-     * @return the stage
-     */
-    public static ItemStage fromValue(final String s) {
-        for (ItemStage c : ItemStage.values()) {
-            if (c.value.equals(s)) {
-                return c;
-            }
-        }
-        throw new IllegalArgumentException(s);
-    }
-
-    /**
      * Value string.
      *
      * @return the string
@@ -50,5 +35,4 @@ public enum ItemStage {
     public String value() {
         return value;
     }
-
 }

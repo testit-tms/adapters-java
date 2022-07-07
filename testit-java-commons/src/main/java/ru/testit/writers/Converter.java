@@ -1,4 +1,4 @@
-package ru.testit.writer;
+package ru.testit.writers;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.threeten.bp.OffsetDateTime;

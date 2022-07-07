@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 import ru.testit.models.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
-import ru.testit.writer.TmsWriter;
+import ru.testit.writers.TmsWriter;
+import ru.testit.writers.Writer;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -19,7 +19,7 @@ public class TmsManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TmsManager.class);
     private final ThreadContext threadContext;
     private final ResultStorage storage;
-    private final TmsWriter writer;
+    private final Writer writer;
 
     public TmsManager() {
         storage = TmsFactory.getResultStorage();

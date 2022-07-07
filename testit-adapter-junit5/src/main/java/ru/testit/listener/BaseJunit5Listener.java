@@ -12,25 +12,9 @@ import static java.util.Objects.nonNull;
 
 public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAllCallback, InvocationInterceptor, TestWatcher {
     private final TmsManager tmsManager;
-    /**
-     * Store uuid for current executable fixture.
-     */
-    private final ThreadLocal<String> executableFixture = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
-    /**
-     * Store current executable test.
-     */
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
-
-    /**
-     * Store current executable context of tests.
-     */
     private final String launcherUUID = UUID.randomUUID().toString();
-
-    /**
-     * Store current executable context of tests.
-     */
     private final String classUUID = UUID.randomUUID().toString();
-
 
     public BaseJunit5Listener() {
         tmsManager = TmsFactory.getTmsManager();
@@ -64,7 +48,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        final String uuid = executableFixture.get();
+        final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
         tmsManager.startPrepareFixtureAll(launcherUUID, uuid, fixture);
 
@@ -72,16 +56,13 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             invocation.proceed();
             tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
         } catch (Throwable throwable) {
-            tmsManager.updateFixture(uuid, result -> result
-                    .setItemStatus(ItemStatus.FAILED));
+            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
         }
 
         tmsManager.stopFixture(uuid);
-        executableFixture.remove();
     }
 
     private FixtureResult getFixtureResult(final Method method) {
-
         return new FixtureResult()
                 .setName(Utils.extractTitle(method))
                 .setDescription(Utils.extractDescription(method))
@@ -95,25 +76,25 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        final String uuid = executableFixture.get();
+        final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
         tmsManager.startPrepareFixtureEachTest(classUUID, uuid, fixture);
         ExecutableTest test = executableTest.get();
-        if (test.isStarted()){
+
+        if (test.isStarted()) {
             executableTest.remove();
             test = executableTest.get();
         }
         fixture.setParent(test.getUuid());
+
         try {
             invocation.proceed();
             tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
         } catch (Throwable throwable) {
-            tmsManager.updateFixture(uuid, result -> result
-                    .setItemStatus(ItemStatus.FAILED));
+            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
         }
 
         tmsManager.stopFixture(uuid);
-        executableFixture.remove();
     }
 
     @Override
@@ -121,7 +102,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             InvocationInterceptor.Invocation<Void> invocation,
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
-    ) throws Exception {
+    ) {
         ExecutableTest executableTest = this.executableTest.get();
         if (executableTest.isStarted()) {
             executableTest = refreshContext();
@@ -180,7 +161,6 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     public void testAborted(ExtensionContext context, Throwable cause) {
         ExecutableTest executableTest = this.executableTest.get();
 
-        //testng is being skipped as dependent on failed testng, closing context for previous testng here
         if (executableTest.isAfter()) {
             executableTest = refreshContext();
         }
@@ -214,7 +194,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        final String uuid = executableFixture.get();
+        final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
         tmsManager.startTearDownFixtureEachTest(classUUID, uuid, fixture);
         ExecutableTest test = executableTest.get();
@@ -228,7 +208,6 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         }
 
         tmsManager.stopFixture(uuid);
-        executableFixture.remove();
     }
 
     @Override
@@ -237,7 +216,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        final String uuid = executableFixture.get();
+        final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
         tmsManager.startTearDownFixtureAll(launcherUUID, uuid, fixture);
 
@@ -245,12 +224,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             invocation.proceed();
             tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
         } catch (Throwable throwable) {
-            tmsManager.updateFixture(uuid, result -> result
-                    .setItemStatus(ItemStatus.FAILED));
+            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
         }
 
         tmsManager.stopFixture(uuid);
-        executableFixture.remove();
     }
 
     private ExecutableTest refreshContext() {

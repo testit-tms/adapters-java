@@ -1,6 +1,5 @@
 package ru.testit.tms.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionLikeType;
@@ -24,10 +23,8 @@ import ru.testit.tms.models.request.*;
 import ru.testit.tms.models.response.CreateTestItemResponse;
 import ru.testit.tms.models.response.GetTestItemResponse;
 import ru.testit.tms.models.response.StartLaunchResponse;
-import ru.testit.writer.Converter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 

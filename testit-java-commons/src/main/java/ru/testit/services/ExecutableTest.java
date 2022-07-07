@@ -1,15 +1,15 @@
-package ru.testit.listener;
+package ru.testit.services;
 
 import java.util.UUID;
 
 /**
  * Describes executable test.
  */
-class ExecutableTest {
+public class ExecutableTest {
     private final String uuid;
     private ExecutableTestStage executableTestStage;
 
-    ExecutableTest() {
+    public ExecutableTest() {
         this.uuid = UUID.randomUUID().toString();
         this.executableTestStage = ExecutableTestStage.BEFORE;
     }
