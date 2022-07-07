@@ -9,13 +9,13 @@ import ru.testit.models.Label;
 
 public class Utils {
 
-    public static String extractExternalID(final Description atomicTest) {
-        final ExternalId annotation = atomicTest.getAnnotation(ExternalId.class);
+    public static String extractExternalID(final Description method) {
+        final ExternalId annotation = method.getAnnotation(ExternalId.class);
         return (annotation != null) ? annotation.value() : null;
     }
 
-    public static String extractDisplayName(final Description atomicTest) {
-        final DisplayName annotation = atomicTest.getAnnotation(DisplayName.class);
+    public static String extractDisplayName(final Description method) {
+        final DisplayName annotation = method.getAnnotation(DisplayName.class);
         return (annotation != null) ? annotation.value() : null;
     }
 
@@ -54,8 +54,8 @@ public class Utils {
         return labels;
     }
 
-    public static String extractTitle(final Description currentTest) {
-        final Title annotation = currentTest.getAnnotation(Title.class);
+    public static String extractTitle(final Description method) {
+        final Title annotation = method.getAnnotation(Title.class);
         return (annotation != null) ? annotation.value() : null;
     }
 
@@ -67,8 +67,8 @@ public class Utils {
                 .setType(linkAnnotation.type());
     }
 
-    public static String extractDescription(final Description currentTest) {
-        final ru.testit.annotations.Description annotation = currentTest.getAnnotation(ru.testit.annotations.Description.class);
+    public static String extractDescription(final Description method) {
+        final ru.testit.annotations.Description annotation = method.getAnnotation(ru.testit.annotations.Description.class);
         return (annotation != null) ? annotation.value() : null;
     }
 }

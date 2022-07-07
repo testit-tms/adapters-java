@@ -16,7 +16,6 @@ dependencies {
 
     testImplementation("junit:junit:$junitVersion")
     testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
-    testImplementation("org.aspectj:aspectjweaver:$aspectjVersion")
     testImplementation ("org.junit.platform:junit-platform-runner:1.6.3") {
         exclude("junit", "junit")
     }
@@ -36,7 +35,7 @@ tasks.compileTestJava {
 
 tasks.getByName<Test>("test") {
     useJUnit()
-
+    exclude("**/samples/*")
     doFirst {
         jvmArgs(
             "-javaagent:${agent.singleFile}"

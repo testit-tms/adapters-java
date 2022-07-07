@@ -121,7 +121,7 @@ repositories {
 
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation 'ru.testit:testit-adapter-junit:0.1'
+    testImplementation 'ru.testit:testit-adapter-junit4:0.1'
     testImplementation 'ru.testit:testit-java-commons:0.1'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.junit.platform:junit-platform-runner:1.6.3'
@@ -178,6 +178,7 @@ And fill parameters with your configuration, where:
 Annotations can be used to specify information about autotest.
 
 Description of Annotations (\* - required):
+- \*`RunWith(BaseJunit4Runner.class)` - connect the adapter package to run tests
 - `WorkItemID` - linking an autotest to a test case
 - \*`DisplayName` - name of the autotest in the Test IT system
 - \*`ExternalID` - ID of the autotest within the project in the Test IT System
