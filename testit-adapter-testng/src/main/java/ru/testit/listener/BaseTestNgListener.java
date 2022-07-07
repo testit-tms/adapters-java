@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 import static java.util.Objects.nonNull;
 
-public class TestNgListener implements
+public class BaseTestNgListener implements
         ISuiteListener,
         ITestListener,
         IClassListener,
@@ -49,7 +49,7 @@ public class TestNgListener implements
 
     private final TmsManager tmsManager;
 
-    public TestNgListener() {
+    public BaseTestNgListener() {
         tmsManager = TmsFactory.getTmsManager();
     }
 

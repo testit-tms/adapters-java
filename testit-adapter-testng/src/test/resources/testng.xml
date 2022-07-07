@@ -3,7 +3,7 @@
 
 <suite name="My suite">
     <listeners>
-        <listener class-name="ru.testit.listener.TestNgListener"/>
+        <listener class-name="ru.testit.listener.BaseTestNgListener"/>
     </listeners>
     <test name="All">
         <classes>
