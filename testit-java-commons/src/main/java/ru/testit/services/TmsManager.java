@@ -140,6 +140,22 @@ public class TmsManager {
     }
 
     /**
+     * Updates current test case
+     *
+     * @param update the update function.
+     */
+    public void updateTestCase(final Consumer<TestResult> update) {
+        final Optional<String> root = threadContext.getRoot();
+        if (!root.isPresent()) {
+            LOGGER.error("Could not update test case: no test case running");
+            return;
+        }
+
+        final String uuid = root.get();
+        updateTestCase(uuid, update);
+    }
+
+    /**
      * Updates test case by given uuid.
      *
      * @param uuid   the uuid of test case to update.

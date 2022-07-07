@@ -14,6 +14,7 @@ public class TestResult implements ResultWithSteps {
     private String spaceName;
     private List<Label> labels = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
+    private List<LinkItem> resultLinks = new ArrayList<>();
     private String name;
     private String title;
     private ItemStatus itemStatus;
@@ -161,6 +162,26 @@ public class TestResult implements ResultWithSteps {
      */
     public TestResult setLinkItems(List<LinkItem> linkItems) {
         this.linkItems = linkItems;
+        return this;
+    }
+
+    /**
+     * Gets result links.
+     *
+     * @return the links
+     */
+    public List<LinkItem> getResultLinks() {
+        return resultLinks;
+    }
+
+    /**
+     * Sets result links.
+     *
+     * @param resultLinks the test
+     * @return self for method chaining
+     */
+    public TestResult setResultLinks(List<LinkItem> resultLinks) {
+        this.resultLinks = resultLinks;
         return this;
     }
 

@@ -64,7 +64,7 @@ public class Converter {
     public static AutoTestResultsForTestRunModel testResultToAutoTestResultsForTestRunModel(TestResult result) {
         AutoTestResultsForTestRunModel model = new AutoTestResultsForTestRunModel();
 
-        model.setLinks(convertPostLinks(result.getLinkItems()));
+        model.setLinks(convertPostLinks(result.getResultLinks()));
         model.setAutoTestExternalId(result.getExternalId());
         model.setStartedOn(dateToOffsetDateTime(result.getStart()));
         model.setCompletedOn(dateToOffsetDateTime(result.getStop()));

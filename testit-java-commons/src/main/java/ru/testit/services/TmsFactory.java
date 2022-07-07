@@ -1,5 +1,8 @@
 package ru.testit.services;
 
+import ru.testit.models.LinkItem;
+import ru.testit.models.LinkType;
+
 import java.util.Objects;
 
 public final class TmsFactory {
@@ -16,5 +19,10 @@ public final class TmsFactory {
             storage = new ResultStorage();
         }
         return storage;
+    }
+
+    public static void link(final String title, final String description, final LinkType type, final String url) {
+        final LinkItem link = new LinkItem().setTitle(title).setDescription(description).setType(type).setUrl(url);
+        getTmsManager().updateTestCase(testResult -> testResult.getResultLinks().add(link));
     }
 }
