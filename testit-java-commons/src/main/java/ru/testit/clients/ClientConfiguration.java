@@ -1,4 +1,4 @@
-package ru.testit.tms.models.config;
+package ru.testit.clients;
 
 import java.util.Properties;
 

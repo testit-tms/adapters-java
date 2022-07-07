@@ -5,7 +5,6 @@ import ru.testit.client.TestResultsApi;
 import ru.testit.client.TestRunsApi;
 import ru.testit.invoker.ApiException;
 import ru.testit.model.*;
-import ru.testit.tms.models.config.ClientConfiguration;
 
 import java.util.List;
 import java.util.UUID;

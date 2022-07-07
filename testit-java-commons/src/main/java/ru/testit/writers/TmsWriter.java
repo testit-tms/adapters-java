@@ -12,7 +12,7 @@ import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;
 import ru.testit.properties.AppProperties;
 import ru.testit.services.TmsFactory;
-import ru.testit.tms.models.config.ClientConfiguration;
+import ru.testit.clients.ClientConfiguration;
 
 import java.util.*;
 

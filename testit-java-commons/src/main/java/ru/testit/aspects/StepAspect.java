@@ -22,9 +22,6 @@ public class StepAspect {
         }
     };
 
-    private static final InheritableThreadLocal<StepNode> currentStep;
-    private static final InheritableThreadLocal<StepNode> previousStep;
-
     @Pointcut("@annotation(step)")
     public void withStepAnnotation(final Step step) {
     }
@@ -60,35 +57,33 @@ public class StepAspect {
         tmsService.get().stopStep();
     }
 
-    @Pointcut("@annotation(addLink)")
-    public void withAddLinkAnnotation(final AddLink addLink) {
-    }
-
-    @Pointcut("args(linkItem)")
-    public void hasLinkArg(final LinkItem linkItem) {
-    }
-
-    @Before(value = "withAddLinkAnnotation(addLink) && hasLinkArg(linkItem) && anyMethod()", argNames = "addLink,linkItem")
-    public void startAddLink(final AddLink addLink, final LinkItem linkItem) {
-        final StepNode stepNode = StepAspect.currentStep.get();
-        if (stepNode == null) {
-            return;
-        }
-        stepNode.getLinkItems().add(linkItem);
-    }
-
-    public static void setStepNodes(final StepNode parentNode) {
-        StepAspect.previousStep.set(StepAspect.currentStep.get());
-        StepAspect.currentStep.set(parentNode);
-    }
-
-    public static void returnStepNode() {
-        StepAspect.currentStep.set(StepAspect.previousStep.get());
-        StepAspect.previousStep.set(StepAspect.currentStep.get());
-    }
-
-    static {
-        currentStep = new InheritableThreadLocal<StepNode>();
-        previousStep = new InheritableThreadLocal<StepNode>();
-    }
+//    @Pointcut("@annotation(addLink)")
+//    public void withAddLinkAnnotation(final AddLink addLink) {
+//    }
+//
+//    @Pointcut("args(linkItem)")
+//    public void hasLinkArg(final LinkItem linkItem) {
+//    }
+//
+//    @Before(value = "withAddLinkAnnotation(addLink) && hasLinkArg(linkItem) && anyMethod()", argNames = "addLink,linkItem")
+//    public void startAddLink(final AddLink addLink, final LinkItem linkItem) {
+//        final StepNode stepNode = StepAspect.currentStep.get();
+//        if (stepNode == null) {
+//            return;
+//        }
+//        stepNode.getLinkItems().add(linkItem);
+//    }
+//
+//    public static void setStepNodes(final StepNode parentNode) {
+//        StepAspect.previousStep.set(StepAspect.currentStep.get());
+//        StepAspect.currentStep.set(parentNode);
+//    }
+//
+//    public static void returnStepNode() {
+//        StepAspect.currentStep.set(StepAspect.previousStep.get());
+//        StepAspect.previousStep.set(StepAspect.currentStep.get());
+//    }
+//@AddLink
+//public static void addLink(final LinkItem linkItem) {
+//}
 }
