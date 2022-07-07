@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface ApiClient {
     TestRunV2GetModel createTestRun(TestRunV2PostShortModel model) throws ApiException;
+    TestRunV2GetModel getTestRun(String uuid) throws ApiException;
     void completeTestRun(String uuid) throws ApiException;
     void updateAutoTest(AutoTestPutModel model) throws ApiException;
     void createAutoTest(AutoTestPostModel model) throws ApiException;

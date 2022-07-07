@@ -49,7 +49,11 @@ public class TmsWriter implements Writer {
     @Override
     public void finishLaunch() {
         try {
-            apiClient.completeTestRun(config.getTestRunId());
+            TestRunV2GetModel testRun = apiClient.getTestRun(config.getTestRunId());
+
+            if (testRun.getStateName() != TestRunStateTypeModel.COMPLETED){
+                apiClient.completeTestRun(config.getTestRunId());
+            }
         } catch (ApiException e) {
             if (e.getResponseBody().contains("the StateName is already Completed")) {
                 return;

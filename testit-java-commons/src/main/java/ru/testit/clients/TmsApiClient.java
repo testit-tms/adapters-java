@@ -33,6 +33,11 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
+    public TestRunV2GetModel getTestRun(String uuid) throws ApiException {
+        return testRunsApi.getTestRunById(UUID.fromString(uuid));
+    }
+
+    @Override
     public void completeTestRun(String uuid) throws ApiException {
         testRunsApi.completeTestRun(UUID.fromString(uuid));
     }
