@@ -1,5 +1,7 @@
 package ru.testit.clients;
 
+import ru.testit.services.Utils;
+
 import java.util.Properties;
 
 public class ClientConfiguration {
@@ -12,7 +14,7 @@ public class ClientConfiguration {
     public ClientConfiguration(Properties properties) {
         this.privateToken = String.valueOf(properties.get("PrivateToken"));
         this.projectId = String.valueOf(properties.get("ProjectId"));
-        this.url = String.valueOf(properties.get("URL"));
+        this.url = Utils.urlTrim(String.valueOf(properties.get("URL")));
         this.configurationId = String.valueOf(properties.get("ConfigurationId"));
         this.testRunId = String.valueOf(properties.get("TestRunId"));
     }

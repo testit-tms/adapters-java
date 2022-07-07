@@ -71,4 +71,20 @@ public class Utils {
             .setUrl(linkAnnotation.url())
             .setType(linkAnnotation.type());
     }
+
+    public static String urlTrim(String url){
+        if (url.endsWith("/")){
+            return removeTrailing(url);
+        }
+
+        return url;
+    }
+
+    private static String removeTrailing(String s) {
+        StringBuilder sb = new StringBuilder(s);
+        if (sb.length() > 1) {
+            sb.setLength(sb.length() - 1);
+        }
+        return sb.toString();
+    }
 }
