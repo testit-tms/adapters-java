@@ -6,16 +6,19 @@ plugins {
 
 val junitVersion = "5.8.2"
 val aspectjVersion = "1.9.7"
+val slf4jVersion = "1.7.36"
+
 val agent: Configuration by configurations.creating
 
 dependencies {
     agent("org.aspectj:aspectjweaver:$aspectjVersion")
 
     implementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    implementation("org.slf4j:slf4j-api:$slf4jVersion")
+    implementation("org.slf4j:slf4j-simple:$slf4jVersion")
     implementation(project(":testit-java-commons"))
 
     testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
-    testImplementation("org.aspectj:aspectjweaver:$aspectjVersion");
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
 }
@@ -38,6 +41,7 @@ tasks.compileTestJava {
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+    exclude("**/samples/*")
     doFirst {
         jvmArgs("-javaagent:${agent.singleFile}")
     }

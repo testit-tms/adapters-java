@@ -1,8 +1,8 @@
 package ru.testit.services;
 
 import ru.testit.annotations.*;
-import ru.testit.tms.models.request.InnerLink;
-import ru.testit.tms.models.request.Label;
+import ru.testit.models.Label;
+import ru.testit.models.LinkItem;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
@@ -24,18 +24,18 @@ public class Utils {
         return (annotation != null) ? annotation.value() : null;
     }
 
-    public static List<InnerLink> extractLinks(final Method method) {
-        final List<InnerLink> links = new LinkedList<InnerLink>();
+    public static List<LinkItem> extractLinks(final Method method) {
+        final List<LinkItem> links = new LinkedList<LinkItem>();
         final Links linksAnnotation = method.getAnnotation(Links.class);
         if (linksAnnotation != null) {
             for (final Link link : linksAnnotation.links()) {
-                links.add(makeInnerLink(link));
+                links.add(makeLink(link));
             }
         }
         else {
             final Link linkAnnotation = method.getAnnotation(Link.class);
             if (linkAnnotation != null) {
-                links.add(makeInnerLink(linkAnnotation));
+                links.add(makeLink(linkAnnotation));
             }
         }
         return links;
@@ -64,12 +64,27 @@ public class Utils {
         return (annotation != null) ? annotation.value() : null;
     }
 
-    private static InnerLink makeInnerLink(final Link linkAnnotation) {
-        final InnerLink innerLink = new InnerLink();
-        innerLink.setTitle(linkAnnotation.title());
-        innerLink.setDescription(linkAnnotation.description());
-        innerLink.setUrl(linkAnnotation.url());
-        innerLink.setType(linkAnnotation.type().getValue());
-        return innerLink;
+    private static LinkItem makeLink(final Link linkAnnotation) {
+        return new LinkItem()
+            .setTitle(linkAnnotation.title())
+            .setDescription(linkAnnotation.description())
+            .setUrl(linkAnnotation.url())
+            .setType(linkAnnotation.type());
+    }
+
+    public static String urlTrim(String url){
+        if (url.endsWith("/")){
+            return removeTrailing(url);
+        }
+
+        return url;
+    }
+
+    private static String removeTrailing(String s) {
+        StringBuilder sb = new StringBuilder(s);
+        if (sb.length() > 1) {
+            sb.setLength(sb.length() - 1);
+        }
+        return sb.toString();
     }
 }

@@ -1,5 +1,7 @@
 package ru.testit.annotations;
 
+import ru.testit.models.LinkType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

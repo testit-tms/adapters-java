@@ -1,43 +1,25 @@
 package ru.testit.samples;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import ru.testit.annotations.*;
-import ru.testit.models.LinkItem;
-import ru.testit.tms.client.TMSClient;
+import ru.testit.models.LinkType;
+import ru.testit.services.Adapter;
 
 public class SampleTest {
 
-    @Step
-    @Title("doSomething")
-    @Description("doSomethingDesc")
-    private void doSomething() {
-        Assert.assertTrue(true);
-        doThird();
+    @BeforeTest
+    @Title("BeforeTest")
+    @Description("BeforeTestDesc")
+    public void befAll() {
+
     }
 
     @Step
-    @Title("doSecond")
-    @Description("doSecondDesc")
-    private void doSecond() {
-        TMSClient.addLink(new LinkItem("doSecondLink", "www.test.com", "testDesc", LinkType.RELATED));
-        doThird();
-    }
+    @Title("Step doBeforeSt")
+    @Description("Step doBeforeSt desc")
+    public void doBeforeSt() {
 
-    @Step
-    @Title("doThird")
-    @Description("doThirdDesc")
-    private void doThird() {
-        int x = 2 + 5 + 6;
-    }
-
-    @Step
-    @Title("do")
-    @Description("do")
-    private static void doAfterSt() {
-        int x = 2 + 5 + 6;
     }
 
     @BeforeClass
@@ -47,11 +29,18 @@ public class SampleTest {
         doBeforeSt();
     }
 
+    @BeforeMethod
+    @Title("Before method")
+    @Description("Desc bef met")
+    public void befMethod() {
+
+    }
+
     @Step
-    @Title("doBeforeSt")
-    @Description("doBeforeStDesc")
-    private static void doBeforeSt() {
-        int x = 2 + 5 + 6;
+    @Title("Step doSomething")
+    @Description("Step doSomething desc")
+    public void doSomething() {
+
     }
 
     @ExternalId("12345")
@@ -65,7 +54,7 @@ public class SampleTest {
             @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
     public void firstTest() {
         doSomething();
-        doSecond();
+        Adapter.link("Test 1", "Desc 1", LinkType.ISSUE, "https://testit.ru/");
         Assert.assertTrue(true);
     }
 
@@ -79,15 +68,28 @@ public class SampleTest {
             @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
             @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
     public void secondTest() {
-        doSomething();
+        Adapter.link("Test 2", "Desc 2", LinkType.DEFECT, "https://testit.ru/123");
         Assert.assertTrue(true);
+    }
+
+    @AfterMethod
+    @Title("After method")
+    @Description("Desc aft met")
+    public void aftMethod() {
+
     }
 
     @AfterClass
     @Title("AfterClass")
     @Description("AfterClassDesc")
     public void finish() {
-        doAfterSt();
+    }
+
+    @AfterTest
+    @Title("AfterTest")
+    @Description("AfterTestDesc")
+    public void aftAll() {
+
     }
 }
 

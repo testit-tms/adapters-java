@@ -190,7 +190,7 @@ Description of Annotations (\* - required):
 - `Step` - the designation of the step
 
 Description of methods:
-- `AddLink` - links in the autotest result
+- `Adapter.link` - links in the autotest result
 
 ### Examples
 
@@ -221,7 +221,7 @@ public class SimpleTest {
            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
    public void itsTrueReallyTrue() {
       step1();
-      TMSClient.addLink(new LinkItem("doSecondLink", "www.test.com", "testDesc", LinkType.RELATED));
+      Adapter.link("Test 2", "Desc 2", LinkType.DEFECT, "https://testit.ru/123");
       Assertions.assertTrue(true);
    }
 
