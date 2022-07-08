@@ -11,6 +11,7 @@ import ru.testit.services.Adapter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Converter {
@@ -36,29 +37,28 @@ public class Converter {
                 )
                 .collect(Collectors.toList());
 
-        return fixtureResults.stream().filter(f -> {
-            if (f == null) {
-                return false;
-            }
+        return fixtureResults.stream()
+                .filter(fixture -> filterSteps(parentUuid, fixture))
+                .map(fixture -> {
+                            AutoTestStepModel model = new AutoTestStepModel();
 
-            if (parentUuid != null && f.getParent() == parentUuid) {
-                return true;
-            } else if (parentUuid != null && f.getParent() != parentUuid) {
-                return false;
-            }
+                            model.setTitle(fixture.getName());
+                            model.setDescription(fixture.getDescription());
+                            model.setSteps(convertSteps(fixture.getSteps()));
 
+                            return model;
+                        }
+                ).collect(Collectors.toList());
+    }
+
+    private static boolean filterSteps(String parentUuid, FixtureResult f) {
+        if (f == null) {
+            return false;
+        }
+
+        if (parentUuid != null && Objects.equals(f.getParent(), parentUuid)) {
             return true;
-        }).map(
-                fixture -> {
-                    AutoTestStepModel model = new AutoTestStepModel();
-
-                    model.setTitle(fixture.getName());
-                    model.setDescription(fixture.getDescription());
-                    model.setSteps(convertSteps(fixture.getSteps()));
-
-                    return model;
-                }
-        ).collect(Collectors.toList());
+        } else return parentUuid == null || Objects.equals(f.getParent(), parentUuid);
     }
 
     public static AutoTestResultsForTestRunModel testResultToAutoTestResultsForTestRunModel(TestResult result) {
@@ -83,38 +83,25 @@ public class Converter {
 
     public static List<AttachmentPutModelAutoTestStepResultsModel> convertResultFixture(List<String> fixtures, String parentUuid) {
         List<FixtureResult> fixtureResults = fixtures.stream()
-                .map(f ->
-                        Adapter.getResultStorage().getFixture(f).orElse(null)
-                )
+                .map(f -> Adapter.getResultStorage().getFixture(f).orElse(null))
                 .collect(Collectors.toList());
 
-        return fixtureResults.stream().filter(f -> {
-            if (f == null) {
-                return false;
-            }
+        return fixtureResults.stream().filter(f -> filterSteps(parentUuid, f))
+                .map(fixture -> {
+                            AttachmentPutModelAutoTestStepResultsModel model =
+                                    new AttachmentPutModelAutoTestStepResultsModel();
 
-            if (parentUuid != null && f.getParent() == parentUuid) {
-                return true;
-            } else if (parentUuid != null && f.getParent() != parentUuid) {
-                return false;
-            }
+                            model.setTitle(fixture.getName());
+                            model.setDescription(fixture.getDescription());
+                            model.setStartedOn(dateToOffsetDateTime(fixture.getStart()));
+                            model.setCompletedOn(dateToOffsetDateTime(fixture.getStop()));
+                            model.setDuration(fixture.getStop() - fixture.getStart());
+                            model.setOutcome(fixture.getItemStatus().value());
+                            model.setStepResults(convertResultStep(fixture.getSteps()));
 
-            return true;
-        }).map(
-                fixture -> {
-                    AttachmentPutModelAutoTestStepResultsModel model = new AttachmentPutModelAutoTestStepResultsModel();
-
-                    model.setTitle(fixture.getName());
-                    model.setDescription(fixture.getDescription());
-                    model.setStartedOn(dateToOffsetDateTime(fixture.getStart()));
-                    model.setCompletedOn(dateToOffsetDateTime(fixture.getStop()));
-                    model.setDuration(fixture.getStop() - fixture.getStart());
-                    model.setOutcome(fixture.getItemStatus().value());
-                    model.setStepResults(convertResultStep(fixture.getSteps()));
-
-                    return model;
-                }
-        ).collect(Collectors.toList());
+                            return model;
+                        }
+                ).collect(Collectors.toList());
     }
 
     public static AutoTestPutModel testResultToAutoTestPutModel(TestResult result) {

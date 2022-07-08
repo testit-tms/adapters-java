@@ -1,7 +1,6 @@
 package ru.testit.clients;
 
 import ru.testit.client.AutoTestsApi;
-import ru.testit.client.TestResultsApi;
 import ru.testit.client.TestRunsApi;
 import ru.testit.invoker.ApiException;
 import ru.testit.model.*;
@@ -11,9 +10,11 @@ import java.util.UUID;
 
 public class TmsApiClient implements ApiClient {
     private static final String AUTH_PREFIX = "PrivateToken";
-    private TestRunsApi testRunsApi;
-    private AutoTestsApi autoTestsApi;
-    private TestResultsApi testResultsApi;
+    private static final boolean INCLUDE_STEPS = true;
+    private static final boolean INCLUDE_LABELS = true;
+
+    private final TestRunsApi testRunsApi;
+    private final AutoTestsApi autoTestsApi;
 
     public TmsApiClient(ClientConfiguration config){
         ru.testit.invoker.ApiClient apiClient = new ru.testit.invoker.ApiClient();
@@ -23,7 +24,6 @@ public class TmsApiClient implements ApiClient {
 
         testRunsApi = new TestRunsApi(apiClient);
         autoTestsApi = new AutoTestsApi(apiClient);
-        testResultsApi = new TestResultsApi(apiClient);
     }
 
     @Override
@@ -57,9 +57,9 @@ public class TmsApiClient implements ApiClient {
                 externalId, null, null, null, null,
                 null, null, null, null, null, null,
                 null, null, null, null, null, null,
-                true, true, null, null, null, null, null);
+                INCLUDE_STEPS, INCLUDE_LABELS, null, null, null, null, null);
 
-        if (tests.stream().count() == 0) {
+        if ((long) tests.size() == 0) {
             return null;
         }
 
