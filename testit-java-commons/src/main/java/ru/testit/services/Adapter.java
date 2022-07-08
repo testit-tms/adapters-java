@@ -5,14 +5,14 @@ import ru.testit.models.LinkType;
 
 import java.util.Objects;
 
-public final class TmsFactory {
-    private static TmsManager tmsManager;
+public final class Adapter {
+    private static AdapterManager adapterManager;
     private static ResultStorage storage;
-    public static TmsManager getTmsManager() {
-        if (Objects.isNull(tmsManager)) {
-            tmsManager = new TmsManager();
+    public static AdapterManager getAdapterManager() {
+        if (Objects.isNull(adapterManager)) {
+            adapterManager = new AdapterManager();
         }
-        return tmsManager;
+        return adapterManager;
     }
     public static ResultStorage getResultStorage() {
         if (Objects.isNull(storage)) {
@@ -23,6 +23,6 @@ public final class TmsFactory {
 
     public static void link(final String title, final String description, final LinkType type, final String url) {
         final LinkItem link = new LinkItem().setTitle(title).setDescription(description).setType(type).setUrl(url);
-        getTmsManager().updateTestCase(testResult -> testResult.getResultLinks().add(link));
+        getAdapterManager().updateTestCase(testResult -> testResult.getResultLinks().add(link));
     }
 }

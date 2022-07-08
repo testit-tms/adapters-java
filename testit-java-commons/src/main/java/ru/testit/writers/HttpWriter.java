@@ -11,17 +11,17 @@ import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;
 import ru.testit.properties.AppProperties;
-import ru.testit.services.TmsFactory;
+import ru.testit.services.Adapter;
 import ru.testit.clients.ClientConfiguration;
 
 import java.util.*;
 
-public class TmsWriter implements Writer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TmsWriter.class);
+public class HttpWriter implements Writer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpWriter.class);
     private final ApiClient apiClient;
     private ClientConfiguration config;
 
-    public TmsWriter() {
+    public HttpWriter() {
         Properties appProperties = AppProperties.loadProperties();
         this.config = new ClientConfiguration(appProperties);
 
@@ -87,7 +87,7 @@ public class TmsWriter implements Writer {
     @Override
     public void writeClass(ClassContainer container) {
         for (final String testUuid : container.getChildren()) {
-            TmsFactory.getResultStorage().getTestResult(testUuid).ifPresent(
+            Adapter.getResultStorage().getTestResult(testUuid).ifPresent(
                     test -> {
                         try {
                             AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(config.getProjectId(), test.getExternalId());
@@ -128,13 +128,13 @@ public class TmsWriter implements Writer {
         List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
 
         for (final String classUuid : container.getChildren()) {
-            TmsFactory.getResultStorage().getClassContainer(classUuid).ifPresent(
+            Adapter.getResultStorage().getClassContainer(classUuid).ifPresent(
                     cl -> {
                         List<AttachmentPutModelAutoTestStepResultsModel> beforeResultClass = Converter.convertResultFixture(cl.getBeforeClassMethods(), null);
                         List<AttachmentPutModelAutoTestStepResultsModel> afterResultClass = Converter.convertResultFixture(cl.getAfterClassMethods(), null);
 
                         for (final String testUuid : cl.getChildren()) {
-                            TmsFactory.getResultStorage().getTestResult(testUuid).ifPresent(
+                            Adapter.getResultStorage().getTestResult(testUuid).ifPresent(
                                     test -> {
                                         try {
                                             AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(config.getProjectId(), test.getExternalId());

@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.*;
 import ru.testit.annotations.*;
 import ru.testit.models.LinkType;
-import ru.testit.services.TmsFactory;
+import ru.testit.services.Adapter;
 
 public class SampleTest {
 
@@ -54,7 +54,7 @@ public class SampleTest {
             @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
     public void firstTest() {
         doSomething();
-        TmsFactory.link("Test 1", "Desc 1", LinkType.ISSUE, "https://testit.ru/");
+        Adapter.link("Test 1", "Desc 1", LinkType.ISSUE, "https://testit.ru/");
         Assert.assertTrue(true);
     }
 
@@ -68,7 +68,7 @@ public class SampleTest {
             @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
             @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
     public void secondTest() {
-        TmsFactory.link("Test 2", "Desc 2", LinkType.DEFECT, "https://testit.ru/123");
+        Adapter.link("Test 2", "Desc 2", LinkType.DEFECT, "https://testit.ru/123");
         Assert.assertTrue(true);
     }
 

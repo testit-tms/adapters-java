@@ -11,35 +11,35 @@ import java.util.function.Consumer;
 import static java.util.Objects.nonNull;
 
 public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAllCallback, InvocationInterceptor, TestWatcher {
-    private final TmsManager tmsManager;
+    private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
     private final String launcherUUID = UUID.randomUUID().toString();
     private final String classUUID = UUID.randomUUID().toString();
 
     public BaseJunit5Listener() {
-        tmsManager = TmsFactory.getTmsManager();
+        adapterManager = Adapter.getAdapterManager();
     }
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        tmsManager.startTests();
+        adapterManager.startTests();
 
         final MainContainer mainContainer = new MainContainer()
                 .setUuid(launcherUUID);
 
-        tmsManager.startMainContainer(mainContainer);
+        adapterManager.startMainContainer(mainContainer);
 
         final ClassContainer classContainer = new ClassContainer()
                 .setUuid(classUUID);
 
-        tmsManager.startClassContainer(launcherUUID, classContainer);
+        adapterManager.startClassContainer(launcherUUID, classContainer);
     }
 
     @Override
     public void afterAll(ExtensionContext context) {
-        tmsManager.stopClassContainer(classUUID);
-        tmsManager.stopMainContainer(launcherUUID);
-        tmsManager.stopTests();
+        adapterManager.stopClassContainer(classUUID);
+        adapterManager.stopMainContainer(launcherUUID);
+        adapterManager.stopTests();
     }
 
     @Override
@@ -50,16 +50,16 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     ) {
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        tmsManager.startPrepareFixtureAll(launcherUUID, uuid, fixture);
+        adapterManager.startPrepareFixtureAll(launcherUUID, uuid, fixture);
 
         try {
             invocation.proceed();
-            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
+            adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
         } catch (Throwable throwable) {
-            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
+            adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
         }
 
-        tmsManager.stopFixture(uuid);
+        adapterManager.stopFixture(uuid);
     }
 
     private FixtureResult getFixtureResult(final Method method) {
@@ -78,7 +78,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     ) {
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        tmsManager.startPrepareFixtureEachTest(classUUID, uuid, fixture);
+        adapterManager.startPrepareFixtureEachTest(classUUID, uuid, fixture);
         ExecutableTest test = executableTest.get();
 
         if (test.isStarted()) {
@@ -89,12 +89,12 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
         try {
             invocation.proceed();
-            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
+            adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
         } catch (Throwable throwable) {
-            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
+            adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
         }
 
-        tmsManager.stopFixture(uuid);
+        adapterManager.stopFixture(uuid);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         final String uuid = executableTest.getUuid();
         startTestCase(extensionContext.getRequiredTestMethod(), uuid);
 
-        tmsManager.updateClassContainer(classUUID,
+        adapterManager.updateClassContainer(classUUID,
                 container -> container.getChildren().add(uuid));
 
         try {
@@ -136,16 +136,16 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
                 .setLinkItems(Utils.extractLinks(method))
                 .setDescription(Utils.extractDescription(method));
 
-        tmsManager.scheduleTestCase(result);
-        tmsManager.startTestCase(uuid);
+        adapterManager.scheduleTestCase(result);
+        adapterManager.startTestCase(uuid);
     }
 
     @Override
     public void testSuccessful(ExtensionContext context) {
         final ExecutableTest executableTest = this.executableTest.get();
         executableTest.setAfterStatus();
-        tmsManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
-        tmsManager.stopTestCase(executableTest.getUuid());
+        adapterManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
+        adapterManager.stopTestCase(executableTest.getUuid());
     }
 
     private Consumer<TestResult> setStatus(final ItemStatus status, final Throwable throwable) {
@@ -184,8 +184,8 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     }
 
     private void stopTestCase(final String uuid, final Throwable throwable, final ItemStatus status) {
-        tmsManager.updateTestCase(uuid, setStatus(status, throwable));
-        tmsManager.stopTestCase(uuid);
+        adapterManager.updateTestCase(uuid, setStatus(status, throwable));
+        adapterManager.stopTestCase(uuid);
     }
 
     @Override
@@ -196,18 +196,18 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     ) {
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        tmsManager.startTearDownFixtureEachTest(classUUID, uuid, fixture);
+        adapterManager.startTearDownFixtureEachTest(classUUID, uuid, fixture);
         ExecutableTest test = executableTest.get();
         fixture.setParent(test.getUuid());
         try {
             invocation.proceed();
-            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
+            adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
         } catch (Throwable throwable) {
-            tmsManager.updateFixture(uuid, result -> result
+            adapterManager.updateFixture(uuid, result -> result
                     .setItemStatus(ItemStatus.FAILED));
         }
 
-        tmsManager.stopFixture(uuid);
+        adapterManager.stopFixture(uuid);
     }
 
     @Override
@@ -218,16 +218,16 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     ) {
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        tmsManager.startTearDownFixtureAll(launcherUUID, uuid, fixture);
+        adapterManager.startTearDownFixtureAll(launcherUUID, uuid, fixture);
 
         try {
             invocation.proceed();
-            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
+            adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
         } catch (Throwable throwable) {
-            tmsManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
+            adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
         }
 
-        tmsManager.stopFixture(uuid);
+        adapterManager.stopFixture(uuid);
     }
 
     private ExecutableTest refreshContext() {

@@ -177,7 +177,7 @@ Description of Annotations (\* - required):
 - `Step` - the designation of the step
 
 Description of methods:
-- `AddLink` - links in the autotest result
+- `Adapter.link` - links in the autotest result
 
 ### Examples
 
@@ -224,7 +224,7 @@ public class SampleTests {
 
     public void simpleTest2() {
         step1();
-        TestITClient.addLink(new LinkItem("doSecondLink", "www.test.com", "testDesc", LinkType.RELATED));
+        Adapter.link("Test 2", "Desc 2", LinkType.DEFECT, "https://testit.ru/123");
         Assert.assertTrue(true);
     }
 }

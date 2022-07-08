@@ -6,8 +6,8 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 import ru.testit.models.*;
 import ru.testit.services.ExecutableTest;
-import ru.testit.services.TmsFactory;
-import ru.testit.services.TmsManager;
+import ru.testit.services.Adapter;
+import ru.testit.services.AdapterManager;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -16,35 +16,35 @@ import static java.util.Objects.nonNull;
 @RunListener.ThreadSafe
 public class BaseJunit4Listener extends RunListener
 {
-    private final TmsManager tmsManager;
+    private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
     private final String launcherUUID = UUID.randomUUID().toString();
     private final String classUUID = UUID.randomUUID().toString();
 
     public BaseJunit4Listener() {
-        tmsManager = TmsFactory.getTmsManager();
+        adapterManager = Adapter.getAdapterManager();
     }
 
     @Override
     public void testRunStarted(final Description description) {
-        tmsManager.startTests();
+        adapterManager.startTests();
 
         final MainContainer mainContainer = new MainContainer()
                 .setUuid(launcherUUID);
 
-        tmsManager.startMainContainer(mainContainer);
+        adapterManager.startMainContainer(mainContainer);
 
         final ClassContainer classContainer = new ClassContainer()
                 .setUuid(classUUID);
 
-        tmsManager.startClassContainer(launcherUUID, classContainer);
+        adapterManager.startClassContainer(launcherUUID, classContainer);
     }
 
     @Override
     public void testRunFinished(final Result result) {
-        tmsManager.stopClassContainer(classUUID);
-        tmsManager.stopMainContainer(launcherUUID);
-        tmsManager.stopTests();
+        adapterManager.stopClassContainer(classUUID);
+        adapterManager.stopMainContainer(launcherUUID);
+        adapterManager.stopTests();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class BaseJunit4Listener extends RunListener
         final String uuid = executableTest.getUuid();
         startTestCase(description, uuid);
 
-        tmsManager.updateClassContainer(classUUID,
+        adapterManager.updateClassContainer(classUUID,
                 container -> container.getChildren().add(uuid));
     }
 
@@ -84,8 +84,8 @@ public class BaseJunit4Listener extends RunListener
     public void testFinished(final Description description) {
         final ExecutableTest executableTest = this.executableTest.get();
         executableTest.setAfterStatus();
-        tmsManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
-        tmsManager.stopTestCase(executableTest.getUuid());
+        adapterManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
+        adapterManager.stopTestCase(executableTest.getUuid());
     }
 
     private FixtureResult getFixtureResult(final Description method) {
@@ -110,13 +110,13 @@ public class BaseJunit4Listener extends RunListener
                 .setLinkItems(Utils.extractLinks(method))
                 .setDescription(Utils.extractDescription(method));
 
-        tmsManager.scheduleTestCase(result);
-        tmsManager.startTestCase(uuid);
+        adapterManager.scheduleTestCase(result);
+        adapterManager.startTestCase(uuid);
     }
 
     private void stopTestCase(final String uuid, final Throwable throwable, final ItemStatus status) {
-        tmsManager.updateTestCase(uuid, setStatus(status, throwable));
-        tmsManager.stopTestCase(uuid);
+        adapterManager.updateTestCase(uuid, setStatus(status, throwable));
+        adapterManager.stopTestCase(uuid);
     }
 
     private Consumer<TestResult> setStatus(final ItemStatus status, final Throwable throwable) {

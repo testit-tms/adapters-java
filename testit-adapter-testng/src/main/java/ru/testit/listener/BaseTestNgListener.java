@@ -5,8 +5,8 @@ import ru.testit.models.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
 import ru.testit.services.ExecutableTest;
-import ru.testit.services.TmsFactory;
-import ru.testit.services.TmsManager;
+import ru.testit.services.Adapter;
+import ru.testit.services.AdapterManager;
 import ru.testit.services.Utils;
 
 import java.lang.reflect.Method;
@@ -47,20 +47,20 @@ public class BaseTestNgListener implements
     private final Map<ITestClass, String> classContainers = new ConcurrentHashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    private final TmsManager tmsManager;
+    private final AdapterManager adapterManager;
 
     public BaseTestNgListener() {
-        tmsManager = TmsFactory.getTmsManager();
+        adapterManager = Adapter.getAdapterManager();
     }
 
     @Override
     public void onStart(final ISuite suite) {
-        tmsManager.startTests();
+        adapterManager.startTests();
     }
 
     @Override
     public void onFinish(final ISuite suite) {
-        tmsManager.stopTests();
+        adapterManager.stopTests();
     }
 
     @Override
@@ -68,12 +68,12 @@ public class BaseTestNgListener implements
         final MainContainer container = new MainContainer()
                 .setUuid(launcherUUID);
 
-        tmsManager.startMainContainer(container);
+        adapterManager.startMainContainer(container);
     }
 
     @Override
     public void onFinish(final ITestContext context) {
-        tmsManager.stopMainContainer(launcherUUID);
+        adapterManager.stopMainContainer(launcherUUID);
     }
 
     @Override
@@ -110,16 +110,16 @@ public class BaseTestNgListener implements
                 .setLinkItems(Utils.extractLinks(method))
                 .setDescription(Utils.extractDescription(method));
 
-        tmsManager.scheduleTestCase(result);
-        tmsManager.startTestCase(uuid);
+        adapterManager.scheduleTestCase(result);
+        adapterManager.startTestCase(uuid);
     }
 
     @Override
     public void onTestSuccess(final ITestResult testResult) {
         final ExecutableTest executableTest = this.executableTest.get();
         executableTest.setAfterStatus();
-        tmsManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
-        tmsManager.stopTestCase(executableTest.getUuid());
+        adapterManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
+        adapterManager.stopTestCase(executableTest.getUuid());
     }
 
     @Override
@@ -168,14 +168,14 @@ public class BaseTestNgListener implements
                 .setUuid(uuid)
                 .setName(testClass.getName());
 
-        tmsManager.startClassContainer(launcherUUID, container);
+        adapterManager.startClassContainer(launcherUUID, container);
 
         setClassContainer(testClass, uuid);
     }
 
     @Override
     public void onAfterClass(ITestClass testClass) {
-        getClassContainer(testClass).ifPresent(tmsManager::stopClassContainer);
+        getClassContainer(testClass).ifPresent(adapterManager::stopClassContainer);
     }
 
     @Override
@@ -191,11 +191,11 @@ public class BaseTestNgListener implements
     private void ifTestFixtureStarted(final ITestNGMethod testMethod) {
         if (testMethod.isBeforeTestConfiguration()) {
             final String uuid = executableFixture.get();
-            tmsManager.startPrepareFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
+            adapterManager.startPrepareFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
         }
         if (testMethod.isAfterTestConfiguration()) {
             final String uuid = executableFixture.get();
-            tmsManager.startTearDownFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
+            adapterManager.startTearDownFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
         }
     }
 
@@ -204,14 +204,14 @@ public class BaseTestNgListener implements
             getClassContainer(testMethod.getTestClass())
                     .ifPresent(parentUuid -> {
                         final String uuid = executableFixture.get();
-                        tmsManager.startPrepareFixture(parentUuid, uuid, getFixtureResult(testMethod));
+                        adapterManager.startPrepareFixture(parentUuid, uuid, getFixtureResult(testMethod));
                     });
         }
         if (testMethod.isAfterClassConfiguration()) {
             getClassContainer(testMethod.getTestClass())
                     .ifPresent(parentUuid -> {
                         final String uuid = executableFixture.get();
-                        tmsManager.startTearDownFixture(parentUuid, uuid, getFixtureResult(testMethod));
+                        adapterManager.startTearDownFixture(parentUuid, uuid, getFixtureResult(testMethod));
                     });
         }
     }
@@ -232,12 +232,12 @@ public class BaseTestNgListener implements
                         }
 
                         fixture.setParent(test.getUuid());
-                        tmsManager.startPrepareFixtureEachTest(parentUuid, uuid, fixture);
+                        adapterManager.startPrepareFixtureEachTest(parentUuid, uuid, fixture);
                     }
 
                     if (testMethod.isAfterMethodConfiguration()) {
                         fixture.setParent(test.getUuid());
-                        tmsManager.startTearDownFixtureEachTest(parentUuid, uuid, fixture);
+                        adapterManager.startTearDownFixtureEachTest(parentUuid, uuid, fixture);
                     }
                 });
     }
@@ -259,12 +259,12 @@ public class BaseTestNgListener implements
             final String executableUuid = executableFixture.get();
             executableFixture.remove();
             if (testResult.isSuccess()) {
-                tmsManager.updateFixture(executableUuid, result -> result.setItemStatus(ItemStatus.PASSED));
+                adapterManager.updateFixture(executableUuid, result -> result.setItemStatus(ItemStatus.PASSED));
             } else {
-                tmsManager.updateFixture(executableUuid, result -> result
+                adapterManager.updateFixture(executableUuid, result -> result
                         .setItemStatus(ItemStatus.FAILED));
             }
-            tmsManager.stopFixture(executableUuid);
+            adapterManager.stopFixture(executableUuid);
         }
     }
 
@@ -276,7 +276,7 @@ public class BaseTestNgListener implements
         lock.writeLock().lock();
         try {
             if (nonNull(containerUuid)) {
-                tmsManager.updateClassContainer(
+                adapterManager.updateClassContainer(
                         containerUuid,
                         container -> container.getChildren().add(childUuid)
                 );
@@ -325,8 +325,8 @@ public class BaseTestNgListener implements
     }
 
     private void stopTestCase(final String uuid, final Throwable throwable, final ItemStatus status) {
-        tmsManager.updateTestCase(uuid, setStatus(status, throwable));
-        tmsManager.stopTestCase(uuid);
+        adapterManager.updateTestCase(uuid, setStatus(status, throwable));
+        adapterManager.stopTestCase(uuid);
     }
 
     private ExecutableTest refreshContext() {

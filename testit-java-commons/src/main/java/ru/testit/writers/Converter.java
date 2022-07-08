@@ -7,7 +7,7 @@ import ru.testit.model.*;
 import ru.testit.models.FixtureResult;
 import ru.testit.models.LinkItem;
 import ru.testit.models.TestResult;
-import ru.testit.services.TmsFactory;
+import ru.testit.services.Adapter;
 
 import java.util.Date;
 import java.util.List;
@@ -32,7 +32,7 @@ public class Converter {
     public static List<AutoTestStepModel> convertFixture(List<String> fixtures, String parentUuid) {
         List<FixtureResult> fixtureResults = fixtures.stream()
                 .map(f ->
-                        TmsFactory.getResultStorage().getFixture(f).orElse(null)
+                        Adapter.getResultStorage().getFixture(f).orElse(null)
                 )
                 .collect(Collectors.toList());
 
@@ -84,7 +84,7 @@ public class Converter {
     public static List<AttachmentPutModelAutoTestStepResultsModel> convertResultFixture(List<String> fixtures, String parentUuid) {
         List<FixtureResult> fixtureResults = fixtures.stream()
                 .map(f ->
-                        TmsFactory.getResultStorage().getFixture(f).orElse(null)
+                        Adapter.getResultStorage().getFixture(f).orElse(null)
                 )
                 .collect(Collectors.toList());
 
@@ -186,7 +186,7 @@ public class Converter {
         return steps.stream().map(stepUUID -> {
             AutoTestStepModel model = new AutoTestStepModel();
 
-            TmsFactory.getResultStorage().getStep(stepUUID).ifPresent(step -> {
+            Adapter.getResultStorage().getStep(stepUUID).ifPresent(step -> {
                 model.setTitle(step.getName());
                 model.setDescription(step.getDescription());
                 model.setSteps(convertSteps(step.getSteps()));
@@ -200,7 +200,7 @@ public class Converter {
         return steps.stream().map(stepUUID -> {
             AttachmentPutModelAutoTestStepResultsModel model = new AttachmentPutModelAutoTestStepResultsModel();
 
-            TmsFactory.getResultStorage().getStep(stepUUID).ifPresent(step -> {
+            Adapter.getResultStorage().getStep(stepUUID).ifPresent(step -> {
                 model.setTitle(step.getName());
                 model.setDescription(step.getDescription());
                 model.setStartedOn(dateToOffsetDateTime(step.getStart()));

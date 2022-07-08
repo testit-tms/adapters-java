@@ -5,8 +5,8 @@ import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import ru.testit.annotations.Step;
 import ru.testit.models.*;
-import ru.testit.services.TmsFactory;
-import ru.testit.services.TmsManager;
+import ru.testit.services.Adapter;
+import ru.testit.services.AdapterManager;
 import ru.testit.services.Utils;
 
 import java.lang.reflect.Method;
@@ -14,11 +14,11 @@ import java.util.UUID;
 
 @Aspect
 public class StepAspect {
-    private static final InheritableThreadLocal<TmsManager> tmsService
-            = new InheritableThreadLocal<TmsManager>() {
+    private static final InheritableThreadLocal<AdapterManager> adapterManager
+            = new InheritableThreadLocal<AdapterManager>() {
         @Override
-        protected TmsManager initialValue() {
-            return TmsFactory.getTmsManager();
+        protected AdapterManager initialValue() {
+            return Adapter.getAdapterManager();
         }
     };
 
@@ -40,21 +40,25 @@ public class StepAspect {
                 .setName(Utils.extractTitle(method))
                 .setDescription(Utils.extractDescription(method));
 
-        tmsService.get().startStep(uuid, result);
+        getManager().startStep(uuid, result);
     }
 
     @AfterReturning(value = "anyMethod() && withStepAnnotation(step)")
     public void finishStep(Step step) {
-        tmsService.get().updateStep(s -> s.setItemStatus(ItemStatus.PASSED));
-        tmsService.get().stopStep();
+        getManager().updateStep(s -> s.setItemStatus(ItemStatus.PASSED));
+        getManager().stopStep();
     }
 
     @AfterThrowing(value = "anyMethod() && withStepAnnotation(step)", throwing = "throwable")
     public void failedStep(final Throwable throwable, Step step) {
-        tmsService.get().updateStep(s ->
+        getManager().updateStep(s ->
                 s.setItemStatus(ItemStatus.FAILED)
                         .setThrowable(throwable)
         );
-        tmsService.get().stopStep();
+        getManager().stopStep();
+    }
+
+    private AdapterManager getManager(){
+        return adapterManager.get();
     }
 }

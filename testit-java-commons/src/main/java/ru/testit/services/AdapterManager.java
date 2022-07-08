@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.testit.models.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
-import ru.testit.writers.TmsWriter;
+import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
 import java.util.Objects;
@@ -15,16 +15,16 @@ import java.util.function.Consumer;
 /**
  * This class manages data from a test framework.
  */
-public class TmsManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TmsManager.class);
+public class AdapterManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdapterManager.class);
     private final ThreadContext threadContext;
     private final ResultStorage storage;
     private final Writer writer;
 
-    public TmsManager() {
-        storage = TmsFactory.getResultStorage();
+    public AdapterManager() {
+        storage = Adapter.getResultStorage();
         threadContext = new ThreadContext();
-        writer = new TmsWriter();
+        writer = new HttpWriter();
     }
 
     public void startTests(){
