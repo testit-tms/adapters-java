@@ -24,7 +24,6 @@ public class SampleTest {
     @Title("Before method")
     @Description("Desc bef met")
     public void befMethod(){
-
         doBeforeSt();
     }
 
@@ -46,7 +45,6 @@ public class SampleTest {
             @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
     public void firstTest() {
         doSomething();
-//        doSecond();
         Assertions.assertTrue(true);
     }
 
@@ -60,7 +58,6 @@ public class SampleTest {
             @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
             @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
     public void secondTest() {
-//        doSomething();
         Assertions.assertTrue(true);
     }
 

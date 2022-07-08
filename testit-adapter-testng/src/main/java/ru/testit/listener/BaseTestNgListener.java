@@ -53,7 +53,6 @@ public class BaseTestNgListener implements
         tmsManager = TmsFactory.getTmsManager();
     }
 
-    // ISuiteListener
     @Override
     public void onStart(final ISuite suite) {
         tmsManager.startTests();
@@ -64,7 +63,6 @@ public class BaseTestNgListener implements
         tmsManager.stopTests();
     }
 
-    // ITestListener
     @Override
     public void onStart(final ITestContext context) {
         final MainContainer container = new MainContainer()
@@ -132,7 +130,6 @@ public class BaseTestNgListener implements
             executableTest = refreshContext();
         }
 
-        //if testng has failed without any setup
         if (!executableTest.isStarted()) {
             createTestResultForTestWithoutSetup(result);
         }
@@ -146,12 +143,10 @@ public class BaseTestNgListener implements
     public void onTestSkipped(final ITestResult result) {
         ExecutableTest executableTest = this.executableTest.get();
 
-        //testng is being skipped as dependent on failed testng, closing context for previous testng here
         if (executableTest.isAfter()) {
             executableTest = refreshContext();
         }
 
-        //if testng was skipped without any setup
         if (!executableTest.isStarted()) {
             createTestResultForTestWithoutSetup(result);
         }
@@ -166,7 +161,6 @@ public class BaseTestNgListener implements
         //do nothing
     }
 
-    // IClassListener
     @Override
     public void onBeforeClass(ITestClass testClass) {
         final String uuid = UUID.randomUUID().toString();
@@ -184,7 +178,6 @@ public class BaseTestNgListener implements
         getClassContainer(testClass).ifPresent(tmsManager::stopClassContainer);
     }
 
-    // IInvokedMethodListener
     @Override
     public void beforeInvocation(final IInvokedMethod method, final ITestResult testResult) {
         final ITestNGMethod testMethod = method.getTestMethod();
