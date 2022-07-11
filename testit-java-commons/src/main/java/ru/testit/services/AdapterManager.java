@@ -2,14 +2,19 @@ package ru.testit.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.testit.clients.ApiClient;
+import ru.testit.clients.ClientConfiguration;
+import ru.testit.clients.TmsApiClient;
 import ru.testit.models.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
+import ru.testit.properties.AppProperties;
 import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.function.Consumer;
 
 /**
@@ -24,7 +29,12 @@ public class AdapterManager {
     public AdapterManager() {
         storage = Adapter.getResultStorage();
         threadContext = new ThreadContext();
-        writer = new HttpWriter();
+
+        Properties appProperties = AppProperties.loadProperties();
+        ClientConfiguration clientConfiguration = new ClientConfiguration(appProperties);
+        ApiClient client = new TmsApiClient(clientConfiguration);
+
+        writer = new HttpWriter(clientConfiguration, client, storage);
     }
 
     public void startTests(){

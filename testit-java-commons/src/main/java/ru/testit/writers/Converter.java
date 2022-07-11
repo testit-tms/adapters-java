@@ -5,6 +5,7 @@ import org.threeten.bp.OffsetDateTime;
 import org.threeten.bp.ZoneOffset;
 import ru.testit.model.*;
 import ru.testit.models.FixtureResult;
+import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 import ru.testit.models.TestResult;
 import ru.testit.services.Adapter;
@@ -26,6 +27,7 @@ public class Converter {
         model.setTitle(result.getTitle());
         model.setLinks(convertPostLinks(result.getLinkItems()));
         model.setSteps(convertSteps(result.getSteps()));
+        model.setLabels(labelsPostConvert(result.getLabels()));
 
         return model;
     }
@@ -115,6 +117,7 @@ public class Converter {
         model.setTitle(result.getTitle());
         model.setLinks(convertPutLinks(result.getLinkItems()));
         model.setSteps(convertSteps(result.getSteps()));
+        model.setLabels(labelsPostConvert(result.getLabels()));
 
         return model;
     }
@@ -202,6 +205,16 @@ public class Converter {
     }
 
     private static List<LabelPostModel> labelsConvert(List<LabelShortModel> labels) {
+        return labels.stream().map(label -> {
+            LabelPostModel model = new LabelPostModel();
+
+            model.setName(label.getName());
+
+            return model;
+        }).collect(Collectors.toList());
+    }
+
+    private static List<LabelPostModel> labelsPostConvert(List<Label> labels) {
         return labels.stream().map(label -> {
             LabelPostModel model = new LabelPostModel();
 

@@ -16,6 +16,7 @@ public class Label
         return this.name;
     }
 
+    // TODO Make set method as builder
     /**
      * Sets name.
      *

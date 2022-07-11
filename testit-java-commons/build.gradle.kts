@@ -14,6 +14,10 @@ dependencies {
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
     implementation("ru.testit:testit-api-client:0.1")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+    testImplementation ("org.mockito:mockito-core:4.6.1")
 }
 
 tasks.getByName<Test>("test") {

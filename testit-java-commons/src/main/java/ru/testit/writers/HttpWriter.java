@@ -4,33 +4,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.testit.clients.ApiClient;
-import ru.testit.clients.TmsApiClient;
 import ru.testit.invoker.ApiException;
 import ru.testit.model.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;
-import ru.testit.properties.AppProperties;
-import ru.testit.services.Adapter;
 import ru.testit.clients.ClientConfiguration;
+import ru.testit.services.ResultStorage;
 
 import java.util.*;
 
 public class HttpWriter implements Writer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpWriter.class);
     private final ApiClient apiClient;
-    private ClientConfiguration config;
+    private final ResultStorage storage;
+    private final ClientConfiguration config;
 
-    public HttpWriter() {
-        Properties appProperties = AppProperties.loadProperties();
-        this.config = new ClientConfiguration(appProperties);
-
-        apiClient = new TmsApiClient(config);
+    public HttpWriter(ClientConfiguration config, ApiClient client, ResultStorage storage) {
+        this.config = config;
+        this.apiClient = client;
+        this.storage = storage;
     }
 
     @Override
     public void startLaunch() {
-        if (this.config.getTestRunId() != "null") {
+        if (!Objects.equals(this.config.getTestRunId(), "null")) {
             return;
         }
 
@@ -87,7 +85,7 @@ public class HttpWriter implements Writer {
     @Override
     public void writeClass(ClassContainer container) {
         for (final String testUuid : container.getChildren()) {
-            Adapter.getResultStorage().getTestResult(testUuid).ifPresent(
+            storage.getTestResult(testUuid).ifPresent(
                     test -> {
                         try {
                             AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(config.getProjectId(), test.getExternalId());
@@ -128,13 +126,13 @@ public class HttpWriter implements Writer {
         List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
 
         for (final String classUuid : container.getChildren()) {
-            Adapter.getResultStorage().getClassContainer(classUuid).ifPresent(
+            storage.getClassContainer(classUuid).ifPresent(
                     cl -> {
                         List<AttachmentPutModelAutoTestStepResultsModel> beforeResultClass = Converter.convertResultFixture(cl.getBeforeClassMethods(), null);
                         List<AttachmentPutModelAutoTestStepResultsModel> afterResultClass = Converter.convertResultFixture(cl.getAfterClassMethods(), null);
 
                         for (final String testUuid : cl.getChildren()) {
-                            Adapter.getResultStorage().getTestResult(testUuid).ifPresent(
+                            storage.getTestResult(testUuid).ifPresent(
                                     test -> {
                                         try {
                                             AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(config.getProjectId(), test.getExternalId());
