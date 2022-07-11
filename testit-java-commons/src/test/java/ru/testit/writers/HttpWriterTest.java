@@ -7,9 +7,7 @@ import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.invoker.ApiException;
 import ru.testit.model.*;
-import ru.testit.models.ClassContainer;
-import ru.testit.models.MainContainer;
-import ru.testit.models.TestResult;
+import ru.testit.models.*;
 import ru.testit.services.ResultStorage;
 
 import java.util.Optional;
@@ -109,11 +107,14 @@ class HttpWriterTest {
     void writeTest_WithExistingAutoTest_InvokeUpdateHandler() throws ApiException {
         // arrange
         TestResult testResult = Helper.generateTestResult();
-        AutoTestModel response = Helper.generateAutoTestModel();
+        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+        StepResult stepResult = Helper.generateStepResult();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
+        when(storage.getStep(testResult.getSteps().get(0)))
+                .thenReturn(Optional.of(stepResult));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -121,8 +122,7 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        // TODO needs to use AutoTestPutModel
-        verify(client, times(1)).updateAutoTest(any(AutoTestPutModel.class));
+        verify(client, times(1)).updateAutoTest(request);
     }
 
     @Test
@@ -130,9 +130,12 @@ class HttpWriterTest {
         // arrange
         TestResult testResult = Helper.generateTestResult();
         AutoTestPostModel request = Helper.generateAutoTestPostModel(config.getProjectId());
+        StepResult stepResult = Helper.generateStepResult();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(null);
+        when(storage.getStep(testResult.getSteps().get(0)))
+                .thenReturn(Optional.of(stepResult));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -140,8 +143,7 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        // TODO needs to use AutoTestPostModel
-        verify(client, times(1)).createAutoTest(any(AutoTestPostModel.class));
+        verify(client, times(1)).createAutoTest(request);
     }
 
     @Test
@@ -169,12 +171,25 @@ class HttpWriterTest {
         // arrange
         ClassContainer container = Helper.generateClassContainer();
         TestResult testResult = Helper.generateTestResult();
-        AutoTestModel response = Helper.generateAutoTestModel();
+        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+        request.getSetup().add(Helper.generateBeforeEachSetup());
+        request.getTeardown().add(Helper.generateAfterEachSetup());
+
+        StepResult stepResult = Helper.generateStepResult();
+        FixtureResult fixtureResultBeforeEach = Helper.generateBeforeEachFixtureResult();
+        FixtureResult fixtureResultAfterEach = Helper.generateAfterEachFixtureResult();
 
         when(storage.getTestResult(testResult.getUuid()))
                 .thenReturn(Optional.of(testResult));
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
+        when(storage.getStep(testResult.getSteps().get(0)))
+                .thenReturn(Optional.of(stepResult));
+        when(storage.getFixture(container.getBeforeEachTest().get(0)))
+                .thenReturn(Optional.of(fixtureResultBeforeEach));
+        when(storage.getFixture(container.getAfterEachTest().get(0)))
+                .thenReturn(Optional.of(fixtureResultAfterEach));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -182,8 +197,7 @@ class HttpWriterTest {
         writer.writeClass(container);
 
         // assert
-        // TODO needs to use AutoTestPutModel
-        verify(client,  times(1)).updateAutoTest(any(AutoTestPutModel.class));
+        verify(client, times(1)).updateAutoTest(request);
     }
 
     @Test
@@ -216,7 +230,21 @@ class HttpWriterTest {
         MainContainer container = Helper.generateMainContainer();
         ClassContainer classContainer = Helper.generateClassContainer();
         TestResult testResult = Helper.generateTestResult();
-        AutoTestModel response = Helper.generateAutoTestModel();
+        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+        response.getSetup().add(Helper.generateBeforeEachSetup());
+        response.getTeardown().add(Helper.generateAfterEachSetup());
+
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+        request.getSetup().add(Helper.generateBeforeAllSetup());
+        request.getSetup().add(Helper.generateBeforeEachSetup());
+        request.getTeardown().add(Helper.generateAfterAllSetup());
+        request.getTeardown().add(Helper.generateAfterEachSetup());
+
+        StepResult stepResult = Helper.generateStepResult();
+        FixtureResult fixtureResultBeforeEach = Helper.generateBeforeEachFixtureResult();
+        FixtureResult fixtureResultAfterEach = Helper.generateAfterEachFixtureResult();
+        FixtureResult fixtureResultBeforeAll = Helper.generateBeforeAllFixtureResult();
+        FixtureResult fixtureResultAfterAll = Helper.generateAfterAllFixtureResult();
 
         when(storage.getClassContainer(classContainer.getUuid()))
                 .thenReturn(Optional.of(classContainer));
@@ -224,6 +252,16 @@ class HttpWriterTest {
                 .thenReturn(Optional.of(testResult));
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
+        when(storage.getStep(testResult.getSteps().get(0)))
+                .thenReturn(Optional.of(stepResult));
+        when(storage.getFixture(classContainer.getBeforeEachTest().get(0)))
+                .thenReturn(Optional.of(fixtureResultBeforeEach));
+        when(storage.getFixture(classContainer.getAfterEachTest().get(0)))
+                .thenReturn(Optional.of(fixtureResultAfterEach));
+        when(storage.getFixture(container.getBeforeMethods().get(0)))
+                .thenReturn(Optional.of(fixtureResultBeforeAll));
+        when(storage.getFixture(container.getAfterMethods().get(0)))
+                .thenReturn(Optional.of(fixtureResultAfterAll));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -231,8 +269,7 @@ class HttpWriterTest {
         writer.writeTests(container);
 
         // assert
-        // TODO needs to use AutoTestPutModel
-        verify(client,  times(1)).updateAutoTest(any(AutoTestPutModel.class));
+        verify(client, times(1)).updateAutoTest(request);
         verify(client, times(1)).sendTestResults(eq(TEST_RUN_ID), any());
     }
 }
