@@ -147,7 +147,10 @@ public class HttpWriter implements Writer {
                                             beforeFinish.addAll(autoTestPutModel.getSetup());
                                             autoTestPutModel.setSetup(beforeFinish);
 
+                                            List<AutoTestStepModel> afterClass = Converter.convertFixture(storage, cl.getAfterClassMethods(), null);
+
                                             List<AutoTestStepModel> afterFinish = afterAll;
+                                            afterFinish.addAll(afterClass);
                                             afterFinish.addAll(autoTestPutModel.getTeardown());
                                             autoTestPutModel.setTeardown(afterFinish);
 
