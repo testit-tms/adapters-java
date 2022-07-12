@@ -12,6 +12,8 @@ public class ThreadContext {
 
     /**
      * Returns last (most recent) uuid.
+     *
+     * @return last uuid.
      */
     public Optional<String> getCurrent() {
         final LinkedList<String> uuids = context.get();
@@ -22,6 +24,8 @@ public class ThreadContext {
 
     /**
      * Returns first (oldest) uuid.
+     *
+     * @return first uuid.
      */
     public Optional<String> getRoot() {
         final LinkedList<String> uuids = context.get();
@@ -32,6 +36,8 @@ public class ThreadContext {
 
     /**
      * Adds new uuid.
+     *
+     * @param uuid the value
      */
     public void start(final String uuid) {
         Objects.requireNonNull(uuid, "step uuid");
