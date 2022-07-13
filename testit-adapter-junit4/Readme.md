@@ -8,8 +8,9 @@ Copy the contents of the **"packages"** folder to to `{%HOME_FOLDER%}/.m2/reposi
 
 ## Usage
 
-#### Maven
-1. Add to **pom.xml** following lines:
+#### Maven users
+
+1. Add this dependency to your project's POM:
     ````
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -93,8 +94,9 @@ Copy the contents of the **"packages"** folder to to `{%HOME_FOLDER%}/.m2/reposi
     ````
 2. Press "Reload All Maven Projects" button
 
-#### Gradle
-1. Add to **build.gradle** following lines:
+#### Gradle users
+
+1. Add this dependency to your project's build file:
 ```
 plugins {
    id 'java'
@@ -173,7 +175,7 @@ And fill parameters with your configuration, where:
 
 > TEST_RUN_ID is optional. If it's not provided than it create automatically.
 
-### Tags
+### Annotations
 
 Annotations can be used to specify information about autotest.
 
