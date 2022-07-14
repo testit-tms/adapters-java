@@ -102,7 +102,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             InvocationInterceptor.Invocation<Void> invocation,
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
-    ) {
+    ) throws Exception {
         ExecutableTest executableTest = this.executableTest.get();
         if (executableTest.isStarted()) {
             executableTest = refreshContext();
@@ -119,6 +119,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             invocation.proceed();
         } catch (Throwable throwable) {
             stopTestCase(executableTest.getUuid(), throwable, ItemStatus.FAILED);
+            throw new Exception(throwable.getMessage());
         }
     }
 
