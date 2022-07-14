@@ -1,6 +1,6 @@
 package ru.testit.writers;
 
-import ru.testit.model.*;
+import ru.testit.client.model.*;
 import ru.testit.models.*;
 import ru.testit.models.LinkType;
 
@@ -312,7 +312,7 @@ public class Helper {
         link.setTitle(LINK_TITLE);
         link.setDescription(LINK_DESCRIPTION);
         link.setUrl(LINK_URL);
-        link.setType(ru.testit.model.LinkType.fromValue(LINK_TYPE.getValue()));
+        link.setType(ru.testit.client.model.LinkType.fromValue(LINK_TYPE.getValue()));
 
         links.add(link);
 
@@ -326,7 +326,7 @@ public class Helper {
         link.setTitle(LINK_TITLE);
         link.setDescription(LINK_DESCRIPTION);
         link.setUrl(LINK_URL);
-        link.setType(ru.testit.model.LinkType.fromValue(LINK_TYPE.getValue()));
+        link.setType(ru.testit.client.model.LinkType.fromValue(LINK_TYPE.getValue()));
 
         links.add(link);
 
