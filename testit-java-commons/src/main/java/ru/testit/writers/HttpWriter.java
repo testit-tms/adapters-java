@@ -149,9 +149,9 @@ public class HttpWriter implements Writer {
 
                                             List<AutoTestStepModel> afterClass = Converter.convertFixture(storage, cl.getAfterClassMethods(), null);
 
-                                            List<AutoTestStepModel> afterFinish = afterAll;
+                                            List<AutoTestStepModel> afterFinish = autoTestPutModel.getTeardown();
                                             afterFinish.addAll(afterClass);
-                                            afterFinish.addAll(autoTestPutModel.getTeardown());
+                                            afterFinish.addAll(afterAll);
                                             autoTestPutModel.setTeardown(afterFinish);
 
                                             apiClient.updateAutoTest(autoTestPutModel);
@@ -172,9 +172,9 @@ public class HttpWriter implements Writer {
                                             List<AttachmentPutModelAutoTestStepResultsModel> afterResultEach =
                                                     Converter.convertResultFixture(storage, cl.getAfterEachTest(), testUuid);
                                             List<AttachmentPutModelAutoTestStepResultsModel> afterResultFinish = new ArrayList<>();
-                                            afterResultFinish.addAll(afterResultAll);
-                                            afterResultFinish.addAll(afterResultClass);
                                             afterResultFinish.addAll(afterResultEach);
+                                            afterResultFinish.addAll(afterResultClass);
+                                            afterResultFinish.addAll(afterResultAll);
 
                                             autoTestResultsForTestRunModel.setSetupResults(beforeResultFinish);
                                             autoTestResultsForTestRunModel.setTeardownResults(afterResultFinish);
