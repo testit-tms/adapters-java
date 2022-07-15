@@ -16,7 +16,7 @@ public class Helper {
     private final static String NAME = "Test name";
     private final static String CLASS_NAME = "ClassName";
     private final static String SPACE_NAME = "SpaceName";
-    private final static String WORK_ITEM_ID = "WorkItemId";
+    private final static String WORK_ITEM_ID = "6523";
     private final static ItemStatus ITEM_STATUS = ItemStatus.PASSED;
     private final static String TEST_UUID = "99d77db9-8d68-4835-9e17-3a6333f01251";
 
@@ -101,6 +101,7 @@ public class Helper {
         model.setLabels(generateShortLabels());
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
+        model.setId(UUID.fromString(TEST_UUID));
 
         return model;
     }
@@ -120,6 +121,7 @@ public class Helper {
         model.setProjectId(UUID.fromString(projectId));
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
+        model.setId(UUID.fromString(TEST_UUID));
 
         return model;
     }

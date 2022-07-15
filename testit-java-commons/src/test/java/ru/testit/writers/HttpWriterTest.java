@@ -109,6 +109,7 @@ class HttpWriterTest {
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+        request.setId(null);
         StepResult stepResult = Helper.generateStepResult();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
@@ -144,6 +145,44 @@ class HttpWriterTest {
 
         // assert
         verify(client, times(1)).createAutoTest(request);
+    }
+
+    @Test
+    void writeTest_WithWorkItemId_InvokeUpdateHandler() throws ApiException {
+        // arrange
+        TestResult testResult = Helper.generateTestResult();
+        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+        String autotestId = response.getId().toString();
+        String workItemGlobalId = testResult.getWorkItemId();
+
+        when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
+                .thenReturn(response);
+
+        Writer writer = new HttpWriter(config, client, storage);
+
+        // act
+        writer.writeTest(testResult);
+
+        // assert
+        verify(client, times(1)).linkAutoTestToWorkItem(autotestId, workItemGlobalId);
+    }
+
+    @Test
+    void writeTest_WithoutWorkItemId_InvokeUpdateHandler() throws ApiException {
+        // arrange
+        TestResult testResult = Helper.generateTestResult()
+                .setWorkItemId(null);
+        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+        String autotestId = response.getId().toString();
+        String workItemGlobalId = testResult.getWorkItemId();
+
+        Writer writer = new HttpWriter(config, client, storage);
+
+        // act
+        writer.writeTest(testResult);
+
+        // assert
+        verify(client, times(0)).linkAutoTestToWorkItem(autotestId, workItemGlobalId);
     }
 
     @Test
@@ -237,8 +276,8 @@ class HttpWriterTest {
         AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
         request.getSetup().add(Helper.generateBeforeAllSetup());
         request.getSetup().add(Helper.generateBeforeEachSetup());
-        request.getTeardown().add(Helper.generateAfterAllSetup());
         request.getTeardown().add(Helper.generateAfterEachSetup());
+        request.getTeardown().add(Helper.generateAfterAllSetup());
 
         StepResult stepResult = Helper.generateStepResult();
         FixtureResult fixtureResultBeforeEach = Helper.generateBeforeEachFixtureResult();
