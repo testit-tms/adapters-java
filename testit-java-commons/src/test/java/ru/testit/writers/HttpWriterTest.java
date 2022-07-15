@@ -106,9 +106,10 @@ class HttpWriterTest {
     @Test
     void writeTest_WithExistingAutoTest_InvokeUpdateHandler() throws ApiException {
         // arrange
-        TestResult testResult = Helper.generateTestResult(false);
+        TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId(), false);
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+        request.setId(null);
         StepResult stepResult = Helper.generateStepResult();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
@@ -128,7 +129,7 @@ class HttpWriterTest {
     @Test
     void writeTest_WithCreatingAutoTest_InvokeCreateHandler() throws ApiException {
         // arrange
-        TestResult testResult = Helper.generateTestResult(false);
+        TestResult testResult = Helper.generateTestResult();
         AutoTestPostModel request = Helper.generateAutoTestPostModel(config.getProjectId());
         StepResult stepResult = Helper.generateStepResult();
 
@@ -149,7 +150,7 @@ class HttpWriterTest {
     @Test
     void writeTest_WithWorkItemId_InvokeUpdateHandler() throws ApiException {
         // arrange
-        TestResult testResult = Helper.generateTestResult(true);
+        TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         String autotestId = response.getId().toString();
         String workItemGlobalId = testResult.getWorkItemId();
@@ -169,7 +170,8 @@ class HttpWriterTest {
     @Test
     void writeTest_WithoutWorkItemId_InvokeUpdateHandler() throws ApiException {
         // arrange
-        TestResult testResult = Helper.generateTestResult(false);
+        TestResult testResult = Helper.generateTestResult()
+                .setWorkItemId(null);
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         String autotestId = response.getId().toString();
         String workItemGlobalId = testResult.getWorkItemId();
@@ -187,7 +189,7 @@ class HttpWriterTest {
     void writeClass_WithoutAutoTest_NoInvokeUpdateHandler() throws ApiException {
         // arrange
         ClassContainer container = Helper.generateClassContainer();
-        TestResult testResult = Helper.generateTestResult(false);
+        TestResult testResult = Helper.generateTestResult();
 
         when(storage.getTestResult(testResult.getUuid()))
                 .thenReturn(Optional.of(testResult));
@@ -207,9 +209,9 @@ class HttpWriterTest {
     void writeClass_WithAutoTest_InvokeUpdateHandler() throws ApiException {
         // arrange
         ClassContainer container = Helper.generateClassContainer();
-        TestResult testResult = Helper.generateTestResult(false);
+        TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId(), true);
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
         request.getSetup().add(Helper.generateBeforeEachSetup());
         request.getTeardown().add(Helper.generateAfterEachSetup());
 
@@ -242,7 +244,7 @@ class HttpWriterTest {
         // arrange
         MainContainer container = Helper.generateMainContainer();
         ClassContainer classContainer = Helper.generateClassContainer();
-        TestResult testResult = Helper.generateTestResult(false);
+        TestResult testResult = Helper.generateTestResult();
 
         when(storage.getClassContainer(classContainer.getUuid()))
                 .thenReturn(Optional.of(classContainer));
@@ -266,12 +268,12 @@ class HttpWriterTest {
         // arrange
         MainContainer container = Helper.generateMainContainer();
         ClassContainer classContainer = Helper.generateClassContainer();
-        TestResult testResult = Helper.generateTestResult(false);
+        TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         response.getSetup().add(Helper.generateBeforeEachSetup());
         response.getTeardown().add(Helper.generateAfterEachSetup());
 
-        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId(), true);
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
         request.getSetup().add(Helper.generateBeforeAllSetup());
         request.getSetup().add(Helper.generateBeforeEachSetup());
         request.getTeardown().add(Helper.generateAfterEachSetup());

@@ -49,7 +49,7 @@ public class Helper {
     private final static String AFTER_ALL_NAME = "After All name";
     private final static String AFTER_ALL_DESCRIPTION = "After All description";
 
-    public static TestResult generateTestResult(boolean withWorkItemId) {
+    public static TestResult generateTestResult() {
         Date startDate = new Date();
         Date stopDate = new Date(startDate.getTime() + 1000);
 
@@ -77,14 +77,11 @@ public class Helper {
                 .setSpaceName(SPACE_NAME)
                 .setStart(startDate.getTime())
                 .setStop(stopDate.getTime())
+                .setWorkItemId(WORK_ITEM_ID)
                 .setItemStatus(ITEM_STATUS)
                 .setLinkItems(links)
                 .setSteps(steps)
                 .setLabels(labels);
-
-        if (withWorkItemId) {
-            testResult.setWorkItemId(WORK_ITEM_ID);
-        }
 
         return testResult;
     }
@@ -109,7 +106,7 @@ public class Helper {
         return model;
     }
 
-    public static AutoTestPutModel generateAutoTestPutModel(String projectId, boolean convertFromPostModel) {
+    public static AutoTestPutModel generateAutoTestPutModel(String projectId) {
         AutoTestPutModel model = new AutoTestPutModel();
 
         model.setTitle(TITLE);
@@ -124,10 +121,7 @@ public class Helper {
         model.setProjectId(UUID.fromString(projectId));
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
-
-        if (convertFromPostModel) {
-            model.setId(UUID.fromString(TEST_UUID));
-        }
+        model.setId(UUID.fromString(TEST_UUID));
 
         return model;
     }
