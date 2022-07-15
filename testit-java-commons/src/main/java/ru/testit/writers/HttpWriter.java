@@ -69,6 +69,7 @@ public class HttpWriter implements Writer {
                 AutoTestPutModel autoTestPutModel = Converter.testResultToAutoTestPutModel(storage, testResult);
                 autoTestPutModel.setProjectId(UUID.fromString(config.getProjectId()));
                 apiClient.updateAutoTest(autoTestPutModel);
+                apiClient.linkAutoTestToWorkItem(test.getId().toString(), testResult.getWorkItemId());
 
                 return;
             }
@@ -76,7 +77,8 @@ public class HttpWriter implements Writer {
             AutoTestPostModel model = Converter.testResultToAutoTestPostModel(storage, testResult);
             model.setProjectId(UUID.fromString(config.getProjectId()));
 
-            apiClient.createAutoTest(model);
+            String autoTestId = apiClient.createAutoTest(model);
+            apiClient.linkAutoTestToWorkItem(autoTestId, testResult.getWorkItemId());
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: ".concat(e.getMessage()));
         }

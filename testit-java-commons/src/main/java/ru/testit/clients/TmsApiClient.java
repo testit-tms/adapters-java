@@ -47,8 +47,8 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public void createAutoTest(AutoTestPostModel model) throws ApiException {
-        autoTestsApi.createAutoTest(model);
+    public String createAutoTest(AutoTestPostModel model) throws ApiException {
+        return autoTestsApi.createAutoTest(model).getId().toString();
     }
 
     @Override
@@ -64,6 +64,11 @@ public class TmsApiClient implements ApiClient {
         }
 
         return tests.get(0);
+    }
+
+    @Override
+    public void linkAutoTestToWorkItem(String id, String workItemId) throws ApiException {
+        autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
     }
 
     @Override
