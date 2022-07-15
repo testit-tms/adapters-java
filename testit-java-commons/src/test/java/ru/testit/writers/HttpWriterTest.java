@@ -108,7 +108,7 @@ class HttpWriterTest {
         // arrange
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId(), false);
         StepResult stepResult = Helper.generateStepResult();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
@@ -172,7 +172,7 @@ class HttpWriterTest {
         ClassContainer container = Helper.generateClassContainer();
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId(), true);
         request.getSetup().add(Helper.generateBeforeEachSetup());
         request.getTeardown().add(Helper.generateAfterEachSetup());
 
@@ -234,11 +234,11 @@ class HttpWriterTest {
         response.getSetup().add(Helper.generateBeforeEachSetup());
         response.getTeardown().add(Helper.generateAfterEachSetup());
 
-        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId(), true);
         request.getSetup().add(Helper.generateBeforeAllSetup());
         request.getSetup().add(Helper.generateBeforeEachSetup());
-        request.getTeardown().add(Helper.generateAfterAllSetup());
         request.getTeardown().add(Helper.generateAfterEachSetup());
+        request.getTeardown().add(Helper.generateAfterAllSetup());
 
         StepResult stepResult = Helper.generateStepResult();
         FixtureResult fixtureResultBeforeEach = Helper.generateBeforeEachFixtureResult();

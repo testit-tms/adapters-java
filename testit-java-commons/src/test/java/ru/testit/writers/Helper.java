@@ -101,11 +101,12 @@ public class Helper {
         model.setLabels(generateShortLabels());
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
+        model.setId(UUID.fromString(TEST_UUID));
 
         return model;
     }
 
-    public static AutoTestPutModel generateAutoTestPutModel(String projectId) {
+    public static AutoTestPutModel generateAutoTestPutModel(String projectId, boolean convertFromPostModel) {
         AutoTestPutModel model = new AutoTestPutModel();
 
         model.setTitle(TITLE);
@@ -120,6 +121,9 @@ public class Helper {
         model.setProjectId(UUID.fromString(projectId));
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
+        if (convertFromPostModel) {
+            model.setId(UUID.fromString(TEST_UUID));
+        }
 
         return model;
     }
