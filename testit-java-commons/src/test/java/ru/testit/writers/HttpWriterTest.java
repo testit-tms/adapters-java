@@ -3,10 +3,10 @@ package ru.testit.writers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import ru.testit.client.invoker.ApiException;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
-import ru.testit.invoker.ApiException;
-import ru.testit.model.*;
+import ru.testit.client.model.*;
 import ru.testit.models.*;
 import ru.testit.services.ResultStorage;
 

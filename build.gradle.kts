@@ -1,11 +1,24 @@
 plugins {
     java
     `maven-publish`
+    signing
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
+
+group = "ru.testit"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        }
+    }
 }
 
 tasks.withType(JavaCompile::class) {
@@ -16,6 +29,7 @@ configure(subprojects) {
     group = "ru.testit"
     version = version
 
+    apply(plugin = "signing")
     apply(plugin = "maven-publish")
     apply(plugin = "java")
 
@@ -38,6 +52,13 @@ configure(subprojects) {
                             url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                         }
                     }
+                    developers {
+                        developer {
+                            id.set("integration")
+                            name.set("Integration team")
+                            email.set("integrations@testit.software")
+                        }
+                    }
                     scm {
                         developerConnection.set("scm:git:git://github.com/testit-tms/adapters-java")
                         connection.set("scm:git:git://github.com/testit-tms/adapters-java")
@@ -50,6 +71,10 @@ configure(subprojects) {
                 }
             }
         }
+    }
+
+    signing {
+        sign(publishing.publications["maven"])
     }
 
     java {

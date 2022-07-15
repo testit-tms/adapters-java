@@ -1,9 +1,9 @@
 package ru.testit.clients;
 
-import ru.testit.client.AutoTestsApi;
-import ru.testit.client.TestRunsApi;
-import ru.testit.invoker.ApiException;
-import ru.testit.model.*;
+import ru.testit.client.api.AutoTestsApi;
+import ru.testit.client.api.TestRunsApi;
+import ru.testit.client.invoker.ApiException;
+import ru.testit.client.model.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,8 +16,8 @@ public class TmsApiClient implements ApiClient {
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
 
-    public TmsApiClient(ClientConfiguration config){
-        ru.testit.invoker.ApiClient apiClient = new ru.testit.invoker.ApiClient();
+    public TmsApiClient(ClientConfiguration config) {
+        ru.testit.client.invoker.ApiClient apiClient = new ru.testit.client.invoker.ApiClient();
         apiClient.setBasePath(config.getUrl());
         apiClient.setApiKeyPrefix(AUTH_PREFIX);
         apiClient.setApiKey(config.getPrivateToken());

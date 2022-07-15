@@ -1,15 +1,15 @@
 package ru.testit.writers;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.threeten.bp.OffsetDateTime;
-import org.threeten.bp.ZoneOffset;
-import ru.testit.model.*;
+import ru.testit.client.model.*;
 import ru.testit.models.FixtureResult;
 import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 import ru.testit.models.TestResult;
 import ru.testit.services.ResultStorage;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -229,13 +229,6 @@ public class Converter {
 
     private static OffsetDateTime dateToOffsetDateTime(Long time) {
         Date date = new Date(time);
-        return convertFrom(date.toInstant().atOffset(java.time.ZoneOffset.UTC));
-    }
-
-    private static OffsetDateTime convertFrom(java.time.OffsetDateTime ttOdt) {
-        return OffsetDateTime.of(ttOdt.getYear(), ttOdt.getMonthValue(),
-                ttOdt.getDayOfMonth(), ttOdt.getHour(), ttOdt.getMinute(),
-                ttOdt.getSecond(), ttOdt.getNano(),
-                ZoneOffset.ofTotalSeconds(ttOdt.getOffset().getTotalSeconds()));
+        return date.toInstant().atOffset(ZoneOffset.UTC);
     }
 }

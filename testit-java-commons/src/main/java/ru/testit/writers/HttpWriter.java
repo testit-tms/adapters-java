@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.testit.clients.ApiClient;
-import ru.testit.invoker.ApiException;
-import ru.testit.model.*;
+import ru.testit.client.invoker.ApiException;
+import ru.testit.client.model.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;

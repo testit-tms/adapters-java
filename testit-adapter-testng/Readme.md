@@ -4,14 +4,34 @@
 ## Getting Started
 
 ### Installation
-Copy the contents of the **"packages"** folder to to `{%HOME_FOLDER%}/.m2/repository/`
+
+#### Maven users
+
+Add this dependency to your project's POM:
+
+```xml
+<dependency>
+    <groupId>ru.testit</groupId>
+    <artifactId>testit-adapter-testng</artifactId>
+    <version>0.1</version>
+    <scope>compile</scope>
+</dependency>
+```
+
+#### Gradle users
+
+Add this dependency to your project's build file:
+
+```groovy
+implementation "ru.testit:testit-adapter-testng:01"
+```
 
 ## Usage
 
 #### Maven users
 
 1. Add this dependency to your project's POM:
-    ````
+    ````xml
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
@@ -87,7 +107,7 @@ Copy the contents of the **"packages"** folder to to `{%HOME_FOLDER%}/.m2/reposi
 #### Gradle users
 
 1. Add this dependency to your project's build file:
-```
+```groovy
 plugins {
    id 'java'
 }

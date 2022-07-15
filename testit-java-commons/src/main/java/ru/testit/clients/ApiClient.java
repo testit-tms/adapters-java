@@ -1,7 +1,7 @@
 package ru.testit.clients;
 
-import ru.testit.invoker.ApiException;
-import ru.testit.model.*;
+import ru.testit.client.invoker.ApiException;
+import ru.testit.client.model.*;
 
 import java.util.List;
 
