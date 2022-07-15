@@ -23,7 +23,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-testng:01"
+implementation "ru.testit:testit-adapter-testng:0.1"
 ```
 
 ## Usage
