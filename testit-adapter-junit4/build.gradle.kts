@@ -4,7 +4,7 @@ plugins {
     id("java")
 }
 
-val junitVersion = "4.12"
+val junitVersion = "4.13.2"
 val aspectjVersion = "1.9.7"
 val agent: Configuration by configurations.creating
 
