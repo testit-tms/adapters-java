@@ -11,13 +11,7 @@ import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
 @RunWith(BaseJunit4Runner.class)
-public class OnlyBeforeAfterAllTests {
-    @BeforeClass
-    @Title("Open browser")
-    public static void openBrowser() {
-        Assert.assertTrue(true);
-    }
-
+public class SampleTests {
     @Step
     @Title("Log in the system")
     @Description("System authentication")
@@ -76,11 +70,11 @@ public class OnlyBeforeAfterAllTests {
     }
 
     @Test
-    @ExternalId("failed_BeforeAll_AfterAll_with_all_annotations")
+    @ExternalId("failed_with_all_annotations")
     @DisplayName("Failed test with all annotations")
     @WorkItemId("123")
     @Title("Title in the autotest card")
-    @Description("Test with BeforeAll, AfterAll and all annotations")
+    @Description("Test with all annotations")
     @Labels({"Tag1","Tag2"})
     @Links(links = {
             @Link(url = "https://dumps.example.com/module/repository", title = "Repository", description = "Example of repository", type = LinkType.REPOSITORY),
@@ -101,15 +95,9 @@ public class OnlyBeforeAfterAllTests {
     }
 
     @Test
-    @ExternalId("failed_BeforeAll_AfterAll_with_required_annotations")
+    @ExternalId("failed_with_required_annotations")
     @DisplayName("Failed test with required annotations")
     public void requiredAnnotationsTest() {
-        Assert.assertTrue(true);
-    }
-
-    @AfterClass
-    @Title("Close browser")
-    public static void CloseBrowser() {
         Assert.assertTrue(false);
     }
 }
