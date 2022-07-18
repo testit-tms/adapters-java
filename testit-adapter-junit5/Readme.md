@@ -107,6 +107,11 @@ implementation "ru.testit:testit-adapter-junit5:0.1"
                 <configuration>
                     <argLine>-XX:-UseSplitVerifier</argLine>
                     <argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar</argLine>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.extensions.autodetection.enabled = true
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
         </plugins>
