@@ -1,6 +1,9 @@
 package ru.testit.samples;
 
-import org.junit.*;
+import org.junit.Test;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import ru.testit.annotations.*;
 import ru.testit.listener.BaseJunit4Runner;
@@ -8,14 +11,8 @@ import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
 @RunWith(BaseJunit4Runner.class)
-public class FullBeforeAfterTests {
-    @BeforeClass
-    @Title("Open browser")
-    public static void openBrowser() {
-        Assert.assertTrue(true);
-    }
-
-    @Before
+public class SampleTests {
+    @Step
     @Title("Log in the system")
     @Description("System authentication")
     public void authorization() {
@@ -53,7 +50,7 @@ public class FullBeforeAfterTests {
     @Title("Create a section")
     @Description("Section was created")
     public void createSection() {
-        Assert.assertTrue(false);
+        Assert.assertTrue(true);
     }
 
     @Step
@@ -61,12 +58,6 @@ public class FullBeforeAfterTests {
     @Description("Test case was created")
     public void createTestCase() {
         Assert.assertTrue(true);
-    }
-
-    @Before
-    @Title("Maximum nesting in setup step")
-    public void beforeStepWithMaximumNesting() {
-        maximumNestingStep(13);
     }
 
     @Step
@@ -79,11 +70,11 @@ public class FullBeforeAfterTests {
     }
 
     @Test
-    @ExternalId("full_before_after_with_all_annotations")
+    @ExternalId("with_all_annotations")
     @DisplayName("Test with all annotations")
     @WorkItemId("123")
     @Title("Title in the autotest card")
-    @Description("Test with all Before, After and all annotations")
+    @Description("Test with all annotations")
     @Labels({"Tag1","Tag2"})
     @Links(links = {
             @Link(url = "https://dumps.example.com/module/repository", title = "Repository", description = "Example of repository", type = LinkType.REPOSITORY),
@@ -95,6 +86,7 @@ public class FullBeforeAfterTests {
     })
     public void allAnnotationsTest() {
         Adapter.link("Test 1", "Desc 1", LinkType.ISSUE, "https://testit.ru/");
+        authorization();
         createProject();
         enterProject();
         createSection();
@@ -103,27 +95,9 @@ public class FullBeforeAfterTests {
     }
 
     @Test
-    @ExternalId("full_before_after_with_required_annotations")
+    @ExternalId("with_required_annotations")
     @DisplayName("Test with required annotations")
     public void requiredAnnotationsTest() {
-        Assert.assertTrue(true);
-    }
-
-    @After
-    @Title("Log out the system")
-    public void logOut() {
-        Assert.assertTrue(true);
-    }
-
-    @After
-    @Title("Maximum nesting in teardown step")
-    public void afterStepWithMaximumNesting() {
-        maximumNestingStep(13);
-    }
-
-    @AfterClass
-    @Title("Close browser")
-    public static void CloseBrowser() {
         Assert.assertTrue(true);
     }
 }

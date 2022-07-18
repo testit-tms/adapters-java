@@ -65,38 +65,39 @@ public class BaseJunit4Listener extends RunListener
     @Override
     public void testFailure(final Failure failure) {
         ExecutableTest executableTest = this.executableTest.get();
+        executableTest.setAfterStatus();
         stopTestCase(executableTest.getUuid(), failure.getException(), ItemStatus.FAILED);
     }
 
     @Override
     public void testAssumptionFailure(final Failure failure) {
         ExecutableTest executableTest = this.executableTest.get();
+        executableTest.setAfterStatus();
         stopTestCase(executableTest.getUuid(), failure.getException(), ItemStatus.FAILED);
     }
 
     @Override
     public void testIgnored(final Description description) {
         ExecutableTest executableTest = this.executableTest.get();
+        executableTest.setAfterStatus();
         stopTestCase(executableTest.getUuid(), null, ItemStatus.SKIPPED);
     }
 
     @Override
     public void testFinished(final Description description) {
         final ExecutableTest executableTest = this.executableTest.get();
+        if (executableTest.isAfter()) {
+            return;
+        }
         executableTest.setAfterStatus();
         adapterManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
         adapterManager.stopTestCase(executableTest.getUuid());
     }
 
-    private FixtureResult getFixtureResult(final Description method) {
-        return new FixtureResult()
-                .setName(Utils.extractTitle(method))
-                .setDescription(Utils.extractDescription(method))
-                .setStart(System.currentTimeMillis())
-                .setItemStage(ItemStage.RUNNING);
-    }
-
     protected void startTestCase(Description method, final String uuid) {
+        String fullName =  method.getClassName();
+        int index = fullName.lastIndexOf(".");
+
         final TestResult result = new TestResult()
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method))
@@ -104,9 +105,8 @@ public class BaseJunit4Listener extends RunListener
                 .setWorkItemId(Utils.extractWorkItemId(method))
                 .setTitle(Utils.extractTitle(method))
                 .setName(Utils.extractDisplayName(method))
-                .setClassName(method.getClass().getSimpleName())
-                .setSpaceName((method.getClass().getPackage() == null)
-                        ? null : method.getClass().getPackage().getName())
+                .setClassName((index != -1) ? fullName.substring(index + 1) : fullName)
+                .setSpaceName((index != -1) ? fullName.substring(0, index) : null)
                 .setLinkItems(Utils.extractLinks(method))
                 .setDescription(Utils.extractDescription(method));
 
