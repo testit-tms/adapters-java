@@ -36,7 +36,6 @@ implementation "ru.testit:testit-adapter-junit5:LATEST_VERSION"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <aspectj.version>1.9.7</aspectj.version>
-        <testit.version>LATEST_VERSION</testit.version>
     </properties>
     <dependencies>
         <dependency>
@@ -52,12 +51,12 @@ implementation "ru.testit:testit-adapter-junit5:LATEST_VERSION"
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-java-commons</artifactId>
-            <version>${testit.version}</version>
+            <version>LATEST_VERSION</version>
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-adapter-junit5</artifactId>
-            <version>${testit.version}</version>
+            <version>LATEST_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -147,12 +146,10 @@ repositories {
    mavenLocal()
 }
 
-def testit_version = "LATEST_VERSION"
-
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation "ru.testit:testit-adapter-junit:$testit_version"
-    testImplementation "ru.testit:testit-java-commons:$testit_version"
+    testImplementation "ru.testit:testit-adapter-junit:$LATEST_VERSION"
+    testImplementation "ru.testit:testit-java-commons:$LATEST_VERSION"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"

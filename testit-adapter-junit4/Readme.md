@@ -36,7 +36,6 @@ implementation "ru.testit:testit-adapter-junit4:LATEST_VERSION"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <aspectj.version>1.9.7</aspectj.version>
-        <testit.version>LATEST_VERSION</testit.version>
     </properties>
     <dependencies>
         <dependency>
@@ -52,12 +51,12 @@ implementation "ru.testit:testit-adapter-junit4:LATEST_VERSION"
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-java-commons</artifactId>
-            <version>${testit.version}</version>
+            <version>LATEST_VERSION</version>
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-adapter-junit4</artifactId>
-            <version>${testit.version}</version>
+            <version>LATEST_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -142,12 +141,10 @@ repositories {
    mavenLocal()
 }
 
-def testit_version = "LATEST_VERSION"
-
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation "ru.testit:testit-adapter-junit4:$testit_version"
-    testImplementation "ru.testit:testit-java-commons:$testit_version"
+    testImplementation "ru.testit:testit-adapter-junit4:$LATEST_VERSION"
+    testImplementation "ru.testit:testit-java-commons:$LATEST_VERSION"
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.junit.platform:junit-platform-runner:1.6.3'
     aspectConfig "org.aspectj:aspectjweaver:1.9.7"
