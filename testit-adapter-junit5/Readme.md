@@ -13,7 +13,7 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-junit5</artifactId>
-    <version>0.1</version>
+    <version>LATEST_VERSION</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-junit5:0.1"
+implementation "ru.testit:testit-adapter-junit5:LATEST_VERSION"
 ```
 
 ## Usage
@@ -36,6 +36,7 @@ implementation "ru.testit:testit-adapter-junit5:0.1"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <aspectj.version>1.9.7</aspectj.version>
+        <testit.version>LATEST_VERSION</testit.version>
     </properties>
     <dependencies>
         <dependency>
@@ -51,12 +52,12 @@ implementation "ru.testit:testit-adapter-junit5:0.1"
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-java-commons</artifactId>
-            <version>0.1</version>
+            <version>${testit.version}</version>
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-adapter-junit5</artifactId>
-            <version>0.1</version>
+            <version>${testit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -146,10 +147,12 @@ repositories {
    mavenLocal()
 }
 
+def testit_version = "LATEST_VERSION"
+
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation 'ru.testit:testit-adapter-junit:0.1'
-    testImplementation 'ru.testit:testit-java-commons:0.1'
+    testImplementation "ru.testit:testit-adapter-junit:$testit_version"
+    testImplementation "ru.testit:testit-java-commons:$testit_version"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"

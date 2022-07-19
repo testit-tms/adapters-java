@@ -4,18 +4,39 @@
 ## Getting Started
 
 ### Installation
-Copy the contents of the **"packages"** folder to to `{%HOME_FOLDER%}/.m2/repository/`
+
+#### Maven users
+
+Add this dependency to your project's POM:
+
+```xml
+<dependency>
+    <groupId>ru.testit</groupId>
+    <artifactId>testit-adapter-junit4</artifactId>
+    <version>LATEST_VERSION</version>
+    <scope>compile</scope>
+</dependency>
+```
+
+#### Gradle users
+
+Add this dependency to your project's build file:
+
+```groovy
+implementation "ru.testit:testit-adapter-junit4:LATEST_VERSION"
+```
 
 ## Usage
 
 #### Maven users
 
 1. Add this dependency to your project's POM:
-    ````
+    ````xml
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <aspectj.version>1.9.7</aspectj.version>
+        <testit.version>LATEST_VERSION</testit.version>
     </properties>
     <dependencies>
         <dependency>
@@ -31,12 +52,12 @@ Copy the contents of the **"packages"** folder to to `{%HOME_FOLDER%}/.m2/reposi
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-java-commons</artifactId>
-            <version>0.1</version>
+            <version>${testit.version}</version>
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-adapter-junit4</artifactId>
-            <version>0.1</version>
+            <version>${testit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -97,7 +118,7 @@ Copy the contents of the **"packages"** folder to to `{%HOME_FOLDER%}/.m2/reposi
 #### Gradle users
 
 1. Add this dependency to your project's build file:
-```
+```groovy
 plugins {
    id 'java'
 }
@@ -121,10 +142,12 @@ repositories {
    mavenLocal()
 }
 
+def testit_version = "LATEST_VERSION"
+
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation 'ru.testit:testit-adapter-junit4:0.1'
-    testImplementation 'ru.testit:testit-java-commons:0.1'
+    testImplementation "ru.testit:testit-adapter-junit4:$testit_version"
+    testImplementation "ru.testit:testit-java-commons:$testit_version"
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.junit.platform:junit-platform-runner:1.6.3'
     aspectConfig "org.aspectj:aspectjweaver:1.9.7"
