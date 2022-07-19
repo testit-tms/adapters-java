@@ -13,7 +13,7 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-junit5</artifactId>
-    <version>0.1</version>
+    <version>LATEST_VERSION</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-junit5:0.1"
+implementation "ru.testit:testit-adapter-junit5:LATEST_VERSION"
 ```
 
 ## Usage
@@ -51,12 +51,12 @@ implementation "ru.testit:testit-adapter-junit5:0.1"
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-java-commons</artifactId>
-            <version>0.1</version>
+            <version>LATEST_VERSION</version>
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-adapter-junit5</artifactId>
-            <version>0.1</version>
+            <version>LATEST_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -148,8 +148,8 @@ repositories {
 
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation 'ru.testit:testit-adapter-junit:0.1'
-    testImplementation 'ru.testit:testit-java-commons:0.1'
+    testImplementation "ru.testit:testit-adapter-junit:$LATEST_VERSION"
+    testImplementation "ru.testit:testit-java-commons:$LATEST_VERSION"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"

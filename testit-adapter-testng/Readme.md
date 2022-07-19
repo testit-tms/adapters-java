@@ -13,7 +13,7 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-testng</artifactId>
-    <version>0.1</version>
+    <version>LATEST_VERSION</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-testng:0.1"
+implementation "ru.testit:testit-adapter-testng:LATEST_VERSION"
 ```
 
 ## Usage
@@ -46,7 +46,12 @@ implementation "ru.testit:testit-adapter-testng:0.1"
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-adapter-testng</artifactId>
-            <version>0.1</version>
+            <version>LATEST_VERSION</version>
+        </dependency>
+           <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-java-commons</artifactId>
+            <version>LATEST_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -61,7 +66,6 @@ implementation "ru.testit:testit-adapter-testng:0.1"
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -133,8 +137,8 @@ repositories {
 
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation 'ru.testit:testit-adapter-testng:0.1'
-    testImplementation 'ru.testit:testit-java-commons:0.1'
+    testImplementation "ru.testit:testit-adapter-testng:$LATEST_VERSION"
+    testImplementation "ru.testit:testit-java-commons:$LATEST_VERSION"
     testImplementation 'org.testng:testng:7.5'
     aspectConfig "org.aspectj:aspectjweaver:1.9.7"
 }
