@@ -1,7 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Tue Jul 05 10:44:10 MSK 2022
-testit-api-client-0.1-sources.jar>=
-testit-api-client-0.1.pom>=
-testit-api-client-0.1-javadoc.jar>=
-testit-api-client-0.1-tests.jar>=
-testit-api-client-0.1.jar>=
