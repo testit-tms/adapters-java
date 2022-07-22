@@ -1,4 +1,4 @@
-package ru.testit.writers;
+package ru.testit;
 
 import ru.testit.client.model.*;
 import ru.testit.models.*;
