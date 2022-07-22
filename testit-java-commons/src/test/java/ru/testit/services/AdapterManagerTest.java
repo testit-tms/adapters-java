@@ -1,6 +1,7 @@
 package ru.testit.services;
 
 import javafx.beans.binding.When;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -8,6 +9,7 @@ import ru.testit.Helper;
 import ru.testit.models.*;
 import ru.testit.writers.HttpWriter;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -57,6 +59,7 @@ public class AdapterManagerTest {
     void startMainContainer_InvokePutHandler() {
         // arrange
         MainContainer container = Helper.generateMainContainer();
+        container.setStart(null);
 
         AdapterManager manager = new AdapterManager(threadContext, storage, writer);
 
@@ -64,6 +67,7 @@ public class AdapterManagerTest {
         manager.startMainContainer(container);
 
         // assert
+        Assertions.assertNotEquals(null, container.getStart());
         verify(storage, times(1)).put(container.getUuid(), container);
     }
 
@@ -72,6 +76,7 @@ public class AdapterManagerTest {
         // arrange
         MainContainer container = Helper.generateMainContainer();
         String uuid = container.getUuid();
+        container.setStop(null);
 
         when(storage.getTestsContainer(uuid)).thenReturn(Optional.of(container));
 
@@ -81,6 +86,7 @@ public class AdapterManagerTest {
         manager.stopMainContainer(uuid);
 
         // assert
+        Assertions.assertNotNull(container.getStop());
         verify(writer, times(1)).writeTests(container);
     }
 
@@ -89,6 +95,7 @@ public class AdapterManagerTest {
         // arrange
         MainContainer container = Helper.generateMainContainer();
         String uuid = container.getUuid();
+        container.setStop(null);
 
         when(storage.getTestsContainer(uuid)).thenReturn(Optional.empty());
 
@@ -98,14 +105,17 @@ public class AdapterManagerTest {
         manager.stopMainContainer(container.getUuid());
 
         // assert
+        Assertions.assertNull(container.getStop());
         verify(writer, never()).writeTests(container);
     }
 
     @Test
-    void startClassContainer_InvokeGetTestsContainerHandler() {
+    void startClassContainer_WithTestContainer_InvokeGetTestsContainerHandler() {
         // arrange
         MainContainer testContainer = Helper.generateMainContainer();
+        testContainer.setChildren(new ArrayList<>());
         ClassContainer classContainer = Helper.generateClassContainer();
+        classContainer.setStart(null);
         String parentUuid = testContainer.getUuid();
 
         when(storage.getTestsContainer(parentUuid)).thenReturn(Optional.of(testContainer));
@@ -116,6 +126,30 @@ public class AdapterManagerTest {
         manager.startClassContainer(parentUuid, classContainer);
 
         // assert
+        Assertions.assertFalse(testContainer.getChildren().isEmpty());
+        Assertions.assertNotNull(classContainer.getStart());
+        verify(storage, times(1)).put(classContainer.getUuid(), classContainer);
+    }
+
+    @Test
+    void startClassContainer_WithoutTestContainer_InvokeGetTestsContainerHandler() {
+        // arrange
+        MainContainer testContainer = Helper.generateMainContainer();
+        testContainer.setChildren(new ArrayList<>());
+        ClassContainer classContainer = Helper.generateClassContainer();
+        classContainer.setStart(null);
+        String parentUuid = testContainer.getUuid();
+
+        when(storage.getTestsContainer(parentUuid)).thenReturn(Optional.empty());
+
+        AdapterManager manager = new AdapterManager(threadContext, storage, writer);
+
+        // act
+        manager.startClassContainer(parentUuid, classContainer);
+
+        // assert
+        Assertions.assertTrue(testContainer.getChildren().isEmpty());
+        Assertions.assertNotNull(classContainer.getStart());
         verify(storage, times(1)).put(classContainer.getUuid(), classContainer);
     }
 
@@ -123,6 +157,7 @@ public class AdapterManagerTest {
     void stopClassContainer_WithContainer_InvokeWriteTestsHandler() {
         // arrange
         ClassContainer container = Helper.generateClassContainer();
+        container.setStop(null);
         String uuid = container.getUuid();
 
         when(storage.getClassContainer(uuid)).thenReturn(Optional.of(container));
@@ -133,6 +168,7 @@ public class AdapterManagerTest {
         manager.stopClassContainer(uuid);
 
         // assert
+        Assertions.assertNotNull(container.getStop());
         verify(writer, times(1)).writeClass(container);
     }
 
@@ -140,6 +176,7 @@ public class AdapterManagerTest {
     void stopClassContainer_WithoutContainer_NoInvokeWriteTestsHandler() {
         // arrange
         ClassContainer container = Helper.generateClassContainer();
+        container.setStop(null);
         String uuid = container.getUuid();
 
         when(storage.getClassContainer(uuid)).thenReturn(Optional.empty());
@@ -150,6 +187,7 @@ public class AdapterManagerTest {
         manager.stopClassContainer(uuid);
 
         // assert
+        Assertions.assertNull(container.getStop());
         verify(writer, never()).writeClass(container);
     }
 
@@ -191,6 +229,7 @@ public class AdapterManagerTest {
     void startTestCase_WithTestResult_InvokeStartHandler() {
         // arrange
         TestResult result = Helper.generateTestResult();
+        result.setStart(null);
         String uuid = result.getUuid();
 
         when(storage.getTestResult(uuid)).thenReturn(Optional.of(result));
@@ -201,6 +240,8 @@ public class AdapterManagerTest {
         manager.startTestCase(uuid);
 
         // assert
+        Assertions.assertNotNull(result.getStart());
+        Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
         verify(threadContext, times(1)).clear();
         verify(threadContext, times(1)).start(uuid);
     }
@@ -209,6 +250,7 @@ public class AdapterManagerTest {
     void startTestCase_WithoutTestResult_NoInvokeStartHandler() {
         // arrange
         TestResult result = Helper.generateTestResult();
+        result.setStart(null);
         String uuid = result.getUuid();
 
         when(storage.getTestResult(uuid)).thenReturn(Optional.empty());
@@ -219,6 +261,8 @@ public class AdapterManagerTest {
         manager.startTestCase(uuid);
 
         // assert
+        Assertions.assertNull(result.getStart());
+        Assertions.assertNull(result.getItemStage());
         verify(threadContext, times(1)).clear();
         verify(threadContext, never()).start(uuid);
     }
@@ -234,6 +278,7 @@ public class AdapterManagerTest {
         manager.scheduleTestCase(result);
 
         // assert
+        Assertions.assertEquals(ItemStage.SCHEDULED, result.getItemStage());
         verify(storage, times(1)).put(result.getUuid(), result);
     }
 
@@ -293,6 +338,7 @@ public class AdapterManagerTest {
     void stopTestCase_WithTestResult_InvokeWriteTestHandler() {
         // arrange
         TestResult result = Helper.generateTestResult();
+        result.setStop(null);
         String uuid = result.getUuid();
 
         when(storage.getTestResult(uuid)).thenReturn(Optional.of(result));
@@ -303,6 +349,8 @@ public class AdapterManagerTest {
         manager.stopTestCase(uuid);
 
         // assert
+        Assertions.assertNotNull(result.getStop());
+        Assertions.assertEquals(ItemStage.FINISHED, result.getItemStage());
         verify(threadContext, times(1)).clear();
         verify(writer, times(1)).writeTest(result);
     }
@@ -311,6 +359,7 @@ public class AdapterManagerTest {
     void stopTestCase_WithoutTestResult_NoInvokeWriteTestHandler() {
         // arrange
         TestResult result = Helper.generateTestResult();
+        result.setStop(null);
         String uuid = result.getUuid();
 
         when(storage.getTestResult(uuid)).thenReturn(Optional.empty());
@@ -321,6 +370,8 @@ public class AdapterManagerTest {
         manager.stopTestCase(uuid);
 
         // assert
+        Assertions.assertNull(result.getStop());
+        Assertions.assertNull(result.getItemStage());
         verify(threadContext, never()).clear();
         verify(writer, never()).writeTest(result);
     }
@@ -329,7 +380,9 @@ public class AdapterManagerTest {
     void startPrepareFixtureAll_InvokeStartHandler() {
         // arrange
         FixtureResult result = Helper.generateBeforeAllFixtureResult();
+        result.setStart(null);
         MainContainer container = Helper.generateMainContainer();
+        container.setBeforeMethods(new ArrayList<>());
         String parentUuid = container.getUuid();
         String uuid = UUID.randomUUID().toString();
 
@@ -342,6 +395,9 @@ public class AdapterManagerTest {
         manager.startPrepareFixtureAll(parentUuid, uuid, result);
 
         // assert
+        Assertions.assertNotNull(result.getStart());
+        Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
+        Assertions.assertFalse(container.getBeforeMethods().isEmpty());
         verify(storage, times(1)).put(uuid, result);
         verify(threadContext, times(1)).clear();
         verify(threadContext, times(1)).start(uuid);
@@ -351,7 +407,9 @@ public class AdapterManagerTest {
     void startTearDownFixtureAll_InvokeStartHandler() {
         // arrange
         FixtureResult result = Helper.generateAfterAllFixtureResult();
+        result.setStart(null);
         MainContainer container = Helper.generateMainContainer();
+        container.setAfterMethods(new ArrayList<>());
         String parentUuid = container.getUuid();
         String uuid = UUID.randomUUID().toString();
 
@@ -364,6 +422,9 @@ public class AdapterManagerTest {
         manager.startTearDownFixtureAll(parentUuid, uuid, result);
 
         // assert
+        Assertions.assertNotNull(result.getStart());
+        Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
+        Assertions.assertFalse(container.getAfterMethods().isEmpty());
         verify(storage, times(1)).put(uuid, result);
         verify(threadContext, times(1)).clear();
         verify(threadContext, times(1)).start(uuid);
@@ -373,7 +434,9 @@ public class AdapterManagerTest {
     void startPrepareFixture_InvokeStartHandler() {
         // arrange
         FixtureResult result = Helper.generateBeforeEachFixtureResult();
+        result.setStart(null);
         ClassContainer container = Helper.generateClassContainer();
+        container.setBeforeClassMethods(new ArrayList<>());
         String parentUuid = container.getUuid();
         String uuid = UUID.randomUUID().toString();
 
@@ -386,6 +449,9 @@ public class AdapterManagerTest {
         manager.startPrepareFixture(parentUuid, uuid, result);
 
         // assert
+        Assertions.assertNotNull(result.getStart());
+        Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
+        Assertions.assertFalse(container.getBeforeClassMethods().isEmpty());
         verify(storage, times(1)).put(uuid, result);
         verify(threadContext, times(1)).clear();
         verify(threadContext, times(1)).start(uuid);
@@ -395,7 +461,9 @@ public class AdapterManagerTest {
     void startTearDownFixture_InvokeStartHandler() {
         // arrange
         FixtureResult result = Helper.generateAfterEachFixtureResult();
+        result.setStart(null);
         ClassContainer container = Helper.generateClassContainer();
+        container.setAfterClassMethods(new ArrayList<>());
         String parentUuid = container.getUuid();
         String uuid = UUID.randomUUID().toString();
 
@@ -408,6 +476,9 @@ public class AdapterManagerTest {
         manager.startTearDownFixture(parentUuid, uuid, result);
 
         // assert
+        Assertions.assertNotNull(result.getStart());
+        Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
+        Assertions.assertFalse(container.getAfterClassMethods().isEmpty());
         verify(storage, times(1)).put(uuid, result);
         verify(threadContext, times(1)).clear();
         verify(threadContext, times(1)).start(uuid);
@@ -417,7 +488,9 @@ public class AdapterManagerTest {
     void startPrepareFixtureEachTest_InvokeStartHandler() {
         // arrange
         FixtureResult result = Helper.generateBeforeEachFixtureResult();
+        result.setStart(null);
         ClassContainer container = Helper.generateClassContainer();
+        container.setBeforeEachTest(new ArrayList<>());
         String parentUuid = container.getUuid();
         String uuid = UUID.randomUUID().toString();
 
@@ -430,6 +503,9 @@ public class AdapterManagerTest {
         manager.startPrepareFixtureEachTest(parentUuid, uuid, result);
 
         // assert
+        Assertions.assertNotNull(result.getStart());
+        Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
+        Assertions.assertFalse(container.getBeforeEachTest().isEmpty());
         verify(storage, times(1)).put(uuid, result);
         verify(threadContext, times(1)).clear();
         verify(threadContext, times(1)).start(uuid);
@@ -439,7 +515,9 @@ public class AdapterManagerTest {
     void startTearDownFixtureEachTest_InvokeStartHandler() {
         // arrange
         FixtureResult result = Helper.generateAfterEachFixtureResult();
+        result.setStart(null);
         ClassContainer container = Helper.generateClassContainer();
+        container.setAfterEachTest(new ArrayList<>());
         String parentUuid = container.getUuid();
         String uuid = UUID.randomUUID().toString();
 
@@ -452,6 +530,9 @@ public class AdapterManagerTest {
         manager.startTearDownFixtureEachTest(parentUuid, uuid, result);
 
         // assert
+        Assertions.assertNotNull(result.getStart());
+        Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
+        Assertions.assertFalse(container.getAfterEachTest().isEmpty());
         verify(storage, times(1)).put(uuid, result);
         verify(threadContext, times(1)).clear();
         verify(threadContext, times(1)).start(uuid);
@@ -495,6 +576,7 @@ public class AdapterManagerTest {
     void stopFixture_WithFixture_InvokeClearHandler() {
         // arrange
         FixtureResult result = Helper.generateBeforeEachFixtureResult();
+        result.setStop(null);
         String uuid = Helper.generateTestResult().getUuid();
 
         when(storage.getFixture(uuid)).thenReturn(Optional.of(result));
@@ -505,12 +587,16 @@ public class AdapterManagerTest {
         manager.stopFixture(uuid);
 
         // assert
+        Assertions.assertNotNull(result.getStop());
+        Assertions.assertEquals(ItemStage.FINISHED, result.getItemStage());
         verify(threadContext, times(1)).clear();
     }
 
     @Test
     void stopFixture_WithoutFixture_NoInvokeClearHandler() {
         // arrange
+        FixtureResult result = Helper.generateBeforeEachFixtureResult();
+        result.setStop(null);
         String uuid = Helper.generateTestResult().getUuid();
 
         when(storage.getFixture(uuid)).thenReturn(Optional.empty());
@@ -521,6 +607,8 @@ public class AdapterManagerTest {
         manager.stopFixture(uuid);
 
         // assert
+        Assertions.assertNull(result.getStop());
+        Assertions.assertNull(result.getItemStage());
         verify(threadContext, never()).clear();
     }
 
@@ -528,6 +616,7 @@ public class AdapterManagerTest {
     void startStep_WithCurrent_InvokeStartHandler() {
         // arrange
         StepResult result = Helper.generateStepResult();
+        result.setStart(null);
         String uuid = UUID.randomUUID().toString();
         String parentUuid = UUID.randomUUID().toString();
 
@@ -540,6 +629,9 @@ public class AdapterManagerTest {
         manager.startStep(uuid, result);
 
         // assert
+        Assertions.assertNotNull(result.getStart());
+        Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
+        Assertions.assertFalse(result.getSteps().isEmpty());
         verify(threadContext, times(1)).start(uuid);
         verify(storage, times(1)).put(uuid, result);
     }
@@ -548,6 +640,7 @@ public class AdapterManagerTest {
     void startStep_WithoutCurrent_NoInvokeStartHandler() {
         // arrange
         StepResult result = Helper.generateStepResult();
+        result.setStart(null);
         String uuid = UUID.randomUUID().toString();
 
         when(threadContext.getCurrent()).thenReturn(Optional.empty());
@@ -558,6 +651,9 @@ public class AdapterManagerTest {
         manager.startStep(uuid, result);
 
         // assert
+        Assertions.assertNull(result.getStart());
+        Assertions.assertNull(result.getItemStage());
+        Assertions.assertTrue(result.getSteps().isEmpty());
         verify(threadContext, never()).start(uuid);
         verify(storage, never()).put(uuid, result);
     }
@@ -618,6 +714,7 @@ public class AdapterManagerTest {
     void stopStep_WithRoot_InvokeStopHandler() {
         // arrange
         StepResult result = Helper.generateStepResult();
+        result.setStop(null);
         String root = UUID.randomUUID().toString();
         String current = UUID.randomUUID().toString();
 
@@ -631,12 +728,16 @@ public class AdapterManagerTest {
         manager.stopStep();
 
         // assert
+        Assertions.assertNotNull(result.getStop());
+        Assertions.assertEquals(ItemStage.FINISHED, result.getItemStage());
         verify(threadContext, times(1)).stop();
     }
 
     @Test
     void stopStep_WithRootEqualsCurrent_NoInvokeStopHandler() {
         // arrange
+        StepResult result = Helper.generateStepResult();
+        result.setStop(null);
         String root = UUID.randomUUID().toString();
 
         when(threadContext.getRoot()).thenReturn(Optional.of(root));
@@ -648,12 +749,16 @@ public class AdapterManagerTest {
         manager.stopStep();
 
         // assert
+        Assertions.assertNull(result.getStop());
+        Assertions.assertNull(result.getItemStage());
         verify(threadContext, never()).stop();
     }
 
     @Test
     void stopStep_WithoutRootWithCurrent_NoInvokeStopHandler() {
         // arrange
+        StepResult result = Helper.generateStepResult();
+        result.setStop(null);
         String current = UUID.randomUUID().toString();
 
         when(threadContext.getRoot()).thenReturn(Optional.empty());
@@ -665,12 +770,16 @@ public class AdapterManagerTest {
         manager.stopStep();
 
         // assert
+        Assertions.assertNull(result.getStop());
+        Assertions.assertNull(result.getItemStage());
         verify(threadContext, never()).stop();
     }
 
     @Test
     void stopStep_WithRootWithoutCurrent_NoInvokeStopHandler() {
         // arrange
+        StepResult result = Helper.generateStepResult();
+        result.setStop(null);
         String root = UUID.randomUUID().toString();
 
         when(threadContext.getRoot()).thenReturn(Optional.of(root));
@@ -682,12 +791,16 @@ public class AdapterManagerTest {
         manager.stopStep();
 
         // assert
+        Assertions.assertNull(result.getStop());
+        Assertions.assertNull(result.getItemStage());
         verify(threadContext, never()).stop();
     }
 
     @Test
     void stopStep_WithoutStepResult_NoInvokeStopHandler() {
         // arrange
+        StepResult result = Helper.generateStepResult();
+        result.setStop(null);
         String root = UUID.randomUUID().toString();
 
         when(threadContext.getRoot()).thenReturn(Optional.of(root));
@@ -700,6 +813,8 @@ public class AdapterManagerTest {
         manager.stopStep();
 
         // assert
+        Assertions.assertNull(result.getStop());
+        Assertions.assertNull(result.getItemStage());
         verify(threadContext, never()).stop();
     }
 }
