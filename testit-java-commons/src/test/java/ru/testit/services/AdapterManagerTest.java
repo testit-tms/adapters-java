@@ -67,7 +67,7 @@ public class AdapterManagerTest {
         manager.startMainContainer(container);
 
         // assert
-        Assertions.assertNotEquals(null, container.getStart());
+        Assertions.assertNotNull(container.getStart());
         verify(storage, times(1)).put(container.getUuid(), container);
     }
 
