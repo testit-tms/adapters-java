@@ -18,8 +18,8 @@ public class BaseJunit4Listener extends RunListener
 {
     private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
-    private final String launcherUUID = UUID.randomUUID().toString();
-    private final String classUUID = UUID.randomUUID().toString();
+    private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
+    private final ThreadLocal<String> classUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
 
     public BaseJunit4Listener() {
         adapterManager = Adapter.getAdapterManager();
@@ -30,20 +30,20 @@ public class BaseJunit4Listener extends RunListener
         adapterManager.startTests();
 
         final MainContainer mainContainer = new MainContainer()
-                .setUuid(launcherUUID);
+                .setUuid(launcherUUID.get());
 
         adapterManager.startMainContainer(mainContainer);
 
         final ClassContainer classContainer = new ClassContainer()
-                .setUuid(classUUID);
+                .setUuid(classUUID.get());
 
-        adapterManager.startClassContainer(launcherUUID, classContainer);
+        adapterManager.startClassContainer(launcherUUID.get(), classContainer);
     }
 
     @Override
     public void testRunFinished(final Result result) {
-        adapterManager.stopClassContainer(classUUID);
-        adapterManager.stopMainContainer(launcherUUID);
+        adapterManager.stopClassContainer(classUUID.get());
+        adapterManager.stopMainContainer(launcherUUID.get());
         adapterManager.stopTests();
     }
 
@@ -58,7 +58,7 @@ public class BaseJunit4Listener extends RunListener
         final String uuid = executableTest.getUuid();
         startTestCase(description, uuid);
 
-        adapterManager.updateClassContainer(classUUID,
+        adapterManager.updateClassContainer(classUUID.get(),
                 container -> container.getChildren().add(uuid));
     }
 
