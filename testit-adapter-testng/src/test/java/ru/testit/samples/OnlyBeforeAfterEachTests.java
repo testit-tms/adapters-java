@@ -1,7 +1,9 @@
 package ru.testit.samples;
 
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import ru.testit.annotations.*;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
@@ -76,7 +78,7 @@ public class OnlyBeforeAfterEachTests {
     @WorkItemId("456")
     @Title("Title in the autotest card")
     @Description("Test with BeforeEach, AfterEach and all annotations")
-    @Labels({"Tag1","Tag2"})
+    @Labels({"Tag1", "Tag2"})
     @Links(links = {
             @Link(url = "https://dumps.example.com/module/repository", title = "Repository", description = "Example of repository", type = LinkType.REPOSITORY),
             @Link(url = "https://dumps.example.com/module/projects", title = "Projects", type = LinkType.REQUIREMENT),
@@ -86,7 +88,7 @@ public class OnlyBeforeAfterEachTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
     public void allAnnotationsTest() {
-        Adapter.link("Test 1", "Desc 1", LinkType.ISSUE, "https://testit.ru/");
+        Adapter.addLink("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
         createProject();
         enterProject();
         createSection();

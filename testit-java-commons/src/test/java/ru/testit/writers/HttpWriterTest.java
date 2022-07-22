@@ -312,4 +312,17 @@ class HttpWriterTest {
         verify(client, times(1)).updateAutoTest(request);
         verify(client, times(1)).sendTestResults(eq(TEST_RUN_ID), any());
     }
+
+    @Test
+    void writeAttachment_withValue_InvokeAddHandler() throws ApiException {
+        // arrange
+        Writer writer = new HttpWriter(config, client, storage);
+        String path = "C:/test.txt";
+
+        // act
+        writer.writeAttachment(path);
+
+        // assert
+        verify(client).addAttachment(path);
+    }
 }

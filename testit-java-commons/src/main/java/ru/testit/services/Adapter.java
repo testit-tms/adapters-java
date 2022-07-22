@@ -26,10 +26,8 @@ public final class Adapter {
     }
 
     /**
-     * @deprecated
-     * This method is no longer acceptable to compute time between versions.
-     * <p> Use {@link Adapter#addLink(LinkItem)} addLink()} instead.
-     *
+     * @deprecated This method is no longer acceptable to compute time between versions.
+     * <p> Use {@link Adapter#addLink(String, String, String, LinkType)} addLink()} instead.
      */
     @Deprecated
     public static void link(final String title, final String description, final LinkType type, final String url) {
@@ -37,13 +35,17 @@ public final class Adapter {
         getAdapterManager().updateTestCase(testResult -> testResult.getResultLinks().add(link));
     }
 
-    public static void addLink(LinkItem link) {
-        addLink(new ArrayList<LinkItem>() {{
+    public static void addLink(final String url, final String title, final String description, final LinkType type) {
+        LinkItem link = new LinkItem().setTitle(title)
+                .setDescription(description)
+                .setType(type)
+                .setUrl(url);
+        addLinks(new ArrayList<LinkItem>() {{
             add(link);
         }});
     }
 
-    public static void addLink(List<LinkItem> links) {
+    public static void addLinks(List<LinkItem> links) {
         getAdapterManager().updateTestCase(testResult -> testResult.getResultLinks().addAll(links));
     }
 
