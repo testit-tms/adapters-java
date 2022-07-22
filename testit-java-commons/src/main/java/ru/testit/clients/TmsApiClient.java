@@ -32,7 +32,9 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public TestRunV2GetModel createTestRun(TestRunV2PostShortModel model) throws ApiException {
-        return testRunsApi.createEmpty(model);
+        TestRunV2GetModel response = testRunsApi.createEmpty(model);
+        testRunsApi.startTestRun(response.getId());
+        return response;
     }
 
     @Override

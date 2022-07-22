@@ -13,8 +13,8 @@ import static java.util.Objects.nonNull;
 public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAllCallback, InvocationInterceptor, TestWatcher {
     private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
-    private final String launcherUUID = UUID.randomUUID().toString();
-    private final String classUUID = UUID.randomUUID().toString();
+    private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
+    private final ThreadLocal<String> classUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
 
     public BaseJunit5Listener() {
         adapterManager = Adapter.getAdapterManager();
@@ -25,20 +25,20 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         adapterManager.startTests();
 
         final MainContainer mainContainer = new MainContainer()
-                .setUuid(launcherUUID);
+                .setUuid(launcherUUID.get());
 
         adapterManager.startMainContainer(mainContainer);
 
         final ClassContainer classContainer = new ClassContainer()
-                .setUuid(classUUID);
+                .setUuid(classUUID.get());
 
-        adapterManager.startClassContainer(launcherUUID, classContainer);
+        adapterManager.startClassContainer(launcherUUID.get(), classContainer);
     }
 
     @Override
     public void afterAll(ExtensionContext context) {
-        adapterManager.stopClassContainer(classUUID);
-        adapterManager.stopMainContainer(launcherUUID);
+        adapterManager.stopClassContainer(classUUID.get());
+        adapterManager.stopMainContainer(launcherUUID.get());
         adapterManager.stopTests();
     }
 
@@ -50,7 +50,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     ) {
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        adapterManager.startPrepareFixtureAll(launcherUUID, uuid, fixture);
+        adapterManager.startPrepareFixtureAll(launcherUUID.get(), uuid, fixture);
 
         try {
             invocation.proceed();
@@ -78,7 +78,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     ) {
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        adapterManager.startPrepareFixtureEachTest(classUUID, uuid, fixture);
+        adapterManager.startPrepareFixtureEachTest(classUUID.get(), uuid, fixture);
         ExecutableTest test = executableTest.get();
 
         if (test.isStarted()) {
@@ -112,7 +112,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         final String uuid = executableTest.getUuid();
         startTestCase(extensionContext.getRequiredTestMethod(), uuid);
 
-        adapterManager.updateClassContainer(classUUID,
+        adapterManager.updateClassContainer(classUUID.get(),
                 container -> container.getChildren().add(uuid));
 
         try {
@@ -197,7 +197,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     ) {
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        adapterManager.startTearDownFixtureEachTest(classUUID, uuid, fixture);
+        adapterManager.startTearDownFixtureEachTest(classUUID.get(), uuid, fixture);
         ExecutableTest test = executableTest.get();
         fixture.setParent(test.getUuid());
         try {
@@ -219,7 +219,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     ) {
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        adapterManager.startTearDownFixtureAll(launcherUUID, uuid, fixture);
+        adapterManager.startTearDownFixtureAll(launcherUUID.get(), uuid, fixture);
 
         try {
             invocation.proceed();

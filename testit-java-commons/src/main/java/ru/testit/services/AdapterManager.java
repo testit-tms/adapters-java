@@ -35,6 +35,16 @@ public class AdapterManager {
         writer = new HttpWriter(clientConfiguration, client, storage);
     }
 
+    public AdapterManager(
+            ThreadContext threadContext,
+            ResultStorage storage,
+            Writer writer
+    ) {
+        this.threadContext = threadContext;
+        this.storage = storage;
+        this.writer = writer;
+    }
+
     public void startTests(){
         writer.startLaunch();
     }
@@ -442,7 +452,7 @@ public class AdapterManager {
      *
      * @param uuid the uuid of step to stop.
      */
-    public void stopStep(final String uuid) {
+    private void stopStep(final String uuid) {
         final Optional<StepResult> found = storage.getStep(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop step: step with uuid {} not found", uuid);

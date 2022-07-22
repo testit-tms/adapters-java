@@ -28,19 +28,21 @@ public class HttpWriter implements Writer {
 
     @Override
     public void startLaunch() {
-        if (!Objects.equals(this.config.getTestRunId(), "null")) {
-            return;
-        }
+        synchronized (config){
+            if (!Objects.equals(this.config.getTestRunId(), "null")) {
+                return;
+            }
 
-        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
-        model.setProjectId(UUID.fromString(config.getProjectId()));
+            TestRunV2PostShortModel model = new TestRunV2PostShortModel();
+            model.setProjectId(UUID.fromString(config.getProjectId()));
 
-        try {
-            TestRunV2GetModel response = apiClient.createTestRun(model);
-            this.config.setTestRunId(response.getId().toString());
+            try {
+                TestRunV2GetModel response = apiClient.createTestRun(model);
+                this.config.setTestRunId(response.getId().toString());
 
-        } catch (ApiException e) {
-            LOGGER.error("Can not start the launch: ".concat(e.getMessage()));
+            } catch (ApiException e) {
+                LOGGER.error("Can not start the launch: ".concat(e.getMessage()));
+            }
         }
     }
 
