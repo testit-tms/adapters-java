@@ -7,13 +7,14 @@ import java.util.List;
  * Model describes step.
  */
 
-public class StepResult implements ResultWithSteps {
+public class StepResult implements ResultWithSteps, ResultWithAttachments {
     private String name;
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
     private List<String> steps = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
+    private List<String> attachments = new ArrayList<>();
     private Throwable throwable;
     private Long start;
     private Long stop;
@@ -95,6 +96,26 @@ public class StepResult implements ResultWithSteps {
      */
     public StepResult setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    /**
+     * Gets attachments.
+     *
+     * @return the attachments
+     */
+    public List<String> getAttachments() {
+        return attachments;
+    }
+
+    /**
+     * Sets attachments.
+     *
+     * @param attachments the attachments
+     * @return self for method chaining
+     */
+    public StepResult setAttachments(List<String> attachments) {
+        this.attachments = attachments;
         return this;
     }
 

@@ -7,13 +7,14 @@ import java.util.List;
  * Model describes fixture.
  */
 
-public class FixtureResult implements ResultWithSteps {
+public class FixtureResult implements ResultWithSteps, ResultWithAttachments {
     private String name;
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
     private List<String> steps = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
+    private List<String> attachments = new ArrayList<>();
     private String parent;
     private Long start;
     private Long stop;
@@ -95,6 +96,26 @@ public class FixtureResult implements ResultWithSteps {
      */
     public FixtureResult setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    /**
+     * Gets attachments.
+     *
+     * @return the attachments
+     */
+    public List<String> getAttachments() {
+        return attachments;
+    }
+
+    /**
+     * Sets attachments.
+     *
+     * @param attachments the attachments
+     * @return self for method chaining
+     */
+    public FixtureResult setAttachments(List<String> attachments) {
+        this.attachments = attachments;
         return this;
     }
 

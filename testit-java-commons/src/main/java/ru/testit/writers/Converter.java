@@ -1,6 +1,7 @@
 package ru.testit.writers;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import ru.testit.client.api.AttachmentsApi;
 import ru.testit.client.model.*;
 import ru.testit.models.FixtureResult;
 import ru.testit.models.Label;
@@ -10,10 +11,7 @@ import ru.testit.services.ResultStorage;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Converter {
@@ -74,6 +72,8 @@ public class Converter {
         model.setDuration(result.getStop() - result.getStart());
         model.setOutcome(result.getItemStatus().value());
         model.setStepResults(convertResultStep(storage, result.getSteps()));
+        model.attachments(convertAttachments(result.getAttachments()));
+        model.setMessage(result.getMessage());
 
         Throwable throwable = result.getThrowable();
         if (throwable != null) {
@@ -101,6 +101,7 @@ public class Converter {
                             model.setDuration(fixture.getStop() - fixture.getStart());
                             model.setOutcome(fixture.getItemStatus().value());
                             model.setStepResults(convertResultStep(storage, fixture.getSteps()));
+                            model.attachments(convertAttachments(fixture.getAttachments()));
 
                             return model;
                         }
@@ -201,6 +202,7 @@ public class Converter {
                 model.setDuration(step.getStop() - step.getStart());
                 model.setOutcome(step.getItemStatus().value());
                 model.setStepResults(convertResultStep(storage, step.getSteps()));
+                model.attachments(convertAttachments(step.getAttachments()));
             });
 
             return model;
@@ -230,5 +232,15 @@ public class Converter {
     private static OffsetDateTime dateToOffsetDateTime(Long time) {
         Date date = new Date(time);
         return date.toInstant().atOffset(ZoneOffset.UTC);
+    }
+
+    private static List<AttachmentPutModel> convertAttachments(List<String> uuids){
+        return uuids.stream().map(attach -> {
+            AttachmentPutModel model = new AttachmentPutModel();
+
+            model.setId(UUID.fromString(attach));
+
+            return model;
+        }).collect(Collectors.toList());
     }
 }
