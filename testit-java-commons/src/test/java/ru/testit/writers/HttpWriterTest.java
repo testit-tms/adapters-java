@@ -3,6 +3,7 @@ package ru.testit.writers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
