@@ -4,6 +4,7 @@ import org.aspectj.lang.annotation.Before;
 import org.testng.Assert;
 import org.testng.annotations.*;
 import ru.testit.annotations.*;
+import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
@@ -93,7 +94,7 @@ public class FullBeforeAfterTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
     public void allAnnotationsTest() {
-        Adapter.link("Test 1", "Desc 1", LinkType.ISSUE, "https://testit.ru/");
+        Adapter.addLink(new LinkItem().setTitle("Test 1").setDescription("Desc 1").setType(LinkType.ISSUE).setUrl("https://testit.ru/"));
         createProject();
         enterProject();
         createSection();

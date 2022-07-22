@@ -217,7 +217,11 @@ Description of Annotations (\* - required):
 - `Step` - the designation of the step
 
 Description of methods:
-- `Adapter.link` - links in the autotest result
+- `Adapter.addLink` - link in the autotest result
+- `Adapter.addLinks` - links in the autotest result
+- `Adapter.addAttachment` - attachment in the autotest result
+- `Adapter.addAttachments` - attachments in the autotest result
+- `Adapter.addMessage` - message in the autotest result
 
 ### Examples
 
@@ -248,7 +252,7 @@ public class SimpleTest {
            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
    public void itsTrueReallyTrue() {
       step1();
-      Adapter.link("Test 2", "Desc 2", LinkType.DEFECT, "https://testit.ru/123");
+      Adapter.addLink(new LinkItem().setTitle("Test 1").setDescription("Desc 1").setType(LinkType.ISSUE).setUrl("https://testit.ru/"));
       Assertions.assertTrue(true);
    }
 
@@ -258,6 +262,7 @@ public class SimpleTest {
    private void step1() {
       step2();
       Assertions.assertTrue(true);
+      Adapter.addMessage("Message");
    }
 
    @Step
@@ -265,6 +270,7 @@ public class SimpleTest {
    @Description("Step 2 description")
    private void step2() {
       Assertions.assertTrue(true);
+      Adapter.addAttachment("/Users/user/screen.json");
    }
 }
 ```

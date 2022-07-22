@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import ru.testit.annotations.*;
 import ru.testit.listener.BaseJunit4Runner;
+import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
@@ -85,7 +86,7 @@ public class SampleTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
     public void allAnnotationsTest() {
-        Adapter.link("Test 1", "Desc 1", LinkType.ISSUE, "https://testit.ru/");
+        Adapter.addLink(new LinkItem().setTitle("Test 1").setDescription("Desc 1").setType(LinkType.ISSUE).setUrl("https://testit.ru/"));
         authorization();
         createProject();
         enterProject();
