@@ -7,8 +7,12 @@
     </listeners>
     <test name="All">
         <classes>
-            <class name="ru.testit.samples.SampleTest" >
-            </class>
+            <class name="ru.testit.samples.FullBeforeAfterTests" />
+            <class name="ru.testit.samples.OnlyBeforeAfterAllTests" />
+            <class name="ru.testit.samples.OnlyBeforeAfterEachTests" />
+            <class name="ru.testit.samples.failed.FullBeforeAfterTests" />
+            <class name="ru.testit.samples.failed.OnlyBeforeAfterAllTests" />
+            <class name="ru.testit.samples.failed.OnlyBeforeAfterEachTests" />
         </classes>
     </test>
 </suite>
