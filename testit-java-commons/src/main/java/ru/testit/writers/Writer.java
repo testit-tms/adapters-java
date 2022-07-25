@@ -14,4 +14,6 @@ public interface Writer {
     void writeClass(ClassContainer container);
 
     void writeTests(MainContainer container);
+
+    String writeAttachment(String path);
 }

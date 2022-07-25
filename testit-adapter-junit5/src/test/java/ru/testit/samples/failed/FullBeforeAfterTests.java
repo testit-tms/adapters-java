@@ -3,6 +3,7 @@ package ru.testit.samples.failed;
 import org.junit.jupiter.api.*;
 import ru.testit.annotations.DisplayName;
 import ru.testit.annotations.*;
+import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
@@ -92,7 +93,7 @@ public class FullBeforeAfterTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
     public void allAnnotationsTest() {
-        Adapter.link("Test 1", "Desc 1", LinkType.ISSUE, "https://testit.ru/");
+       Adapter.addLink("https://testit.ru/", "Test 1","Desc 1", LinkType.ISSUE);
         createProject();
         enterProject();
         createSection();

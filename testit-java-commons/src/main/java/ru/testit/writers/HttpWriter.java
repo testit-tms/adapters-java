@@ -203,4 +203,15 @@ public class HttpWriter implements Writer {
             LOGGER.error("Can not write the test results: ".concat(e.getMessage()));
         }
     }
+
+    @Override
+    public String writeAttachment(String path) {
+        try {
+            return apiClient.addAttachment(path);
+        } catch (ApiException e) {
+            LOGGER.error("Can not write attachment: ".concat(e.getMessage()));
+
+            return "";
+        }
+    }
 }

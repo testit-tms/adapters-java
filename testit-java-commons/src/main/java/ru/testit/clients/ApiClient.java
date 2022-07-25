@@ -14,4 +14,5 @@ public interface ApiClient {
     AutoTestModel getAutoTestByExternalId(String projectId,String externalId) throws ApiException;
     void linkAutoTestToWorkItem(String id, String workItemId) throws ApiException;
     void sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException;
+    String addAttachment(String path) throws ApiException;
 }

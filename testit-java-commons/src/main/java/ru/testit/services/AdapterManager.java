@@ -12,9 +12,7 @@ import ru.testit.properties.AppProperties;
 import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -467,5 +465,26 @@ public class AdapterManager {
         step.setStop(System.currentTimeMillis());
 
         threadContext.stop();
+    }
+
+    public void addAttachments(List<String> attachments){
+        List<String> uuids = new ArrayList<>();
+        for (final String attachment : attachments) {
+            uuids.add(writer.writeAttachment(attachment));
+        }
+
+        final Optional<String> current = threadContext.getCurrent();
+        if (!current.isPresent()) {
+            LOGGER.error("Could not add attachment: no test is running");
+            return;
+        }
+
+        storage.get(current.get(), ResultWithAttachments.class).ifPresent(
+                result -> {
+                    synchronized (storage) {
+                        result.getAttachments().addAll(uuids);
+                    }
+                }
+        );
     }
 }

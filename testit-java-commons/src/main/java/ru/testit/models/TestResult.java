@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * The model object that stores information about test that was run.
  */
-public class TestResult implements ResultWithSteps {
+public class TestResult implements ResultWithSteps, ResultWithAttachments {
     private String uuid;
     private String externalId;
     private String workItemId;
@@ -15,8 +15,10 @@ public class TestResult implements ResultWithSteps {
     private List<Label> labels = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
     private List<LinkItem> resultLinks = new ArrayList<>();
+    private List<String> attachments = new ArrayList<>();
     private String name;
     private String title;
+    private String message;
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
@@ -126,6 +128,26 @@ public class TestResult implements ResultWithSteps {
     }
 
     /**
+     * Gets attachments.
+     *
+     * @return the attachments
+     */
+    public List<String> getAttachments() {
+        return attachments;
+    }
+
+    /**
+     * Sets attachments.
+     *
+     * @param attachments the attachments
+     * @return self for method chaining
+     */
+    public TestResult setAttachments(List<String> attachments) {
+        this.attachments = attachments;
+        return this;
+    }
+
+    /**
      * Gets labels.
      *
      * @return the labels
@@ -182,6 +204,26 @@ public class TestResult implements ResultWithSteps {
      */
     public TestResult setResultLinks(List<LinkItem> resultLinks) {
         this.resultLinks = resultLinks;
+        return this;
+    }
+
+    /**
+     * Gets message.
+     *
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * Sets message.
+     *
+     * @param message the message
+     * @return self for method chaining
+     */
+    public TestResult setMessage(String message) {
+        this.message = message;
         return this;
     }
 

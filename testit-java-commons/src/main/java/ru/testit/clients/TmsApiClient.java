@@ -1,10 +1,12 @@
 package ru.testit.clients;
 
+import ru.testit.client.api.AttachmentsApi;
 import ru.testit.client.api.AutoTestsApi;
 import ru.testit.client.api.TestRunsApi;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,15 +17,17 @@ public class TmsApiClient implements ApiClient {
 
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
+    private final AttachmentsApi attachmentsApi;
 
     public TmsApiClient(ClientConfiguration config) {
-        ru.testit.client.invoker.ApiClient apiClient = new ru.testit.client.invoker.ApiClient();
+        ApiClientExtended apiClient = new ApiClientExtended();
         apiClient.setBasePath(config.getUrl());
         apiClient.setApiKeyPrefix(AUTH_PREFIX);
         apiClient.setApiKey(config.getPrivateToken());
 
         testRunsApi = new TestRunsApi(apiClient);
         autoTestsApi = new AutoTestsApi(apiClient);
+        attachmentsApi = new AttachmentsApi(apiClient);
     }
 
     @Override
@@ -76,5 +80,13 @@ public class TmsApiClient implements ApiClient {
     @Override
     public void sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException {
         testRunsApi.setAutoTestResultsForTestRun(UUID.fromString(testRunUuid), models);
+    }
+
+    @Override
+    public String addAttachment(String path) throws ApiException {
+        File file = new File(path);
+        AttachmentModel model = attachmentsApi.apiV2AttachmentsPost(file);
+
+        return model.getId().toString();
     }
 }

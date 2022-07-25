@@ -1,6 +1,5 @@
 package ru.testit.services;
 
-import javafx.beans.binding.When;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -816,5 +815,25 @@ public class AdapterManagerTest {
         Assertions.assertNull(result.getStop());
         Assertions.assertNull(result.getItemStage());
         verify(threadContext, never()).stop();
+    }
+
+    @Test
+    void addAttachments() {
+        // arrange
+        String path = "C:/temp.jpeg";
+        TestResult result = Helper.generateTestResult();
+
+        when(threadContext.getRoot()).thenReturn(Optional.of(result.getUuid()));
+        when(threadContext.getCurrent()).thenReturn(Optional.of(result.getUuid()));
+        when(storage.get(result.getUuid(), ResultWithAttachments.class)).thenReturn(Optional.of(result));
+
+        AdapterManager manager = new AdapterManager(threadContext, storage, writer);
+
+        // act
+        manager.addAttachments(new ArrayList<String>(){{add(path);}});
+
+        // assert
+        Assertions.assertFalse(result.getAttachments().isEmpty());
+        verify(writer).writeAttachment(path);
     }
 }
