@@ -25,7 +25,7 @@ public class Utils {
     }
 
     public static List<LinkItem> extractLinks(final Method method) {
-        final List<LinkItem> links = new LinkedList<LinkItem>();
+        final List<LinkItem> links = new LinkedList<>();
         final Links linksAnnotation = method.getAnnotation(Links.class);
         if (linksAnnotation != null) {
             for (final Link link : linksAnnotation.links()) {
@@ -42,12 +42,12 @@ public class Utils {
     }
 
     public static List<Label> extractLabels(final Method method) {
-        final List<Label> labels = new LinkedList<Label>();
+        final List<Label> labels = new LinkedList<>();
         final Labels annotation = method.getAnnotation(Labels.class);
         if (annotation != null) {
             for (final String s : annotation.value()) {
-                final Label label = new Label();
-                label.setName(s);
+                final Label label = new Label()
+                        .setName(s);
                 labels.add(label);
             }
         }
