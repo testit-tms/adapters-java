@@ -63,8 +63,7 @@ public class Helper {
         steps.add(STEP_UUID);
 
         List<Label> labels = new ArrayList<>();
-        Label label = new Label();
-        label.setName(LABEL_NAME);
+        Label label = new Label().setName(LABEL_NAME);
         labels.add(label);
 
         TestResult testResult = new TestResult();
