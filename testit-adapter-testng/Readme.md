@@ -240,7 +240,6 @@ public class SampleTests {
     @Title("Step 2")
     @Description("Step 2 description")
     private void step2() {
-        Adapter.add
         Assert.assertTrue(true);
         Adapter.addAttachment("/Users/user/screen.json");
     }
@@ -254,7 +253,6 @@ public class SampleTests {
     @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
                 @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
                 @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
-
     public void simpleTest2() {
         step1();
         Adapter.addLink("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
