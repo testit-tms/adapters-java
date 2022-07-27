@@ -20,6 +20,7 @@ public class BaseJunit4Listener extends RunListener
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
     private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
     private final ThreadLocal<String> classUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
+    private final ThreadLocal<Boolean> isFinished = ThreadLocal.withInitial(() -> false);
 
     public BaseJunit4Listener() {
         adapterManager = Adapter.getAdapterManager();
@@ -42,9 +43,14 @@ public class BaseJunit4Listener extends RunListener
 
     @Override
     public void testRunFinished(final Result result) {
+        if (isFinished.get()){
+            return;
+        }
+
         adapterManager.stopClassContainer(classUUID.get());
         adapterManager.stopMainContainer(launcherUUID.get());
         adapterManager.stopTests();
+        isFinished.set(true);
     }
 
     @Override
