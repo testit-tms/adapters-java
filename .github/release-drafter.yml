@@ -1,21 +1,21 @@
 name-template: 'v$NEXT_PATCH_VERSION'
 tag-template: 'v$NEXT_PATCH_VERSION'
 categories:
-  - title: ' New Features'
+  - title: '🚀 Features'
     labels:
-      - 'type:features'
+      - 'enhancement'
 
-  - title: ' Bugs Fixes'
+  - title: '🐛 Bug Fixes'
     labels:
-      - 'type:fix'
+      - 'bug'
 
-  - title: ' Documentation'
+  - title: '🧾 Documentation'
     labels:
       - 'type:documentation'
 
-  - title: ' Configuration'
+  - title: '🧪 Tests'
     labels:
-      - 'type:config'
+      - 'tests'
 
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 template: |
