@@ -3,17 +3,8 @@ plugins {
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
-    jacoco
-    id("org.sonarqube") version "3.4.0.2513"
 }
 
-sonarqube {
-    properties {
-        properties["sonar.projectKey"] = "testit-tms_adapters-java"
-        properties["sonar.organization"] = "testit-tms"
-        properties["sonar.host.url"] = "https://sonarcloud.io"
-    }
-}
 group = "ru.testit"
 
 java {
@@ -41,7 +32,6 @@ configure(subprojects) {
     apply(plugin = "signing")
     apply(plugin = "maven-publish")
     apply(plugin = "java")
-    apply(plugin = "jacoco")
 
     publishing {
         publications {
@@ -118,19 +108,6 @@ configure(subprojects) {
     publishing.publications.named<MavenPublication>("maven") {
         pom {
             from(components["java"])
-        }
-    }
-
-    tasks.test {
-        finalizedBy(tasks.jacocoTestReport)
-    }
-
-    tasks.jacocoTestReport {
-        dependsOn(tasks.test)
-        reports {
-            xml.required.set(true)
-            csv.required.set(false)
-            html.required.set(false)
         }
     }
 }
