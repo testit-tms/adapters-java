@@ -57,6 +57,7 @@ public class ResultStorage {
         lock.writeLock().lock();
         try {
             Objects.requireNonNull(uuid, "Can't put result to storage: uuid can't be null");
+            Objects.requireNonNull(item, "Can't put result to storage: item can't be null");
             storage.put(uuid, item);
             return item;
         } finally {
