@@ -10,9 +10,7 @@ import ru.testit.services.AdapterManager;
 import ru.testit.services.Utils;
 
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -96,19 +94,24 @@ public class BaseTestNgListener implements
 
     protected void startTestCase(final ITestResult testResult,
                                  final String uuid) {
+        final Map<String, String> parameters = new HashMap<>(
+                testResult.getTestContext().getCurrentXmlTest().getAllParameters()
+        );
+
         Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
         final TestResult result = new TestResult()
                 .setUuid(uuid)
-                .setLabels(Utils.extractLabels(method))
-                .setExternalId(Utils.extractExternalID(method))
-                .setWorkItemId(Utils.extractWorkItemId(method))
-                .setTitle(Utils.extractTitle(method))
-                .setName(Utils.extractDisplayName(method))
+                .setLabels(Utils.extractLabels(method, parameters))
+                .setExternalId(Utils.extractExternalID(method, parameters))
+                .setWorkItemId(Utils.extractWorkItemId(method, parameters))
+                .setTitle(Utils.extractTitle(method, parameters))
+                .setName(Utils.extractDisplayName(method, parameters))
                 .setClassName(method.getDeclaringClass().getSimpleName())
                 .setSpaceName((method.getDeclaringClass().getPackage() == null)
                         ? null : method.getDeclaringClass().getPackage().getName())
-                .setLinkItems(Utils.extractLinks(method))
-                .setDescription(Utils.extractDescription(method));
+                .setLinkItems(Utils.extractLinks(method, parameters))
+                .setDescription(Utils.extractDescription(method, parameters))
+                .setParameters(parameters);
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);
@@ -246,8 +249,8 @@ public class BaseTestNgListener implements
         final Method method = testMethod.getConstructorOrMethod().getMethod();
 
         return new FixtureResult()
-                .setName(Utils.extractTitle(method))
-                .setDescription(Utils.extractDescription(method))
+                .setName(Utils.extractTitle(method, null))
+                .setDescription(Utils.extractDescription(method, null))
                 .setStart(System.currentTimeMillis())
                 .setItemStage(ItemStage.RUNNING);
     }
