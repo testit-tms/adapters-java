@@ -2,6 +2,7 @@ package ru.testit.models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The model object that stores information about test that was run.
@@ -26,6 +27,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments {
     private Long start;
     private Long stop;
     private Throwable throwable;
+    private Map<String, String> parameters;
 
     /**
      * Gets uuid.
@@ -390,7 +392,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments {
     /**
      * Gets throwable.
      *
-     * @return the stop
+     * @return the throwable
      */
     public Throwable getThrowable() {
         return throwable;
@@ -404,6 +406,26 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments {
      */
     public TestResult setThrowable(Throwable throwable) {
         this.throwable = throwable;
+        return this;
+    }
+
+    /**
+     * Gets parameters.
+     *
+     * @return the parameters
+     */
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    /**
+     * Sets parameters.
+     *
+     * @param parameters the value
+     * @return self for method chaining
+     */
+    public TestResult setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
         return this;
     }
 }

@@ -74,6 +74,7 @@ public class Converter {
         model.setStepResults(convertResultStep(storage, result.getSteps()));
         model.attachments(convertAttachments(result.getAttachments()));
         model.setMessage(result.getMessage());
+        model.setParameters(result.getParameters());
 
         Throwable throwable = result.getThrowable();
         if (throwable != null) {
@@ -102,6 +103,7 @@ public class Converter {
                             model.setOutcome(fixture.getItemStatus().value());
                             model.setStepResults(convertResultStep(storage, fixture.getSteps()));
                             model.attachments(convertAttachments(fixture.getAttachments()));
+                            model.parameters(fixture.getParameters());
 
                             return model;
                         }
@@ -203,6 +205,7 @@ public class Converter {
                 model.setOutcome(step.getItemStatus().value());
                 model.setStepResults(convertResultStep(storage, step.getSteps()));
                 model.attachments(convertAttachments(step.getAttachments()));
+                model.parameters(step.getParameters());
             });
 
             return model;

@@ -10,6 +10,9 @@ import ru.testit.services.AdapterManager;
 import ru.testit.services.Utils;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Aspect
@@ -35,10 +38,22 @@ public class StepAspect {
         final MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         final String uuid = UUID.randomUUID().toString();
         Method method = signature.getMethod();
+        Parameter[] parameters = method.getParameters();
+        Map<String, String> stepParameters = new HashMap<>();
+
+        for (int i = 0; i < parameters.length; i++) {
+            final Parameter parameter = parameters[i];
+
+            String name = parameter.getName();
+            String value = joinPoint.getArgs()[i].toString();
+
+            stepParameters.put(name, value);
+        }
 
         final StepResult result = new StepResult()
-                .setName(Utils.extractTitle(method))
-                .setDescription(Utils.extractDescription(method));
+                .setName(Utils.extractTitle(method, stepParameters))
+                .setDescription(Utils.extractDescription(method, stepParameters))
+                .setParameters(stepParameters);
 
         getManager().startStep(uuid, result);
     }

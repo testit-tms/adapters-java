@@ -2,6 +2,7 @@ package ru.testit.models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Model describes step.
@@ -18,6 +19,7 @@ public class StepResult implements ResultWithSteps, ResultWithAttachments {
     private Throwable throwable;
     private Long start;
     private Long stop;
+    private Map<String, String> parameters;
 
     /**
      * Gets name.
@@ -216,6 +218,26 @@ public class StepResult implements ResultWithSteps, ResultWithAttachments {
      */
     public StepResult setThrowable(Throwable throwable) {
         this.throwable = throwable;
+        return this;
+    }
+
+    /**
+     * Gets parameters.
+     *
+     * @return the parameters
+     */
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    /**
+     * Sets parameters.
+     *
+     * @param parameters the value
+     * @return self for method chaining
+     */
+    public StepResult setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
         return this;
     }
 }
