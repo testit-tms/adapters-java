@@ -36,6 +36,7 @@ tasks.jar {
 
 tasks.compileTestJava {
     options.encoding = "UTF-8"
+    options.compilerArgs.add("-parameters")
 }
 
 tasks.getByName<Test>("test") {
