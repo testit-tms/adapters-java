@@ -24,21 +24,21 @@ public class Utils {
         return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
-    public static String extractWorkItemId(final Method method, Map<String, String> parameters) {
-        final WorkItemId annotation = method.getAnnotation(WorkItemId.class);
+    public static String extractWorkItemId(final Method atomicTest, Map<String, String> parameters) {
+        final WorkItemId annotation = atomicTest.getAnnotation(WorkItemId.class);
         return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
-    public static List<LinkItem> extractLinks(final Method method, Map<String, String> parameters) {
+    public static List<LinkItem> extractLinks(final Method atomicTest, Map<String, String> parameters) {
         final List<LinkItem> links = new LinkedList<>();
-        final Links linksAnnotation = method.getAnnotation(Links.class);
+        final Links linksAnnotation = atomicTest.getAnnotation(Links.class);
         if (linksAnnotation != null) {
             for (final Link link : linksAnnotation.links()) {
                 links.add(makeLink(link, parameters));
             }
         }
         else {
-            final Link linkAnnotation = method.getAnnotation(Link.class);
+            final Link linkAnnotation = atomicTest.getAnnotation(Link.class);
             if (linkAnnotation != null) {
                 links.add(makeLink(linkAnnotation, parameters));
             }
@@ -46,9 +46,9 @@ public class Utils {
         return links;
     }
 
-    public static List<Label> extractLabels(final Method method, Map<String, String> parameters) {
+    public static List<Label> extractLabels(final Method atomicTest, Map<String, String> parameters) {
         final List<Label> labels = new LinkedList<>();
-        final Labels annotation = method.getAnnotation(Labels.class);
+        final Labels annotation = atomicTest.getAnnotation(Labels.class);
         if (annotation != null) {
             for (final String s : annotation.value()) {
                 final Label label = new Label()
@@ -59,13 +59,13 @@ public class Utils {
         return labels;
     }
 
-    public static String extractDescription(final Method currentTest, Map<String, String> parameters) {
-        final Description annotation = currentTest.getAnnotation(Description.class);
+    public static String extractDescription(final Method atomicTest, Map<String, String> parameters) {
+        final Description annotation = atomicTest.getAnnotation(Description.class);
         return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
-    public static String extractTitle(final Method currentTest, Map<String, String> parameters) {
-        final Title annotation = currentTest.getAnnotation(Title.class);
+    public static String extractTitle(final Method atomicTest, Map<String, String> parameters) {
+        final Title annotation = atomicTest.getAnnotation(Title.class);
         return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
@@ -94,15 +94,17 @@ public class Utils {
     }
 
     private static String setParameters(String value, Map<String, String> parameters) {
-        Pattern pattern = Pattern.compile("\\{\\s*(\\w+)}");
-        Matcher matcher = pattern.matcher(value);
+        if (!isNull(parameters) && !isNull(value)) {
+            Pattern pattern = Pattern.compile("\\{\\s*(\\w+)}");
+            Matcher matcher = pattern.matcher(value);
 
-        while (matcher.find()){
-            String parameterName = matcher.group(1);
-            String parameterValue = parameters.get(parameterName);
+            while (matcher.find()){
+                String parameterName = matcher.group(1);
+                String parameterValue = parameters.get(parameterName);
 
-            if (!isNull(parameterValue)) {
-                value = value.replace(String.format("{%s}", parameterName), parameters.get(parameterName));
+                if (!isNull(parameterValue)) {
+                    value = value.replace(String.format("{%s}", parameterName), parameters.get(parameterName));
+                }
             }
         }
 

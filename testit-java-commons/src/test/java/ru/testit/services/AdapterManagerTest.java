@@ -3,7 +3,6 @@ package ru.testit.services;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import ru.testit.Helper;
 import ru.testit.models.*;
 import ru.testit.writers.HttpWriter;
@@ -24,10 +23,10 @@ public class AdapterManagerTest {
 
     @BeforeEach
     void init() {
-        this.storage = Mockito.mock(ResultStorage.class);
-        this.threadContext = Mockito.mock(ThreadContext.class);
-        this.writer = Mockito.mock(HttpWriter.class);
-        this.update = Mockito.mock(Consumer.class);
+        this.storage = mock(ResultStorage.class);
+        this.threadContext = mock(ThreadContext.class);
+        this.writer = mock(HttpWriter.class);
+        this.update = mock(Consumer.class);
     }
 
     @Test
