@@ -54,10 +54,7 @@ public class Helper {
         Date stopDate = new Date(startDate.getTime() + 1000);
 
         List<LinkItem> links = new ArrayList<>();
-        links.add(new LinkItem().setTitle(LINK_TITLE)
-                .setDescription(LINK_DESCRIPTION)
-                .setType(LINK_TYPE)
-                .setUrl(LINK_URL));
+        links.add(generateLinkItem());
 
         List<String> steps = new ArrayList<>();
         steps.add(STEP_UUID);
@@ -83,6 +80,14 @@ public class Helper {
                 .setLabels(labels);
 
         return testResult;
+    }
+
+    public static LinkItem generateLinkItem() {
+        return new LinkItem()
+                .setTitle(LINK_TITLE)
+                .setDescription(LINK_DESCRIPTION)
+                .setType(LINK_TYPE)
+                .setUrl(LINK_URL);
     }
 
     public static AutoTestModel generateAutoTestModel(String projectId) {

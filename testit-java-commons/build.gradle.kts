@@ -17,7 +17,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
-    testImplementation ("org.mockito:mockito-core:4.6.1")
+    testImplementation("org.mockito:mockito-inline:3.4.6")
 }
 
 tasks.getByName<Test>("test") {

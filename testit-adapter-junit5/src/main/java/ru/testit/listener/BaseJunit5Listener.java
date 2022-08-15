@@ -5,7 +5,7 @@ import ru.testit.models.*;
 import ru.testit.services.*;
 
 import java.lang.reflect.*;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static java.util.Objects.nonNull;
@@ -64,8 +64,8 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
     private FixtureResult getFixtureResult(final Method method) {
         return new FixtureResult()
-                .setName(Utils.extractTitle(method))
-                .setDescription(Utils.extractDescription(method))
+                .setName(Utils.extractTitle(method, null))
+                .setDescription(Utils.extractDescription(method, null))
                 .setStart(System.currentTimeMillis())
                 .setItemStage(ItemStage.RUNNING);
     }
@@ -98,11 +98,13 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     }
 
     @Override
-    public void interceptTestMethod(
+    public void interceptTestTemplateMethod(
             InvocationInterceptor.Invocation<Void> invocation,
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) throws Exception {
+        Map<String, String> parameters = getParameters(invocationContext);
+
         ExecutableTest executableTest = this.executableTest.get();
         if (executableTest.isStarted()) {
             executableTest = refreshContext();
@@ -110,7 +112,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         executableTest.setTestStatus();
 
         final String uuid = executableTest.getUuid();
-        startTestCase(extensionContext.getRequiredTestMethod(), uuid);
+        startTestCase(extensionContext.getRequiredTestMethod(), uuid, parameters);
 
         adapterManager.updateClassContainer(classUUID.get(),
                 container -> container.getChildren().add(uuid));
@@ -123,19 +125,69 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         }
     }
 
-    protected void startTestCase(Method method, final String uuid) {
+    private Map<String, String> getParameters(
+            final ReflectiveInvocationContext<Method> invocationContext
+    ) {
+        final Parameter[] parameters = invocationContext.getExecutable().getParameters();
+        Map<String, String> testParameters = new HashMap<>();
+
+        for (int i = 0; i < parameters.length; i++) {
+            final Parameter parameter = parameters[i];
+            final Class<?> parameterType = parameter.getType();
+
+            if (parameterType.getCanonicalName().startsWith("org.junit.jupiter.api")) {
+                continue;
+            }
+
+            String name = parameter.getName();
+            String value = invocationContext.getArguments().get(i).toString();
+
+            testParameters.put(name, value);
+        }
+
+        return testParameters;
+    }
+
+    @Override
+    public void interceptTestMethod(
+            InvocationInterceptor.Invocation<Void> invocation,
+            ReflectiveInvocationContext<Method> invocationContext,
+            ExtensionContext extensionContext
+    ) throws Exception {
+        ExecutableTest executableTest = this.executableTest.get();
+        if (executableTest.isStarted()) {
+            executableTest = refreshContext();
+        }
+        executableTest.setTestStatus();
+
+        final String uuid = executableTest.getUuid();
+        startTestCase(extensionContext.getRequiredTestMethod(), uuid, null);
+
+        adapterManager.updateClassContainer(classUUID.get(),
+                container -> container.getChildren().add(uuid));
+
+        try {
+            invocation.proceed();
+        } catch (Throwable throwable) {
+            stopTestCase(executableTest.getUuid(), throwable, ItemStatus.FAILED);
+            throw new Exception(throwable.getMessage());
+        }
+    }
+
+    protected void startTestCase(Method method, final String uuid, Map<String, String> parameters) {
         final TestResult result = new TestResult()
                 .setUuid(uuid)
-                .setLabels(Utils.extractLabels(method))
-                .setExternalId(Utils.extractExternalID(method))
-                .setWorkItemId(Utils.extractWorkItemId(method))
-                .setTitle(Utils.extractTitle(method))
-                .setName(Utils.extractDisplayName(method))
+                .setLabels(Utils.extractLabels(method, parameters))
+                .setExternalId(Utils.extractExternalID(method, parameters))
+                .setWorkItemId(Utils.extractWorkItemId(method, parameters))
+                .setTitle(Utils.extractTitle(method, parameters))
+                .setName(Utils.extractDisplayName(method, parameters))
                 .setClassName(method.getDeclaringClass().getSimpleName())
                 .setSpaceName((method.getDeclaringClass().getPackage() == null)
                         ? null : method.getDeclaringClass().getPackage().getName())
-                .setLinkItems(Utils.extractLinks(method))
-                .setDescription(Utils.extractDescription(method));
+                .setLinkItems(Utils.extractLinks(method, parameters))
+                .setDescription(Utils.extractDescription(method, parameters))
+                .setParameters(parameters);
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);

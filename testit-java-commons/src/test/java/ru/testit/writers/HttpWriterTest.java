@@ -2,7 +2,6 @@ package ru.testit.writers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.clients.ApiClient;
@@ -25,9 +24,9 @@ class HttpWriterTest {
 
     @BeforeEach
     void init() {
-        this.client = Mockito.mock(ApiClient.class);
-        this.config = Mockito.mock(ClientConfiguration.class);
-        this.storage = Mockito.mock(ResultStorage.class);
+        this.client = mock(ApiClient.class);
+        this.config = mock(ClientConfiguration.class);
+        this.storage = mock(ResultStorage.class);
 
         when(config.getUrl()).thenReturn("https://example.test/");
         when(config.getProjectId()).thenReturn("d7defd1e-c1ed-400d-8be8-091ebfdda744");

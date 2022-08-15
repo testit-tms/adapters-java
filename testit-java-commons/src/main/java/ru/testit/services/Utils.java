@@ -7,68 +7,73 @@ import ru.testit.models.LinkItem;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.Objects.isNull;
 
 public class Utils {
-    public static String extractExternalID(final Method atomicTest) {
+    public static String extractExternalID(final Method atomicTest, Map<String, String> parameters) {
         final ExternalId annotation = atomicTest.getAnnotation(ExternalId.class);
-        return (annotation != null) ? annotation.value() : null;
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
-    public static String extractDisplayName(final Method atomicTest) {
+    public static String extractDisplayName(final Method atomicTest, Map<String, String> parameters) {
         final DisplayName annotation = atomicTest.getAnnotation(DisplayName.class);
-        return (annotation != null) ? annotation.value() : null;
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
-    public static String extractWorkItemId(final Method method) {
-        final WorkItemId annotation = method.getAnnotation(WorkItemId.class);
-        return (annotation != null) ? annotation.value() : null;
+    public static String extractWorkItemId(final Method atomicTest, Map<String, String> parameters) {
+        final WorkItemId annotation = atomicTest.getAnnotation(WorkItemId.class);
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
-    public static List<LinkItem> extractLinks(final Method method) {
+    public static List<LinkItem> extractLinks(final Method atomicTest, Map<String, String> parameters) {
         final List<LinkItem> links = new LinkedList<>();
-        final Links linksAnnotation = method.getAnnotation(Links.class);
+        final Links linksAnnotation = atomicTest.getAnnotation(Links.class);
         if (linksAnnotation != null) {
             for (final Link link : linksAnnotation.links()) {
-                links.add(makeLink(link));
+                links.add(makeLink(link, parameters));
             }
         }
         else {
-            final Link linkAnnotation = method.getAnnotation(Link.class);
+            final Link linkAnnotation = atomicTest.getAnnotation(Link.class);
             if (linkAnnotation != null) {
-                links.add(makeLink(linkAnnotation));
+                links.add(makeLink(linkAnnotation, parameters));
             }
         }
         return links;
     }
 
-    public static List<Label> extractLabels(final Method method) {
+    public static List<Label> extractLabels(final Method atomicTest, Map<String, String> parameters) {
         final List<Label> labels = new LinkedList<>();
-        final Labels annotation = method.getAnnotation(Labels.class);
+        final Labels annotation = atomicTest.getAnnotation(Labels.class);
         if (annotation != null) {
             for (final String s : annotation.value()) {
                 final Label label = new Label()
-                        .setName(s);
+                        .setName(setParameters(s, parameters));
                 labels.add(label);
             }
         }
         return labels;
     }
 
-    public static String extractDescription(final Method currentTest) {
-        final Description annotation = currentTest.getAnnotation(Description.class);
-        return (annotation != null) ? annotation.value() : null;
+    public static String extractDescription(final Method atomicTest, Map<String, String> parameters) {
+        final Description annotation = atomicTest.getAnnotation(Description.class);
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
-    public static String extractTitle(final Method currentTest) {
-        final Title annotation = currentTest.getAnnotation(Title.class);
-        return (annotation != null) ? annotation.value() : null;
+    public static String extractTitle(final Method atomicTest, Map<String, String> parameters) {
+        final Title annotation = atomicTest.getAnnotation(Title.class);
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
-    private static LinkItem makeLink(final Link linkAnnotation) {
+    private static LinkItem makeLink(final Link linkAnnotation, Map<String, String> parameters) {
         return new LinkItem()
-            .setTitle(linkAnnotation.title())
-            .setDescription(linkAnnotation.description())
-            .setUrl(linkAnnotation.url())
+            .setTitle(setParameters(linkAnnotation.title(), parameters))
+            .setDescription(setParameters(linkAnnotation.description(), parameters))
+            .setUrl(setParameters(linkAnnotation.url(), parameters))
             .setType(linkAnnotation.type());
     }
 
@@ -86,5 +91,23 @@ public class Utils {
             sb.setLength(sb.length() - 1);
         }
         return sb.toString();
+    }
+
+    private static String setParameters(String value, Map<String, String> parameters) {
+        if (!isNull(parameters) && !isNull(value)) {
+            Pattern pattern = Pattern.compile("\\{\\s*(\\w+)}");
+            Matcher matcher = pattern.matcher(value);
+
+            while (matcher.find()){
+                String parameterName = matcher.group(1);
+                String parameterValue = parameters.get(parameterName);
+
+                if (!isNull(parameterValue)) {
+                    value = value.replace(String.format("{%s}", parameterName), parameters.get(parameterName));
+                }
+            }
+        }
+
+        return value;
     }
 }
