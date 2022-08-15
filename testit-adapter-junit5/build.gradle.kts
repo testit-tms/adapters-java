@@ -36,6 +36,7 @@ tasks.jar {
 
 tasks.compileTestJava {
     options.encoding = "UTF-8"
+    // Allows the adapter to accept real parameter names
     options.compilerArgs.add("-parameters")
 }
 

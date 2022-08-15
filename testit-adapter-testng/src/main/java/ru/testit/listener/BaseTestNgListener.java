@@ -125,7 +125,7 @@ public class BaseTestNgListener implements
         );
 
         Object[] parameters = testResult.getParameters();
-        List<Class<?>> INJECTED_TYPES = Arrays.asList(
+        List<Class<?>> injectedTypes = Arrays.asList(
                 ITestContext.class, ITestResult.class, XmlTest.class, Method.class, Object[].class
         );
 
@@ -146,7 +146,7 @@ public class BaseTestNgListener implements
         int skippedCount = 0;
         for (int i = 0; i < parameterTypes.length; i++) {
             final Class<?> parameterType = parameterTypes[i];
-            if (INJECTED_TYPES.contains(parameterType)) {
+            if (injectedTypes.contains(parameterType)) {
                 skippedCount++;
                 continue;
             }

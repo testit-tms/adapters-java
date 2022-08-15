@@ -76,6 +76,10 @@ implementation "ru.testit:testit-adapter-testng:LATEST_VERSION"
                     <complianceLevel>${maven.compiler.source}</complianceLevel>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.source}</target>
+                    <!--Allows the adapter to accept real parameter names-->
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
                 <executions>
                     <execution>
@@ -128,6 +132,8 @@ version '1.0-SNAPSHOT'
 compileJava.options.encoding = 'utf-8'
 tasks.withType(JavaCompile) {
    options.encoding = 'utf-8'
+   // Allows the adapter to accept real parameter names
+   options.compilerArgs.add("-parameters")
 }
 
 repositories {
@@ -211,13 +217,13 @@ Description of methods:
 
 ### Examples
 
+#### Simple test
 ```java
 import ru.testit.annotations.*;
 import ru.testit.models.LinkItem;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
-@Test()
 public class SampleTests {
 
     @Test
@@ -258,6 +264,56 @@ public class SampleTests {
         Adapter.addLink("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
         Assert.assertTrue(true);
     }
+}
+```
+
+#### Parameterized test
+
+```java
+package ru.testit.samples;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.*;
+import ru.testit.annotations.*;
+import ru.testit.models.LinkType;
+
+import java.util.stream.Stream;
+
+public class ParameterizedTests {
+
+   @ParameterizedTest
+   @ValueSource(shorts = {1, 2, 3})
+   @ExternalId("Parameterized_test_with_one_parameter_{number}")
+   @DisplayName("Test with number = {number} parameter")
+   @WorkItemId("{number}")
+   @Title("Title in the autotest card {number}")
+   @Description("Test with BeforeEach, AfterEach and all annotations {number}")
+   @Labels({"Tag{number}"})
+   void testWithOneParameter(int number) {
+
+   }
+
+   @ParameterizedTest
+   @MethodSource("arguments")
+   @ExternalId("Parameterized_test_with_multiple_parameters_{number}")
+   @DisplayName("Parameterized test with number = {number}, title = {title}, expected = {expected}, url = {url}")
+   @Links(links = {
+           @Link(url = "https://{url}/module/repository", title = "{title} Repository", description = "Example of repository", type = LinkType.REPOSITORY),
+           @Link(url = "https://{url}/module/projects", title = "{title} Projects", type = LinkType.REQUIREMENT),
+           @Link(url = "https://{url}/module/", type = LinkType.BLOCKED_BY),
+           @Link(url = "https://{url}/module/docs", title = "{title} Documentation", type = LinkType.RELATED),
+           @Link(url = "https://{url}/module/JCP-777", title = "{title} JCP-777", type = LinkType.DEFECT),
+           @Link(url = "https://{url}/module/issue/5", title = "{title} Issue-5", type = LinkType.ISSUE),
+   })
+   void testWithMultipleParameters(int number, String title, boolean expected, String url) {
+   }
+
+   static Stream<Arguments> arguments() {
+      return Stream.of(
+              Arguments.of(1, "Test version 1", true, "google.com"),
+              Arguments.of(2, "Test version 2", false, "yandex.ru")
+      );
+   }
 }
 ```
 
