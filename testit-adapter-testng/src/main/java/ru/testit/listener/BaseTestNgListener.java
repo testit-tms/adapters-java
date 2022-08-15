@@ -1,6 +1,8 @@
 package ru.testit.listener;
 
 import org.testng.*;
+import org.testng.annotations.Parameters;
+import org.testng.xml.XmlTest;
 import ru.testit.models.*;
 import ru.testit.models.ClassContainer;
 import ru.testit.models.MainContainer;
@@ -15,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 
@@ -94,9 +97,7 @@ public class BaseTestNgListener implements
 
     protected void startTestCase(final ITestResult testResult,
                                  final String uuid) {
-        final Map<String, String> parameters = new HashMap<>(
-                testResult.getTestContext().getCurrentXmlTest().getAllParameters()
-        );
+        Map<String, String> parameters = getParameters(testResult);
 
         Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
         final TestResult result = new TestResult()
@@ -115,6 +116,53 @@ public class BaseTestNgListener implements
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);
+    }
+
+    private Map<String, String> getParameters(final ITestResult testResult) {
+        Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
+        final Map<String, String> testParameters = new HashMap<>(
+                testResult.getTestContext().getCurrentXmlTest().getAllParameters()
+        );
+
+        Object[] parameters = testResult.getParameters();
+        List<Class<?>> INJECTED_TYPES = Arrays.asList(
+                ITestContext.class, ITestResult.class, XmlTest.class, Method.class, Object[].class
+        );
+
+        final Class<?>[] parameterTypes = method.getParameterTypes();
+
+        if (parameterTypes.length != parameters.length) {
+            return testParameters;
+        }
+
+        final String[] providedNames = Optional.ofNullable(method.getAnnotation(Parameters.class))
+                .map(Parameters::value)
+                .orElse(new String[]{});
+
+        final String[] reflectionNames = Stream.of(method.getParameters())
+                .map(java.lang.reflect.Parameter::getName)
+                .toArray(String[]::new);
+
+        int skippedCount = 0;
+        for (int i = 0; i < parameterTypes.length; i++) {
+            final Class<?> parameterType = parameterTypes[i];
+            if (INJECTED_TYPES.contains(parameterType)) {
+                skippedCount++;
+                continue;
+            }
+
+            final int indexFromAnnotation = i - skippedCount;
+            if (indexFromAnnotation < providedNames.length) {
+                testParameters.put(providedNames[indexFromAnnotation], parameters[i].toString());
+                continue;
+            }
+
+            if (i < reflectionNames.length) {
+                testParameters.put(reflectionNames[i], parameters[i].toString());
+            }
+        }
+
+        return testParameters;
     }
 
     @Override
