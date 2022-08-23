@@ -21,7 +21,7 @@ public class Utils {
     }
 
     public static List<String> extractWorkItemId(final Description method) {
-        final List<String> workItemIds = new LinkedList<>();
+        final List<String> workItemIds = new ArrayList<>();
         final WorkItemId workItem = method.getAnnotation(WorkItemId.class);
         if (workItem != null) {
             workItemIds.add(workItem.value());
