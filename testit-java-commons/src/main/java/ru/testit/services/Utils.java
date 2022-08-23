@@ -25,7 +25,7 @@ public class Utils {
     }
 
     public static List<String> extractWorkItemId(final Method atomicTest, Map<String, String> parameters) {
-        final List<String> workItemIds = new LinkedList<>();
+        final List<String> workItemIds = new ArrayList<>();
         final WorkItemId workItem = atomicTest.getAnnotation(WorkItemId.class);
         if (workItem != null) {
             workItemIds.add(setParameters(workItem.value(), parameters));
