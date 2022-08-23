@@ -213,7 +213,7 @@ And fill parameters with your configuration, where:
 Annotations can be used to specify information about autotest.
 
 Description of Annotations (\* - required):
-- `WorkItemID` - linking an autotest to a test case
+- `WorkItemIds` - linking an autotest to a test case
 - \*`DisplayName` - name of the autotest in the Test IT system
 - \*`ExternalID` - ID of the autotest within the project in the Test IT System
 - `Title` - title in the autotest card and the step card
@@ -251,7 +251,7 @@ public class SimpleTest {
 
    @Test
    @ExternalId("Simple_test_2")
-   @WorkItemId("1")
+   @WorkItemIds({"12345","54321"})
    @DisplayName("Simple test 2")
    @Title("test №2")
    @Description("Description")
@@ -306,7 +306,7 @@ public class DataProviderParameterizedTests {
    @Test(dataProvider = "allParameters")
    @ExternalId("Parameterized_test_with_data_provider_parameters_{number}")
    @DisplayName("Test with title = {title}, number = {number}, url = {url} parameters")
-   @WorkItemId("{number}")
+   @WorkItemIds("{number}")
    @Title("Title in the autotest card {number}")
    @Description("{title}")
    @Labels({"Tag{number}"})

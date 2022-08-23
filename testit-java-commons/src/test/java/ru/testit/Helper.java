@@ -64,6 +64,8 @@ public class Helper {
         labels.add(label);
 
         TestResult testResult = new TestResult();
+        List<String> workItems = new ArrayList<>();
+        workItems.add(WORK_ITEM_ID);
         testResult.setExternalId(EXTERNAL_ID)
                 .setUuid(TEST_UUID)
                 .setTitle(TITLE)
@@ -73,7 +75,7 @@ public class Helper {
                 .setSpaceName(SPACE_NAME)
                 .setStart(startDate.getTime())
                 .setStop(stopDate.getTime())
-                .setWorkItemId(WORK_ITEM_ID)
+                .setWorkItemId(workItems)
                 .setItemStatus(ITEM_STATUS)
                 .setLinkItems(links)
                 .setSteps(steps)

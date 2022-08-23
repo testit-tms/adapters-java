@@ -18,7 +18,7 @@ public class DataProviderParameterizedTests {
     @Test(dataProvider = "allParameters")
     @ExternalId("Parameterized_test_with_data_provider_parameters_{number}")
     @DisplayName("Test with title = {title}, number = {number}, url = {url} parameters")
-    @WorkItemId("{number}")
+    @WorkItemIds("{number}")
     @Title("Title in the autotest card {number}")
     @Description("{title}")
     @Labels({"Tag{number}"})

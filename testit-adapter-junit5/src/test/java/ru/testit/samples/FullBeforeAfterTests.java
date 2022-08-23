@@ -80,7 +80,7 @@ public class FullBeforeAfterTests {
     @Test
     @ExternalId("full_before_after_with_all_annotations")
     @DisplayName("Test with all annotations")
-    @WorkItemId("123")
+    @WorkItemIds("123")
     @Title("Title in the autotest card")
     @Description("Test with all Before, After and all annotations")
     @Labels({"Tag1","Tag2"})
