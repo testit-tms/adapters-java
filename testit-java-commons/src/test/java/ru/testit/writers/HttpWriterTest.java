@@ -8,6 +8,7 @@ import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.client.model.*;
 import ru.testit.models.*;
+import ru.testit.models.LinkType;
 import ru.testit.services.ResultStorage;
 
 import java.util.ArrayList;
@@ -150,7 +151,7 @@ class HttpWriterTest {
     }
 
     @Test
-    void writeTest_WithWorkItemId_InvokeUpdateHandler() throws ApiException {
+    void writeTest_WithWorkItemId_InvokeLinkHandler() throws ApiException {
         // arrange
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
@@ -170,7 +171,7 @@ class HttpWriterTest {
     }
 
     @Test
-    void writeTest_WithoutWorkItemId_NoInvokeUpdateHandler() throws ApiException {
+    void writeTest_WithoutWorkItemId_NoInvokeLinkHandler() throws ApiException {
         // arrange
         TestResult testResult = Helper.generateTestResult()
                 .setWorkItemId(new ArrayList<>());
@@ -182,6 +183,61 @@ class HttpWriterTest {
 
         // assert
         verify(client, never()).linkAutoTestToWorkItem(anyString(), anyString());
+    }
+
+    @Test
+    void writeTest_FiledExistingAutoTest_NoInvokeLinkHandler() throws ApiException {
+        // arrange
+        TestResult testResult = Helper.generateTestResult()
+                .setItemStatus(ItemStatus.FAILED);
+        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+
+        when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
+                .thenReturn(response);
+
+        Writer writer = new HttpWriter(config, client, storage);
+
+        // act
+        writer.writeTest(testResult);
+
+        // assert
+        verify(client, never()).linkAutoTestToWorkItem(anyString(), anyString());
+    }
+
+    @Test
+    void writeTest_FiledExistingAutoTest_InvokeUpdateHandler() throws ApiException {
+        // arrange
+        List<LinkItem> links = new ArrayList<>();
+        LinkItem link = new LinkItem();
+        link.setTitle("Title").setDescription("Description").setType(LinkType.DEFECT).setUrl("http://test.example/bug123");
+        links.add(link);
+
+        TestResult testResult = Helper.generateTestResult()
+                .setItemStatus(ItemStatus.FAILED)
+                .setLinkItems(links);
+        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+
+        List<LinkPutModel> putLinks = new ArrayList<>();
+        LinkPutModel putLink = new LinkPutModel();
+        putLink.setTitle("Title");
+        putLink.setDescription("Description");
+        putLink.setUrl("http://test.example/bug123");
+        putLink.setType(ru.testit.client.model.LinkType.DEFECT);
+        putLinks.add(putLink);
+
+        AutoTestPutModel putModel = Helper.generateAutoTestPutModel(config.getProjectId());
+        putModel.links(putLinks);
+
+        when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
+                .thenReturn(response);
+
+        Writer writer = new HttpWriter(config, client, storage);
+
+        // act
+        writer.writeTest(testResult);
+
+        // assert
+        verify(client).updateAutoTest(putModel);
     }
 
     @Test
