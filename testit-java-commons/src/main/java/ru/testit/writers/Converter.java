@@ -163,7 +163,7 @@ public class Converter {
         ).collect(Collectors.toList());
     }
 
-    private static List<LinkPutModel> convertPutLinks(List<LinkItem> links) {
+    public static List<LinkPutModel> convertPutLinks(List<LinkItem> links) {
         return links.stream().map(
                 link -> {
                     LinkPutModel model = new LinkPutModel();

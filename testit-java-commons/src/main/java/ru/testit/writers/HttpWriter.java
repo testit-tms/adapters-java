@@ -2,17 +2,20 @@ package ru.testit.writers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ru.testit.clients.ApiClient;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
+import ru.testit.clients.ApiClient;
+import ru.testit.clients.ClientConfiguration;
 import ru.testit.models.ClassContainer;
+import ru.testit.models.ItemStatus;
 import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;
-import ru.testit.clients.ClientConfiguration;
 import ru.testit.services.ResultStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class HttpWriter implements Writer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpWriter.class);
@@ -28,7 +31,7 @@ public class HttpWriter implements Writer {
 
     @Override
     public void startLaunch() {
-        synchronized (config){
+        synchronized (config) {
             if (!Objects.equals(this.config.getTestRunId(), "null")) {
                 return;
             }
@@ -70,8 +73,16 @@ public class HttpWriter implements Writer {
             String autoTestId;
 
             if (test != null) {
-                AutoTestPutModel autoTestPutModel = Converter.testResultToAutoTestPutModel(storage, testResult);
-                autoTestPutModel.setProjectId(UUID.fromString(config.getProjectId()));
+                AutoTestPutModel autoTestPutModel;
+
+                if (testResult.getItemStatus() == ItemStatus.FAILED) {
+                    autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(test);
+                    autoTestPutModel.links(Converter.convertPutLinks(testResult.getLinkItems()));
+                } else {
+                    autoTestPutModel = Converter.testResultToAutoTestPutModel(storage, testResult);
+                    autoTestPutModel.setProjectId(UUID.fromString(config.getProjectId()));
+                }
+
                 apiClient.updateAutoTest(autoTestPutModel);
                 autoTestId = test.getId().toString();
             } else {
@@ -80,15 +91,18 @@ public class HttpWriter implements Writer {
                 autoTestId = apiClient.createAutoTest(model);
             }
 
-            if (workItemId.stream().count() != 0) {
-                workItemId.stream().forEach( i -> {
-                    try {
-                        apiClient.linkAutoTestToWorkItem(autoTestId, i);
-                    } catch (ApiException e) {
-                        LOGGER.error("Can not link the autotest: ".concat(e.getMessage()));
-                    }
-                });
+            if (workItemId.size() == 0 ||
+                    (test != null && testResult.getItemStatus() == ItemStatus.FAILED)) {
+                return;
             }
+
+            workItemId.forEach(i -> {
+                try {
+                    apiClient.linkAutoTestToWorkItem(autoTestId, i);
+                } catch (ApiException e) {
+                    LOGGER.error("Can not link the autotest: ".concat(e.getMessage()));
+                }
+            });
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: ".concat(e.getMessage()));
         }
