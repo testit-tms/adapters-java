@@ -2,10 +2,12 @@ package ru.testit.listener;
 
 import org.junit.runner.Description;
 import ru.testit.annotations.*;
+import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import ru.testit.models.Label;
 
 public class Utils {
 
@@ -19,9 +21,23 @@ public class Utils {
         return (annotation != null) ? annotation.value() : null;
     }
 
-    public static String extractWorkItemId(final Description method) {
-        final WorkItemId annotation = method.getAnnotation(WorkItemId.class);
-        return (annotation != null) ? annotation.value() : null;
+    public static List<String> extractWorkItemId(final Description method) {
+        final List<String> workItemIds = new ArrayList<>();
+        final WorkItemId workItem = method.getAnnotation(WorkItemId.class);
+        if (workItem != null) {
+            workItemIds.add(workItem.value());
+
+            return workItemIds;
+        }
+
+        final WorkItemIds workItems = method.getAnnotation(WorkItemIds.class);
+        if (workItems != null) {
+            for (final String workItemId : workItems.value()) {
+                workItemIds.add(workItemId);
+            }
+        }
+
+        return workItemIds;
     }
 
     public static List<LinkItem> extractLinks(final Description method) {
@@ -31,8 +47,7 @@ public class Utils {
             for (final Link link : linksAnnotation.links()) {
                 links.add(makeLink(link));
             }
-        }
-        else {
+        } else {
             final Link linkAnnotation = method.getAnnotation(Link.class);
             if (linkAnnotation != null) {
                 links.add(makeLink(linkAnnotation));

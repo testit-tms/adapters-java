@@ -10,6 +10,8 @@ import ru.testit.client.model.*;
 import ru.testit.models.*;
 import ru.testit.services.ResultStorage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -153,7 +155,7 @@ class HttpWriterTest {
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         String autotestId = response.getId().toString();
-        String workItemGlobalId = testResult.getWorkItemId();
+        List<String> workItemGlobalId = testResult.getWorkItemId();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
@@ -164,17 +166,14 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, times(1)).linkAutoTestToWorkItem(autotestId, workItemGlobalId);
+        verify(client, times(1)).linkAutoTestToWorkItem(autotestId, workItemGlobalId.get(0));
     }
 
     @Test
-    void writeTest_WithoutWorkItemId_InvokeUpdateHandler() throws ApiException {
+    void writeTest_WithoutWorkItemId_NoInvokeUpdateHandler() throws ApiException {
         // arrange
         TestResult testResult = Helper.generateTestResult()
-                .setWorkItemId(null);
-        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-        String autotestId = response.getId().toString();
-        String workItemGlobalId = testResult.getWorkItemId();
+                .setWorkItemId(new ArrayList<>());
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -182,7 +181,7 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, times(0)).linkAutoTestToWorkItem(autotestId, workItemGlobalId);
+        verify(client, never()).linkAutoTestToWorkItem(anyString(), anyString());
     }
 
     @Test

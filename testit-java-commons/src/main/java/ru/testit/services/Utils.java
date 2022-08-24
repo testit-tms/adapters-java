@@ -5,6 +5,7 @@ import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +25,22 @@ public class Utils {
         return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
     }
 
-    public static String extractWorkItemId(final Method atomicTest, Map<String, String> parameters) {
-        final WorkItemId annotation = atomicTest.getAnnotation(WorkItemId.class);
-        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
+    public static List<String> extractWorkItemId(final Method atomicTest, Map<String, String> parameters) {
+        final List<String> workItemIds = new ArrayList<>();
+        final WorkItemId workItem = atomicTest.getAnnotation(WorkItemId.class);
+        if (workItem != null) {
+            workItemIds.add(setParameters(workItem.value(), parameters));
+            return workItemIds;
+        }
+
+        final WorkItemIds workItems = atomicTest.getAnnotation(WorkItemIds.class);
+        if (workItems != null) {
+            for (final String workItemId : workItems.value()) {
+                workItemIds.add(setParameters(workItemId, parameters));
+            }
+        }
+
+        return workItemIds;
     }
 
     public static List<LinkItem> extractLinks(final Method atomicTest, Map<String, String> parameters) {
@@ -36,8 +50,7 @@ public class Utils {
             for (final Link link : linksAnnotation.links()) {
                 links.add(makeLink(link, parameters));
             }
-        }
-        else {
+        } else {
             final Link linkAnnotation = atomicTest.getAnnotation(Link.class);
             if (linkAnnotation != null) {
                 links.add(makeLink(linkAnnotation, parameters));
@@ -71,14 +84,14 @@ public class Utils {
 
     private static LinkItem makeLink(final Link linkAnnotation, Map<String, String> parameters) {
         return new LinkItem()
-            .setTitle(setParameters(linkAnnotation.title(), parameters))
-            .setDescription(setParameters(linkAnnotation.description(), parameters))
-            .setUrl(setParameters(linkAnnotation.url(), parameters))
-            .setType(linkAnnotation.type());
+                .setTitle(setParameters(linkAnnotation.title(), parameters))
+                .setDescription(setParameters(linkAnnotation.description(), parameters))
+                .setUrl(setParameters(linkAnnotation.url(), parameters))
+                .setType(linkAnnotation.type());
     }
 
-    public static String urlTrim(String url){
-        if (url.endsWith("/")){
+    public static String urlTrim(String url) {
+        if (url.endsWith("/")) {
             return removeTrailing(url);
         }
 
@@ -98,7 +111,7 @@ public class Utils {
             Pattern pattern = Pattern.compile("\\{\\s*(\\w+)}");
             Matcher matcher = pattern.matcher(value);
 
-            while (matcher.find()){
+            while (matcher.find()) {
                 String parameterName = matcher.group(1);
                 String parameterValue = parameters.get(parameterName);
 

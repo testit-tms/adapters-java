@@ -201,7 +201,7 @@ Annotations can be used to specify information about autotest.
 
 Description of Annotations (\* - required):
 - \*`RunWith(BaseJunit4Runner.class)` - connect the adapter package to run tests
-- `WorkItemID` - linking an autotest to a test case
+- `WorkItemIds` - linking an autotest to a test case
 - \*`DisplayName` - name of the autotest in the Test IT system
 - \*`ExternalID` - ID of the autotest within the project in the Test IT System
 - `Title` - title in the autotest card and the step card
@@ -241,7 +241,7 @@ public class SampleTest {
 
    @Test
    @ExternalId("Simple_test_2")
-   @WorkItemId("1")
+   @WorkItemIds({"12345","54321"})
    @DisplayName("Simple test 2")
    @Title("test №2")
    @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),

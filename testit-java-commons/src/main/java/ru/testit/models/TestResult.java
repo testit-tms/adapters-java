@@ -10,7 +10,7 @@ import java.util.Map;
 public class TestResult implements ResultWithSteps, ResultWithAttachments {
     private String uuid;
     private String externalId;
-    private String workItemId;
+    private List<String> workItemIds = new ArrayList<>();
     private String className;
     private String spaceName;
     private List<Label> labels = new ArrayList<>();
@@ -74,18 +74,18 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments {
      *
      * @return the work item id
      */
-    public String getWorkItemId() {
-        return workItemId;
+    public List<String> getWorkItemId() {
+        return workItemIds;
     }
 
     /**
      * Sets work item id.
      *
-     * @param workItemId the value
+     * @param workItemIds the value
      * @return self for method chaining
      */
-    public TestResult setWorkItemId(String workItemId) {
-        this.workItemId = workItemId;
+    public TestResult setWorkItemId(List<String> workItemIds) {
+        this.workItemIds = workItemIds;
         return this;
     }
 

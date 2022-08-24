@@ -172,10 +172,10 @@ public class UtilsTest {
         when(annotation.value()).thenReturn(textBeforeSetParameters);
 
         // act
-        String workItemId = Utils.extractWorkItemId(atomicTest, parameters);
+        List<String> workItemIds = Utils.extractWorkItemId(atomicTest, parameters);
 
         // assert
-        Assertions.assertEquals(textAfterSetParameters, workItemId);
+        Assertions.assertEquals(textAfterSetParameters, workItemIds.get(0));
     }
 
     @Test
@@ -189,10 +189,10 @@ public class UtilsTest {
         when(annotation.value()).thenReturn(textBeforeSetParameters);
 
         // act
-        String workItemId = Utils.extractWorkItemId(atomicTest, null);
+        List<String> workItemIds = Utils.extractWorkItemId(atomicTest, null);
 
         // assert
-        Assertions.assertEquals(textBeforeSetParameters, workItemId);
+        Assertions.assertEquals(textBeforeSetParameters, workItemIds.get(0));
     }
 
     @Test
@@ -205,10 +205,10 @@ public class UtilsTest {
         when(annotation.value()).thenReturn(TEXT_WITHOUT_PARAMETERS);
 
         // act
-        String workItemId = Utils.extractWorkItemId(atomicTest, parameters);
+        List<String> workItemIds = Utils.extractWorkItemId(atomicTest, parameters);
 
         // assert
-        Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, workItemId);
+        Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, workItemIds.get(0));
     }
 
     @Test
@@ -219,12 +219,12 @@ public class UtilsTest {
         when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(null);
 
         // act
-        String workItemIdWithoutInputParameters = Utils.extractWorkItemId(atomicTest, null);
-        String workItemIdWithInputParameters = Utils.extractWorkItemId(atomicTest, parameters);
+        List<String> workItemIdWithoutInputParameters = Utils.extractWorkItemId(atomicTest, null);
+        List<String> workItemIdWithInputParameters = Utils.extractWorkItemId(atomicTest, parameters);
 
         // assert
-        Assertions.assertNull(workItemIdWithoutInputParameters);
-        Assertions.assertNull(workItemIdWithInputParameters);
+        Assertions.assertTrue(workItemIdWithoutInputParameters.isEmpty());
+        Assertions.assertTrue(workItemIdWithInputParameters.isEmpty());
     }
 
     @Test

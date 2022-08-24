@@ -66,7 +66,7 @@ public class HttpWriter implements Writer {
     public void writeTest(TestResult testResult) {
         try {
             AutoTestModel test = apiClient.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId());
-            String workItemId = testResult.getWorkItemId();
+            List<String> workItemId = testResult.getWorkItemId();
             String autoTestId;
 
             if (test != null) {
@@ -80,8 +80,14 @@ public class HttpWriter implements Writer {
                 autoTestId = apiClient.createAutoTest(model);
             }
 
-            if (workItemId != null) {
-                apiClient.linkAutoTestToWorkItem(autoTestId, workItemId);
+            if (workItemId.stream().count() != 0) {
+                workItemId.stream().forEach( i -> {
+                    try {
+                        apiClient.linkAutoTestToWorkItem(autoTestId, i);
+                    } catch (ApiException e) {
+                        LOGGER.error("Can not link the autotest: ".concat(e.getMessage()));
+                    }
+                });
             }
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: ".concat(e.getMessage()));

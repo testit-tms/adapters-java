@@ -199,7 +199,7 @@ And fill parameters with your configuration, where:
 Annotations can be used to specify information about autotest.
 
 Description of Annotations (\* - required):
-- `WorkItemID` - linking an autotest to a test case
+- `WorkItemIds` - linking an autotest to a test case
 - \*`DisplayName` - name of the autotest in the Test IT system
 - \*`ExternalID` - ID of the autotest within the project in the Test IT System
 - `Title` - title in the autotest card and the step card
@@ -253,7 +253,7 @@ public class SampleTests {
     @Test
     @ExternalId("Simple_test_2")
     @DisplayName("Simple test 2")
-    @WorkItemId("12345")
+    @WorkItemIds({"12345","54321"})
     @Title("Simple test 2")
     @Description("Simple test 2 description")
     @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
@@ -285,7 +285,7 @@ public class ParameterizedTests {
    @ValueSource(shorts = {1, 2, 3})
    @ExternalId("Parameterized_test_with_one_parameter_{number}")
    @DisplayName("Test with number = {number} parameter")
-   @WorkItemId("{number}")
+   @WorkItemIds("{number}")
    @Title("Title in the autotest card {number}")
    @Description("Test with BeforeEach, AfterEach and all annotations {number}")
    @Labels({"Tag{number}"})

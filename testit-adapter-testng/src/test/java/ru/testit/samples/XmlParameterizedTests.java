@@ -11,7 +11,7 @@ public class XmlParameterizedTests {
     @Parameters({"title", "number", "url"})
     @ExternalId("Parameterized_test_with_xml_parameters_{number}")
     @DisplayName("Test with title = {title}, number = {number} parameters")
-    @WorkItemId("{number}")
+    @WorkItemIds("{number}")
     @Title("Title in the autotest card {number}")
     @Description("{title}")
     @Labels({"Tag{number}"})
