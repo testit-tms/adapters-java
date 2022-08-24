@@ -71,7 +71,15 @@ public class Utils {
 
     public static String extractTitle(final Description method) {
         final Title annotation = method.getAnnotation(Title.class);
-        return (annotation != null) ? annotation.value() : null;
+
+        String title;
+        if (annotation == null) {
+            title = method.getClassName();
+        } else {
+            title = annotation.value();
+        }
+
+        return title;
     }
 
     private static LinkItem makeLink(final Link linkAnnotation) {
@@ -84,6 +92,6 @@ public class Utils {
 
     public static String extractDescription(final Description method) {
         final ru.testit.annotations.Description annotation = method.getAnnotation(ru.testit.annotations.Description.class);
-        return (annotation != null) ? annotation.value() : null;
+        return (annotation != null) ? annotation.value() : "";
     }
 }

@@ -524,8 +524,8 @@ public class UtilsTest {
         String descriptionWithInputParameters = Utils.extractDescription(atomicTest, parameters);
 
         // assert
-        Assertions.assertNull(descriptionWithoutInputParameters);
-        Assertions.assertNull(descriptionWithInputParameters);
+        Assertions.assertTrue(descriptionWithoutInputParameters.isEmpty());
+        Assertions.assertTrue(descriptionWithInputParameters.isEmpty());
     }
 
     @Test
@@ -585,13 +585,14 @@ public class UtilsTest {
         Map<String, String> parameters = UtilsHelper.generateParameters();
 
         when(atomicTest.getAnnotation(Title.class)).thenReturn(null);
+        when(atomicTest.getName()).thenReturn("class name");
 
         // act
         String titleWithoutInputParameters = Utils.extractTitle(atomicTest, null);
         String titleWithInputParameters = Utils.extractTitle(atomicTest, parameters);
 
         // assert
-        Assertions.assertNull(titleWithoutInputParameters);
-        Assertions.assertNull(titleWithInputParameters);
+        Assertions.assertEquals("class name", titleWithoutInputParameters);
+        Assertions.assertEquals("class name", titleWithInputParameters);
     }
 }

@@ -74,12 +74,20 @@ public class Utils {
 
     public static String extractDescription(final Method atomicTest, Map<String, String> parameters) {
         final Description annotation = atomicTest.getAnnotation(Description.class);
-        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : "";
     }
 
     public static String extractTitle(final Method atomicTest, Map<String, String> parameters) {
         final Title annotation = atomicTest.getAnnotation(Title.class);
-        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
+
+        String title;
+        if (annotation == null) {
+            title = atomicTest.getName();
+        } else {
+            title = annotation.value();
+        }
+
+        return setParameters(title, parameters);
     }
 
     private static LinkItem makeLink(final Link linkAnnotation, Map<String, String> parameters) {
