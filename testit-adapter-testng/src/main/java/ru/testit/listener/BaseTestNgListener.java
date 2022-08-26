@@ -4,7 +4,6 @@ import org.testng.*;
 import org.testng.annotations.Parameters;
 import org.testng.xml.XmlTest;
 import ru.testit.models.*;
-import ru.testit.properties.AdapterMode;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
 import ru.testit.services.ExecutableTest;
@@ -41,8 +40,6 @@ public class BaseTestNgListener implements
      */
     private final String launcherUUID = UUID.randomUUID().toString();
 
-    private List<String> testForRun = new ArrayList<>();
-
     /**
      * Store class container uuids.
      */
@@ -57,11 +54,7 @@ public class BaseTestNgListener implements
 
     @Override
     public void onStart(final ISuite suite) {
-        adapterManager.validateAdapterConfig();
         adapterManager.startTests();
-        if (adapterManager.getAdapterMode() == AdapterMode.USE_FILTER) {
-            testForRun = adapterManager.getTestFromTestRun();
-        }
     }
 
     @Override
@@ -88,8 +81,7 @@ public class BaseTestNgListener implements
         Map<String, String> parameters = getParameters(testResult);
         String externalId = Utils.extractExternalID(method, parameters);
 
-        if (adapterManager.getAdapterMode() == AdapterMode.USE_FILTER
-                && !testForRun.contains(externalId)) {
+        if (adapterManager.SkipTest(externalId)) {
             throw new SkipException("filter");
         }
 
@@ -198,8 +190,7 @@ public class BaseTestNgListener implements
 
     @Override
     public void onTestSkipped(final ITestResult result) {
-        if (adapterManager.getAdapterMode() == AdapterMode.USE_FILTER
-                && result.getThrowable() instanceof SkipException
+        if (result.getThrowable() instanceof SkipException
                 && result.getThrowable().getMessage().equals("filter")) {
             return;
         }

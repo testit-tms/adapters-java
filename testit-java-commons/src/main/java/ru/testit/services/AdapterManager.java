@@ -29,11 +29,12 @@ public class AdapterManager {
     private final ApiClient client;
     private final ClientConfiguration clientConfiguration;
     private final AdapterConfig adapterConfig;
+    private List<String> testForRun = new ArrayList<>();
 
     public AdapterManager(ConfigManager configManager) {
         this.clientConfiguration = configManager.getClientConfiguration();
         this.adapterConfig = configManager.getAdapterConfig();
-
+        validateAdapterConfig();
         this.storage = Adapter.getResultStorage();
         this.threadContext = new ThreadContext();
         this.client = new TmsApiClient(this.clientConfiguration);
@@ -56,6 +57,13 @@ public class AdapterManager {
     }
 
     public void startTests() {
+        synchronized (testForRun) {
+            if (adapterConfig.getMode().equals(AdapterMode.USE_FILTER)) {
+                if (testForRun.isEmpty()) {
+                    testForRun = getTestFromTestRun();
+                }
+            }
+        }
         writer.startLaunch();
     }
 
@@ -498,7 +506,7 @@ public class AdapterManager {
         );
     }
 
-    public List<String> getTestFromTestRun() {
+    private List<String> getTestFromTestRun() {
         try {
             return client.getTestFromTestRun(clientConfiguration.getTestRunId(), clientConfiguration.getConfigurationId());
         } catch (ApiException e) {
@@ -507,11 +515,15 @@ public class AdapterManager {
         return new ArrayList<>();
     }
 
-    public AdapterMode getAdapterMode() {
-        return adapterConfig.getMode();
+    public boolean SkipTest(String externalId){
+        if (!adapterConfig.getMode().equals(AdapterMode.USE_FILTER)){
+            return false;
+        }
+
+        return !testForRun.contains(externalId);
     }
 
-    public void validateAdapterConfig() {
+    private void validateAdapterConfig() {
         switch (adapterConfig.getMode()) {
             case USE_FILTER:
             case RUN_ALL_TESTS:
