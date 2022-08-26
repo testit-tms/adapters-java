@@ -9,6 +9,7 @@ import ru.testit.client.model.*;
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class TmsApiClient implements ApiClient {
     private static final String AUTH_PREFIX = "PrivateToken";
@@ -88,5 +89,14 @@ public class TmsApiClient implements ApiClient {
         AttachmentModel model = attachmentsApi.apiV2AttachmentsPost(file);
 
         return model.getId().toString();
+    }
+
+    public List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException {
+        TestRunV2GetModel model = testRunsApi.getTestRunById(UUID.fromString(testRunUuid));
+        UUID configUUID = UUID.fromString(configurationId);
+
+        return model.getTestResults().stream()
+                .filter(result -> result.getConfigurationId().equals(configUUID))
+                .map(result -> result.getAutoTest().getExternalId()).collect(Collectors.toList());
     }
 }

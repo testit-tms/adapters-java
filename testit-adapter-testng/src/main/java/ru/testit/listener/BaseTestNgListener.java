@@ -4,11 +4,10 @@ import org.testng.*;
 import org.testng.annotations.Parameters;
 import org.testng.xml.XmlTest;
 import ru.testit.models.*;
-import ru.testit.models.ClassContainer;
-import ru.testit.models.MainContainer;
-import ru.testit.services.ExecutableTest;
+import ru.testit.properties.AdapterMode;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
+import ru.testit.services.ExecutableTest;
 import ru.testit.services.Utils;
 
 import java.lang.reflect.Method;
@@ -42,6 +41,8 @@ public class BaseTestNgListener implements
      */
     private final String launcherUUID = UUID.randomUUID().toString();
 
+    private List<String> testForRun = new ArrayList<>();
+
     /**
      * Store class container uuids.
      */
@@ -56,7 +57,11 @@ public class BaseTestNgListener implements
 
     @Override
     public void onStart(final ISuite suite) {
+        adapterManager.validateAdapterConfig();
         adapterManager.startTests();
+        if (adapterManager.getAdapterMode() == AdapterMode.USE_FILTER) {
+            testForRun = adapterManager.getTestFromTestRun();
+        }
     }
 
     @Override
@@ -79,6 +84,15 @@ public class BaseTestNgListener implements
 
     @Override
     public void onTestStart(final ITestResult testResult) {
+        Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
+        Map<String, String> parameters = getParameters(testResult);
+        String externalId = Utils.extractExternalID(method, parameters);
+
+        if (adapterManager.getAdapterMode() == AdapterMode.USE_FILTER
+                && !testForRun.contains(externalId)) {
+            throw new SkipException("filter");
+        }
+
         ExecutableTest executableTest = this.executableTest.get();
         if (executableTest.isStarted()) {
             executableTest = refreshContext();
@@ -87,23 +101,10 @@ public class BaseTestNgListener implements
 
         final String uuid = executableTest.getUuid();
 
-        startTestCase(testResult, uuid);
-
-        Optional.of(testResult)
-                .map(ITestResult::getMethod)
-                .map(ITestNGMethod::getTestClass)
-                .ifPresent(cl -> addClassContainerChild(cl, uuid));
-    }
-
-    protected void startTestCase(final ITestResult testResult,
-                                 final String uuid) {
-        Map<String, String> parameters = getParameters(testResult);
-
-        Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
         final TestResult result = new TestResult()
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method, parameters))
-                .setExternalId(Utils.extractExternalID(method, parameters))
+                .setExternalId(externalId)
                 .setWorkItemId(Utils.extractWorkItemId(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters))
                 .setName(Utils.extractDisplayName(method, parameters))
@@ -116,6 +117,11 @@ public class BaseTestNgListener implements
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);
+
+        Optional.of(testResult)
+                .map(ITestResult::getMethod)
+                .map(ITestNGMethod::getTestClass)
+                .ifPresent(cl -> addClassContainerChild(cl, uuid));
     }
 
     private Map<String, String> getParameters(final ITestResult testResult) {
@@ -192,6 +198,12 @@ public class BaseTestNgListener implements
 
     @Override
     public void onTestSkipped(final ITestResult result) {
+        if (adapterManager.getAdapterMode() == AdapterMode.USE_FILTER
+                && result.getThrowable() instanceof SkipException
+                && result.getThrowable().getMessage().equals("filter")) {
+            return;
+        }
+
         ExecutableTest executableTest = this.executableTest.get();
 
         if (executableTest.isAfter()) {
@@ -275,9 +287,8 @@ public class BaseTestNgListener implements
                 .ifPresent(parentUuid -> {
                     ExecutableTest test = executableTest.get();
 
-                    if (testMethod.isBeforeMethodConfiguration())
-                    {
-                        if (test.isStarted()){
+                    if (testMethod.isBeforeMethodConfiguration()) {
+                        if (test.isStarted()) {
                             executableTest.remove();
                             test = executableTest.get();
                         }
