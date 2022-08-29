@@ -14,15 +14,23 @@ import java.util.regex.Pattern;
 
 
 public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
-    private final List<String> testsForRun;
+    private List<String> testsForRun;
+    private final boolean isFilteredMode;
 
-    public Junit5PostDiscoveryFilter(){
+    public Junit5PostDiscoveryFilter() {
         AdapterManager manager = Adapter.getAdapterManager();
-        testsForRun = manager.getTestFromTestRun();
+        isFilteredMode = manager.IsFilteredMode();
+        if (isFilteredMode) {
+            testsForRun = manager.getTestFromTestRun();
+        }
     }
 
     @Override
     public FilterResult apply(TestDescriptor object) {
+        if (!isFilteredMode) {
+            return FilterResult.included("Adapter mode isn't filtered");
+        }
+
         if (!object.getChildren().isEmpty()) {
             return FilterResult.included("filter only applied for tests");
         }
@@ -34,7 +42,7 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
 
         for (String test : testsForRun) {
             Matcher matcher = pattern.matcher(test);
-            if(matcher.find()){
+            if (matcher.find()) {
                 return FilterResult.includedIf(true);
             }
         }

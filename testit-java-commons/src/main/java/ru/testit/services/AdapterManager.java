@@ -8,6 +8,7 @@ import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.TmsApiClient;
 import ru.testit.models.*;
 import ru.testit.properties.AdapterConfig;
+import ru.testit.properties.AdapterMode;
 import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
@@ -495,6 +496,10 @@ public class AdapterManager {
                     }
                 }
         );
+    }
+
+    public boolean IsFilteredMode() {
+        return adapterConfig.getMode() == AdapterMode.USE_FILTER;
     }
 
     public List<String> getTestFromTestRun() {

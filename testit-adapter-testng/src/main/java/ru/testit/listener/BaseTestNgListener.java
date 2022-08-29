@@ -388,6 +388,10 @@ public class BaseTestNgListener implements
 
     @Override
     public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
+        if (!adapterManager.IsFilteredMode()){
+            return methods;
+        }
+
         List<String> testsForRun = adapterManager.getTestFromTestRun();
 
         return methods.stream().filter(method -> {
