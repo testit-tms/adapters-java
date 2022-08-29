@@ -7,6 +7,7 @@ import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -94,6 +95,10 @@ public class TmsApiClient implements ApiClient {
     public List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException {
         TestRunV2GetModel model = testRunsApi.getTestRunById(UUID.fromString(testRunUuid));
         UUID configUUID = UUID.fromString(configurationId);
+
+        if (model.getTestResults().size() == 0){
+            return new ArrayList<>();
+        }
 
         return model.getTestResults().stream()
                 .filter(result -> result.getConfigurationId().equals(configUUID))
