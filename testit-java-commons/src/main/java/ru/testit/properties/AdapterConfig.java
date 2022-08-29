@@ -6,7 +6,11 @@ public class AdapterConfig {
     private final AdapterMode mode;
 
     public AdapterConfig(Properties properties) {
-        this.mode = AdapterMode.valueOf(Integer.parseInt(String.valueOf(properties.get("AdapterMode"))));
+        String modeValue = String.valueOf(properties.get("AdapterMode"));
+        if (modeValue == "null") {
+            modeValue = "0";
+        }
+        this.mode = AdapterMode.valueOf(Integer.parseInt(modeValue));
     }
 
     public AdapterMode getMode() {
