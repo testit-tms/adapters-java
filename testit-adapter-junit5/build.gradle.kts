@@ -5,6 +5,7 @@ plugins {
 }
 
 val junitVersion = "5.8.2"
+val junitLauncherVersion = "1.9.0"
 val aspectjVersion = "1.9.7"
 val slf4jVersion = "1.7.36"
 
@@ -14,6 +15,7 @@ dependencies {
     agent("org.aspectj:aspectjweaver:$aspectjVersion")
 
     implementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    implementation("org.junit.platform:junit-platform-launcher:$junitLauncherVersion")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
     implementation(project(":testit-java-commons"))
