@@ -15,6 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
@@ -24,7 +27,8 @@ public class BaseTestNgListener implements
         ITestListener,
         IClassListener,
         IInvokedMethodListener,
-        IConfigurationListener {
+        IConfigurationListener,
+        IMethodInterceptor {
 
     /**
      * Store current executable test.
@@ -77,14 +81,6 @@ public class BaseTestNgListener implements
 
     @Override
     public void onTestStart(final ITestResult testResult) {
-        Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
-        Map<String, String> parameters = getParameters(testResult);
-        String externalId = Utils.extractExternalID(method, parameters);
-
-        if (adapterManager.SkipTest(externalId)) {
-            throw new SkipException("filter");
-        }
-
         ExecutableTest executableTest = this.executableTest.get();
         if (executableTest.isStarted()) {
             executableTest = refreshContext();
@@ -93,10 +89,23 @@ public class BaseTestNgListener implements
 
         final String uuid = executableTest.getUuid();
 
+        startTestCase(testResult, uuid);
+
+        Optional.of(testResult)
+                .map(ITestResult::getMethod)
+                .map(ITestNGMethod::getTestClass)
+                .ifPresent(cl -> addClassContainerChild(cl, uuid));
+    }
+
+    protected void startTestCase(final ITestResult testResult,
+                                 final String uuid) {
+        Map<String, String> parameters = getParameters(testResult);
+
+        Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
         final TestResult result = new TestResult()
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method, parameters))
-                .setExternalId(externalId)
+                .setExternalId(Utils.extractExternalID(method, parameters))
                 .setWorkItemId(Utils.extractWorkItemId(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters))
                 .setName(Utils.extractDisplayName(method, parameters))
@@ -109,11 +118,6 @@ public class BaseTestNgListener implements
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);
-
-        Optional.of(testResult)
-                .map(ITestResult::getMethod)
-                .map(ITestNGMethod::getTestClass)
-                .ifPresent(cl -> addClassContainerChild(cl, uuid));
     }
 
     private Map<String, String> getParameters(final ITestResult testResult) {
@@ -190,11 +194,6 @@ public class BaseTestNgListener implements
 
     @Override
     public void onTestSkipped(final ITestResult result) {
-        if (result.getThrowable() instanceof SkipException
-                && result.getThrowable().getMessage().equals("filter")) {
-            return;
-        }
-
         ExecutableTest executableTest = this.executableTest.get();
 
         if (executableTest.isAfter()) {
@@ -385,5 +384,24 @@ public class BaseTestNgListener implements
     private ExecutableTest refreshContext() {
         executableTest.remove();
         return executableTest.get();
+    }
+
+    @Override
+    public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
+        List<String> testsForRun = adapterManager.getTestFromTestRun();
+
+        return methods.stream().filter(method -> {
+            String externalId = Utils.extractExternalID(method.getMethod().getConstructorOrMethod().getMethod(), null);
+            Pattern pattern = Pattern.compile(externalId.replaceAll("\\{.*}", ".*"));
+
+            for (String test : testsForRun) {
+                Matcher matcher = pattern.matcher(test);
+                if (matcher.find()) {
+                    return true;
+                }
+            }
+
+            return false;
+        }).collect(Collectors.toList());
     }
 }

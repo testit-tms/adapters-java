@@ -8,7 +8,6 @@ import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.TmsApiClient;
 import ru.testit.models.*;
 import ru.testit.properties.AdapterConfig;
-import ru.testit.properties.AdapterMode;
 import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
@@ -29,7 +28,6 @@ public class AdapterManager {
     private final ApiClient client;
     private final ClientConfiguration clientConfiguration;
     private final AdapterConfig adapterConfig;
-    private List<String> testForRun = new ArrayList<>();
 
     public AdapterManager(ConfigManager configManager) {
         this.clientConfiguration = configManager.getClientConfiguration();
@@ -57,13 +55,6 @@ public class AdapterManager {
     }
 
     public void startTests() {
-        synchronized (testForRun) {
-            if (adapterConfig.getMode().equals(AdapterMode.USE_FILTER)) {
-                if (testForRun.isEmpty()) {
-                    testForRun = getTestFromTestRun();
-                }
-            }
-        }
         writer.startLaunch();
     }
 
@@ -506,21 +497,13 @@ public class AdapterManager {
         );
     }
 
-    private List<String> getTestFromTestRun() {
+    public List<String> getTestFromTestRun() {
         try {
             return client.getTestFromTestRun(clientConfiguration.getTestRunId(), clientConfiguration.getConfigurationId());
         } catch (ApiException e) {
             LOGGER.error("Could not get tests from test run", e);
         }
         return new ArrayList<>();
-    }
-
-    public boolean SkipTest(String externalId){
-        if (!adapterConfig.getMode().equals(AdapterMode.USE_FILTER)){
-            return false;
-        }
-
-        return !testForRun.contains(externalId);
     }
 
     private void validateAdapterConfig() {
