@@ -4,11 +4,9 @@ import org.testng.*;
 import org.testng.annotations.Parameters;
 import org.testng.xml.XmlTest;
 import ru.testit.models.*;
-import ru.testit.models.ClassContainer;
-import ru.testit.models.MainContainer;
-import ru.testit.services.ExecutableTest;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
+import ru.testit.services.ExecutableTest;
 import ru.testit.services.Utils;
 
 import java.lang.reflect.Method;
@@ -17,6 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
@@ -26,7 +27,8 @@ public class BaseTestNgListener implements
         ITestListener,
         IClassListener,
         IInvokedMethodListener,
-        IConfigurationListener {
+        IConfigurationListener,
+        IMethodInterceptor {
 
     /**
      * Store current executable test.
@@ -275,9 +277,8 @@ public class BaseTestNgListener implements
                 .ifPresent(parentUuid -> {
                     ExecutableTest test = executableTest.get();
 
-                    if (testMethod.isBeforeMethodConfiguration())
-                    {
-                        if (test.isStarted()){
+                    if (testMethod.isBeforeMethodConfiguration()) {
+                        if (test.isStarted()) {
                             executableTest.remove();
                             test = executableTest.get();
                         }
@@ -383,5 +384,28 @@ public class BaseTestNgListener implements
     private ExecutableTest refreshContext() {
         executableTest.remove();
         return executableTest.get();
+    }
+
+    @Override
+    public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
+        if (!adapterManager.IsFilteredMode()){
+            return methods;
+        }
+
+        List<String> testsForRun = adapterManager.getTestFromTestRun();
+
+        return methods.stream().filter(method -> {
+            String externalId = Utils.extractExternalID(method.getMethod().getConstructorOrMethod().getMethod(), null);
+            Pattern pattern = Pattern.compile(externalId.replaceAll("\\{.*}", ".*"));
+
+            for (String test : testsForRun) {
+                Matcher matcher = pattern.matcher(test);
+                if (matcher.find()) {
+                    return true;
+                }
+            }
+
+            return false;
+        }).collect(Collectors.toList());
     }
 }

@@ -182,6 +182,7 @@ PrivateToken={%USER_PRIVATE_TOKEN%}
 ProjectId={%PROJECT_ID%} 
 ConfigurationId={%CONFIGURATION_ID%}
 TestRunId={%TEST_RUN_ID%}
+AdapterMode={%ADAPTER_MODE%}
 ```
 And fill parameters with your configuration, where:  
 `URL` - location of the TMS instance  
@@ -207,6 +208,12 @@ And fill parameters with your configuration, where:
 `TEST_RUN_ID` - id of the created test-run in TMS instance  
 
 > TEST_RUN_ID is optional. If it's not provided than it create automatically.
+
+`ADAPTER_MODE` - mode of adapter. Default value - 0
+> Adapter supports following modes:
+> 0 - in this mode adapter filters tests by test run id and configuration id and sends results to test run
+> 1 - in this mode adapter sends all results to test run without filtering
+> 2 - in this mode adapter creates new test run and sends results to new test run
 
 ### Annotations
 

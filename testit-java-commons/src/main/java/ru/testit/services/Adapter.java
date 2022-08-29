@@ -2,10 +2,12 @@ package ru.testit.services;
 
 import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
+import ru.testit.properties.AppProperties;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 
 public final class Adapter {
     private static AdapterManager adapterManager;
@@ -13,7 +15,9 @@ public final class Adapter {
 
     public static AdapterManager getAdapterManager() {
         if (Objects.isNull(adapterManager)) {
-            adapterManager = new AdapterManager();
+            Properties appProperties = AppProperties.loadProperties();
+            ConfigManager manager = new ConfigManager(appProperties);
+            adapterManager = new AdapterManager(manager);
         }
         return adapterManager;
     }

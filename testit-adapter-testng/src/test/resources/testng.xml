@@ -5,6 +5,30 @@
     <listeners>
         <listener class-name="ru.testit.listener.BaseTestNgListener"/>
     </listeners>
+    <test name = "testWithXmlParameters1">
+        <parameter name = "title" value="Test version 1"/>
+        <parameter name = "number" value="1"/>
+        <parameter name = "url" value="google.com"/>
+        <classes>
+            <class name="ru.testit.samples.XmlParameterizedTests" />
+        </classes>
+    </test>
+    <test name = "testWithXmlParameters2">
+        <parameter name = "title" value="Test version 2"/>
+        <parameter name = "number" value="2"/>
+        <parameter name = "url" value="yandex.ru"/>
+        <classes>
+            <class name="ru.testit.samples.XmlParameterizedTests" />
+        </classes>
+    </test>
+    <test name = "testWithXmlParameters3">
+        <parameter name = "title" value="Test version 3"/>
+        <parameter name = "number" value="3"/>
+        <parameter name = "url" value="duckduckgo.com"/>
+        <classes>
+            <class name="ru.testit.samples.XmlParameterizedTests" />
+        </classes>
+    </test>
     <test name="All">
         <classes>
             <class name="ru.testit.samples.FullBeforeAfterTests" />
@@ -13,6 +37,7 @@
             <class name="ru.testit.samples.failed.FullBeforeAfterTests" />
             <class name="ru.testit.samples.failed.OnlyBeforeAfterAllTests" />
             <class name="ru.testit.samples.failed.OnlyBeforeAfterEachTests" />
+            <class name="ru.testit.samples.DataProviderParameterizedTests" />
         </classes>
     </test>
 </suite>
