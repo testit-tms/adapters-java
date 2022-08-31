@@ -64,4 +64,14 @@ public class ResultStorage {
             lock.writeLock().unlock();
         }
     }
+
+    public void remove(final String uuid) {
+        lock.writeLock().lock();
+        try {
+            Objects.requireNonNull(uuid, "Can't remove item from storage: uuid can't be null");
+            storage.remove(uuid);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
 }

@@ -8,8 +8,8 @@ import java.util.List;
  */
 public class MainContainer {
     private String uuid;
-    private List<String> beforeMethods = new ArrayList<>();
-    private List<String> afterMethods = new ArrayList<>();
+    private List<FixtureResult> beforeMethods = new ArrayList<>();
+    private List<FixtureResult> afterMethods = new ArrayList<>();
     private List<String> children = new ArrayList<>();
     private Long start;
     private Long stop;
@@ -59,7 +59,7 @@ public class MainContainer {
      *
      * @return the beforeMethods
      */
-    public List<String> getBeforeMethods() {
+    public List<FixtureResult> getBeforeMethods() {
         return beforeMethods;
     }
 
@@ -69,7 +69,7 @@ public class MainContainer {
      * @param beforeMethods the beforeMethods
      * @return self for method chaining
      */
-    public MainContainer setBeforeMethods(List<String> beforeMethods) {
+    public MainContainer setBeforeMethods(List<FixtureResult> beforeMethods) {
         this.beforeMethods = beforeMethods;
         return this;
     }
@@ -79,7 +79,7 @@ public class MainContainer {
      *
      * @return the afterMethods
      */
-    public List<String> getAfterMethods() {
+    public List<FixtureResult> getAfterMethods() {
         return afterMethods;
     }
 
@@ -89,7 +89,7 @@ public class MainContainer {
      * @param afterMethods the afterMethods
      * @return self for method chaining
      */
-    public MainContainer setAfterMethods(List<String> afterMethods) {
+    public MainContainer setAfterMethods(List<FixtureResult> afterMethods) {
         this.afterMethods = afterMethods;
         return this;
     }

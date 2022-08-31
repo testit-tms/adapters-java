@@ -9,10 +9,10 @@ import java.util.List;
 public class ClassContainer {
     private String uuid;
     private String name;
-    private List<String> beforeEachTest = new ArrayList<>();
-    private List<String> afterEachTest = new ArrayList<>();
-    private List<String> beforeClassMethods = new ArrayList<>();
-    private List<String> afterClassMethods = new ArrayList<>();
+    private List<FixtureResult> beforeEachTest = new ArrayList<>();
+    private List<FixtureResult> afterEachTest = new ArrayList<>();
+    private List<FixtureResult> beforeClassMethods = new ArrayList<>();
+    private List<FixtureResult> afterClassMethods = new ArrayList<>();
     private List<String> children = new ArrayList<>();
     private Long start;
     private Long stop;
@@ -42,7 +42,7 @@ public class ClassContainer {
      *
      * @return the beforeEachTest
      */
-    public List<String> getBeforeEachTest() {
+    public List<FixtureResult> getBeforeEachTest() {
         return beforeEachTest;
     }
 
@@ -52,7 +52,7 @@ public class ClassContainer {
      * @param beforeEachTest the beforeEachTest
      * @return self for method chaining
      */
-    public ClassContainer setBeforeEachTest(List<String> beforeEachTest) {
+    public ClassContainer setBeforeEachTest(List<FixtureResult> beforeEachTest) {
         this.beforeEachTest = beforeEachTest;
         return this;
     }
@@ -62,7 +62,7 @@ public class ClassContainer {
      *
      * @return the afterEachTest
      */
-    public List<String> getAfterEachTest() {
+    public List<FixtureResult> getAfterEachTest() {
         return afterEachTest;
     }
 
@@ -72,7 +72,7 @@ public class ClassContainer {
      * @param afterEachTest the afters
      * @return self for method chaining
      */
-    public ClassContainer setAfterEachTest(List<String> afterEachTest) {
+    public ClassContainer setAfterEachTest(List<FixtureResult> afterEachTest) {
         this.afterEachTest = afterEachTest;
         return this;
     }
@@ -122,7 +122,7 @@ public class ClassContainer {
      *
      * @return the beforeClassMethods
      */
-    public List<String> getBeforeClassMethods() {
+    public List<FixtureResult> getBeforeClassMethods() {
         return beforeClassMethods;
     }
 
@@ -132,7 +132,7 @@ public class ClassContainer {
      * @param beforeClassMethods the beforeClassMethods
      * @return self for method chaining
      */
-    public ClassContainer setBeforeClassMethods(List<String> beforeClassMethods) {
+    public ClassContainer setBeforeClassMethods(List<FixtureResult> beforeClassMethods) {
         this.beforeClassMethods = beforeClassMethods;
         return this;
     }
@@ -142,7 +142,7 @@ public class ClassContainer {
      *
      * @return the afterClassMethods
      */
-    public List<String> getAfterClassMethods() {
+    public List<FixtureResult> getAfterClassMethods() {
         return afterClassMethods;
     }
 
@@ -152,7 +152,7 @@ public class ClassContainer {
      * @param afterClassMethods the afterClassMethods
      * @return self for method chaining
      */
-    public ClassContainer setAfterClassMethods(List<String> afterClassMethods) {
+    public ClassContainer setAfterClassMethods(List<FixtureResult> afterClassMethods) {
         this.afterClassMethods = afterClassMethods;
         return this;
     }

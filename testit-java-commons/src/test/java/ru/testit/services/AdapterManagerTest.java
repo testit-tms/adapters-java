@@ -4,12 +4,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.testit.Helper;
+import ru.testit.client.invoker.ApiException;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.models.*;
+import ru.testit.properties.AdapterConfig;
+import ru.testit.properties.AdapterMode;
 import ru.testit.writers.HttpWriter;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -835,10 +839,83 @@ public class AdapterManagerTest {
         AdapterManager manager = new AdapterManager(configManager, threadContext, storage, writer, client);
 
         // act
-        manager.addAttachments(new ArrayList<String>(){{add(path);}});
+        manager.addAttachments(new ArrayList<String>() {{
+            add(path);
+        }});
 
         // assert
         Assertions.assertFalse(result.getAttachments().isEmpty());
         verify(writer).writeAttachment(path);
+    }
+
+    @Test
+    void isFilteredMode_FilteredMode_ReturnsTrue() {
+        // arrange
+        AdapterConfig config = mock(AdapterConfig.class);
+        when(config.getMode()).thenReturn(AdapterMode.USE_FILTER);
+        when(configManager.getAdapterConfig()).thenReturn(config);
+
+        AdapterManager manager = new AdapterManager(configManager, threadContext, storage, writer, client);
+
+        // act
+        Boolean result = manager.isFilteredMode();
+
+        // assert
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void isFilteredMode_NoFilteredMode_ReturnsFalse() {
+        // arrange
+        AdapterConfig config = mock(AdapterConfig.class);
+        when(config.getMode()).thenReturn(AdapterMode.RUN_ALL_TESTS);
+        when(configManager.getAdapterConfig()).thenReturn(config);
+
+        AdapterManager manager = new AdapterManager(configManager, threadContext, storage, writer, client);
+
+        // act
+        Boolean result = manager.isFilteredMode();
+
+        // assert
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    void getTestFromTestRun_SuccessInvoke_ReturnsListOfTests() throws ApiException {
+        // arrange
+        List<String> testForRuns = new ArrayList<>();
+        testForRuns.add("9876");
+        ClientConfiguration config = mock(ClientConfiguration.class);
+        when(config.getTestRunId()).thenReturn("1234");
+        when(config.getConfigurationId()).thenReturn("4321");
+        when(configManager.getClientConfiguration()).thenReturn(config);
+        when(client.getTestFromTestRun("1234", "4321")).thenReturn(testForRuns);
+
+        AdapterManager manager = new AdapterManager(configManager, threadContext, storage, writer, client);
+
+        // act
+        List<String> result = manager.getTestFromTestRun();
+
+        // assert
+        Assertions.assertFalse(result.isEmpty());
+        Assertions.assertEquals(testForRuns, result);
+    }
+
+    @Test
+    void getTestFromTestRun_ThrowInvoke_ReturnsListOfTests() throws ApiException {
+        // arrange
+        ClientConfiguration config = mock(ClientConfiguration.class);
+        when(config.getTestRunId()).thenReturn("1234");
+        when(config.getConfigurationId()).thenReturn("4321");
+        when(configManager.getClientConfiguration()).thenReturn(config);
+        when(client.getTestFromTestRun("1234", "4321")).thenThrow(new ApiException());
+
+        AdapterManager manager = new AdapterManager(configManager, threadContext, storage, writer, client);
+
+        // act
+        List<String> result = manager.getTestFromTestRun();
+
+        // assert
+        Assertions.assertTrue(result.isEmpty());
     }
 }

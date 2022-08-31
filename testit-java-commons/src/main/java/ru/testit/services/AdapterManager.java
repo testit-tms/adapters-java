@@ -230,7 +230,7 @@ public class AdapterManager {
     public void startPrepareFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getTestsContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getBeforeMethods().add(uuid);
+                container.getBeforeMethods().add(result);
             }
         });
         startFixture(uuid, result);
@@ -246,7 +246,7 @@ public class AdapterManager {
     public void startTearDownFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getTestsContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getAfterMethods().add(uuid);
+                container.getAfterMethods().add(result);
             }
         });
 
@@ -263,7 +263,7 @@ public class AdapterManager {
     public void startPrepareFixture(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getClassContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getBeforeClassMethods().add(uuid);
+                container.getBeforeClassMethods().add(result);
             }
         });
         startFixture(uuid, result);
@@ -279,7 +279,7 @@ public class AdapterManager {
     public void startTearDownFixture(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getClassContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getAfterClassMethods().add(uuid);
+                container.getAfterClassMethods().add(result);
             }
         });
 
@@ -296,7 +296,7 @@ public class AdapterManager {
     public void startPrepareFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getClassContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getBeforeEachTest().add(uuid);
+                container.getBeforeEachTest().add(result);
             }
         });
         startFixture(uuid, result);
@@ -312,7 +312,7 @@ public class AdapterManager {
     public void startTearDownFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getClassContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getAfterEachTest().add(uuid);
+                container.getAfterEachTest().add(result);
             }
         });
 
@@ -368,6 +368,7 @@ public class AdapterManager {
         fixture.setItemStage(ItemStage.FINISHED)
                 .setStop(System.currentTimeMillis());
 
+        storage.remove(uuid);
         threadContext.clear();
     }
 
@@ -404,7 +405,7 @@ public class AdapterManager {
         storage.put(uuid, result);
         storage.get(parentUuid, ResultWithSteps.class).ifPresent(parentStep -> {
             synchronized (storage) {
-                parentStep.getSteps().add(uuid);
+                parentStep.getSteps().add(result);
             }
         });
     }
@@ -474,6 +475,7 @@ public class AdapterManager {
         step.setItemStage(ItemStage.FINISHED);
         step.setStop(System.currentTimeMillis());
 
+        storage.remove(uuid);
         threadContext.stop();
     }
 
@@ -498,7 +500,7 @@ public class AdapterManager {
         );
     }
 
-    public boolean IsFilteredMode() {
+    public boolean isFilteredMode() {
         return adapterConfig.getMode() == AdapterMode.USE_FILTER;
     }
 

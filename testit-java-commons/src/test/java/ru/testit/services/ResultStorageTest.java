@@ -4,9 +4,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.testit.Helper;
 import ru.testit.models.*;
+
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ResultStorageTest {
@@ -52,9 +54,7 @@ public class ResultStorageTest {
         // act
         Throwable expectedException = assertThrows(
                 NullPointerException.class,
-                () -> {
-                    storage.getTestResult(null);
-                });
+                () -> storage.getTestResult(null));
 
         // assert
         Assertions.assertEquals(message, expectedException.getMessage());
@@ -101,9 +101,7 @@ public class ResultStorageTest {
         // act
         Throwable expectedException = assertThrows(
                 NullPointerException.class,
-                () -> {
-                    storage.getFixture(null);
-                });
+                () -> storage.getFixture(null));
 
         // assert
         Assertions.assertEquals(message, expectedException.getMessage());
@@ -150,9 +148,7 @@ public class ResultStorageTest {
         // act
         Throwable expectedException = assertThrows(
                 NullPointerException.class,
-                () -> {
-                    storage.getStep(null);
-                });
+                () -> storage.getStep(null));
 
         // assert
         Assertions.assertEquals(message, expectedException.getMessage());
@@ -199,9 +195,7 @@ public class ResultStorageTest {
         // act
         Throwable expectedException = assertThrows(
                 NullPointerException.class,
-                () -> {
-                    storage.getTestsContainer(null);
-                });
+                () -> storage.getTestsContainer(null));
 
         // assert
         Assertions.assertEquals(message, expectedException.getMessage());
@@ -248,9 +242,7 @@ public class ResultStorageTest {
         // act
         Throwable expectedException = assertThrows(
                 NullPointerException.class,
-                () -> {
-                    storage.getClassContainer(null);
-                });
+                () -> storage.getClassContainer(null));
 
         // assert
         Assertions.assertEquals(message, expectedException.getMessage());
@@ -266,9 +258,7 @@ public class ResultStorageTest {
         // act
         Throwable expectedException = assertThrows(
                 NullPointerException.class,
-                () -> {
-                    storage.put(null, setResult);
-                });
+                () -> storage.put(null, setResult));
 
         // assert
         Assertions.assertEquals(message, expectedException.getMessage());
@@ -284,11 +274,50 @@ public class ResultStorageTest {
         // act
         Throwable expectedException = assertThrows(
                 NullPointerException.class,
-                () -> {
-                    storage.put(uuid, null);
-                });
+                () -> storage.put(uuid, null));
 
         // assert
         Assertions.assertEquals(message, expectedException.getMessage());
+    }
+
+    @Test
+    void remove_WithEmptyUuid_InvokeNullPointerException() {
+        // arrange
+        ResultStorage storage = new ResultStorage();
+        String message = "Can't remove item from storage: uuid can't be null";
+
+        // act
+        Throwable expectedException = assertThrows(
+                NullPointerException.class,
+                () -> storage.remove(null));
+
+        // assert
+        Assertions.assertEquals(message, expectedException.getMessage());
+    }
+
+    @Test
+    void remove_WithCorrectUuid_NoException() {
+        // arrange
+        ResultStorage storage = new ResultStorage();
+        ClassContainer setResult = Helper.generateClassContainer();
+        String uuid = UUID.randomUUID().toString();
+        storage.put(setResult.getUuid(), setResult);
+
+        // act
+
+        // assert
+        assertDoesNotThrow(() -> storage.remove(uuid));
+    }
+
+    @Test
+    void remove_WithUnCorrectUuid_NoException() {
+        // arrange
+        ResultStorage storage = new ResultStorage();
+        String uuid = UUID.randomUUID().toString();
+
+        // act
+
+        // assert
+        assertDoesNotThrow(() -> storage.remove(uuid));
     }
 }

@@ -23,7 +23,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments {
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
-    private List<String> steps = new ArrayList<>();
+    private List<StepResult> steps = new ArrayList<>();
     private Long start;
     private Long stop;
     private Throwable throwable;
@@ -334,7 +334,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments {
      *
      * @return the steps
      */
-    public List<String> getSteps() {
+    public List<StepResult> getSteps() {
         return steps;
     }
 
@@ -344,7 +344,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments {
      * @param steps the steps
      * @return self for method chaining
      */
-    public TestResult setSteps(List<String> steps) {
+    public TestResult setSteps(List<StepResult> steps) {
         this.steps = steps;
         return this;
     }

@@ -388,7 +388,7 @@ public class BaseTestNgListener implements
 
     @Override
     public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
-        if (!adapterManager.IsFilteredMode()){
+        if (!adapterManager.isFilteredMode()){
             return methods;
         }
 

@@ -25,6 +25,7 @@ class HttpWriterTest {
     private ApiClient client;
     private ResultStorage storage;
 
+
     @BeforeEach
     void init() {
         this.client = mock(ApiClient.class);
@@ -113,12 +114,9 @@ class HttpWriterTest {
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
         request.setId(null);
-        StepResult stepResult = Helper.generateStepResult();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
-        when(storage.getStep(testResult.getSteps().get(0)))
-                .thenReturn(Optional.of(stepResult));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -134,12 +132,9 @@ class HttpWriterTest {
         // arrange
         TestResult testResult = Helper.generateTestResult();
         AutoTestPostModel request = Helper.generateAutoTestPostModel(config.getProjectId());
-        StepResult stepResult = Helper.generateStepResult();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(null);
-        when(storage.getStep(testResult.getSteps().get(0)))
-                .thenReturn(Optional.of(stepResult));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -270,20 +265,10 @@ class HttpWriterTest {
         request.getSetup().add(Helper.generateBeforeEachSetup());
         request.getTeardown().add(Helper.generateAfterEachSetup());
 
-        StepResult stepResult = Helper.generateStepResult();
-        FixtureResult fixtureResultBeforeEach = Helper.generateBeforeEachFixtureResult();
-        FixtureResult fixtureResultAfterEach = Helper.generateAfterEachFixtureResult();
-
         when(storage.getTestResult(testResult.getUuid()))
                 .thenReturn(Optional.of(testResult));
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
-        when(storage.getStep(testResult.getSteps().get(0)))
-                .thenReturn(Optional.of(stepResult));
-        when(storage.getFixture(container.getBeforeEachTest().get(0)))
-                .thenReturn(Optional.of(fixtureResultBeforeEach));
-        when(storage.getFixture(container.getAfterEachTest().get(0)))
-                .thenReturn(Optional.of(fixtureResultAfterEach));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -334,28 +319,12 @@ class HttpWriterTest {
         request.getTeardown().add(Helper.generateAfterEachSetup());
         request.getTeardown().add(Helper.generateAfterAllSetup());
 
-        StepResult stepResult = Helper.generateStepResult();
-        FixtureResult fixtureResultBeforeEach = Helper.generateBeforeEachFixtureResult();
-        FixtureResult fixtureResultAfterEach = Helper.generateAfterEachFixtureResult();
-        FixtureResult fixtureResultBeforeAll = Helper.generateBeforeAllFixtureResult();
-        FixtureResult fixtureResultAfterAll = Helper.generateAfterAllFixtureResult();
-
         when(storage.getClassContainer(classContainer.getUuid()))
                 .thenReturn(Optional.of(classContainer));
         when(storage.getTestResult(testResult.getUuid()))
                 .thenReturn(Optional.of(testResult));
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
-        when(storage.getStep(testResult.getSteps().get(0)))
-                .thenReturn(Optional.of(stepResult));
-        when(storage.getFixture(classContainer.getBeforeEachTest().get(0)))
-                .thenReturn(Optional.of(fixtureResultBeforeEach));
-        when(storage.getFixture(classContainer.getAfterEachTest().get(0)))
-                .thenReturn(Optional.of(fixtureResultAfterEach));
-        when(storage.getFixture(container.getBeforeMethods().get(0)))
-                .thenReturn(Optional.of(fixtureResultBeforeAll));
-        when(storage.getFixture(container.getAfterMethods().get(0)))
-                .thenReturn(Optional.of(fixtureResultAfterAll));
 
         Writer writer = new HttpWriter(config, client, storage);
 

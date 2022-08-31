@@ -44,6 +44,11 @@ implementation "ru.testit:testit-adapter-junit5:LATEST_VERSION"
             <version>5.7.0</version>
         </dependency>
         <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.7.0</version>
@@ -159,6 +164,7 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"
+    testImplementation "org.junit.platform:junit-platform-launcher:1.9.0"
     aspectConfig "org.aspectj:aspectjweaver:1.9.7"
 }
 
