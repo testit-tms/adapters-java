@@ -19,7 +19,7 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
 
     public Junit5PostDiscoveryFilter() {
         AdapterManager manager = Adapter.getAdapterManager();
-        isFilteredMode = manager.IsFilteredMode();
+        isFilteredMode = manager.isFilteredMode();
         if (isFilteredMode) {
             testsForRun = manager.getTestFromTestRun();
         }

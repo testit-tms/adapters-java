@@ -13,7 +13,7 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments {
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
-    private List<String> steps = new ArrayList<>();
+    private List<StepResult> steps = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
     private List<String> attachments = new ArrayList<>();
     private String parent;
@@ -126,7 +126,7 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments {
      *
      * @return the steps
      */
-    public List<String> getSteps() {
+    public List<StepResult> getSteps() {
         return steps;
     }
 
@@ -136,7 +136,7 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments {
      * @param steps the steps
      * @return self for method chaining
      */
-    public FixtureResult setSteps(List<String> steps) {
+    public FixtureResult setSteps(List<StepResult> steps) {
         this.steps = steps;
         return this;
     }
