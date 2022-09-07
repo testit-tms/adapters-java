@@ -1,15 +1,21 @@
 package ru.testit.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.properties.AppProperties;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 public final class Adapter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Adapter.class);
     private static AdapterManager adapterManager;
     private static ResultStorage storage;
 
@@ -72,6 +78,40 @@ public final class Adapter {
         getAdapterManager().addAttachments(attachments);
     }
 
+    public static void addAttachments(String attachment) {
+        addAttachments(new ArrayList<String>() {{
+            add(attachment);
+        }});
+    }
+
+    public static void addAttachments(String content, String fileName) {
+        if (fileName == null) {
+            fileName = UUID.randomUUID() + "-attachment.txt";
+        }
+
+        Path path = Paths.get(fileName);
+        try {
+            BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset());
+            writer.write(content);
+            writer.close();
+        } catch (IOException e) {
+            LOGGER.error(String.format("Can not write file '%s':", fileName), e);
+        }
+
+        addAttachments(fileName);
+
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            LOGGER.error(String.format("Can not delete file '%s':", fileName), e);
+        }
+    }
+
+    /**
+     * @deprecated This method is no longer acceptable to compute time between versions.
+     * <p> Use {@link Adapter#addAttachments(String attachment)} instead.
+     */
+    @Deprecated
     public static void addAttachment(String attachment) {
         getAdapterManager().addAttachments(new ArrayList<String>() {{
             add(attachment);
