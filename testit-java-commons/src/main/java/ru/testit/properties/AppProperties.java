@@ -19,6 +19,11 @@ public class AppProperties {
         Properties properties = new Properties();
         loadPropertiesFrom(Thread.currentThread().getContextClassLoader(), properties);
         loadPropertiesFrom(ClassLoader.getSystemClassLoader(), properties);
+
+        if (!String.valueOf(properties.get("PrivateToken")).equals("null")) {
+            log.warn("The configuration file specifies a private token. It is not safe. Use TMS_PRIVATE_TOKEN environment variable");
+        }
+
         properties.putAll(System.getenv());
         return properties;
     }
