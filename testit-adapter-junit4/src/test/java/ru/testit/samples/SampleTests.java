@@ -86,7 +86,7 @@ public class SampleTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
     public void allAnnotationsTest() {
-       Adapter.addLink("https://testit.ru/", "Test 1","Desc 1", LinkType.ISSUE);
+       Adapter.addLinks("https://testit.ru/", "Test 1","Desc 1", LinkType.ISSUE);
         authorization();
         createProject();
         enterProject();
