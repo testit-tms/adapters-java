@@ -7,9 +7,10 @@ import ru.testit.models.LinkType;
 import ru.testit.properties.AppProperties;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -85,11 +86,12 @@ public final class Adapter {
 
     public static void addAttachments(String content, String fileName) {
         if (fileName == null) {
-            fileName = UUID.randomUUID() + ".txt";
+            fileName = UUID.randomUUID() + "-attachment.txt";
         }
 
+        Path path = Paths.get(fileName);
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset());
             writer.write(content);
             writer.close();
         } catch (IOException e) {
@@ -99,7 +101,7 @@ public final class Adapter {
         addAttachments(fileName);
 
         try {
-            Files.deleteIfExists(Paths.get(fileName));
+            Files.deleteIfExists(path);
         } catch (IOException e) {
             LOGGER.error(String.format("Can not delete file '%s':", fileName), e);
         }
