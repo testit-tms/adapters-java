@@ -273,7 +273,7 @@ public class SimpleTest {
            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
    public void itsTrueReallyTrue() {
       step1();
-      Adapter.addLink("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
+      Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
       Assertions.assertTrue(true);
    }
 
