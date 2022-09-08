@@ -6,6 +6,7 @@ import ru.testit.models.LinkItem;
 
 import javax.xml.bind.DatatypeConverter;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -137,8 +138,8 @@ public class Utils {
 
     private static String getHash(String value) {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(value.getBytes());
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(value.getBytes(StandardCharsets.UTF_8));
             byte[] digest = md.digest();
             return DatatypeConverter.printHexBinary(digest);
         } catch (NoSuchAlgorithmException e) {
