@@ -5,6 +5,10 @@ import ru.testit.annotations.*;
 import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 
+import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,12 +17,12 @@ public class Utils {
 
     public static String extractExternalID(final Description method) {
         final ExternalId annotation = method.getAnnotation(ExternalId.class);
-        return (annotation != null) ? annotation.value() : null;
+        return (annotation != null) ? annotation.value() : getHash(method.getMethodName());
     }
 
     public static String extractDisplayName(final Description method) {
         final DisplayName annotation = method.getAnnotation(DisplayName.class);
-        return (annotation != null) ? annotation.value() : null;
+        return (annotation != null) ? annotation.value() : method.getMethodName();
     }
 
     public static List<String> extractWorkItemId(final Description method) {
@@ -93,5 +97,16 @@ public class Utils {
     public static String extractDescription(final Description method) {
         final ru.testit.annotations.Description annotation = method.getAnnotation(ru.testit.annotations.Description.class);
         return (annotation != null) ? annotation.value() : "";
+    }
+
+    private static String getHash(String value) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(value.getBytes(StandardCharsets.UTF_8));
+            byte[] digest = md.digest();
+            return DatatypeConverter.printHexBinary(digest);
+        } catch (NoSuchAlgorithmException e) {
+            return value;
+        }
     }
 }
