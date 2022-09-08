@@ -80,7 +80,8 @@ public class UtilsTest {
     void extractExternalID_WithoutExternalID() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-
+        String hash = "5621B4CD98EEB77748315FA3D5E6CD00";
+        when(atomicTest.getName()).thenReturn("allAnnotationsTest");
         when(atomicTest.getAnnotation(ExternalId.class)).thenReturn(null);
 
         // act
@@ -88,8 +89,8 @@ public class UtilsTest {
         String externalIdWithInputParameters = Utils.extractExternalID(atomicTest, parameters);
 
         // assert
-        Assertions.assertNull(externalIdWithoutInputParameters);
-        Assertions.assertNull(externalIdWithInputParameters);
+        Assertions.assertEquals(hash, externalIdWithoutInputParameters);
+        Assertions.assertEquals(hash, externalIdWithInputParameters);
     }
 
     @Test
@@ -148,7 +149,8 @@ public class UtilsTest {
     void extractDisplayName_WithoutDisplayName() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-
+        String methodName = "allAnnotationsTest";
+        when(atomicTest.getName()).thenReturn(methodName);
         when(atomicTest.getAnnotation(DisplayName.class)).thenReturn(null);
 
         // act
@@ -156,8 +158,8 @@ public class UtilsTest {
         String displayNameWithInputParameters = Utils.extractDisplayName(atomicTest, parameters);
 
         // assert
-        Assertions.assertNull(displayNameWithoutInputParameters);
-        Assertions.assertNull(displayNameWithInputParameters);
+        Assertions.assertEquals(methodName, displayNameWithoutInputParameters);
+        Assertions.assertEquals(methodName, displayNameWithInputParameters);
     }
 
     @Test

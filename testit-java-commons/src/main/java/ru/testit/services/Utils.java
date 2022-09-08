@@ -4,7 +4,10 @@ import ru.testit.annotations.*;
 import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 
+import javax.xml.bind.DatatypeConverter;
 import java.lang.reflect.Method;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,12 +20,12 @@ import static java.util.Objects.isNull;
 public class Utils {
     public static String extractExternalID(final Method atomicTest, Map<String, String> parameters) {
         final ExternalId annotation = atomicTest.getAnnotation(ExternalId.class);
-        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : getHash(atomicTest.getName());
     }
 
     public static String extractDisplayName(final Method atomicTest, Map<String, String> parameters) {
         final DisplayName annotation = atomicTest.getAnnotation(DisplayName.class);
-        return (annotation != null) ? setParameters(annotation.value(), parameters) : null;
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : atomicTest.getName();
     }
 
     public static List<String> extractWorkItemId(final Method atomicTest, Map<String, String> parameters) {
@@ -130,5 +133,16 @@ public class Utils {
         }
 
         return value;
+    }
+
+    private static String getHash(String value) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(value.getBytes());
+            byte[] digest = md.digest();
+            return DatatypeConverter.printHexBinary(digest);
+        } catch (NoSuchAlgorithmException e) {
+            return value;
+        }
     }
 }

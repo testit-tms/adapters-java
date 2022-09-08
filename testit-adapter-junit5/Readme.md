@@ -225,10 +225,10 @@ And fill parameters with your configuration, where:
 
 Annotations can be used to specify information about autotest.
 
-Description of Annotations (\* - required):
+Description of Annotations:
 - `WorkItemIds` - linking an autotest to a test case
-- \*`DisplayName` - name of the autotest in the Test IT system
-- \*`ExternalID` - ID of the autotest within the project in the Test IT System
+- `DisplayName` - name of the autotest in the Test IT system
+- `ExternalID` - ID of the autotest within the project in the Test IT System
 - `Title` - title in the autotest card and the step card
 - `Description` - description in the autotest card and the step card
 - `Labels` - tags in the autotest card
