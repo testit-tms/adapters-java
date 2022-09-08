@@ -232,13 +232,11 @@ Description of Annotations:
 - `Title` - title in the autotest card and the step card
 - `Description` - description in the autotest card and the step card
 - `Labels` - tags in the autotest card
-- `Link` - links in the autotest card
+- `Links` - links in the autotest card
 - `Step` - the designation of the step
 
 Description of methods:
-- `Adapter.addLink` - link in the autotest result
 - `Adapter.addLinks` - links in the autotest result
-- `Adapter.addAttachment` - attachment in the autotest result
 - `Adapter.addAttachments` - attachments in the autotest result
 - `Adapter.addMessage` - message in the autotest result
 
