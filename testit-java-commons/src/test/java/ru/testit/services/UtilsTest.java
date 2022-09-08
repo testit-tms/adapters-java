@@ -80,7 +80,7 @@ public class UtilsTest {
     void extractExternalID_WithoutExternalID() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        String hash = "5621B4CD98EEB77748315FA3D5E6CD00";
+        String hash = "8E698E31EBAB7E751C6A1DF17DAB0113D3C9F6E71D3AE666ECB83D94971EDD8F";
         when(atomicTest.getName()).thenReturn("allAnnotationsTest");
         when(atomicTest.getAnnotation(ExternalId.class)).thenReturn(null);
 
