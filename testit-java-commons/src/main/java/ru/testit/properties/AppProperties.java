@@ -28,7 +28,6 @@ public class AppProperties {
     }
 
     public static Properties loadProperties() {
-
         Properties properties = new Properties();
         loadPropertiesFrom(Thread.currentThread().getContextClassLoader(), properties, getConfigFileName());
         loadPropertiesFrom(ClassLoader.getSystemClassLoader(), properties, getConfigFileName());
@@ -38,6 +37,8 @@ public class AppProperties {
         }
 
         properties.putAll(loadPropertiesFromEnv());
+        properties.putAll(loadPropertiesFromCli());
+
         return properties;
     }
 
@@ -92,11 +93,58 @@ public class AppProperties {
         return map;
     }
 
-    private static String getConfigFileName() {
-        String fileName = System.getenv(String.format("%s%s", ENV_PREFIX, CONFIG_FILE.toUpperCase(Locale.getDefault())));
+    private static Map<String, String> loadPropertiesFromCli(){
+        Map<String, String> map = new HashMap<>();
+        Properties systemProperties = System.getProperties();
 
-        if (fileName != null) {
-            return fileName;
+        String url = systemProperties.getProperty("tmsUrl");
+        if (url != null) {
+            map.put(URL, url);
+        }
+
+        String token = systemProperties.getProperty("tmsPrivateToken");
+        if (token != null) {
+            map.put(PRIVATE_TOKEN, token);
+        }
+
+        String project = systemProperties.getProperty("tmsProjectId");
+        if (project != null) {
+            map.put(PROJECT_ID, project);
+        }
+
+        String config = systemProperties.getProperty("tmsConfigurationId");
+        if (config != null) {
+            map.put(CONFIGURATION_ID, config);
+        }
+
+        String testRunId = systemProperties.getProperty("tmsTestRunId");
+        if (testRunId != null) {
+            map.put(TEST_RUN_ID, testRunId);
+        }
+
+        String testRunName = systemProperties.getProperty("tmsTestRunName");
+        if (testRunName != null) {
+            map.put(TEST_RUN_NAME, testRunName);
+        }
+
+        String adapterMode = systemProperties.getProperty("tmsAdapterMode");
+        if (adapterMode != null) {
+            map.put(ADAPTER_MODE, adapterMode);
+        }
+
+        return map;
+    }
+
+    private static String getConfigFileName() {
+        Properties systemProperties = System.getProperties();
+        String fileNameFromCli = systemProperties.getProperty("tmsConfigFile");
+        if (fileNameFromCli != null){
+            return fileNameFromCli;
+        }
+
+        String fileNameFromEnv = System.getenv(String.format("%s%s", ENV_PREFIX, CONFIG_FILE.toUpperCase(Locale.getDefault())));
+        if (fileNameFromEnv != null) {
+            return fileNameFromEnv;
         }
 
         return PROPERTIES_FILE;

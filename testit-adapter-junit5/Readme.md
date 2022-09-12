@@ -250,6 +250,38 @@ You also can use environment variables (environment variables take precedence ov
 
 > TMS_CONFIG_FILE is optional. If it's not provided than it uses default file name.
 
+#### Command line
+
+You also can CLI variables (CLI variables take precedence over environment variables):
+
+##### Gradle
+```
+gradle test -DtmsUrl=http://localhost:8080
+```
+
+##### Maven
+```
+maven test -DtmsUrl=http://localhost:8080
+```
+
+`tmsUrl` - location of the TMS instance
+
+`tmsPrivateToken` - API secret key
+
+`tmsProjectId` - id of project in TMS instance
+
+`tmsConfigurationId` - id of configuration in TMS instance
+
+`tmsTestRunId` - id of the created test-run in TMS instance
+
+`tmsTestRunName` - name of new test-run
+
+`tmsAdapterMode` - mode of adapter. Default value - 0
+
+`tmsConfigFile` - name of configuration file
+
+> tmsConfigFile is optional. If it's not provided than it uses default file name.
+
 ### Annotations
 
 Annotations can be used to specify information about autotest.

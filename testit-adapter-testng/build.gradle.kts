@@ -29,6 +29,7 @@ tasks.getByName<Test>("test")  {
     doFirst {
         jvmArgs("-javaagent:${agent.singleFile}")
     }
+    systemProperties(System.getProperties().toMap() as Map<String,Object>)
 }
 
 tasks.compileTestJava {
