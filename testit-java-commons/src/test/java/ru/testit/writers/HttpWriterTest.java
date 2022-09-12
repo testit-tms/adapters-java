@@ -52,7 +52,7 @@ class HttpWriterTest {
     }
 
     @Test
-    void startLaunch_WithoutTestRunId_InvokeCreateHandler() throws ApiException {
+    void startLaunch_WithoutTestRunIdAndWithoutTestRunName_InvokeCreateHandler() throws ApiException {
         // arrange
         TestRunV2PostShortModel model = new TestRunV2PostShortModel();
         model.setProjectId(UUID.fromString(config.getProjectId()));
@@ -62,6 +62,32 @@ class HttpWriterTest {
 
         when(client.createTestRun(model)).thenReturn(response);
         when(config.getTestRunId()).thenReturn("null");
+        when(config.getTestRunName()).thenReturn("null");
+
+        Writer writer = new HttpWriter(config, client, storage);
+
+        // act
+        writer.startLaunch();
+
+        // assert
+        verify(client, times(1)).createTestRun(model);
+        verify(config, times(1)).setTestRunId(TEST_RUN_ID);
+    }
+
+    @Test
+    void startLaunch_WithoutTestRunIdAndWithTestRunName_InvokeCreateHandler() throws ApiException {
+        // arrange
+        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
+        model.setProjectId(UUID.fromString(config.getProjectId()));
+        model.setName("Test run name");
+
+        TestRunV2GetModel response = new TestRunV2GetModel();
+        response.setId(UUID.fromString(TEST_RUN_ID));
+        response.setName("Test run name");
+
+        when(client.createTestRun(model)).thenReturn(response);
+        when(config.getTestRunId()).thenReturn("null");
+        when(config.getTestRunName()).thenReturn("Test run name");
 
         Writer writer = new HttpWriter(config, client, storage);
 

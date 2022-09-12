@@ -39,6 +39,10 @@ public class HttpWriter implements Writer {
             TestRunV2PostShortModel model = new TestRunV2PostShortModel();
             model.setProjectId(UUID.fromString(config.getProjectId()));
 
+            if (!Objects.equals(this.config.getTestRunName(), "null")){
+                model.setName(this.config.getTestRunName());
+            }
+
             try {
                 TestRunV2GetModel response = apiClient.createTestRun(model);
                 this.config.setTestRunId(response.getId().toString());

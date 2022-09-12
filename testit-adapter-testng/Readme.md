@@ -161,13 +161,16 @@ test {
 
 ### Configuration
 
-Create **testit.properties** file in the resource directory of the project or set environment variables (environment variables take precedence over file variables):
+#### File
+
+Create **testit.properties** file in the resource directory of the project:
 ``` 
-URL={%URL%}
-PrivateToken={%USER_PRIVATE_TOKEN%} 
-ProjectId={%PROJECT_ID%} 
-ConfigurationId={%CONFIGURATION_ID%}
+url={%URL%}
+privateToken={%USER_PRIVATE_TOKEN%} 
+projectId={%PROJECT_ID%} 
+configurationId={%CONFIGURATION_ID%}
 TestRunId={%TEST_RUN_ID%}
+TestRunName={%TEST_RUN_NAME%}
 AdapterMode={%ADAPTER_MODE%}
 ```
 And fill parameters with your configuration, where:  
@@ -193,13 +196,39 @@ And fill parameters with your configuration, where:
 
 `TEST_RUN_ID` - id of the created test-run in TMS instance  
 
-> TEST_RUN_ID is optional. If it's not provided than it create automatically.
+> TEST_RUN_ID is optional. If it's not provided than it creates automatically.
+
+`TEST_RUN_NAME` - name of new test-run
+
+> TEST_RUN_NAME is optional. If it's not provided than it generates automatically.
 
 `ADAPTER_MODE` - mode of adapter. Default value - 0 
 > Adapter supports following modes:
 > 0 - in this mode adapter filters tests by test run id and configuration id and sends results to test run
 > 1 - in this mode adapter sends all results to test run without filtering
 > 2 - in this mode adapter creates new test run and sends results to new test run
+
+#### ENV
+
+You also can use environment variables (environment variables take precedence over file variables):
+
+`TMS_URL` - location of the TMS instance
+
+`TMS_PRIVATE_TOKEN` - API secret key
+
+`TMS_PROJECT_ID` - id of project in TMS instance
+
+`TMS_CONFIGURATION_ID` - id of configuration in TMS instance
+
+`TMS_TEST_RUN_ID` - id of the created test-run in TMS instance
+
+`TMS_TEST_RUN_NAME` - name of new test-run
+
+`TMS_ADAPTER_MODE` - mode of adapter. Default value - 0
+
+`TMS_CONFIG_FILE` - name of configuration file
+
+> TMS_CONFIG_FILE is optional. If it's not provided than it uses default file name.
 
 ### Annotations
 
