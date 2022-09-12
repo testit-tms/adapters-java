@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -28,9 +30,15 @@ public class AppProperties {
     }
 
     public static Properties loadProperties() {
+        String configFile = getConfigFileName();
+
+        if (Files.notExists(Paths.get(configFile))) {
+            throw new RuntimeException(String.format("Config file '%s' not found", configFile));
+        }
+
         Properties properties = new Properties();
-        loadPropertiesFrom(Thread.currentThread().getContextClassLoader(), properties, getConfigFileName());
-        loadPropertiesFrom(ClassLoader.getSystemClassLoader(), properties, getConfigFileName());
+        loadPropertiesFrom(Thread.currentThread().getContextClassLoader(), properties, configFile);
+        loadPropertiesFrom(ClassLoader.getSystemClassLoader(), properties, configFile);
 
         if (!String.valueOf(properties.get(PRIVATE_TOKEN)).equals("null")) {
             log.warn("The configuration file specifies a private token. It is not safe. Use TMS_PRIVATE_TOKEN environment variable");
