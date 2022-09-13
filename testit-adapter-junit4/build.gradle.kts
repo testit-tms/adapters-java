@@ -41,4 +41,5 @@ tasks.getByName<Test>("test") {
             "-javaagent:${agent.singleFile}"
         )
     }
+    systemProperties(System.getProperties().toMap() as Map<String,Object>)
 }

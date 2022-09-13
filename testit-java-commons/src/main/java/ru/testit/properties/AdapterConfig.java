@@ -6,7 +6,7 @@ public class AdapterConfig {
     private final AdapterMode mode;
 
     public AdapterConfig(Properties properties) {
-        String modeValue = String.valueOf(properties.get("AdapterMode"));
+        String modeValue = String.valueOf(properties.get(AppProperties.ADAPTER_MODE));
         if (modeValue.equals("null")) {
             modeValue = "0";
         }

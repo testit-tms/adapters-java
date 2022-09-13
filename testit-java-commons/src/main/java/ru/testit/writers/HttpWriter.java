@@ -39,6 +39,10 @@ public class HttpWriter implements Writer {
             TestRunV2PostShortModel model = new TestRunV2PostShortModel();
             model.setProjectId(UUID.fromString(config.getProjectId()));
 
+            if (!Objects.equals(this.config.getTestRunName(), "null")){
+                model.setName(this.config.getTestRunName());
+            }
+
             try {
                 TestRunV2GetModel response = apiClient.createTestRun(model);
                 this.config.setTestRunId(response.getId().toString());
@@ -218,6 +222,10 @@ public class HttpWriter implements Writer {
         }
 
         try {
+            if (results.size() == 0) {
+                return;
+            }
+
             apiClient.sendTestResults(config.getTestRunId(), results);
         } catch (ApiException e) {
             LOGGER.error("Can not write the test results: ".concat(e.getMessage()));
