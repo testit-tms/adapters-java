@@ -326,7 +326,7 @@ class HttpWriterTest {
 
         // assert
         verify(client, never()).updateAutoTest(any(AutoTestPutModel.class));
-        verify(client, times(1)).sendTestResults(eq(TEST_RUN_ID), any());
+        verify(client, never()).sendTestResults(eq(TEST_RUN_ID), any());
     }
 
     @Test
