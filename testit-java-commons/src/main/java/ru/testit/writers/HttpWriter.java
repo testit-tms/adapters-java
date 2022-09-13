@@ -222,6 +222,10 @@ public class HttpWriter implements Writer {
         }
 
         try {
+            if (results.size() == 0) {
+                return;
+            }
+
             apiClient.sendTestResults(config.getTestRunId(), results);
         } catch (ApiException e) {
             LOGGER.error("Can not write the test results: ".concat(e.getMessage()));

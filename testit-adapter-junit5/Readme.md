@@ -230,7 +230,7 @@ And fill parameters with your configuration, where:
 
 #### ENV
 
-You also can use environment variables (environment variables take precedence over file variables):
+You can use environment variables (environment variables take precedence over file variables):
 
 `TMS_URL` - location of the TMS instance
 
@@ -242,7 +242,11 @@ You also can use environment variables (environment variables take precedence ov
 
 `TMS_TEST_RUN_ID` - id of the created test-run in TMS instance
 
+> TMS_TEST_RUN_ID is optional. If it's not provided than it creates automatically.
+
 `TMS_TEST_RUN_NAME` - name of new test-run
+
+> TMS_TEST_RUN_NAME is optional. If it's not provided than it generates automatically.
 
 `TMS_ADAPTER_MODE` - mode of adapter. Default value - 0
 
@@ -274,13 +278,18 @@ maven test -DtmsUrl=http://localhost:8080
 
 `tmsTestRunId` - id of the created test-run in TMS instance
 
+> tmsTestRunId is optional. If it's not provided than it creates automatically.
+
 `tmsTestRunName` - name of new test-run
+
+> tmsTestRunName is optional. If it's not provided than it generates automatically.
 
 `tmsAdapterMode` - mode of adapter. Default value - 0
 
 `tmsConfigFile` - name of configuration file
 
 > tmsConfigFile is optional. If it's not provided than it uses default file name.
+
 
 ### Annotations
 
