@@ -280,7 +280,7 @@ Description of methods:
 - `Adapter.addLinks` - add links to the autotest result.
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
-- 
+
 ### Examples
 
 ```java
