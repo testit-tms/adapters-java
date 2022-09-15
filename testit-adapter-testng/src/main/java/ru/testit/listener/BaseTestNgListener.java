@@ -62,11 +62,6 @@ public class BaseTestNgListener implements
     }
 
     @Override
-    public void onFinish(final ISuite suite) {
-        adapterManager.stopTests();
-    }
-
-    @Override
     public void onStart(final ITestContext context) {
         final MainContainer container = new MainContainer()
                 .setUuid(launcherUUID);
@@ -396,16 +391,25 @@ public class BaseTestNgListener implements
 
         return methods.stream().filter(method -> {
             String externalId = Utils.extractExternalID(method.getMethod().getConstructorOrMethod().getMethod(), null);
-            Pattern pattern = Pattern.compile(externalId.replaceAll("\\{.*}", ".*"));
 
-            for (String test : testsForRun) {
-                Matcher matcher = pattern.matcher(test);
-                if (matcher.find()) {
-                    return true;
-                }
+            if (externalId.matches("\\{.*}")) {
+                return filterTestWithParameters(testsForRun, externalId);
             }
 
-            return false;
+            return testsForRun.contains(externalId);
         }).collect(Collectors.toList());
+    }
+
+    private boolean filterTestWithParameters(List<String> testsForRun, String externalId){
+        Pattern pattern = Pattern.compile(externalId.replaceAll("\\{.*}", ".*"));
+
+        for (String test : testsForRun) {
+            Matcher matcher = pattern.matcher(test);
+            if (matcher.find()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

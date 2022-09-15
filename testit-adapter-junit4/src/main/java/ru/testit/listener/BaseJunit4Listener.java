@@ -49,7 +49,6 @@ public class BaseJunit4Listener extends RunListener
 
         adapterManager.stopClassContainer(classUUID.get());
         adapterManager.stopMainContainer(launcherUUID.get());
-        adapterManager.stopTests();
         isFinished.set(true);
     }
 
