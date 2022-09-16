@@ -39,7 +39,6 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     public void afterAll(ExtensionContext context) {
         adapterManager.stopClassContainer(classUUID.get());
         adapterManager.stopMainContainer(launcherUUID.get());
-        adapterManager.stopTests();
     }
 
     @Override

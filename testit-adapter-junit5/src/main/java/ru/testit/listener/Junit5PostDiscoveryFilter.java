@@ -38,6 +38,22 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
         final MethodSource source = (MethodSource) object.getSource().get();
         String externalId = Utils.extractExternalID(source.getJavaMethod(), null);
 
+        if (externalId.matches("\\{.*}")) {
+            return filterTestWithParameters(externalId);
+        }
+
+        return filterSimpleTest(externalId);
+    }
+
+    private FilterResult filterSimpleTest(String externalId) {
+        if (testsForRun.contains(externalId)) {
+            return FilterResult.includedIf(true);
+        }
+
+        return FilterResult.excluded("test excluded");
+    }
+
+    private FilterResult filterTestWithParameters(String externalId) {
         Pattern pattern = Pattern.compile(externalId.replaceAll("\\{.*}", ".*"));
 
         for (String test : testsForRun) {
@@ -46,7 +62,6 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
                 return FilterResult.includedIf(true);
             }
         }
-
         return FilterResult.excluded("test excluded");
     }
 }
