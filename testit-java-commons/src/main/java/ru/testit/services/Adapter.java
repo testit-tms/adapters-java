@@ -55,9 +55,11 @@ public final class Adapter {
                 .setDescription(description)
                 .setType(type)
                 .setUrl(url);
-        addLinks(new ArrayList<LinkItem>() {{
-            add(link);
-        }});
+
+        List<LinkItem> links = new ArrayList<>();
+        links.add(link);
+
+        addLinks(links);
     }
 
     public static void addLinks(final String url, final String title, final String description, final LinkType type) {
@@ -65,9 +67,11 @@ public final class Adapter {
                 .setDescription(description)
                 .setType(type)
                 .setUrl(url);
-        addLinks(new ArrayList<LinkItem>() {{
-            add(link);
-        }});
+
+        List<LinkItem> links = new ArrayList<>();
+        links.add(link);
+
+        addLinks(links);
     }
 
     public static void addLinks(List<LinkItem> links) {
@@ -79,9 +83,10 @@ public final class Adapter {
     }
 
     public static void addAttachments(String attachment) {
-        addAttachments(new ArrayList<String>() {{
-            add(attachment);
-        }});
+        List<String> attachments = new ArrayList<>();
+        attachments.add(attachment);
+
+        addAttachments(attachments);
     }
 
     public static void addAttachments(String content, String fileName) {
@@ -113,9 +118,10 @@ public final class Adapter {
      */
     @Deprecated
     public static void addAttachment(String attachment) {
-        getAdapterManager().addAttachments(new ArrayList<String>() {{
-            add(attachment);
-        }});
+        List<String> attachments = new ArrayList<>();
+        attachments.add(attachment);
+
+        getAdapterManager().addAttachments(attachments);
     }
 
     public static void addMessage(String message) {
