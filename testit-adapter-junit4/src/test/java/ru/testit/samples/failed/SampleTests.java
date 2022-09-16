@@ -73,7 +73,7 @@ public class SampleTests {
     @Test
     @ExternalId("failed_with_all_annotations")
     @DisplayName("Failed test with all annotations")
-    @WorkItemId("123")
+    @WorkItemIds("123")
     @Title("Title in the autotest card")
     @Description("Test with all annotations")
     @Labels({"Tag1","Tag2"})
@@ -86,7 +86,7 @@ public class SampleTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
     public void allAnnotationsTest() {
-       Adapter.addLink("https://testit.ru/", "Test 1","Desc 1", LinkType.ISSUE);
+       Adapter.addLinks("https://testit.ru/", "Test 1","Desc 1", LinkType.ISSUE);
         authorization();
         createProject();
         enterProject();

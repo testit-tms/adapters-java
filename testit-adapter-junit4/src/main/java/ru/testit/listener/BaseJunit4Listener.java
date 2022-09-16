@@ -49,7 +49,6 @@ public class BaseJunit4Listener extends RunListener
 
         adapterManager.stopClassContainer(classUUID.get());
         adapterManager.stopMainContainer(launcherUUID.get());
-        adapterManager.stopTests();
         isFinished.set(true);
     }
 
@@ -84,7 +83,10 @@ public class BaseJunit4Listener extends RunListener
 
     @Override
     public void testIgnored(final Description description) {
-        ExecutableTest executableTest = this.executableTest.get();
+        final ExecutableTest executableTest = this.executableTest.get();
+        if (executableTest.isAfter() || executableTest.isBefore()) {
+            return;
+        }
         executableTest.setAfterStatus();
         stopTestCase(executableTest.getUuid(), null, ItemStatus.SKIPPED);
     }

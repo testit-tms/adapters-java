@@ -1,5 +1,6 @@
 package ru.testit.clients;
 
+import ru.testit.properties.AppProperties;
 import ru.testit.services.Utils;
 
 import java.util.Properties;
@@ -10,13 +11,15 @@ public class ClientConfiguration {
     private String url;
     private String configurationId;
     private String testRunId;
+    private String testRunName;
 
     public ClientConfiguration(Properties properties) {
-        this.privateToken = String.valueOf(properties.get("PrivateToken"));
-        this.projectId = String.valueOf(properties.get("ProjectId"));
-        this.url = Utils.urlTrim(String.valueOf(properties.get("URL")));
-        this.configurationId = String.valueOf(properties.get("ConfigurationId"));
-        this.testRunId = String.valueOf(properties.get("TestRunId"));
+        this.privateToken = String.valueOf(properties.get(AppProperties.PRIVATE_TOKEN));
+        this.projectId = String.valueOf(properties.get(AppProperties.PROJECT_ID));
+        this.url = Utils.urlTrim(String.valueOf(properties.get(AppProperties.URL)));
+        this.configurationId = String.valueOf(properties.get(AppProperties.CONFIGURATION_ID));
+        this.testRunId = String.valueOf(properties.get(AppProperties.TEST_RUN_ID));
+        this.testRunName = String.valueOf(properties.get(AppProperties.TEST_RUN_NAME));
     }
 
     public String getPrivateToken() {
@@ -41,5 +44,9 @@ public class ClientConfiguration {
 
     public void setTestRunId(String id) {
         this.testRunId = id;
+    }
+
+    public String getTestRunName() {
+        return testRunName;
     }
 }

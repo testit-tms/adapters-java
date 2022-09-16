@@ -12,5 +12,5 @@ public interface ResultWithSteps {
      *
      * @return the steps
      */
-    List<String> getSteps();
+    List<StepResult> getSteps();
 }

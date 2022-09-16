@@ -2,6 +2,7 @@ package ru.testit.models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Model describes step.
@@ -12,12 +13,13 @@ public class StepResult implements ResultWithSteps, ResultWithAttachments {
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
-    private List<String> steps = new ArrayList<>();
+    private List<StepResult> steps = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
     private List<String> attachments = new ArrayList<>();
     private Throwable throwable;
     private Long start;
     private Long stop;
+    private Map<String, String> parameters;
 
     /**
      * Gets name.
@@ -124,7 +126,7 @@ public class StepResult implements ResultWithSteps, ResultWithAttachments {
      *
      * @return the steps
      */
-    public List<String> getSteps() {
+    public List<StepResult> getSteps() {
         return steps;
     }
 
@@ -134,7 +136,7 @@ public class StepResult implements ResultWithSteps, ResultWithAttachments {
      * @param steps the steps
      * @return self for method chaining
      */
-    public StepResult setSteps(List<String> steps) {
+    public StepResult setSteps(List<StepResult> steps) {
         this.steps = steps;
         return this;
     }
@@ -216,6 +218,26 @@ public class StepResult implements ResultWithSteps, ResultWithAttachments {
      */
     public StepResult setThrowable(Throwable throwable) {
         this.throwable = throwable;
+        return this;
+    }
+
+    /**
+     * Gets parameters.
+     *
+     * @return the parameters
+     */
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    /**
+     * Sets parameters.
+     *
+     * @param parameters the value
+     * @return self for method chaining
+     */
+    public StepResult setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
         return this;
     }
 }

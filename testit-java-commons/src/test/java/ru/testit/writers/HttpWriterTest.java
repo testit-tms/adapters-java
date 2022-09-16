@@ -2,15 +2,17 @@ package ru.testit.writers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.client.model.*;
 import ru.testit.models.*;
+import ru.testit.models.LinkType;
 import ru.testit.services.ResultStorage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,11 +25,12 @@ class HttpWriterTest {
     private ApiClient client;
     private ResultStorage storage;
 
+
     @BeforeEach
     void init() {
-        this.client = Mockito.mock(ApiClient.class);
-        this.config = Mockito.mock(ClientConfiguration.class);
-        this.storage = Mockito.mock(ResultStorage.class);
+        this.client = mock(ApiClient.class);
+        this.config = mock(ClientConfiguration.class);
+        this.storage = mock(ResultStorage.class);
 
         when(config.getUrl()).thenReturn("https://example.test/");
         when(config.getProjectId()).thenReturn("d7defd1e-c1ed-400d-8be8-091ebfdda744");
@@ -49,7 +52,7 @@ class HttpWriterTest {
     }
 
     @Test
-    void startLaunch_WithoutTestRunId_InvokeCreateHandler() throws ApiException {
+    void startLaunch_WithoutTestRunIdAndWithoutTestRunName_InvokeCreateHandler() throws ApiException {
         // arrange
         TestRunV2PostShortModel model = new TestRunV2PostShortModel();
         model.setProjectId(UUID.fromString(config.getProjectId()));
@@ -59,6 +62,32 @@ class HttpWriterTest {
 
         when(client.createTestRun(model)).thenReturn(response);
         when(config.getTestRunId()).thenReturn("null");
+        when(config.getTestRunName()).thenReturn("null");
+
+        Writer writer = new HttpWriter(config, client, storage);
+
+        // act
+        writer.startLaunch();
+
+        // assert
+        verify(client, times(1)).createTestRun(model);
+        verify(config, times(1)).setTestRunId(TEST_RUN_ID);
+    }
+
+    @Test
+    void startLaunch_WithoutTestRunIdAndWithTestRunName_InvokeCreateHandler() throws ApiException {
+        // arrange
+        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
+        model.setProjectId(UUID.fromString(config.getProjectId()));
+        model.setName("Test run name");
+
+        TestRunV2GetModel response = new TestRunV2GetModel();
+        response.setId(UUID.fromString(TEST_RUN_ID));
+        response.setName("Test run name");
+
+        when(client.createTestRun(model)).thenReturn(response);
+        when(config.getTestRunId()).thenReturn("null");
+        when(config.getTestRunName()).thenReturn("Test run name");
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -111,12 +140,9 @@ class HttpWriterTest {
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
         request.setId(null);
-        StepResult stepResult = Helper.generateStepResult();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
-        when(storage.getStep(testResult.getSteps().get(0)))
-                .thenReturn(Optional.of(stepResult));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -132,12 +158,9 @@ class HttpWriterTest {
         // arrange
         TestResult testResult = Helper.generateTestResult();
         AutoTestPostModel request = Helper.generateAutoTestPostModel(config.getProjectId());
-        StepResult stepResult = Helper.generateStepResult();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(null);
-        when(storage.getStep(testResult.getSteps().get(0)))
-                .thenReturn(Optional.of(stepResult));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -149,12 +172,12 @@ class HttpWriterTest {
     }
 
     @Test
-    void writeTest_WithWorkItemId_InvokeUpdateHandler() throws ApiException {
+    void writeTest_WithWorkItemId_InvokeLinkHandler() throws ApiException {
         // arrange
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         String autotestId = response.getId().toString();
-        String workItemGlobalId = testResult.getWorkItemId();
+        List<String> workItemGlobalId = testResult.getWorkItemId();
 
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
@@ -165,17 +188,14 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, times(1)).linkAutoTestToWorkItem(autotestId, workItemGlobalId);
+        verify(client, times(1)).linkAutoTestToWorkItem(autotestId, workItemGlobalId.get(0));
     }
 
     @Test
-    void writeTest_WithoutWorkItemId_InvokeUpdateHandler() throws ApiException {
+    void writeTest_WithoutWorkItemId_NoInvokeLinkHandler() throws ApiException {
         // arrange
         TestResult testResult = Helper.generateTestResult()
-                .setWorkItemId(null);
-        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-        String autotestId = response.getId().toString();
-        String workItemGlobalId = testResult.getWorkItemId();
+                .setWorkItemId(new ArrayList<>());
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -183,7 +203,62 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, times(0)).linkAutoTestToWorkItem(autotestId, workItemGlobalId);
+        verify(client, never()).linkAutoTestToWorkItem(anyString(), anyString());
+    }
+
+    @Test
+    void writeTest_FiledExistingAutoTest_NoInvokeLinkHandler() throws ApiException {
+        // arrange
+        TestResult testResult = Helper.generateTestResult()
+                .setItemStatus(ItemStatus.FAILED);
+        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+
+        when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
+                .thenReturn(response);
+
+        Writer writer = new HttpWriter(config, client, storage);
+
+        // act
+        writer.writeTest(testResult);
+
+        // assert
+        verify(client, never()).linkAutoTestToWorkItem(anyString(), anyString());
+    }
+
+    @Test
+    void writeTest_FiledExistingAutoTest_InvokeUpdateHandler() throws ApiException {
+        // arrange
+        List<LinkItem> links = new ArrayList<>();
+        LinkItem link = new LinkItem();
+        link.setTitle("Title").setDescription("Description").setType(LinkType.DEFECT).setUrl("http://test.example/bug123");
+        links.add(link);
+
+        TestResult testResult = Helper.generateTestResult()
+                .setItemStatus(ItemStatus.FAILED)
+                .setLinkItems(links);
+        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+
+        List<LinkPutModel> putLinks = new ArrayList<>();
+        LinkPutModel putLink = new LinkPutModel();
+        putLink.setTitle("Title");
+        putLink.setDescription("Description");
+        putLink.setUrl("http://test.example/bug123");
+        putLink.setType(ru.testit.client.model.LinkType.DEFECT);
+        putLinks.add(putLink);
+
+        AutoTestPutModel putModel = Helper.generateAutoTestPutModel(config.getProjectId());
+        putModel.links(putLinks);
+
+        when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
+                .thenReturn(response);
+
+        Writer writer = new HttpWriter(config, client, storage);
+
+        // act
+        writer.writeTest(testResult);
+
+        // assert
+        verify(client).updateAutoTest(putModel);
     }
 
     @Test
@@ -216,20 +291,10 @@ class HttpWriterTest {
         request.getSetup().add(Helper.generateBeforeEachSetup());
         request.getTeardown().add(Helper.generateAfterEachSetup());
 
-        StepResult stepResult = Helper.generateStepResult();
-        FixtureResult fixtureResultBeforeEach = Helper.generateBeforeEachFixtureResult();
-        FixtureResult fixtureResultAfterEach = Helper.generateAfterEachFixtureResult();
-
         when(storage.getTestResult(testResult.getUuid()))
                 .thenReturn(Optional.of(testResult));
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
-        when(storage.getStep(testResult.getSteps().get(0)))
-                .thenReturn(Optional.of(stepResult));
-        when(storage.getFixture(container.getBeforeEachTest().get(0)))
-                .thenReturn(Optional.of(fixtureResultBeforeEach));
-        when(storage.getFixture(container.getAfterEachTest().get(0)))
-                .thenReturn(Optional.of(fixtureResultAfterEach));
 
         Writer writer = new HttpWriter(config, client, storage);
 
@@ -261,7 +326,7 @@ class HttpWriterTest {
 
         // assert
         verify(client, never()).updateAutoTest(any(AutoTestPutModel.class));
-        verify(client, times(1)).sendTestResults(eq(TEST_RUN_ID), any());
+        verify(client, never()).sendTestResults(eq(TEST_RUN_ID), any());
     }
 
     @Test
@@ -280,28 +345,12 @@ class HttpWriterTest {
         request.getTeardown().add(Helper.generateAfterEachSetup());
         request.getTeardown().add(Helper.generateAfterAllSetup());
 
-        StepResult stepResult = Helper.generateStepResult();
-        FixtureResult fixtureResultBeforeEach = Helper.generateBeforeEachFixtureResult();
-        FixtureResult fixtureResultAfterEach = Helper.generateAfterEachFixtureResult();
-        FixtureResult fixtureResultBeforeAll = Helper.generateBeforeAllFixtureResult();
-        FixtureResult fixtureResultAfterAll = Helper.generateAfterAllFixtureResult();
-
         when(storage.getClassContainer(classContainer.getUuid()))
                 .thenReturn(Optional.of(classContainer));
         when(storage.getTestResult(testResult.getUuid()))
                 .thenReturn(Optional.of(testResult));
         when(client.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId()))
                 .thenReturn(response);
-        when(storage.getStep(testResult.getSteps().get(0)))
-                .thenReturn(Optional.of(stepResult));
-        when(storage.getFixture(classContainer.getBeforeEachTest().get(0)))
-                .thenReturn(Optional.of(fixtureResultBeforeEach));
-        when(storage.getFixture(classContainer.getAfterEachTest().get(0)))
-                .thenReturn(Optional.of(fixtureResultAfterEach));
-        when(storage.getFixture(container.getBeforeMethods().get(0)))
-                .thenReturn(Optional.of(fixtureResultBeforeAll));
-        when(storage.getFixture(container.getAfterMethods().get(0)))
-                .thenReturn(Optional.of(fixtureResultAfterAll));
 
         Writer writer = new HttpWriter(config, client, storage);
 

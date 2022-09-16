@@ -80,7 +80,7 @@ public class FullBeforeAfterTests {
     @Test
     @ExternalId("full_before_after_with_all_annotations")
     @DisplayName("Test with all annotations")
-    @WorkItemId("123")
+    @WorkItemIds("123")
     @Title("Title in the autotest card")
     @Description("Test with all Before, After and all annotations")
     @Labels({"Tag1","Tag2"})
@@ -93,7 +93,7 @@ public class FullBeforeAfterTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
     public void allAnnotationsTest() {
-       Adapter.addLink("https://testit.ru/", "Test 1","Desc 1", LinkType.ISSUE);
+       Adapter.addLinks("https://testit.ru/", "Test 1","Desc 1", LinkType.ISSUE);
         createProject();
         enterProject();
         createSection();

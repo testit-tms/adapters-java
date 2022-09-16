@@ -30,6 +30,10 @@ public class ExecutableTest {
         return this.executableTestStage == ExecutableTestStage.AFTER;
     }
 
+    public boolean isBefore() {
+        return this.executableTestStage == ExecutableTestStage.BEFORE;
+    }
+
     public String getUuid() {
         return uuid;
     }

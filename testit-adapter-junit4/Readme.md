@@ -7,35 +7,36 @@
 
 #### Maven users
 
-Add this dependency to your project's POM:
+Add this dependency to your project POM:
 
 ```xml
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-junit4</artifactId>
-    <version>LATEST_VERSION</version>
+    <version>1.0.0</version>
     <scope>compile</scope>
 </dependency>
 ```
 
 #### Gradle users
 
-Add this dependency to your project's build file:
+Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-junit4:LATEST_VERSION"
+implementation "ru.testit:testit-adapter-junit4:1.0.0"
 ```
 
 ## Usage
 
 #### Maven users
 
-1. Add this dependency to your project's POM:
+1. Add this dependency to your project POM:
     ````xml
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <aspectj.version>1.9.7</aspectj.version>
+        <adapter.version>1.0.0</adapter.version>
     </properties>
     <dependencies>
         <dependency>
@@ -51,12 +52,12 @@ implementation "ru.testit:testit-adapter-junit4:LATEST_VERSION"
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-java-commons</artifactId>
-            <version>LATEST_VERSION</version>
+            <version>${adapter.version}</version>
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-adapter-junit4</artifactId>
-            <version>LATEST_VERSION</version>
+            <version>${adapter.version}</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -112,11 +113,11 @@ implementation "ru.testit:testit-adapter-junit4:LATEST_VERSION"
         </plugins>
     </build>
     ````
-2. Press "Reload All Maven Projects" button
+2. Press the **Reload All Maven Projects** button.
 
 #### Gradle users
 
-1. Add this dependency to your project's build file:
+1. Add this dependency to your project build file:
 ```groovy
 plugins {
    id 'java'
@@ -143,8 +144,8 @@ repositories {
 
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation "ru.testit:testit-adapter-junit4:$LATEST_VERSION"
-    testImplementation "ru.testit:testit-java-commons:$LATEST_VERSION"
+    testImplementation "ru.testit:testit-adapter-junit4:1.0.0"
+    testImplementation "ru.testit:testit-java-commons:1.0.0"
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.junit.platform:junit-platform-runner:1.6.3'
     aspectConfig "org.aspectj:aspectjweaver:1.9.7"
@@ -156,65 +157,129 @@ test {
         def weaver = configurations.aspectConfig.find { it.name.contains("aspectjweaver") }
         jvmArgs += "-javaagent:$weaver"
     }
+   // to enable command line options, specify the option that will be passed like this:
+   // systemProperty '<parameter_name>', System.getProperty('<parameter_name>')
+   // for example:
+   // systemProperty 'tmsTestRunName', System.getProperty('tmsTestRunName') 
 }
 ```
-2. Press "Reload All Gradle Projects" button
+2. Press the **Reload All Gradle Projects** button.
 
 ### Configuration
 
-Create **testit.properties** file in the resource directory of the project or set environment variables (environment variables take precedence over file variables):
-``` 
-URL={%URL%}
-PrivateToken={%USER_PRIVATE_TOKEN%} 
-ProjectId={%PROJECT_ID%} 
-ConfigurationId={%CONFIGURATION_ID%}
-TestRunId={%TEST_RUN_ID%}
+#### File
+
+1. Create **testit.properties** file in the resource directory of the project:
+    ``` 
+    url={%URL%}
+    privateToken={%USER_PRIVATE_TOKEN%} 
+    projectId={%PROJECT_ID%} 
+    configurationId={%CONFIGURATION_ID%}
+    testRunId={%TEST_RUN_ID%}
+    testRunName={%TEST_RUN_NAME%}
+    adapterMode={%ADAPTER_MODE%}
+    ```
+2. Fill parameters with your configuration, where:
+   * `URL` - location of the TMS instance.
+   * `USER_PRIVATE_TOKEN` - API secret key. To do that:
+      1. Go to the `https://{DOMAIN}/user-profile` profile.
+      2. Copy the API secret key.
+
+   * `PROJECT_ID` - ID of a project in TMS instance.
+      1. Create a project.
+      2. Open DevTools > Network.
+      3. Go to the project `https://{DOMAIN}/projects/20/tests`.
+      4. GET-request project, Preview tab, copy iID field.
+   * `CONFIGURATION_ID` - ID of a configuration in TMS instance.
+      1. Create a project.
+      2. Open DevTools > Network.
+      3. Go to the project `https://{DOMAIN}/projects/20/tests`.
+      4. GET-request configurations, Preview tab, copy id field.
+
+   * `TEST_RUN_ID` - ID of the created test-run in TMS instance. `TEST_RUN_ID` is optional. If it is not provided, it is created automatically.
+
+   * `TEST_RUN_NAME` - name of the new test-run.`TEST_RUN_NAME` is optional. If it is not provided, it is created automatically.
+
+   * `ADAPTER_MODE` - adapter mode. Default value - 0. The adapter supports following modes:
+      * 0 - in this mode, the adapter filters tests by test run ID and configuration ID, and sends the results to the test run.
+      * 1 - in this mode, the adapter sends all results to the test run without filtering.
+      * 2 - in this mode, the adapter creates a new test run and sends results to the new test run.
+
+
+#### ENV
+
+You can use environment variables (environment variables take precedence over file variables):
+
+* `TMS_URL` - location of the TMS instance.
+
+* `TMS_PRIVATE_TOKEN` - API secret key.
+
+* `TMS_PROJECT_ID` - ID of a project in TMS instance.
+
+* `TMS_CONFIGURATION_ID` - ID of a configuration in TMS instance.
+
+* `TMS_ADAPTER_MODE` - adapter mode. Default value - 0.
+
+* `TMS_TEST_RUN_ID` - ID of the created test-run in TMS instance. `TMS_TEST_RUN_ID` is optional. If it is not provided, it is created automatically.
+
+* `TMS_TEST_RUN_NAME` - name of the new test-run.`TMS_TEST_RUN_NAME` is optional. If it is not provided, it is created automatically.
+
+* `TMS_CONFIG_FILE` - name of the configuration file. `TMS_CONFIG_FILE` is optional. If it is not provided, it is used default file name.
+
+
+#### Command line
+
+You also can CLI variables (CLI variables take precedence over environment variables):
+
+* `tmsUrl` - location of the TMS instance.
+
+* `tmsPrivateToken` - API secret key.
+
+* `tmsProjectId` - ID of a project in TMS instance.
+
+* `tmsConfigurationId` - ID of a configuration in TMS instance.
+
+* `tmsAdapterMode` - adapter mode. Default value - 0.
+
+* `tmsTestRunId` - ID of the created test-run in TMS instance. `tmsTestRunId` is optional. If it is not provided, it is created automatically.
+
+* `tmsTestRunName` - name of the new test-run.`tmsTestRunName` is optional. If it is not provided, it is created automatically.
+
+* `tmsConfigFile` - name of the configuration file. `tmsConfigFile` is optional. If it is not provided, it is used default file name.
+
+#### Examples
+
+##### Gradle
 ```
-And fill parameters with your configuration, where:  
-`URL` - location of the TMS instance  
-`USER_PRIVATE_TOKEN` - API secret key  
+gradle test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
+-DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress
+```
 
-1. go to the https://{DOMAIN}/user-profile profile  
-2. copy the API secret key
-
-`PROJECT_ID` - id of project in TMS instance
-
-1. create a project
-2. open DevTools -> network
-3. go to the project https://{DOMAIN}/projects/20/tests
-4. GET-request project, Preview tab, copy id field  
-
-`CONFIGURATION_ID` - id of configuration in TMS instance  
-
-1. create a project  
-2. open DevTools -> network  
-3. go to the project https://{DOMAIN}/projects/20/tests  
-4. GET-request configurations, Preview tab, copy id field  
-
-`TEST_RUN_ID` - id of the created test-run in TMS instance  
-
-> TEST_RUN_ID is optional. If it's not provided than it create automatically.
+##### Maven
+```
+maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
+-DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress
+```
 
 ### Annotations
 
-Annotations can be used to specify information about autotest.
+Use annotations to specify information about autotest.
 
-Description of Annotations (\* - required):
+Description of annotations (\* - required):
 - \*`RunWith(BaseJunit4Runner.class)` - connect the adapter package to run tests
-- `WorkItemID` - linking an autotest to a test case
-- \*`DisplayName` - name of the autotest in the Test IT system
-- \*`ExternalID` - ID of the autotest within the project in the Test IT System
-- `Title` - title in the autotest card and the step card
-- `Labels` - tags in the autotest card
-- `Link` - links in the autotest card
-- `Step` - the designation of the step
+- `WorkItemIds` - linking an autotest to a test case.
+- `DisplayName` - name of the autotest in Test IT.
+- `ExternalId` - ID of the autotest within the project in Test IT.
+- `Title` - title in the autotest card and the step card.
+- `Description` - description in the autotest card and the step card.
+- `Labels` - tags in the autotest card.
+- `Links` - links in the autotest card.
+- `Step` - the designation of the step.
 
 Description of methods:
-- `Adapter.addLink` - link in the autotest result
-- `Adapter.addLinks` - links in the autotest result
-- `Adapter.addAttachment` - attachment in the autotest result
-- `Adapter.addAttachments` - attachments in the autotest result
-- `Adapter.addMessage` - message in the autotest result
+- `Adapter.addLinks` - add links to the autotest result.
+- `Adapter.addAttachments` - add attachments to the autotest result.
+- `Adapter.addMessage` - add message to the autotest result.
 
 ### Examples
 
@@ -241,7 +306,7 @@ public class SampleTest {
 
    @Test
    @ExternalId("Simple_test_2")
-   @WorkItemId("1")
+   @WorkItemIds({"12345","54321"})
    @DisplayName("Simple test 2")
    @Title("test №2")
    @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
@@ -249,7 +314,7 @@ public class SampleTest {
            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
    public void itsTrueReallyTrue() {
       step1();
-      Adapter.addLink("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
+      Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
       Assert.assertTrue(true);
    }
 
@@ -276,12 +341,11 @@ public class SampleTest {
 
 You can help to develop the project. Any contributions are **greatly appreciated**.
 
-* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/testit-tms/adapters-java/issues/new) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
-* Please make sure you check your spelling and grammar.
+* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/testit-tms/adapters-java/issues/new) to discuss it, or create a direct pull request after you edit the *README.md* file with necessary changes.
+* Make sure to check your spelling and grammar.
 * Create individual PR for each suggestion.
-* Please also read through the [Code Of Conduct](https://github.com/testit-tms/adapters-java/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
+* Read the [Code Of Conduct](https://github.com/testit-tms/adapters-java/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
 
 # License
 
 Distributed under the Apache-2.0 License. See [LICENSE](https://github.com/testit-tms/adapters-java/blob/main/LICENSE.md) for more information.
-

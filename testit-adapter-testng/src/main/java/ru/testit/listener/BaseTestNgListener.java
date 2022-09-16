@@ -1,22 +1,24 @@
 package ru.testit.listener;
 
 import org.testng.*;
+import org.testng.annotations.Parameters;
+import org.testng.xml.XmlTest;
 import ru.testit.models.*;
-import ru.testit.models.ClassContainer;
-import ru.testit.models.MainContainer;
-import ru.testit.services.ExecutableTest;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
+import ru.testit.services.ExecutableTest;
 import ru.testit.services.Utils;
 
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 
@@ -25,7 +27,8 @@ public class BaseTestNgListener implements
         ITestListener,
         IClassListener,
         IInvokedMethodListener,
-        IConfigurationListener {
+        IConfigurationListener,
+        IMethodInterceptor {
 
     /**
      * Store current executable test.
@@ -56,11 +59,6 @@ public class BaseTestNgListener implements
     @Override
     public void onStart(final ISuite suite) {
         adapterManager.startTests();
-    }
-
-    @Override
-    public void onFinish(final ISuite suite) {
-        adapterManager.stopTests();
     }
 
     @Override
@@ -96,22 +94,72 @@ public class BaseTestNgListener implements
 
     protected void startTestCase(final ITestResult testResult,
                                  final String uuid) {
+        Map<String, String> parameters = getParameters(testResult);
+
         Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
         final TestResult result = new TestResult()
                 .setUuid(uuid)
-                .setLabels(Utils.extractLabels(method))
-                .setExternalId(Utils.extractExternalID(method))
-                .setWorkItemId(Utils.extractWorkItemId(method))
-                .setTitle(Utils.extractTitle(method))
-                .setName(Utils.extractDisplayName(method))
+                .setLabels(Utils.extractLabels(method, parameters))
+                .setExternalId(Utils.extractExternalID(method, parameters))
+                .setWorkItemId(Utils.extractWorkItemId(method, parameters))
+                .setTitle(Utils.extractTitle(method, parameters))
+                .setName(Utils.extractDisplayName(method, parameters))
                 .setClassName(method.getDeclaringClass().getSimpleName())
                 .setSpaceName((method.getDeclaringClass().getPackage() == null)
                         ? null : method.getDeclaringClass().getPackage().getName())
-                .setLinkItems(Utils.extractLinks(method))
-                .setDescription(Utils.extractDescription(method));
+                .setLinkItems(Utils.extractLinks(method, parameters))
+                .setDescription(Utils.extractDescription(method, parameters))
+                .setParameters(parameters);
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);
+    }
+
+    private Map<String, String> getParameters(final ITestResult testResult) {
+        Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
+        final Map<String, String> testParameters = new HashMap<>(
+                testResult.getTestContext().getCurrentXmlTest().getAllParameters()
+        );
+
+        Object[] parameters = testResult.getParameters();
+        List<Class<?>> injectedTypes = Arrays.asList(
+                ITestContext.class, ITestResult.class, XmlTest.class, Method.class, Object[].class
+        );
+
+        final Class<?>[] parameterTypes = method.getParameterTypes();
+
+        if (parameterTypes.length != parameters.length) {
+            return testParameters;
+        }
+
+        final String[] providedNames = Optional.ofNullable(method.getAnnotation(Parameters.class))
+                .map(Parameters::value)
+                .orElse(new String[]{});
+
+        final String[] reflectionNames = Stream.of(method.getParameters())
+                .map(java.lang.reflect.Parameter::getName)
+                .toArray(String[]::new);
+
+        int skippedCount = 0;
+        for (int i = 0; i < parameterTypes.length; i++) {
+            final Class<?> parameterType = parameterTypes[i];
+            if (injectedTypes.contains(parameterType)) {
+                skippedCount++;
+                continue;
+            }
+
+            final int indexFromAnnotation = i - skippedCount;
+            if (indexFromAnnotation < providedNames.length) {
+                testParameters.put(providedNames[indexFromAnnotation], parameters[i].toString());
+                continue;
+            }
+
+            if (i < reflectionNames.length) {
+                testParameters.put(reflectionNames[i], parameters[i].toString());
+            }
+        }
+
+        return testParameters;
     }
 
     @Override
@@ -224,9 +272,8 @@ public class BaseTestNgListener implements
                 .ifPresent(parentUuid -> {
                     ExecutableTest test = executableTest.get();
 
-                    if (testMethod.isBeforeMethodConfiguration())
-                    {
-                        if (test.isStarted()){
+                    if (testMethod.isBeforeMethodConfiguration()) {
+                        if (test.isStarted()) {
                             executableTest.remove();
                             test = executableTest.get();
                         }
@@ -246,8 +293,8 @@ public class BaseTestNgListener implements
         final Method method = testMethod.getConstructorOrMethod().getMethod();
 
         return new FixtureResult()
-                .setName(Utils.extractTitle(method))
-                .setDescription(Utils.extractDescription(method))
+                .setName(Utils.extractTitle(method, null))
+                .setDescription(Utils.extractDescription(method, null))
                 .setStart(System.currentTimeMillis())
                 .setItemStage(ItemStage.RUNNING);
     }
@@ -332,5 +379,37 @@ public class BaseTestNgListener implements
     private ExecutableTest refreshContext() {
         executableTest.remove();
         return executableTest.get();
+    }
+
+    @Override
+    public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
+        if (!adapterManager.isFilteredMode()){
+            return methods;
+        }
+
+        List<String> testsForRun = adapterManager.getTestFromTestRun();
+
+        return methods.stream().filter(method -> {
+            String externalId = Utils.extractExternalID(method.getMethod().getConstructorOrMethod().getMethod(), null);
+
+            if (externalId.matches("\\{.*}")) {
+                return filterTestWithParameters(testsForRun, externalId);
+            }
+
+            return testsForRun.contains(externalId);
+        }).collect(Collectors.toList());
+    }
+
+    private boolean filterTestWithParameters(List<String> testsForRun, String externalId){
+        Pattern pattern = Pattern.compile(externalId.replaceAll("\\{.*}", ".*"));
+
+        for (String test : testsForRun) {
+            Matcher matcher = pattern.matcher(test);
+            if (matcher.find()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

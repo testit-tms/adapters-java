@@ -75,7 +75,7 @@ public class OnlyBeforeAfterEachTests {
     @Test
     @ExternalId("BeforeEach_AfterEach_with_all_annotations")
     @DisplayName("Test with all annotations")
-    @WorkItemId("456")
+    @WorkItemIds("123")
     @Title("Title in the autotest card")
     @Description("Test with BeforeEach, AfterEach and all annotations")
     @Labels({"Tag1", "Tag2"})
@@ -88,7 +88,7 @@ public class OnlyBeforeAfterEachTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
     public void allAnnotationsTest() {
-        Adapter.addLink("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
+        Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
         createProject();
         enterProject();
         createSection();

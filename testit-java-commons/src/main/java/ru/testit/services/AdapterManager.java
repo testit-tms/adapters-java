@@ -2,17 +2,20 @@ package ru.testit.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.testit.client.invoker.ApiException;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.TmsApiClient;
 import ru.testit.models.*;
-import ru.testit.models.ClassContainer;
-import ru.testit.models.MainContainer;
-import ru.testit.properties.AppProperties;
+import ru.testit.properties.AdapterConfig;
+import ru.testit.properties.AdapterMode;
 import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -23,33 +26,40 @@ public class AdapterManager {
     private final ThreadContext threadContext;
     private final ResultStorage storage;
     private final Writer writer;
+    private final ApiClient client;
+    private final ClientConfiguration clientConfiguration;
+    private final AdapterConfig adapterConfig;
 
-    public AdapterManager() {
-        storage = Adapter.getResultStorage();
-        threadContext = new ThreadContext();
-
-        Properties appProperties = AppProperties.loadProperties();
-        ClientConfiguration clientConfiguration = new ClientConfiguration(appProperties);
-        ApiClient client = new TmsApiClient(clientConfiguration);
-
-        writer = new HttpWriter(clientConfiguration, client, storage);
+    public AdapterManager(ConfigManager configManager) {
+        this.clientConfiguration = configManager.getClientConfiguration();
+        this.adapterConfig = configManager.getAdapterConfig();
+        validateAdapterConfig();
+        this.storage = Adapter.getResultStorage();
+        this.threadContext = new ThreadContext();
+        this.client = new TmsApiClient(this.clientConfiguration);
+        this.writer = new HttpWriter(this.clientConfiguration, this.client, this.storage);
     }
 
     public AdapterManager(
+            ConfigManager configManager,
             ThreadContext threadContext,
             ResultStorage storage,
-            Writer writer
+            Writer writer,
+            ApiClient client
     ) {
+        this.adapterConfig = configManager.getAdapterConfig();
+        this.clientConfiguration = configManager.getClientConfiguration();
         this.threadContext = threadContext;
         this.storage = storage;
         this.writer = writer;
+        this.client = client;
     }
 
-    public void startTests(){
+    public void startTests() {
         writer.startLaunch();
     }
 
-    public void stopTests(){
+    public void stopTests() {
         writer.finishLaunch();
     }
 
@@ -83,7 +93,7 @@ public class AdapterManager {
      * Starts class container.
      *
      * @param parentUuid the uuid of parent container.
-     * @param container     the class container.
+     * @param container  the class container.
      */
     public void startClassContainer(final String parentUuid, final ClassContainer container) {
         storage.getTestsContainer(parentUuid).ifPresent(parent -> {
@@ -214,13 +224,13 @@ public class AdapterManager {
      * Start a new prepare fixture with given parent.
      *
      * @param parentUuid the uuid of parent container.
-     * @param uuid          the fixture uuid.
-     * @param result        the fixture.
+     * @param uuid       the fixture uuid.
+     * @param result     the fixture.
      */
     public void startPrepareFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getTestsContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getBeforeMethods().add(uuid);
+                container.getBeforeMethods().add(result);
             }
         });
         startFixture(uuid, result);
@@ -230,13 +240,13 @@ public class AdapterManager {
      * Start a new tear down fixture with given parent.
      *
      * @param parentUuid the uuid of parent container.
-     * @param uuid          the fixture uuid.
-     * @param result        the fixture.
+     * @param uuid       the fixture uuid.
+     * @param result     the fixture.
      */
     public void startTearDownFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getTestsContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getAfterMethods().add(uuid);
+                container.getAfterMethods().add(result);
             }
         });
 
@@ -247,13 +257,13 @@ public class AdapterManager {
      * Start a new prepare fixture with given parent.
      *
      * @param parentUuid the uuid of parent container.
-     * @param uuid          the fixture uuid.
-     * @param result        the fixture.
+     * @param uuid       the fixture uuid.
+     * @param result     the fixture.
      */
     public void startPrepareFixture(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getClassContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getBeforeClassMethods().add(uuid);
+                container.getBeforeClassMethods().add(result);
             }
         });
         startFixture(uuid, result);
@@ -263,13 +273,13 @@ public class AdapterManager {
      * Start a new tear down fixture with given parent.
      *
      * @param parentUuid the uuid of parent container.
-     * @param uuid          the fixture uuid.
-     * @param result        the fixture.
+     * @param uuid       the fixture uuid.
+     * @param result     the fixture.
      */
     public void startTearDownFixture(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getClassContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getAfterClassMethods().add(uuid);
+                container.getAfterClassMethods().add(result);
             }
         });
 
@@ -280,13 +290,13 @@ public class AdapterManager {
      * Start a new prepare fixture with given parent.
      *
      * @param parentUuid the uuid of parent container.
-     * @param uuid          the fixture uuid.
-     * @param result        the fixture.
+     * @param uuid       the fixture uuid.
+     * @param result     the fixture.
      */
     public void startPrepareFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getClassContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getBeforeEachTest().add(uuid);
+                container.getBeforeEachTest().add(result);
             }
         });
         startFixture(uuid, result);
@@ -296,13 +306,13 @@ public class AdapterManager {
      * Start a new tear down fixture with given parent.
      *
      * @param parentUuid the uuid of parent container.
-     * @param uuid          the fixture uuid.
-     * @param result        the fixture.
+     * @param uuid       the fixture uuid.
+     * @param result     the fixture.
      */
     public void startTearDownFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
         storage.getClassContainer(parentUuid).ifPresent(container -> {
             synchronized (storage) {
-                container.getAfterEachTest().add(uuid);
+                container.getAfterEachTest().add(result);
             }
         });
 
@@ -358,6 +368,7 @@ public class AdapterManager {
         fixture.setItemStage(ItemStage.FINISHED)
                 .setStop(System.currentTimeMillis());
 
+        storage.remove(uuid);
         threadContext.clear();
     }
 
@@ -394,7 +405,7 @@ public class AdapterManager {
         storage.put(uuid, result);
         storage.get(parentUuid, ResultWithSteps.class).ifPresent(parentStep -> {
             synchronized (storage) {
-                parentStep.getSteps().add(uuid);
+                parentStep.getSteps().add(result);
             }
         });
     }
@@ -464,10 +475,11 @@ public class AdapterManager {
         step.setItemStage(ItemStage.FINISHED);
         step.setStop(System.currentTimeMillis());
 
+        storage.remove(uuid);
         threadContext.stop();
     }
 
-    public void addAttachments(List<String> attachments){
+    public void addAttachments(List<String> attachments) {
         List<String> uuids = new ArrayList<>();
         for (final String attachment : attachments) {
             uuids.add(writer.writeAttachment(attachment));
@@ -486,5 +498,44 @@ public class AdapterManager {
                     }
                 }
         );
+    }
+
+    public boolean isFilteredMode() {
+        return adapterConfig.getMode() == AdapterMode.USE_FILTER;
+    }
+
+    public List<String> getTestFromTestRun() {
+        try {
+            return client.getTestFromTestRun(clientConfiguration.getTestRunId(), clientConfiguration.getConfigurationId());
+        } catch (ApiException e) {
+            LOGGER.error("Could not get tests from test run", e);
+        }
+        return new ArrayList<>();
+    }
+
+    private void validateAdapterConfig() {
+        switch (adapterConfig.getMode()) {
+            case USE_FILTER:
+            case RUN_ALL_TESTS:
+                if (clientConfiguration.getTestRunId().equals("null") || clientConfiguration.getConfigurationId().equals("null")) {
+                    String error = "Adapter works in mode 0. Config should contains test run id and configuration id.";
+                    LOGGER.error(error);
+                    throw new RuntimeException(error);
+                }
+                break;
+            case NEW_TEST_RUN:
+                if (clientConfiguration.getProjectId().equals("null")
+                        || clientConfiguration.getConfigurationId().equals("null")
+                        || !clientConfiguration.getTestRunId().equals("null")) {
+                    String error = "Adapter works in mode 2. Config should contains project id and configuration id. Also doesn't contains test run id.";
+                    LOGGER.error(error);
+                    throw new RuntimeException(error);
+                }
+                break;
+            default:
+                String error = String.format("Unknown mode: %s", adapterConfig.getMode());
+                LOGGER.error(error);
+                throw new RuntimeException(error);
+        }
     }
 }

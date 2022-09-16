@@ -25,7 +25,6 @@ public class Helper {
     private final static LinkType LINK_TYPE = LinkType.ISSUE;
     private final static String LINK_URL = "https://example.test/";
 
-    private final static String STEP_UUID = "d7068da4-3dfc-41a9-a667-27d74902083b";
     private final static String STEP_TITLE = "Step title";
     private final static String STEP_DESCRIPTION = "Step description";
 
@@ -33,19 +32,15 @@ public class Helper {
 
     private final static String CLASS_UUID = "179f193b-2519-4ae9-a364-173c3d8fa6cd";
 
-    private final static String BEFORE_EACH_UUID = "da59461a-c851-43f5-8aac-71a973a4c634";
     private final static String BEFORE_EACH_NAME = "Before Each name";
     private final static String BEFORE_EACH_DESCRIPTION = "Before Each description";
 
-    private final static String AFTER_EACH_UUID = "3f152e15-6949-41b9-aeb8-24a10e3837a3";
     private final static String AFTER_EACH_NAME = "After Each name";
     private final static String AFTER_EACH_DESCRIPTION = "After Each description";
 
-    private final static String BEFORE_ALL_UUID = "f13359e3-2106-481b-8c24-928de63d4d63";
     private final static String BEFORE_ALL_NAME = "Before All name";
     private final static String BEFORE_ALL_DESCRIPTION = "Before All description";
 
-    private final static String AFTER_ALL_UUID = "454aad8f-c862-4f37-824a-1ef80908f9ea";
     private final static String AFTER_ALL_NAME = "After All name";
     private final static String AFTER_ALL_DESCRIPTION = "After All description";
 
@@ -54,19 +49,18 @@ public class Helper {
         Date stopDate = new Date(startDate.getTime() + 1000);
 
         List<LinkItem> links = new ArrayList<>();
-        links.add(new LinkItem().setTitle(LINK_TITLE)
-                .setDescription(LINK_DESCRIPTION)
-                .setType(LINK_TYPE)
-                .setUrl(LINK_URL));
+        links.add(generateLinkItem());
 
-        List<String> steps = new ArrayList<>();
-        steps.add(STEP_UUID);
+        List<StepResult> steps = new ArrayList<>();
+        steps.add(generateStepResult());
 
         List<Label> labels = new ArrayList<>();
         Label label = new Label().setName(LABEL_NAME);
         labels.add(label);
 
         TestResult testResult = new TestResult();
+        List<String> workItems = new ArrayList<>();
+        workItems.add(WORK_ITEM_ID);
         testResult.setExternalId(EXTERNAL_ID)
                 .setUuid(TEST_UUID)
                 .setTitle(TITLE)
@@ -76,13 +70,21 @@ public class Helper {
                 .setSpaceName(SPACE_NAME)
                 .setStart(startDate.getTime())
                 .setStop(stopDate.getTime())
-                .setWorkItemId(WORK_ITEM_ID)
+                .setWorkItemId(workItems)
                 .setItemStatus(ITEM_STATUS)
                 .setLinkItems(links)
                 .setSteps(steps)
                 .setLabels(labels);
 
         return testResult;
+    }
+
+    public static LinkItem generateLinkItem() {
+        return new LinkItem()
+                .setTitle(LINK_TITLE)
+                .setDescription(LINK_DESCRIPTION)
+                .setType(LINK_TYPE)
+                .setUrl(LINK_URL);
     }
 
     public static AutoTestModel generateAutoTestModel(String projectId) {
@@ -147,8 +149,8 @@ public class Helper {
 
         container.setUuid(CLASS_UUID);
         container.getChildren().add(TEST_UUID);
-        container.getBeforeEachTest().add(BEFORE_EACH_UUID);
-        container.getAfterEachTest().add(AFTER_EACH_UUID);
+        container.getBeforeEachTest().add(generateBeforeEachFixtureResult());
+        container.getAfterEachTest().add(generateAfterEachFixtureResult());
 
         return container;
     }
@@ -157,8 +159,8 @@ public class Helper {
         MainContainer container = new MainContainer();
 
         container.getChildren().add(CLASS_UUID);
-        container.getBeforeMethods().add(BEFORE_ALL_UUID);
-        container.getAfterMethods().add(AFTER_ALL_UUID);
+        container.getBeforeMethods().add(generateBeforeAllFixtureResult());
+        container.getAfterMethods().add(generateAfterAllFixtureResult());
 
         return container;
     }

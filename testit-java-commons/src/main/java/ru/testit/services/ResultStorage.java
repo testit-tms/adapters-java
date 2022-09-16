@@ -57,8 +57,19 @@ public class ResultStorage {
         lock.writeLock().lock();
         try {
             Objects.requireNonNull(uuid, "Can't put result to storage: uuid can't be null");
+            Objects.requireNonNull(item, "Can't put result to storage: item can't be null");
             storage.put(uuid, item);
             return item;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public void remove(final String uuid) {
+        lock.writeLock().lock();
+        try {
+            Objects.requireNonNull(uuid, "Can't remove item from storage: uuid can't be null");
+            storage.remove(uuid);
         } finally {
             lock.writeLock().unlock();
         }
