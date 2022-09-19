@@ -160,7 +160,7 @@ repositories {
 
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation "ru.testit:testit-adapter-junit:1.0.0"
+    testImplementation "ru.testit:testit-adapter-junit5:1.0.0"
     testImplementation "ru.testit:testit-java-commons:1.0.0"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.0"
