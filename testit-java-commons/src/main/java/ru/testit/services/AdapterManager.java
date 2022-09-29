@@ -463,7 +463,7 @@ public class AdapterManager {
      *
      * @param uuid the uuid of step to stop.
      */
-    private void stopStep(final String uuid) {
+    public void stopStep(final String uuid) {
         final Optional<StepResult> found = storage.getStep(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop step: step with uuid {} not found", uuid);
