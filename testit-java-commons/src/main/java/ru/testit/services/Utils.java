@@ -136,7 +136,7 @@ public class Utils {
         return value;
     }
 
-    private static String getHash(String value) {
+    public static String getHash(String value) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(value.getBytes(StandardCharsets.UTF_8));

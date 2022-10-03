@@ -13,7 +13,7 @@ Add this dependency to your project POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-junit5</artifactId>
-    <version>1.0.0</version>
+    <version>2.1.0</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-junit5:1.0.0"
+implementation "ru.testit:testit-adapter-junit5:2.1.0"
 ```
 
 ## Usage
@@ -36,7 +36,7 @@ implementation "ru.testit:testit-adapter-junit5:1.0.0"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <aspectj.version>1.9.7</aspectj.version>
-        <adapter.version>1.0.0</adapter.version>
+        <adapter.version>2.1.0</adapter.version>
     </properties>
     <dependencies>
         <dependency>
@@ -160,8 +160,8 @@ repositories {
 
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation "ru.testit:testit-adapter-junit5:1.0.0"
-    testImplementation "ru.testit:testit-java-commons:1.0.0"
+    testImplementation "ru.testit:testit-adapter-junit5:2.1.0"
+    testImplementation "ru.testit:testit-java-commons:2.1.0"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.0"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"
