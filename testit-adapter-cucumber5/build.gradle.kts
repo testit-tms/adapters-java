@@ -27,6 +27,7 @@ dependencies {
 
 tasks.getByName<Test>("test") {
     useTestNG {}
+    exclude("**/samples/*")
 //    systemProperties(System.getProperties().toMap() as Map<String,Object>)
 }
 
