@@ -3,6 +3,7 @@ include("testit-java-commons")
 include("testit-adapter-testng")
 include("testit-adapter-junit4")
 include("testit-adapter-junit5")
+include("testit-adapter-cucumber5")
 
 pluginManagement {
     repositories {
