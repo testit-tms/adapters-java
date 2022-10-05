@@ -1,11 +1,11 @@
-description = "TestIT Cucumber5 Integration"
+description = "TestIT Cucumber6 Integration"
 
 plugins {
     id("java")
 }
 
-val cucumberVersion = "5.1.2"
-val cucumberGherkinVersion = "5.1.0"
+val cucumberVersion = "6.10.2"
+val cucumberGherkinVersion = "18.0.0"
 val slf4jVersion = "1.7.36"
 val testngVersion = "6.14.3"
 
@@ -37,7 +37,7 @@ tasks.compileTestJava {
 tasks.jar {
     manifest {
         attributes(mapOf(
-            "Automatic-Module-Name" to "ru.testit.cucumber5"
+            "Automatic-Module-Name" to "ru.testit.cucumber6"
         ))
     }
 }
