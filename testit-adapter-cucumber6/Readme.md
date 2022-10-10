@@ -219,8 +219,8 @@ repositories {
     mavenLocal()
 }
 
-def cucumberVersion = "5.1.2"
-def cucumberGherkinVersion = "5.1.0"
+def cucumberVersion = "6.11.0"
+def cucumberGherkinVersion = "18.0.0"
 
 dependencies {
     testImplementation "ru.testit:testit-adapter-cucumber6:1.1.0"
@@ -254,8 +254,8 @@ repositories {
     mavenLocal()
 }
 
-def cucumberVersion = "5.5.0"
-def cucumberGherkinVersion = "5.1.0"
+def cucumberVersion = "6.11.0"
+def cucumberGherkinVersion = "18.0.0"
 
 dependencies {
     testImplementation "ru.testit:testit-adapter-cucumber6:1.1.0"
@@ -291,8 +291,8 @@ repositories {
     mavenLocal()
 }
 
-def cucumberVersion = "5.5.0"
-def cucumberGherkinVersion = "5.1.0"
+def cucumberVersion = "6.11.0"
+def cucumberGherkinVersion = "18.0.0"
 def junit4Version = "4.12"
 
 dependencies {
