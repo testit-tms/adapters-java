@@ -1,4 +1,4 @@
-# Test IT TMS Adapter for Cucumber6
+# Test IT TMS Adapter for Cucumber7
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
 ## Getting Started
@@ -12,7 +12,7 @@ Add this dependency to your project POM:
 ```xml
 <dependency>
     <groupId>ru.testit</groupId>
-    <artifactId>testit-adapter-cucumber6</artifactId>
+    <artifactId>testit-adapter-cucumber7</artifactId>
     <version>1.1.0</version>
     <scope>compile</scope>
 </dependency>
@@ -23,7 +23,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-cucumber6:1.1.0"
+implementation "ru.testit:testit-adapter-cucumber7:1.1.0"
 ```
 
 ## Usage
@@ -38,8 +38,8 @@ implementation "ru.testit:testit-adapter-cucumber6:1.1.0"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <adapter.version>1.1.0</adapter.version>
-        <gherkin.version>18.0.0</gherkin.version>
-        <cucumber.version>6.11.0</cucumber.version>
+        <gherkin.version>23.0.1</gherkin.version>
+        <cucumber.version>7.3.2</cucumber.version>
     </properties>
     <dependencies>
         <dependency>
@@ -54,7 +54,7 @@ implementation "ru.testit:testit-adapter-cucumber6:1.1.0"
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
-            <artifactId>testit-adapter-cucumber6</artifactId>
+            <artifactId>testit-adapter-cucumber7</artifactId>
             <version>${adapter.version}</version>
         </dependency>
         <dependency>
@@ -89,12 +89,12 @@ implementation "ru.testit:testit-adapter-cucumber6:1.1.0"
 
 1. Add this dependency to your project POM:
     ````xml
-     <properties>
+      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <adapter.version>1.1.0</adapter.version>
-        <gherkin.version>18.0.0</gherkin.version>
-        <cucumber.version>6.11.0</cucumber.version>
+        <gherkin.version>23.0.1</gherkin.version>
+        <cucumber.version>7.3.2</cucumber.version>
     </properties>
     <dependencies>
         <dependency>
@@ -114,8 +114,20 @@ implementation "ru.testit:testit-adapter-cucumber6:1.1.0"
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
-            <artifactId>testit-adapter-cucumber5</artifactId>
+            <artifactId>testit-adapter-cucumber7</artifactId>
             <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>gherkin</artifactId>
+            <version>${gherkin.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-core</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
@@ -147,8 +159,8 @@ implementation "ru.testit:testit-adapter-cucumber6:1.1.0"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <adapter.version>1.1.0</adapter.version>
-        <gherkin.version>18.0.0</gherkin.version>
-        <cucumber.version>6.11.0</cucumber.version>
+        <gherkin.version>23.0.1</gherkin.version>
+        <cucumber.version>7.3.2</cucumber.version>
     </properties>
     <dependencies>
         <dependency>
@@ -168,7 +180,7 @@ implementation "ru.testit:testit-adapter-cucumber6:1.1.0"
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
-            <artifactId>testit-adapter-cucumber5</artifactId>
+            <artifactId>testit-adapter-cucumber7</artifactId>
             <version>${adapter.version}</version>
         </dependency>
         <dependency>
@@ -199,8 +211,6 @@ implementation "ru.testit:testit-adapter-cucumber6:1.1.0"
     ````
 2. Press the **Reload All Maven Projects** button.
 
-
-
 #### Gradle Users
 
 ##### TestNG
@@ -219,11 +229,11 @@ repositories {
     mavenLocal()
 }
 
-def cucumberVersion = "6.11.0"
-def cucumberGherkinVersion = "18.0.0"
+def cucumberVersion = "7.3.2"
+def cucumberGherkinVersion = "23.0.1"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber6:1.1.0"
+    testImplementation "ru.testit:testit-adapter-cucumber7:1.1.0"
     testImplementation "ru.testit:testit-java-commons:1.1.0"
     testImplementation 'org.testng:testng:7.5'
     testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
@@ -254,11 +264,11 @@ repositories {
     mavenLocal()
 }
 
-def cucumberVersion = "6.11.0"
-def cucumberGherkinVersion = "18.0.0"
+def cucumberVersion = "7.3.2"
+def cucumberGherkinVersion = "23.0.1"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber6:1.1.0"
+    testImplementation "ru.testit:testit-adapter-cucumber7:1.1.0"
     testImplementation "ru.testit:testit-java-commons:1.1.0"
     testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
@@ -266,6 +276,7 @@ dependencies {
     testImplementation("io.cucumber:cucumber-junit:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-junit-platform-engine:$cucumberVersion")
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.junit.platform:junit-platform-suite-engine:1.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
@@ -291,12 +302,12 @@ repositories {
     mavenLocal()
 }
 
-def cucumberVersion = "6.11.0"
-def cucumberGherkinVersion = "18.0.0"
+def cucumberVersion = "7.3.2"
+def cucumberGherkinVersion = "23.0.1"
 def junit4Version = "4.12"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber6:1.1.0"
+    testImplementation "ru.testit:testit-adapter-cucumber7:1.1.0"
     testImplementation "ru.testit:testit-java-commons:1.1.0"
     testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
