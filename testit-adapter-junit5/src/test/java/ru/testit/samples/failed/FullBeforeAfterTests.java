@@ -3,7 +3,6 @@ package ru.testit.samples.failed;
 import org.junit.jupiter.api.*;
 import ru.testit.annotations.DisplayName;
 import ru.testit.annotations.*;
-import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
@@ -105,7 +104,7 @@ public class FullBeforeAfterTests {
     @ExternalId("failed_full_before_after_with_required_annotations")
     @DisplayName("Failed test with required annotations")
     public void requiredAnnotationsTest() {
-        Assertions.assertTrue(true);
+        Assertions.assertTrue(false);
     }
 
     @AfterEach
