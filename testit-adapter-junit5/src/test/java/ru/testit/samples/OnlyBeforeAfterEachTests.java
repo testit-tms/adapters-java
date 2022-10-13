@@ -3,7 +3,6 @@ package ru.testit.samples;
 import org.junit.jupiter.api.*;
 import ru.testit.annotations.*;
 import ru.testit.annotations.DisplayName;
-import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
@@ -46,7 +45,7 @@ public class OnlyBeforeAfterEachTests {
     @Title("Create a section")
     @Description("Section was created")
     public void createSection() {
-        Assertions.assertTrue(false);
+        Assertions.assertTrue(true);
     }
 
     @Step

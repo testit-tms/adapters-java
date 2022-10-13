@@ -21,7 +21,7 @@ import static java.util.Objects.isNull;
 public class Utils {
     public static String extractExternalID(final Method atomicTest, Map<String, String> parameters) {
         final ExternalId annotation = atomicTest.getAnnotation(ExternalId.class);
-        return (annotation != null) ? setParameters(annotation.value(), parameters) : getHash(atomicTest.getName());
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : getHash(atomicTest.getDeclaringClass().getName() + atomicTest.getName());
     }
 
     public static String extractDisplayName(final Method atomicTest, Map<String, String> parameters) {

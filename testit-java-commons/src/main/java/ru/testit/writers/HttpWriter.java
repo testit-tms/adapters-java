@@ -33,6 +33,9 @@ public class HttpWriter implements Writer {
     public void startLaunch() {
         synchronized (config) {
             if (!Objects.equals(this.config.getTestRunId(), "null")) {
+                if (LOGGER.isDebugEnabled()){
+                    LOGGER.debug("Test run is exist.");
+                }
                 return;
             }
 
@@ -41,6 +44,10 @@ public class HttpWriter implements Writer {
 
             if (!Objects.equals(this.config.getTestRunName(), "null")){
                 model.setName(this.config.getTestRunName());
+            }
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("Create new test run: {}", model);
             }
 
             try {
@@ -72,11 +79,19 @@ public class HttpWriter implements Writer {
     @Override
     public void writeTest(TestResult testResult) {
         try {
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("Write auto test {}", testResult.getExternalId());
+            }
+
             AutoTestModel test = apiClient.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId());
             List<String> workItemId = testResult.getWorkItemId();
             String autoTestId;
 
             if (test != null) {
+                if (LOGGER.isDebugEnabled()){
+                    LOGGER.debug("Auto test is exist. Update auto test {}", testResult.getExternalId());
+                }
+
                 AutoTestPutModel autoTestPutModel;
 
                 if (testResult.getItemStatus() == ItemStatus.FAILED) {
@@ -90,6 +105,10 @@ public class HttpWriter implements Writer {
                 apiClient.updateAutoTest(autoTestPutModel);
                 autoTestId = test.getId().toString();
             } else {
+                if (LOGGER.isDebugEnabled()){
+                    LOGGER.debug("Create new auto test {}", testResult.getExternalId());
+                }
+
                 AutoTestPostModel model = Converter.testResultToAutoTestPostModel(testResult);
                 model.setProjectId(UUID.fromString(config.getProjectId()));
                 autoTestId = apiClient.createAutoTest(model);
@@ -102,6 +121,9 @@ public class HttpWriter implements Writer {
 
             workItemId.forEach(i -> {
                 try {
+                    if (LOGGER.isDebugEnabled()){
+                        LOGGER.debug("Link work item {} to auto test {}", i, testResult.getExternalId());
+                    }
                     apiClient.linkAutoTestToWorkItem(autoTestId, i);
                 } catch (ApiException e) {
                     LOGGER.error("Can not link the autotest: ".concat(e.getMessage()));
@@ -225,7 +247,9 @@ public class HttpWriter implements Writer {
             if (results.size() == 0) {
                 return;
             }
-
+            if(LOGGER.isDebugEnabled()){
+                LOGGER.debug("Write results: {}", results);
+            }
             apiClient.sendTestResults(config.getTestRunId(), results);
         } catch (ApiException e) {
             LOGGER.error("Can not write the test results: ".concat(e.getMessage()));
