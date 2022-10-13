@@ -17,7 +17,7 @@ public class Utils {
 
     public static String extractExternalID(final Description method) {
         final ExternalId annotation = method.getAnnotation(ExternalId.class);
-        return (annotation != null) ? annotation.value() : getHash(method.getMethodName());
+        return (annotation != null) ? annotation.value() : getHash(method.getClassName() + method.getMethodName());
     }
 
     public static String extractDisplayName(final Description method) {

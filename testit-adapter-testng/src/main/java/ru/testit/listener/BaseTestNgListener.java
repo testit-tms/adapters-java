@@ -127,7 +127,6 @@ public class BaseTestNgListener implements
         );
 
         final Class<?>[] parameterTypes = method.getParameterTypes();
-
         if (parameterTypes.length != parameters.length) {
             return testParameters;
         }
@@ -150,7 +149,9 @@ public class BaseTestNgListener implements
 
             final int indexFromAnnotation = i - skippedCount;
             if (indexFromAnnotation < providedNames.length) {
-                testParameters.put(providedNames[indexFromAnnotation], parameters[i].toString());
+                if (parameters[i] != null){
+                    testParameters.put(providedNames[indexFromAnnotation], parameters[i].toString());
+                }
                 continue;
             }
 

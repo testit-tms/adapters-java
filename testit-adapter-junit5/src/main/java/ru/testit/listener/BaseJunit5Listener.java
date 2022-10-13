@@ -1,20 +1,28 @@
 package ru.testit.listener;
 
 import org.junit.jupiter.api.extension.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.testit.models.*;
-import ru.testit.services.*;
+import ru.testit.services.Adapter;
+import ru.testit.services.AdapterManager;
+import ru.testit.services.ExecutableTest;
+import ru.testit.services.Utils;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static java.util.Objects.nonNull;
 
 public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAllCallback, InvocationInterceptor, TestWatcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseJunit5Listener.class);
     private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
     private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
-    private final ThreadLocal<String> classUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
 
     public BaseJunit5Listener() {
         adapterManager = Adapter.getAdapterManager();
@@ -22,6 +30,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
     @Override
     public void beforeAll(ExtensionContext context) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Before all: {}", context.getRequiredTestClass().getName());
+        }
+
         adapterManager.startTests();
 
         final MainContainer mainContainer = new MainContainer()
@@ -30,14 +42,18 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         adapterManager.startMainContainer(mainContainer);
 
         final ClassContainer classContainer = new ClassContainer()
-                .setUuid(classUUID.get());
+                .setUuid(Utils.getHash(context.getRequiredTestClass().getName()));
 
         adapterManager.startClassContainer(launcherUUID.get(), classContainer);
     }
 
     @Override
     public void afterAll(ExtensionContext context) {
-        adapterManager.stopClassContainer(classUUID.get());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("After all: {}", context.getDisplayName());
+        }
+
+        adapterManager.stopClassContainer(Utils.getHash(context.getRequiredTestClass().getName()));
         adapterManager.stopMainContainer(launcherUUID.get());
     }
 
@@ -47,6 +63,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Intercept before all: {}", invocationContext.getExecutable().getName());
+        }
+
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
         adapterManager.startPrepareFixtureAll(launcherUUID.get(), uuid, fixture);
@@ -75,9 +95,13 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Intercept before each: {}", invocationContext.getExecutable().getName());
+        }
+
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        adapterManager.startPrepareFixtureEachTest(classUUID.get(), uuid, fixture);
+        adapterManager.startPrepareFixtureEachTest(Utils.getHash(invocationContext.getTargetClass().getName()), uuid, fixture);
         ExecutableTest test = executableTest.get();
 
         if (test.isStarted()) {
@@ -102,6 +126,11 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) throws Exception {
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Intercept test template: {}", invocationContext.getExecutable().getName());
+        }
+
         Map<String, String> parameters = getParameters(invocationContext);
 
         ExecutableTest executableTest = this.executableTest.get();
@@ -113,7 +142,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         final String uuid = executableTest.getUuid();
         startTestCase(extensionContext.getRequiredTestMethod(), uuid, parameters);
 
-        adapterManager.updateClassContainer(classUUID.get(),
+        adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
                 container -> container.getChildren().add(uuid));
 
         try {
@@ -153,6 +182,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) throws Exception {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Intercept test: {}", invocationContext.getExecutable().getName());
+        }
+
         ExecutableTest executableTest = this.executableTest.get();
         if (executableTest.isStarted()) {
             executableTest = refreshContext();
@@ -162,7 +195,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         final String uuid = executableTest.getUuid();
         startTestCase(extensionContext.getRequiredTestMethod(), uuid, null);
 
-        adapterManager.updateClassContainer(classUUID.get(),
+        adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
                 container -> container.getChildren().add(uuid));
 
         try {
@@ -194,6 +227,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
     @Override
     public void testSuccessful(ExtensionContext context) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Test successful: {}", context.getDisplayName());
+        }
+
         final ExecutableTest executableTest = this.executableTest.get();
         executableTest.setAfterStatus();
         adapterManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
@@ -211,6 +248,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
     @Override
     public void testAborted(ExtensionContext context, Throwable cause) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Test aborted: {}", context.getDisplayName());
+        }
+
         ExecutableTest executableTest = this.executableTest.get();
 
         if (executableTest.isAfter()) {
@@ -224,6 +265,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
     @Override
     public void testFailed(ExtensionContext context, Throwable cause) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Test failed: {}", context.getDisplayName());
+        }
+
         ExecutableTest executableTest = this.executableTest.get();
 
         if (executableTest.isAfter()) {
@@ -246,9 +291,13 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Intercept after each: {}", invocationContext.getExecutable().getName());
+        }
+
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        adapterManager.startTearDownFixtureEachTest(classUUID.get(), uuid, fixture);
+        adapterManager.startTearDownFixtureEachTest(Utils.getHash(invocationContext.getTargetClass().getName()), uuid, fixture);
         ExecutableTest test = executableTest.get();
         fixture.setParent(test.getUuid());
         try {
@@ -268,6 +317,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Intercept after all: {}", invocationContext.getExecutable().getName());
+        }
+
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
         adapterManager.startTearDownFixtureAll(launcherUUID.get(), uuid, fixture);

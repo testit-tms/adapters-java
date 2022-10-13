@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.testit.annotations.*;
-import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
@@ -101,7 +100,7 @@ public class OnlyBeforeAfterEachTests {
     @ExternalId("failed_BeforeEach_AfterEach_with_required_annotations")
     @DisplayName("Failed test with required annotations")
     public void requiredAnnotationsTest() {
-        Assertions.assertTrue(true);
+        Assertions.assertTrue(false);
     }
 
     @AfterEach
