@@ -4,17 +4,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
+import ru.testit.client.model.AutoTestModel;
+import ru.testit.client.model.AutoTestPostModel;
+import ru.testit.client.model.AutoTestPutModel;
+import ru.testit.client.model.LinkPutModel;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
-import ru.testit.client.model.*;
 import ru.testit.models.*;
-import ru.testit.models.LinkType;
 import ru.testit.services.ResultStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -37,100 +38,6 @@ class HttpWriterTest {
         when(config.getConfigurationId()).thenReturn("b09d7164-d58c-41a5-9780-89c30e0cc0c7");
         when(config.getPrivateToken()).thenReturn("QwertyT0kentPrivate");
         when(config.getTestRunId()).thenReturn(TEST_RUN_ID);
-    }
-
-    @Test
-    void startLaunch_WithTestRunId_NoInvokeCreateHandler() throws ApiException {
-        // arrange
-        Writer writer = new HttpWriter(config, client, storage);
-
-        // act
-        writer.startLaunch();
-
-        // assert
-        verify(client, never()).createTestRun(new TestRunV2PostShortModel());
-    }
-
-    @Test
-    void startLaunch_WithoutTestRunIdAndWithoutTestRunName_InvokeCreateHandler() throws ApiException {
-        // arrange
-        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
-        model.setProjectId(UUID.fromString(config.getProjectId()));
-
-        TestRunV2GetModel response = new TestRunV2GetModel();
-        response.setId(UUID.fromString(TEST_RUN_ID));
-
-        when(client.createTestRun(model)).thenReturn(response);
-        when(config.getTestRunId()).thenReturn("null");
-        when(config.getTestRunName()).thenReturn("null");
-
-        Writer writer = new HttpWriter(config, client, storage);
-
-        // act
-        writer.startLaunch();
-
-        // assert
-        verify(client, times(1)).createTestRun(model);
-        verify(config, times(1)).setTestRunId(TEST_RUN_ID);
-    }
-
-    @Test
-    void startLaunch_WithoutTestRunIdAndWithTestRunName_InvokeCreateHandler() throws ApiException {
-        // arrange
-        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
-        model.setProjectId(UUID.fromString(config.getProjectId()));
-        model.setName("Test run name");
-
-        TestRunV2GetModel response = new TestRunV2GetModel();
-        response.setId(UUID.fromString(TEST_RUN_ID));
-        response.setName("Test run name");
-
-        when(client.createTestRun(model)).thenReturn(response);
-        when(config.getTestRunId()).thenReturn("null");
-        when(config.getTestRunName()).thenReturn("Test run name");
-
-        Writer writer = new HttpWriter(config, client, storage);
-
-        // act
-        writer.startLaunch();
-
-        // assert
-        verify(client, times(1)).createTestRun(model);
-        verify(config, times(1)).setTestRunId(TEST_RUN_ID);
-    }
-
-    @Test
-    void finishLaunch_WithCompletedTestRun_NoInvokeCompleteHandler() throws ApiException {
-        // arrange
-        TestRunV2GetModel response = new TestRunV2GetModel();
-        response.setStateName(TestRunStateTypeModel.COMPLETED);
-
-        when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
-
-        Writer writer = new HttpWriter(config, client, storage);
-
-        // act
-        writer.finishLaunch();
-
-        // assert
-        verify(client, never()).completeTestRun(anyString());
-    }
-
-    @Test
-    void finishLaunch_WithInProgressTestRun_InvokeCompleteHandler() throws ApiException {
-        // arrange
-        TestRunV2GetModel response = new TestRunV2GetModel();
-        response.setStateName(TestRunStateTypeModel.INPROGRESS);
-
-        when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
-
-        Writer writer = new HttpWriter(config, client, storage);
-
-        // act
-        writer.finishLaunch();
-
-        // assert
-        verify(client, times(1)).completeTestRun(TEST_RUN_ID);
     }
 
     @Test

@@ -14,7 +14,6 @@ import ru.testit.services.ResultStorage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class HttpWriter implements Writer {
@@ -30,56 +29,9 @@ public class HttpWriter implements Writer {
     }
 
     @Override
-    public void startLaunch() {
-        synchronized (config) {
-            if (!Objects.equals(this.config.getTestRunId(), "null")) {
-                if (LOGGER.isDebugEnabled()){
-                    LOGGER.debug("Test run is exist.");
-                }
-                return;
-            }
-
-            TestRunV2PostShortModel model = new TestRunV2PostShortModel();
-            model.setProjectId(UUID.fromString(config.getProjectId()));
-
-            if (!Objects.equals(this.config.getTestRunName(), "null")){
-                model.setName(this.config.getTestRunName());
-            }
-
-            if (LOGGER.isDebugEnabled()){
-                LOGGER.debug("Create new test run: {}", model);
-            }
-
-            try {
-                TestRunV2GetModel response = apiClient.createTestRun(model);
-                this.config.setTestRunId(response.getId().toString());
-
-            } catch (ApiException e) {
-                LOGGER.error("Can not start the launch: ".concat(e.getMessage()));
-            }
-        }
-    }
-
-    @Override
-    public void finishLaunch() {
-        try {
-            TestRunV2GetModel testRun = apiClient.getTestRun(config.getTestRunId());
-
-            if (testRun.getStateName() != TestRunStateTypeModel.COMPLETED) {
-                apiClient.completeTestRun(config.getTestRunId());
-            }
-        } catch (ApiException e) {
-            if (e.getResponseBody().contains("the StateName is already Completed")) {
-                return;
-            }
-            LOGGER.error("Can not finish the launch: ".concat(e.getMessage()));
-        }
-    }
-
-    @Override
     public void writeTest(TestResult testResult) {
         try {
-            if (LOGGER.isDebugEnabled()){
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Write auto test {}", testResult.getExternalId());
             }
 
@@ -88,7 +40,7 @@ public class HttpWriter implements Writer {
             String autoTestId;
 
             if (test != null) {
-                if (LOGGER.isDebugEnabled()){
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Auto test is exist. Update auto test {}", testResult.getExternalId());
                 }
 
@@ -105,7 +57,7 @@ public class HttpWriter implements Writer {
                 apiClient.updateAutoTest(autoTestPutModel);
                 autoTestId = test.getId().toString();
             } else {
-                if (LOGGER.isDebugEnabled()){
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Create new auto test {}", testResult.getExternalId());
                 }
 
@@ -121,7 +73,7 @@ public class HttpWriter implements Writer {
 
             workItemId.forEach(i -> {
                 try {
-                    if (LOGGER.isDebugEnabled()){
+                    if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Link work item {} to auto test {}", i, testResult.getExternalId());
                     }
                     apiClient.linkAutoTestToWorkItem(autoTestId, i);
@@ -247,7 +199,7 @@ public class HttpWriter implements Writer {
             if (results.size() == 0) {
                 return;
             }
-            if(LOGGER.isDebugEnabled()){
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Write results: {}", results);
             }
             apiClient.sendTestResults(config.getTestRunId(), results);
