@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.TestRunStateTypeModel;
 import ru.testit.client.model.TestRunV2GetModel;
-import ru.testit.client.model.TestRunV2PostShortModel;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.TmsApiClient;
@@ -15,7 +14,10 @@ import ru.testit.properties.AdapterMode;
 import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -67,19 +69,8 @@ public class AdapterManager {
                 return;
             }
 
-            TestRunV2PostShortModel model = new TestRunV2PostShortModel();
-            model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
-
-            if (!Objects.equals(this.clientConfiguration.getTestRunName(), "null")) {
-                model.setName(this.clientConfiguration.getTestRunName());
-            }
-
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Create new test run: {}", model);
-            }
-
             try {
-                TestRunV2GetModel response = this.client.createTestRun(model);
+                TestRunV2GetModel response = this.client.createTestRun();
                 this.clientConfiguration.setTestRunId(response.getId().toString());
 
             } catch (ApiException e) {

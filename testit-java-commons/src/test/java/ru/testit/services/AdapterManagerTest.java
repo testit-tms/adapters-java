@@ -61,7 +61,7 @@ public class AdapterManagerTest {
         manager.startTests();
 
         // assert
-        verify(client, never()).createTestRun(new TestRunV2PostShortModel());
+        verify(client, never()).createTestRun();
     }
 
     @Test
@@ -70,13 +70,10 @@ public class AdapterManagerTest {
         when(clientConfiguration.getTestRunId()).thenReturn("null");
         when(clientConfiguration.getTestRunName()).thenReturn("null");
 
-        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
-        model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
-
         TestRunV2GetModel response = new TestRunV2GetModel();
         response.setId(UUID.fromString(TEST_RUN_ID));
 
-        when(client.createTestRun(model)).thenReturn(response);
+        when(client.createTestRun()).thenReturn(response);
 
         AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
 
@@ -84,7 +81,7 @@ public class AdapterManagerTest {
         manager.startTests();
 
         // assert
-        verify(client, times(1)).createTestRun(model);
+        verify(client, times(1)).createTestRun();
         verify(clientConfiguration, times(1)).setTestRunId(TEST_RUN_ID);
     }
 
@@ -94,15 +91,11 @@ public class AdapterManagerTest {
         when(clientConfiguration.getTestRunId()).thenReturn("null");
         when(clientConfiguration.getTestRunName()).thenReturn("Test run name");
 
-        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
-        model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
-        model.setName("Test run name");
-
         TestRunV2GetModel response = new TestRunV2GetModel();
         response.setId(UUID.fromString(TEST_RUN_ID));
         response.setName("Test run name");
 
-        when(client.createTestRun(model)).thenReturn(response);
+        when(client.createTestRun()).thenReturn(response);
 
         AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
 
@@ -110,7 +103,7 @@ public class AdapterManagerTest {
         manager.startTests();
 
         // assert
-        verify(client, times(1)).createTestRun(model);
+        verify(client, times(1)).createTestRun();
         verify(clientConfiguration, times(1)).setTestRunId(TEST_RUN_ID);
     }
 

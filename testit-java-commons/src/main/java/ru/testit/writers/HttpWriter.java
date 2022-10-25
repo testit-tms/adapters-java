@@ -35,7 +35,7 @@ public class HttpWriter implements Writer {
                 LOGGER.debug("Write auto test {}", testResult.getExternalId());
             }
 
-            AutoTestModel test = apiClient.getAutoTestByExternalId(config.getProjectId(), testResult.getExternalId());
+            AutoTestModel test = apiClient.getAutoTestByExternalId(testResult.getExternalId());
             List<String> workItemId = testResult.getWorkItemId();
             String autoTestId;
 
@@ -92,7 +92,7 @@ public class HttpWriter implements Writer {
             storage.getTestResult(testUuid).ifPresent(
                     test -> {
                         try {
-                            AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(config.getProjectId(), test.getExternalId());
+                            AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(test.getExternalId());
 
                             if (autoTestModel == null) {
                                 return;
@@ -139,7 +139,7 @@ public class HttpWriter implements Writer {
                             storage.getTestResult(testUuid).ifPresent(
                                     test -> {
                                         try {
-                                            AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(config.getProjectId(), test.getExternalId());
+                                            AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(test.getExternalId());
 
                                             if (autoTestModel == null) {
                                                 return;

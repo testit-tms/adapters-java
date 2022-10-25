@@ -1,5 +1,7 @@
 package ru.testit.clients;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.testit.client.api.AttachmentsApi;
 import ru.testit.client.api.AutoTestsApi;
 import ru.testit.client.api.TestRunsApi;
@@ -9,10 +11,13 @@ import ru.testit.client.model.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class TmsApiClient implements ApiClient {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TmsApiClient.class);
     private static final String AUTH_PREFIX = "PrivateToken";
     private static final boolean INCLUDE_STEPS = true;
     private static final boolean INCLUDE_LABELS = true;
@@ -21,21 +26,41 @@ public class TmsApiClient implements ApiClient {
     private final AutoTestsApi autoTestsApi;
     private final AttachmentsApi attachmentsApi;
 
+    private final ClientConfiguration clientConfiguration;
+
     public TmsApiClient(ClientConfiguration config) {
         ApiClientExtended apiClient = new ApiClientExtended();
         apiClient.setBasePath(config.getUrl());
         apiClient.setApiKeyPrefix(AUTH_PREFIX);
         apiClient.setApiKey(config.getPrivateToken());
 
+        clientConfiguration = config;
         testRunsApi = new TestRunsApi(apiClient);
         autoTestsApi = new AutoTestsApi(apiClient);
         attachmentsApi = new AttachmentsApi(apiClient);
     }
 
     @Override
-    public TestRunV2GetModel createTestRun(TestRunV2PostShortModel model) throws ApiException {
+    public TestRunV2GetModel createTestRun() throws ApiException {
+
+        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
+        model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
+
+        if (!Objects.equals(this.clientConfiguration.getTestRunName(), "null")) {
+            model.setName(this.clientConfiguration.getTestRunName());
+        }
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Create new test run: {}", model);
+        }
+
         TestRunV2GetModel response = testRunsApi.createEmpty(model);
         testRunsApi.startTestRun(response.getId());
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("The test run created: {}", response);
+        }
+
         return response;
     }
 
@@ -60,8 +85,8 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public AutoTestModel getAutoTestByExternalId(String projectId, String externalId) throws ApiException {
-        List<AutoTestModel> tests = autoTestsApi.getAllAutoTests(UUID.fromString(projectId),
+    public AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException {
+        List<AutoTestModel> tests = autoTestsApi.getAllAutoTests(UUID.fromString(this.clientConfiguration.getProjectId()),
                 externalId, null, null, null, null,
                 null, null, null, null, null, null,
                 null, null, null, null, null, null,
@@ -96,7 +121,7 @@ public class TmsApiClient implements ApiClient {
         TestRunV2GetModel model = testRunsApi.getTestRunById(UUID.fromString(testRunUuid));
         UUID configUUID = UUID.fromString(configurationId);
 
-        if (model.getTestResults().size() == 0){
+        if (model.getTestResults().size() == 0) {
             return new ArrayList<>();
         }
 
