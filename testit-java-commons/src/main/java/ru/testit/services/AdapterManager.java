@@ -3,6 +3,8 @@ package ru.testit.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
+import ru.testit.client.model.TestRunStateTypeModel;
+import ru.testit.client.model.TestRunV2GetModel;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.TmsApiClient;
@@ -12,7 +14,10 @@ import ru.testit.properties.AdapterMode;
 import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -27,9 +32,9 @@ public class AdapterManager {
     private final ClientConfiguration clientConfiguration;
     private final AdapterConfig adapterConfig;
 
-    public AdapterManager(ConfigManager configManager) {
-        this.clientConfiguration = configManager.getClientConfiguration();
-        this.adapterConfig = configManager.getAdapterConfig();
+    public AdapterManager(ClientConfiguration clientConfiguration, AdapterConfig adapterConfig) {
+        this.clientConfiguration = clientConfiguration;
+        this.adapterConfig = adapterConfig;
         validateAdapterConfig();
         this.storage = Adapter.getResultStorage();
         this.threadContext = new ThreadContext();
@@ -38,14 +43,15 @@ public class AdapterManager {
     }
 
     public AdapterManager(
-            ConfigManager configManager,
+            ClientConfiguration clientConfiguration,
+            AdapterConfig adapterConfig,
             ThreadContext threadContext,
             ResultStorage storage,
             Writer writer,
             ApiClient client
     ) {
-        this.adapterConfig = configManager.getAdapterConfig();
-        this.clientConfiguration = configManager.getClientConfiguration();
+        this.adapterConfig = adapterConfig;
+        this.clientConfiguration = clientConfiguration;
         this.threadContext = threadContext;
         this.storage = storage;
         this.writer = writer;
@@ -55,13 +61,39 @@ public class AdapterManager {
     public void startTests() {
         LOGGER.debug("Start launch");
 
-        writer.startLaunch();
+        synchronized (this.clientConfiguration) {
+            if (!Objects.equals(this.clientConfiguration.getTestRunId(), "null")) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Test run is exist.");
+                }
+                return;
+            }
+
+            try {
+                TestRunV2GetModel response = this.client.createTestRun();
+                this.clientConfiguration.setTestRunId(response.getId().toString());
+
+            } catch (ApiException e) {
+                LOGGER.error("Can not start the launch: ".concat(e.getMessage()));
+            }
+        }
     }
 
     public void stopTests() {
         LOGGER.debug("Stop launch");
 
-        writer.finishLaunch();
+        try {
+            TestRunV2GetModel testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
+
+            if (testRun.getStateName() != TestRunStateTypeModel.COMPLETED) {
+                this.client.completeTestRun(this.clientConfiguration.getTestRunId());
+            }
+        } catch (ApiException e) {
+            if (e.getResponseBody().contains("the StateName is already Completed")) {
+                return;
+            }
+            LOGGER.error("Can not finish the launch: ".concat(e.getMessage()));
+        }
     }
 
     /**
@@ -70,7 +102,7 @@ public class AdapterManager {
      * @param container the main container.
      */
     public void startMainContainer(final MainContainer container) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start new main container {}", container.getUuid());
         }
 
@@ -84,7 +116,7 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopMainContainer(final String uuid) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Stop main container {}", uuid);
         }
 
@@ -105,7 +137,7 @@ public class AdapterManager {
      * @param container  the class container.
      */
     public void startClassContainer(final String parentUuid, final ClassContainer container) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start new class container {} for parent {}", container.getUuid(), parentUuid);
         }
 
@@ -124,7 +156,7 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopClassContainer(final String uuid) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Stop class container {}", uuid);
         }
 
@@ -145,7 +177,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateClassContainer(final String uuid, final Consumer<ClassContainer> update) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Update class container {}", uuid);
         }
 
@@ -164,7 +196,7 @@ public class AdapterManager {
      * @param uuid the uuid of test case to start.
      */
     public void startTestCase(final String uuid) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start test case {}", uuid);
         }
 
@@ -188,7 +220,7 @@ public class AdapterManager {
      * @param result the test case to schedule.
      */
     public void scheduleTestCase(final TestResult result) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Schedule test case {}", result.getUuid());
         }
 
@@ -219,7 +251,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateTestCase(final String uuid, final Consumer<TestResult> update) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Update test case {}", uuid);
         }
 
@@ -239,7 +271,7 @@ public class AdapterManager {
      * @param uuid the uuid of test case to stop.
      */
     public void stopTestCase(final String uuid) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Stop test case {}", uuid);
         }
 
@@ -265,7 +297,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startPrepareFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start prepare all fixture {} for parent {}", uuid, parentUuid);
         }
 
@@ -285,7 +317,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startTearDownFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start tear down all fixture {} for parent {}", uuid, parentUuid);
         }
 
@@ -306,7 +338,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startPrepareFixture(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start prepare fixture {} for parent {}", uuid, parentUuid);
         }
 
@@ -326,7 +358,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startTearDownFixture(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start tear down fixture {} for parent {}", uuid, parentUuid);
         }
 
@@ -347,7 +379,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startPrepareFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start prepare for each fixture {} for parent {}", uuid, parentUuid);
         }
 
@@ -367,7 +399,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startTearDownFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start tear down for each fixture {} for parent {}", uuid, parentUuid);
         }
 
@@ -403,7 +435,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateFixture(final String uuid, final Consumer<FixtureResult> update) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Update fixture {}", uuid);
         }
 
@@ -423,7 +455,7 @@ public class AdapterManager {
      * @param uuid the uuid of fixture.
      */
     public void stopFixture(final String uuid) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Stop fixture {}", uuid);
         }
 
@@ -465,7 +497,7 @@ public class AdapterManager {
      * @param result     the step.
      */
     public void startStep(final String parentUuid, final String uuid, final StepResult result) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start step {} for parent {}", uuid, parentUuid);
         }
 
@@ -504,7 +536,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateStep(final String uuid, final Consumer<StepResult> update) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Update step {}", uuid);
         }
 
@@ -540,7 +572,7 @@ public class AdapterManager {
      * @param uuid the uuid of step to stop.
      */
     public void stopStep(final String uuid) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Stop step {}", uuid);
         }
 

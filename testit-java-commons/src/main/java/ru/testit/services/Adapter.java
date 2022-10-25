@@ -23,7 +23,7 @@ public final class Adapter {
         if (Objects.isNull(adapterManager)) {
             Properties appProperties = AppProperties.loadProperties();
             ConfigManager manager = new ConfigManager(appProperties);
-            adapterManager = new AdapterManager(manager);
+            adapterManager = new AdapterManager(manager.getClientConfiguration(), manager.getAdapterConfig());
         }
         return adapterManager;
     }
