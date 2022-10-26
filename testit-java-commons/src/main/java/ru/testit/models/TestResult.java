@@ -1,5 +1,8 @@
 package ru.testit.models;
 
+import ru.testit.services.Utils;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,7 +10,7 @@ import java.util.Map;
 /**
  * The model object that stores information about test that was run.
  */
-public class TestResult implements ResultWithSteps, ResultWithAttachments {
+public class TestResult implements ResultWithSteps, ResultWithAttachments, Serializable {
     private String uuid;
     private String externalId;
     private List<String> workItemIds = new ArrayList<>();
@@ -427,5 +430,34 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments {
     public TestResult setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
         return this;
+    }
+
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class TestResult {\n");
+        sb.append("    uuid: ").append(Utils.toIndentedString(this.uuid)).append("\n");
+        sb.append("    externalId: ").append(Utils.toIndentedString(this.externalId)).append("\n");
+        sb.append("    workItemIds: ").append(Utils.toIndentedString(this.workItemIds)).append("\n");
+        sb.append("    className: ").append(Utils.toIndentedString(this.className)).append("\n");
+        sb.append("    spaceName: ").append(Utils.toIndentedString(this.spaceName)).append("\n");
+        sb.append("    labels: ").append(Utils.toIndentedString(this.labels)).append("\n");
+        sb.append("    linkItems: ").append(Utils.toIndentedString(this.linkItems)).append("\n");
+        sb.append("    resultLinks: ").append(Utils.toIndentedString(this.resultLinks)).append("\n");
+        sb.append("    attachments: ").append(Utils.toIndentedString(this.attachments)).append("\n");
+        sb.append("    name: ").append(Utils.toIndentedString(this.name)).append("\n");
+        sb.append("    title: ").append(Utils.toIndentedString(this.title)).append("\n");
+        sb.append("    message: ").append(Utils.toIndentedString(this.message)).append("\n");
+        sb.append("    itemStatus: ").append(Utils.toIndentedString(this.itemStatus)).append("\n");
+        sb.append("    itemStage: ").append(Utils.toIndentedString(this.itemStage)).append("\n");
+        sb.append("    description: ").append(Utils.toIndentedString(this.description)).append("\n");
+        sb.append("    steps: ").append(Utils.toIndentedString(this.steps)).append("\n");
+        sb.append("    throwable: ").append(Utils.toIndentedString(this.throwable)).append("\n");
+        sb.append("    start: ").append(Utils.toIndentedString(this.start)).append("\n");
+        sb.append("    stop: ").append(Utils.toIndentedString(this.stop)).append("\n");
+        sb.append("    parameters: ").append(Utils.toIndentedString(this.parameters)).append("\n");
+        sb.append("}");
+
+        return sb.toString();
     }
 }

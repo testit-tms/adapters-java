@@ -1,5 +1,8 @@
 package ru.testit.models;
 
+import ru.testit.services.Utils;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +11,7 @@ import java.util.Map;
  * Model describes fixture.
  */
 
-public class FixtureResult implements ResultWithSteps, ResultWithAttachments {
+public class FixtureResult implements ResultWithSteps, ResultWithAttachments, Serializable {
     private String name;
     private ItemStatus itemStatus;
     private ItemStage itemStage;
@@ -239,5 +242,25 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments {
     public FixtureResult setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
         return this;
+    }
+
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class FixtureResult {\n");
+        sb.append("    name: ").append(Utils.toIndentedString(this.name)).append("\n");
+        sb.append("    itemStatus: ").append(Utils.toIndentedString(this.itemStatus)).append("\n");
+        sb.append("    itemStage: ").append(Utils.toIndentedString(this.itemStage)).append("\n");
+        sb.append("    description: ").append(Utils.toIndentedString(this.description)).append("\n");
+        sb.append("    steps: ").append(Utils.toIndentedString(this.steps)).append("\n");
+        sb.append("    linkItems: ").append(Utils.toIndentedString(this.linkItems)).append("\n");
+        sb.append("    attachments: ").append(Utils.toIndentedString(this.attachments)).append("\n");
+        sb.append("    parent: ").append(Utils.toIndentedString(this.parent)).append("\n");
+        sb.append("    start: ").append(Utils.toIndentedString(this.start)).append("\n");
+        sb.append("    stop: ").append(Utils.toIndentedString(this.stop)).append("\n");
+        sb.append("    parameters: ").append(Utils.toIndentedString(this.parameters)).append("\n");
+        sb.append("}");
+
+        return sb.toString();
     }
 }

@@ -4,7 +4,8 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import ru.testit.annotations.Step;
-import ru.testit.models.*;
+import ru.testit.models.ItemStatus;
+import ru.testit.models.StepResult;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
 import ru.testit.services.Utils;
@@ -38,6 +39,7 @@ public class StepAspect {
         final MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         final String uuid = UUID.randomUUID().toString();
         Method method = signature.getMethod();
+
         Parameter[] parameters = method.getParameters();
         Map<String, String> stepParameters = new HashMap<>();
 
@@ -73,7 +75,7 @@ public class StepAspect {
         getManager().stopStep();
     }
 
-    private AdapterManager getManager(){
+    private AdapterManager getManager() {
         return adapterManager.get();
     }
 }

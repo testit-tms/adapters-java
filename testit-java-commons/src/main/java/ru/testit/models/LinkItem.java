@@ -1,5 +1,7 @@
 package ru.testit.models;
 
+import ru.testit.services.Utils;
+
 /**
  * Model object to pass links to external resources.
  */
@@ -88,5 +90,18 @@ public class LinkItem
     public LinkItem setType(final LinkType type) {
         this.type = type;
         return this;
+    }
+
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class LinkItem {\n");
+        sb.append("    title: ").append(Utils.toIndentedString(this.title)).append("\n");
+        sb.append("    url: ").append(Utils.toIndentedString(this.url)).append("\n");
+        sb.append("    description: ").append(Utils.toIndentedString(this.description)).append("\n");
+        sb.append("    type: ").append(Utils.toIndentedString(this.type)).append("\n");
+        sb.append("}");
+
+        return sb.toString();
     }
 }

@@ -102,12 +102,12 @@ public class AdapterManager {
      * @param container the main container.
      */
     public void startMainContainer(final MainContainer container) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start new main container {}", container.getUuid());
-        }
-
         container.setStart(System.currentTimeMillis());
         storage.put(container.getUuid(), container);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Start new main container {}", container);
+        }
     }
 
     /**
@@ -116,10 +116,6 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopMainContainer(final String uuid) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Stop main container {}", uuid);
-        }
-
         final Optional<MainContainer> found = storage.getTestsContainer(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop main container: container with uuid {} not found", uuid);
@@ -127,6 +123,11 @@ public class AdapterManager {
         }
         final MainContainer container = found.get();
         container.setStop(System.currentTimeMillis());
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Stop main container {}", container);
+        }
+
         writer.writeTests(container);
     }
 
@@ -137,10 +138,6 @@ public class AdapterManager {
      * @param container  the class container.
      */
     public void startClassContainer(final String parentUuid, final ClassContainer container) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start new class container {} for parent {}", container.getUuid(), parentUuid);
-        }
-
         storage.getTestsContainer(parentUuid).ifPresent(parent -> {
             synchronized (storage) {
                 parent.getChildren().add(container.getUuid());
@@ -148,6 +145,10 @@ public class AdapterManager {
         });
         container.setStart(System.currentTimeMillis());
         storage.put(container.getUuid(), container);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Start new class container {} for parent {}", container, parentUuid);
+        }
     }
 
     /**
@@ -156,10 +157,6 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopClassContainer(final String uuid) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Stop class container {}", uuid);
-        }
-
         final Optional<ClassContainer> found = storage.getClassContainer(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop class container: container with uuid {} not found", uuid);
@@ -167,6 +164,11 @@ public class AdapterManager {
         }
         final ClassContainer container = found.get();
         container.setStop(System.currentTimeMillis());
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Stop class container {}", container);
+        }
+
         writer.writeClass(container);
     }
 
@@ -196,10 +198,6 @@ public class AdapterManager {
      * @param uuid the uuid of test case to start.
      */
     public void startTestCase(final String uuid) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start test case {}", uuid);
-        }
-
         threadContext.clear();
         final Optional<TestResult> found = storage.getTestResult(uuid);
         if (!found.isPresent()) {
@@ -212,6 +210,10 @@ public class AdapterManager {
                 .setStart(System.currentTimeMillis());
 
         threadContext.start(uuid);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Start test case {}", testResult);
+        }
     }
 
     /**
@@ -220,12 +222,12 @@ public class AdapterManager {
      * @param result the test case to schedule.
      */
     public void scheduleTestCase(final TestResult result) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Schedule test case {}", result.getUuid());
-        }
-
         result.setItemStage(ItemStage.SCHEDULED);
         storage.put(result.getUuid(), result);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Schedule test case {}", result);
+        }
     }
 
     /**
@@ -271,10 +273,6 @@ public class AdapterManager {
      * @param uuid the uuid of test case to stop.
      */
     public void stopTestCase(final String uuid) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Stop test case {}", uuid);
-        }
-
         final Optional<TestResult> found = storage.getTestResult(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop test case: test case with uuid {} not found", uuid);
@@ -286,6 +284,11 @@ public class AdapterManager {
                 .setStop(System.currentTimeMillis());
 
         threadContext.clear();
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Stop test case {}", uuid);
+        }
+
         writer.writeTest(testResult);
     }
 
@@ -298,7 +301,7 @@ public class AdapterManager {
      */
     public void startPrepareFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start prepare all fixture {} for parent {}", uuid, parentUuid);
+            LOGGER.debug("Start prepare all fixture {} for parent {}", result, parentUuid);
         }
 
         storage.getTestsContainer(parentUuid).ifPresent(container -> {
@@ -318,7 +321,7 @@ public class AdapterManager {
      */
     public void startTearDownFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start tear down all fixture {} for parent {}", uuid, parentUuid);
+            LOGGER.debug("Start tear down all fixture {} for parent {}", result, parentUuid);
         }
 
         storage.getTestsContainer(parentUuid).ifPresent(container -> {
@@ -339,7 +342,7 @@ public class AdapterManager {
      */
     public void startPrepareFixture(final String parentUuid, final String uuid, final FixtureResult result) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start prepare fixture {} for parent {}", uuid, parentUuid);
+            LOGGER.debug("Start prepare fixture {} for parent {}", result, parentUuid);
         }
 
         storage.getClassContainer(parentUuid).ifPresent(container -> {
@@ -347,6 +350,7 @@ public class AdapterManager {
                 container.getBeforeClassMethods().add(result);
             }
         });
+
         startFixture(uuid, result);
     }
 
@@ -359,7 +363,7 @@ public class AdapterManager {
      */
     public void startTearDownFixture(final String parentUuid, final String uuid, final FixtureResult result) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start tear down fixture {} for parent {}", uuid, parentUuid);
+            LOGGER.debug("Start tear down fixture {} for parent {}", result, parentUuid);
         }
 
         storage.getClassContainer(parentUuid).ifPresent(container -> {
@@ -380,7 +384,7 @@ public class AdapterManager {
      */
     public void startPrepareFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start prepare for each fixture {} for parent {}", uuid, parentUuid);
+            LOGGER.debug("Start prepare for each fixture {} for parent {}", result, parentUuid);
         }
 
         storage.getClassContainer(parentUuid).ifPresent(container -> {
@@ -388,6 +392,7 @@ public class AdapterManager {
                 container.getBeforeEachTest().add(result);
             }
         });
+
         startFixture(uuid, result);
     }
 
@@ -400,7 +405,7 @@ public class AdapterManager {
      */
     public void startTearDownFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start tear down for each fixture {} for parent {}", uuid, parentUuid);
+            LOGGER.debug("Start tear down for each fixture {} for parent {}", result, parentUuid);
         }
 
         storage.getClassContainer(parentUuid).ifPresent(container -> {
@@ -455,10 +460,6 @@ public class AdapterManager {
      * @param uuid the uuid of fixture.
      */
     public void stopFixture(final String uuid) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Stop fixture {}", uuid);
-        }
-
         final Optional<FixtureResult> found = storage.getFixture(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop test fixture: test fixture with uuid {} not found", uuid);
@@ -471,6 +472,10 @@ public class AdapterManager {
 
         storage.remove(uuid);
         threadContext.clear();
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Stop fixture {}", fixture);
+        }
     }
 
     /**
@@ -497,10 +502,6 @@ public class AdapterManager {
      * @param result     the step.
      */
     public void startStep(final String parentUuid, final String uuid, final StepResult result) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start step {} for parent {}", uuid, parentUuid);
-        }
-
         result.setItemStage(ItemStage.RUNNING)
                 .setStart(System.currentTimeMillis());
 
@@ -512,6 +513,10 @@ public class AdapterManager {
                 parentStep.getSteps().add(result);
             }
         });
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Start step {} for parent {}", result, parentUuid);
+        }
     }
 
     /**
@@ -572,10 +577,6 @@ public class AdapterManager {
      * @param uuid the uuid of step to stop.
      */
     public void stopStep(final String uuid) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Stop step {}", uuid);
-        }
-
         final Optional<StepResult> found = storage.getStep(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop step: step with uuid {} not found", uuid);
@@ -589,6 +590,10 @@ public class AdapterManager {
 
         storage.remove(uuid);
         threadContext.stop();
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Stop step {}", step);
+        }
     }
 
     public void addAttachments(List<String> attachments) {
