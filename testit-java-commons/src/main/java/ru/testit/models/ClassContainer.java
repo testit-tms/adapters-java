@@ -1,12 +1,15 @@
 package ru.testit.models;
 
+import ru.testit.services.Utils;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Model describes class container.
  */
-public class ClassContainer {
+public class ClassContainer implements Serializable {
     private String uuid;
     private String name;
     private List<FixtureResult> beforeEachTest = new ArrayList<>();
@@ -195,5 +198,22 @@ public class ClassContainer {
     public ClassContainer setStop(Long stop) {
         this.stop = stop;
         return this;
+    }
+
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class ClassContainer {\n");
+        sb.append("    uuid: ").append(Utils.toIndentedString(this.uuid)).append("\n");
+        sb.append("    name: ").append(Utils.toIndentedString(this.name)).append("\n");
+        sb.append("    beforeEachTest: ").append(Utils.toIndentedString(this.beforeEachTest)).append("\n");
+        sb.append("    afterEachTest: ").append(Utils.toIndentedString(this.afterEachTest)).append("\n");
+        sb.append("    beforeClassMethods: ").append(Utils.toIndentedString(this.beforeClassMethods)).append("\n");
+        sb.append("    afterClassMethods: ").append(Utils.toIndentedString(this.afterClassMethods)).append("\n");
+        sb.append("    children: ").append(Utils.toIndentedString(this.children)).append("\n");
+        sb.append("    start: ").append(Utils.toIndentedString(this.start)).append("\n");
+        sb.append("    stop: ").append(Utils.toIndentedString(this.stop)).append("\n");
+        sb.append("}");
+        return sb.toString();
     }
 }

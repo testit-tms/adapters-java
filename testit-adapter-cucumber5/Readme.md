@@ -413,6 +413,8 @@ maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId
 -DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress
 ```
 
+If you want to enable debug mode then see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+
 ### Tags
 
 Use tags to specify information about autotest.

@@ -94,6 +94,10 @@ public class Utils {
         return setParameters(title, parameters);
     }
 
+    public static String toIndentedString(Object o) {
+        return o == null ? "null" : o.toString().replace("\n", "\n    ");
+    }
+
     private static LinkItem makeLink(final Link linkAnnotation, Map<String, String> parameters) {
         return new LinkItem()
                 .setTitle(setParameters(linkAnnotation.title(), parameters))
