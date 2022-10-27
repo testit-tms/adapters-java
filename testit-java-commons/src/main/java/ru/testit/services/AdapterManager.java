@@ -33,6 +33,11 @@ public class AdapterManager {
     private final AdapterConfig adapterConfig;
 
     public AdapterManager(ClientConfiguration clientConfiguration, AdapterConfig adapterConfig) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Client configurations: {}", clientConfiguration);
+            LOGGER.debug("Adapter configurations: {}", adapterConfig);
+        }
+
         this.clientConfiguration = clientConfiguration;
         this.adapterConfig = adapterConfig;
         validateAdapterConfig();
@@ -623,7 +628,13 @@ public class AdapterManager {
 
     public List<String> getTestFromTestRun() {
         try {
-            return client.getTestFromTestRun(clientConfiguration.getTestRunId(), clientConfiguration.getConfigurationId());
+            List<String> testsForRun = client.getTestFromTestRun(clientConfiguration.getTestRunId(), clientConfiguration.getConfigurationId());
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("List of tests from test run: {}", testsForRun);
+            }
+
+            return testsForRun;
         } catch (ApiException e) {
             LOGGER.error("Could not get tests from test run", e);
         }
