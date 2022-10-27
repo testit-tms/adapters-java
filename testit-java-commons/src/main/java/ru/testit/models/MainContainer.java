@@ -1,12 +1,15 @@
 package ru.testit.models;
 
+import ru.testit.services.Utils;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Model describes main container with.
  */
-public class MainContainer {
+public class MainContainer implements Serializable {
     private String uuid;
     private List<FixtureResult> beforeMethods = new ArrayList<>();
     private List<FixtureResult> afterMethods = new ArrayList<>();
@@ -132,5 +135,18 @@ public class MainContainer {
     public MainContainer setStop(Long stop) {
         this.stop = stop;
         return this;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class MainContainer {\n");
+        sb.append("    uuid: ").append(Utils.toIndentedString(this.uuid)).append("\n");
+        sb.append("    beforeMethods: ").append(Utils.toIndentedString(this.beforeMethods)).append("\n");
+        sb.append("    afterMethods: ").append(Utils.toIndentedString(this.afterMethods)).append("\n");
+        sb.append("    children: ").append(Utils.toIndentedString(this.children)).append("\n");
+        sb.append("    start: ").append(Utils.toIndentedString(this.start)).append("\n");
+        sb.append("    stop: ").append(Utils.toIndentedString(this.stop)).append("\n");
+        sb.append("}");
+        return sb.toString();
     }
 }

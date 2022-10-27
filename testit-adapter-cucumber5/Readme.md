@@ -13,7 +13,7 @@ Add this dependency to your project POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-cucumber5</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-cucumber5:1.1.1"
+implementation "ru.testit:testit-adapter-cucumber5:1.1.2"
 ```
 
 ## Usage
@@ -37,7 +37,7 @@ implementation "ru.testit:testit-adapter-cucumber5:1.1.1"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <adapter.version>1.1.1</adapter.version>
+        <adapter.version>1.1.2</adapter.version>
     </properties>
     <dependencies>
         <dependency>
@@ -90,7 +90,7 @@ implementation "ru.testit:testit-adapter-cucumber5:1.1.1"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <adapter.version>1.1.1</adapter.version>
+        <adapter.version>1.1.2</adapter.version>
     </properties>
     <dependencies>
         <dependency>
@@ -154,7 +154,7 @@ implementation "ru.testit:testit-adapter-cucumber5:1.1.1"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <adapter.version>1.1.1</adapter.version>
+        <adapter.version>1.1.2</adapter.version>
     </properties>
     <dependencies>
         <dependency>
@@ -229,8 +229,8 @@ def cucumberVersion = "5.1.2"
 def cucumberGherkinVersion = "5.1.0"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber5:1.1.1"
-    testImplementation "ru.testit:testit-java-commons:1.1.1"
+    testImplementation "ru.testit:testit-adapter-cucumber5:1.1.2"
+    testImplementation "ru.testit:testit-java-commons:1.1.2"
     testImplementation 'org.testng:testng:7.5'
     testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
@@ -264,8 +264,8 @@ def cucumberVersion = "5.5.0"
 def cucumberGherkinVersion = "5.1.0"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber5:1.1.1"
-    testImplementation "ru.testit:testit-java-commons:1.1.1"
+    testImplementation "ru.testit:testit-adapter-cucumber5:1.1.2"
+    testImplementation "ru.testit:testit-java-commons:1.1.2"
     testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
@@ -302,8 +302,8 @@ def cucumberGherkinVersion = "5.1.0"
 def junit4Version = "4.12"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber5:1.1.1"
-    testImplementation "ru.testit:testit-java-commons:1.1.1"
+    testImplementation "ru.testit:testit-adapter-cucumber5:1.1.2"
+    testImplementation "ru.testit:testit-java-commons:1.1.2"
     testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
@@ -412,6 +412,8 @@ gradle test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectI
 maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
 -DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress
 ```
+
+If you want to enable debug mode then see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
 
 ### Tags
 
