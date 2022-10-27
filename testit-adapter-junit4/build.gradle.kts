@@ -6,6 +6,7 @@ plugins {
 
 val junitVersion = "4.13.2"
 val aspectjVersion = "1.9.7"
+val slf4jVersion = "1.7.36"
 val agent: Configuration by configurations.creating
 
 dependencies {
@@ -13,6 +14,8 @@ dependencies {
 
     implementation("junit:junit:$junitVersion")
     implementation(project(":testit-java-commons"))
+    implementation("org.slf4j:slf4j-api:$slf4jVersion")
+    implementation("org.slf4j:slf4j-simple:$slf4jVersion")
 
     testImplementation("junit:junit:$junitVersion")
     testImplementation("org.aspectj:aspectjrt:$aspectjVersion")

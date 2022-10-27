@@ -3,9 +3,10 @@ package ru.testit.clients;
 import ru.testit.properties.AppProperties;
 import ru.testit.services.Utils;
 
+import java.io.Serializable;
 import java.util.Properties;
 
-public class ClientConfiguration {
+public class ClientConfiguration implements Serializable {
     private String privateToken;
     private String projectId;
     private String url;
@@ -48,5 +49,20 @@ public class ClientConfiguration {
 
     public String getTestRunName() {
         return testRunName;
+    }
+
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class ClientConfiguration {\n");
+        sb.append("    url: ").append(Utils.toIndentedString(this.url)).append("\n");
+        sb.append("    privateToken: **********").append("\n");
+        sb.append("    projectId: ").append(Utils.toIndentedString(this.projectId)).append("\n");
+        sb.append("    configurationId: ").append(Utils.toIndentedString(this.configurationId)).append("\n");
+        sb.append("    testRunId: ").append(Utils.toIndentedString(this.testRunId)).append("\n");
+        sb.append("    testRunName: ").append(Utils.toIndentedString(this.testRunName)).append("\n");
+        sb.append("}");
+
+        return sb.toString();
     }
 }

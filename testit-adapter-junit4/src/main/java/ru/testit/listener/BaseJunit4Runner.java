@@ -10,13 +10,18 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
+
 import java.util.List;
 
 public class BaseJunit4Runner extends BlockJUnit4ClassRunner {
     private List<String> testsForRun;
     private final boolean isFilteredMode;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseJunit4Runner.class);
 
     public BaseJunit4Runner(Class<?> clazz) throws InitializationError {
         super(clazz);
@@ -65,11 +70,20 @@ public class BaseJunit4Runner extends BlockJUnit4ClassRunner {
 
         String externalId = Utils.extractExternalID(description);
 
-        if (testsForRun.contains(externalId)){
+        if (testsForRun.contains(externalId)) {
             runLeaf(methodBlock(method), description, notifier);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Test {} include for run", externalId);
+            }
+
             return;
         }
 
         notifier.fireTestIgnored(description);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Test {} exclude for run", externalId);
+        }
     }
 }
