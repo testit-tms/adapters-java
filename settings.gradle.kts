@@ -7,6 +7,7 @@ include("testit-adapter-cucumber4")
 include("testit-adapter-cucumber5")
 include("testit-adapter-cucumber6")
 include("testit-adapter-cucumber7")
+include("testit-adapter-jbehave")
 
 pluginManagement {
     repositories {
