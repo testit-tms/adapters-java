@@ -1,5 +1,7 @@
 package ru.testit.listener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.*;
 import org.testng.annotations.Parameters;
 import org.testng.xml.XmlTest;
@@ -29,6 +31,8 @@ public class BaseTestNgListener implements
         IInvokedMethodListener,
         IConfigurationListener,
         IMethodInterceptor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseTestNgListener.class);
 
     /**
      * Store current executable test.
@@ -149,7 +153,7 @@ public class BaseTestNgListener implements
 
             final int indexFromAnnotation = i - skippedCount;
             if (indexFromAnnotation < providedNames.length) {
-                if (parameters[i] != null){
+                if (parameters[i] != null) {
                     testParameters.put(providedNames[indexFromAnnotation], parameters[i].toString());
                 }
                 continue;
@@ -384,7 +388,7 @@ public class BaseTestNgListener implements
 
     @Override
     public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
-        if (!adapterManager.isFilteredMode()){
+        if (!adapterManager.isFilteredMode()) {
             return methods;
         }
 
@@ -394,14 +398,34 @@ public class BaseTestNgListener implements
             String externalId = Utils.extractExternalID(method.getMethod().getConstructorOrMethod().getMethod(), null);
 
             if (externalId.matches("\\{.*}")) {
-                return filterTestWithParameters(testsForRun, externalId);
+                Boolean include = filterTestWithParameters(testsForRun, externalId);
+
+                if (LOGGER.isDebugEnabled()) {
+                    if (include) {
+                        LOGGER.debug("Test {} include for run", externalId);
+                    } else {
+                        LOGGER.debug("Test {} exclude for run", externalId);
+                    }
+                }
+
+                return include;
             }
 
-            return testsForRun.contains(externalId);
+            Boolean include = testsForRun.contains(externalId);
+
+            if (LOGGER.isDebugEnabled()) {
+                if (include) {
+                    LOGGER.debug("Test {} include for run", externalId);
+                } else {
+                    LOGGER.debug("Test {} exclude for run", externalId);
+                }
+            }
+
+            return include;
         }).collect(Collectors.toList());
     }
 
-    private boolean filterTestWithParameters(List<String> testsForRun, String externalId){
+    private boolean filterTestWithParameters(List<String> testsForRun, String externalId) {
         Pattern pattern = Pattern.compile(externalId.replaceAll("\\{.*}", ".*"));
 
         for (String test : testsForRun) {
