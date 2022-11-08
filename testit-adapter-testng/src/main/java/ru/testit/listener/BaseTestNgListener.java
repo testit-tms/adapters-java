@@ -109,7 +109,8 @@ public class BaseTestNgListener implements
                 .setTitle(Utils.extractTitle(method, parameters))
                 .setName(Utils.extractDisplayName(method, parameters))
                 .setClassName(method.getDeclaringClass().getSimpleName())
-                .setSpaceName((method.getDeclaringClass().getPackage() == null)
+                .setSpaceName((method.getDeclaringClass().getPackage() == null
+                        || method.getDeclaringClass().getPackage().getName().equals(""))
                         ? null : method.getDeclaringClass().getPackage().getName())
                 .setLinkItems(Utils.extractLinks(method, parameters))
                 .setDescription(Utils.extractDescription(method, parameters))
@@ -398,7 +399,7 @@ public class BaseTestNgListener implements
             String externalId = Utils.extractExternalID(method.getMethod().getConstructorOrMethod().getMethod(), null);
 
             if (externalId.matches("\\{.*}")) {
-                Boolean include = filterTestWithParameters(testsForRun, externalId);
+                boolean include = filterTestWithParameters(testsForRun, externalId);
 
                 if (LOGGER.isDebugEnabled()) {
                     if (include) {
@@ -411,7 +412,7 @@ public class BaseTestNgListener implements
                 return include;
             }
 
-            Boolean include = testsForRun.contains(externalId);
+            boolean include = testsForRun.contains(externalId);
 
             if (LOGGER.isDebugEnabled()) {
                 if (include) {
