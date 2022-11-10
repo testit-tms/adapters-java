@@ -1,4 +1,4 @@
-# Test IT TMS Adapter for Cucumber5
+# Test IT TMS Adapter for JBehave
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
 ## Getting Started
@@ -12,7 +12,7 @@ Add this dependency to your project POM:
 ```xml
 <dependency>
     <groupId>ru.testit</groupId>
-    <artifactId>testit-adapter-cucumber5</artifactId>
+    <artifactId>testit-adapter-jbehave</artifactId>
     <version>1.1.4</version>
     <scope>compile</scope>
 </dependency>
@@ -23,7 +23,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-cucumber5:1.1.4"
+implementation "ru.testit:testit-adapter-jbehave:1.1.4"
 ```
 
 ## Usage
@@ -38,6 +38,7 @@ implementation "ru.testit:testit-adapter-cucumber5:1.1.4"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <adapter.version>1.1.4</adapter.version>
+        <jbehave.version>4.8.3</jbehave.version>
     </properties>
     <dependencies>
         <dependency>
@@ -52,31 +53,13 @@ implementation "ru.testit:testit-adapter-cucumber5:1.1.4"
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
-            <artifactId>testit-adapter-cucumber5</artifactId>
+            <artifactId>testit-adapter-jbehave</artifactId>
             <version>${adapter.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>gherkin</artifactId>
-            <version>5.1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-core</artifactId>
-            <version>5.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <version>5.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-testng</artifactId>
-            <version>5.5.0</version>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-core</artifactId>
+            <version>${jbehave.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -87,10 +70,11 @@ implementation "ru.testit:testit-adapter-cucumber5:1.1.4"
 
 1. Add this dependency to your project POM:
     ````xml
-     <properties>
+      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <adapter.version>1.1.4</adapter.version>
+        <jbehave.version>4.8.3</jbehave.version>
     </properties>
     <dependencies>
         <dependency>
@@ -110,37 +94,13 @@ implementation "ru.testit:testit-adapter-cucumber5:1.1.4"
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
-            <artifactId>testit-adapter-cucumber5</artifactId>
+            <artifactId>testit-adapter-jbehave</artifactId>
             <version>${adapter.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>gherkin</artifactId>
-            <version>5.1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-core</artifactId>
-            <version>5.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <version>5.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit</artifactId>
-            <version>5.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit-platform-engine</artifactId>
-            <version>5.5.0</version>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-core</artifactId>
+            <version>${jbehave.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -155,6 +115,7 @@ implementation "ru.testit:testit-adapter-cucumber5:1.1.4"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <adapter.version>1.1.4</adapter.version>
+        <jbehave.version>4.8.3</jbehave.version>
     </properties>
     <dependencies>
         <dependency>
@@ -174,38 +135,18 @@ implementation "ru.testit:testit-adapter-cucumber5:1.1.4"
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
-            <artifactId>testit-adapter-cucumber5</artifactId>
+            <artifactId>testit-adapter-jbehave</artifactId>
             <version>${adapter.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>gherkin</artifactId>
-            <version>5.1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-core</artifactId>
-            <version>5.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <version>5.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit</artifactId>
-            <version>5.5.0</version>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-core</artifactId>
+            <version>${jbehave.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
     ````
 2. Press the **Reload All Maven Projects** button.
-
-
 
 #### Gradle Users
 
@@ -225,17 +166,15 @@ repositories {
     mavenLocal()
 }
 
-def cucumberVersion = "5.1.2"
-def cucumberGherkinVersion = "5.1.0"
+def jbehaveVersion = "4.8.3"
+def aspectjVersion = "1.9.7"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber5:1.1.4"
+    testImplementation "ru.testit:testit-adapter-jbehave:1.1.4"
     testImplementation "ru.testit:testit-java-commons:1.1.4"
     testImplementation 'org.testng:testng:7.5'
-    testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
-    testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
-    testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
-    testImplementation("io.cucumber:cucumber-testng:$cucumberVersion")
+    testImplementation("org.jbehave:jbehave-core:$jbehaveVersion")
+    testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
 }
 
 test {
@@ -260,19 +199,16 @@ repositories {
     mavenLocal()
 }
 
-def cucumberVersion = "5.5.0"
-def cucumberGherkinVersion = "5.1.0"
+def jbehaveVersion = "4.8.3"
+def aspectjVersion = "1.9.7"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber5:1.1.4"
+    testImplementation "ru.testit:testit-adapter-jbehave:1.1.4"
     testImplementation "ru.testit:testit-java-commons:1.1.4"
-    testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
-    testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
-    testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
-    testImplementation("io.cucumber:cucumber-junit:$cucumberVersion")
-    testImplementation("io.cucumber:cucumber-junit-platform-engine:$cucumberVersion")
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation("org.jbehave:jbehave-core:$jbehaveVersion")
+    testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.2"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"
 }
 
 test {
@@ -297,18 +233,15 @@ repositories {
     mavenLocal()
 }
 
-def cucumberVersion = "5.5.0"
-def cucumberGherkinVersion = "5.1.0"
-def junit4Version = "4.12"
+def jbehaveVersion = "4.8.3"
+def aspectjVersion = "1.9.7"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber5:1.1.4"
+    testImplementation "ru.testit:testit-adapter-jbehave:1.1.4"
     testImplementation "ru.testit:testit-java-commons:1.1.4"
-    testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
-    testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
-    testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
-    testImplementation("io.cucumber:cucumber-junit:$cucumberVersion")
-    testImplementation "junit:junit:$junit4Version"
+    testImplementation("org.jbehave:jbehave-core:$jbehaveVersion")
+    testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
+    testImplementation "junit:junit:4.12"
 }
 
 test {
@@ -415,14 +348,14 @@ maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId
 
 If you want to enable debug mode then see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
 
-### Tags
+### Meta
 
 Use tags to specify information about autotest.
 
 Description of tags:
 - `WorkItemIds` - linking an autotest to a test case.
-- `DisplayName` - name of the autotest in Test IT.
-- `ExternalId` - ID of the autotest within the project in Test IT.
+- `DisplayName` - name of the autotest in TMS.
+- `ExternalId` - ID of the autotest within the project in TMS.
 - `Title` - title in the autotest card.
 - `Description` - description in the autotest card.
 - `Labels` - tags in the autotest card.
@@ -438,122 +371,76 @@ Description of methods:
 #### Simple test
 
 ```java
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import org.testng.Assert;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
+
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SampleTests {
-    @Given("I authorize on the portal")
-    public void authorization() {
-        Assert.assertTrue(setLogin("User_1"));
-        Assert.assertTrue(setPassword("Pass123"));
+public class SampleSteps {
+
+    private int a;
+    private int b;
+    private int c;
+
+    @Given("a is $number")
+    public void a_is(int arg1) {
+        this.a = arg1;
     }
 
-    private boolean setLogin(String login) {
-        return login.equals("User_1");
+    @Given("b is $number")
+    public void b_is(int arg1) {
+        this.b = arg1;
     }
 
-    private boolean setPassword(String password) {
-        return password.equals("Pass123");
+    @When("I add a to b")
+    public void i_add_a_to_b() {
+        this.c = this.a + this.b;
     }
 
-    @When("I create a project")
-    public void createProject() {
-        Assert.assertTrue(true);
-    }
-
-    @And("I open the project")
-    public void enterProject() {
-        Assert.assertTrue(true);
-    }
-
-    @And("I create a section")
-    public void createSection() {
-        Assert.assertTrue(true);
-    }
-
-    @And("I create a section - failed")
-    public void createFailedSection() {
-        Assert.assertTrue(false);
-    }
-
-    @Then("I create a test case")
-    public void createTestCase() {
+    @Then("result is $number")
+    public void result_is(int arg1) {
         Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
-        Assert.assertTrue(true);
+        assertEquals(this.c, arg1);
     }
 
-    @Then("I check something")
-    public void requiredAnnotationsTest() {
-        Assert.assertTrue(true);
-    }
-
-    @Then("I check something - failed")
-    public void requiredAnnotationsFailedTest() {
-        Assert.assertTrue(false);
-    }
 }
 ```
 
-```gherkin
-Feature: Sample
+```story
+Scenario: Add a to b
+Meta:
+@ExternalId failed_with_all_annotations
+@DisplayName Failed_test_with_all_annotations
+@WorkItemIds 123
+@Title Title_in_the_autotest_card
+@Description Test_with_all_annotations
+@Labels Tag1,Tag2
+@Links {"url":"https://dumps.example.com/module/repository","title":"Repository","description":"Example_of_repository","type":"Repository"}
 
-  Background:
-    Given I authorize on the portal
-
-  @ExternalId=with_all_annotations
-  @DisplayName=Test_with_all_annotations
-  @WorkItemIds=123
-  @Title=Title_in_the_autotest_card
-  @Description=Test_with_all_annotations
-  @Labels=Tag1,Tag2
-  @Links={"url":"https://dumps.example.com/module/repository","title":"Repository","description":"Example_of_repository","type":"Repository"}
-  Scenario: Create new project, section and test case
-    When I create a project
-    And I open the project
-    And I create a section
-    Then I create a test case
+Given a is 5
+And b is 10
+When I add a to b
+Then result is 14
 ```
 
 #### Parameterized test
 
-```java
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import org.testng.Assert;
+```story
+Scenario: Scenario with Positive Examples
 
-public class ParameterizedTest {
-    private int result;
+Given a is <a>
+And b is <b>
+When I add a to b
+Then result is <result>
 
-    @When("Summing {int}+{int}")
-    public void sum(int left, int right){
-        this.result = left + right;
-    }
-
-    @Then("Result is {int}")
-    public void result(int result){
-        Assert.assertEquals(this.result, result);
-    }
-}
-```
-
-```gherkin
-Feature: Rule
-  Tests that use Rule
-
-  Scenario Outline: Summing
-    When Summing <left>+<right>
-    Then Result is <result>
-
-    Examples:
-      | left | right | result |
-      | 1    | 1     | 3      |
-      | 9    | 9     | 18     |
+Examples:
+| a | b | result |
+| 1 | 3 | 4      |
+| 2 | 4 | 6      |
 ```
 
 # Contributing
