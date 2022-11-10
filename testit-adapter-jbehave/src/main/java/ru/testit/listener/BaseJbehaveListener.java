@@ -1,14 +1,17 @@
 package ru.testit.listener;
 
-import java.util.*;
-
-import org.jbehave.core.model.*;
+import org.jbehave.core.model.Scenario;
+import org.jbehave.core.model.Story;
 import org.jbehave.core.reporters.NullStoryReporter;
-
 import ru.testit.models.*;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
 import ru.testit.services.ExecutableTest;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Objects.nonNull;
 
@@ -82,8 +85,8 @@ public class BaseJbehaveListener extends NullStoryReporter {
 
     protected void startTestCase(Scenario scenario, final String uuid, Map<String, String> parameters) {
         final TestResult result = ScenarioParser
-            .parseScenario(executableStory.get(), scenario, parameters)
-            .setUuid(uuid);
+                .parseScenario(executableStory.get(), scenario, parameters)
+                .setUuid(uuid);
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);
@@ -114,9 +117,9 @@ public class BaseJbehaveListener extends NullStoryReporter {
                 container -> container.getChildren().add(uuid));
         exampleUuids.add(uuid);
         startTestCase(
-            executableScenario.get(),
-            uuid,
-            tableRow);
+                executableScenario.get(),
+                uuid,
+                tableRow);
     }
 
     @Override
@@ -145,9 +148,9 @@ public class BaseJbehaveListener extends NullStoryReporter {
                 .setStart(System.currentTimeMillis());
 
         adapterManager.startStep(
-            executableTest.get().getUuid(),
-            UUID.randomUUID().toString(),
-            stepResult);
+                executableTest.get().getUuid(),
+                UUID.randomUUID().toString(),
+                stepResult);
     }
 
     @Override

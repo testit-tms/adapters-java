@@ -1,8 +1,8 @@
 package ru.testit.listener;
 
 import org.jbehave.core.model.Meta;
-import org.jbehave.core.model.Story;
 import org.jbehave.core.model.Scenario;
+import org.jbehave.core.model.Story;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,7 +11,9 @@ import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class TagParser {
     private static final String TAG_VALUE_DELIMITER = ",";
@@ -44,7 +46,7 @@ public class TagParser {
 
         if (!labelsValue.isEmpty()) {
             Arrays.stream(labelsValue.split(TAG_VALUE_DELIMITER))
-                .forEach(label -> getLabels().add(getTagLabel(label)));
+                    .forEach(label -> getLabels().add(getTagLabel(label)));
         }
 
         String linksValue = getMetaValue(storyMeta, scenarioMeta, LINKS);
@@ -59,14 +61,13 @@ public class TagParser {
 
         if (!workItemIdsValue.isEmpty()) {
             Arrays.stream(workItemIdsValue.split(TAG_VALUE_DELIMITER))
-                .forEach(id -> getWorkItemIds().add(id));
+                    .forEach(id -> getWorkItemIds().add(id));
         }
 
-        final String featureName = story.getName();
         final String name = scenario.getTitle();
 
         if (externalId.isEmpty()) {
-            externalId = Utils.getHash(featureName + name);
+            externalId = Utils.getHash(story.getPath() + name);
         }
 
         if (displayName.isEmpty()) {
