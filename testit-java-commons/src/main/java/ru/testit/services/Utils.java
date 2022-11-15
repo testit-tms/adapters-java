@@ -4,8 +4,8 @@ import ru.testit.annotations.*;
 import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 
-import javax.xml.bind.DatatypeConverter;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -145,9 +145,18 @@ public class Utils {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(value.getBytes(StandardCharsets.UTF_8));
             byte[] digest = md.digest();
-            return DatatypeConverter.printHexBinary(digest);
+            return convertToHex(digest);
         } catch (NoSuchAlgorithmException e) {
             return value;
         }
+    }
+
+    private static String convertToHex(final byte[] messageDigest) {
+        BigInteger bigint = new BigInteger(1, messageDigest);
+        String hexText = bigint.toString(16);
+        while (hexText.length() < 32) {
+            hexText = "0".concat(hexText);
+        }
+        return hexText.toUpperCase();
     }
 }
