@@ -7,9 +7,9 @@ import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.TestRunStateTypeModel;
 import ru.testit.client.model.TestRunV2GetModel;
-import ru.testit.client.model.TestRunV2PostShortModel;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
+import ru.testit.listener.ListenerManager;
 import ru.testit.models.*;
 import ru.testit.properties.AdapterConfig;
 import ru.testit.properties.AdapterMode;
@@ -33,6 +33,8 @@ public class AdapterManagerTest {
     private AdapterConfig adapterConfig;
     private ClientConfiguration clientConfiguration;
 
+    private ListenerManager listenerManager;
+
     private final static String TEST_RUN_ID = "5819479d-e38b-40d0-9e35-c5b2dab50158";
 
     @BeforeEach
@@ -44,6 +46,7 @@ public class AdapterManagerTest {
         this.client = mock(ApiClient.class);
         this.adapterConfig = mock(AdapterConfig.class);
         this.clientConfiguration = mock(ClientConfiguration.class);
+        this.listenerManager = mock(ListenerManager.class);
 
         when(clientConfiguration.getUrl()).thenReturn("https://example.test/");
         when(clientConfiguration.getProjectId()).thenReturn("d7defd1e-c1ed-400d-8be8-091ebfdda744");
@@ -55,7 +58,7 @@ public class AdapterManagerTest {
     @Test
     void startTests_WithTestRunId_NoInvokeCreateHandler() throws ApiException {
         // arrange
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startTests();
@@ -75,7 +78,7 @@ public class AdapterManagerTest {
 
         when(client.createTestRun()).thenReturn(response);
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startTests();
@@ -97,7 +100,7 @@ public class AdapterManagerTest {
 
         when(client.createTestRun()).thenReturn(response);
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startTests();
@@ -115,7 +118,7 @@ public class AdapterManagerTest {
 
         when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopTests();
@@ -132,7 +135,7 @@ public class AdapterManagerTest {
 
         when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopTests();
@@ -147,7 +150,7 @@ public class AdapterManagerTest {
         MainContainer container = Helper.generateMainContainer();
         container.setStart(null);
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startMainContainer(container);
@@ -166,7 +169,7 @@ public class AdapterManagerTest {
 
         when(storage.getTestsContainer(uuid)).thenReturn(Optional.of(container));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopMainContainer(uuid);
@@ -185,7 +188,7 @@ public class AdapterManagerTest {
 
         when(storage.getTestsContainer(uuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopMainContainer(container.getUuid());
@@ -206,7 +209,7 @@ public class AdapterManagerTest {
 
         when(storage.getTestsContainer(parentUuid)).thenReturn(Optional.of(testContainer));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startClassContainer(parentUuid, classContainer);
@@ -228,7 +231,7 @@ public class AdapterManagerTest {
 
         when(storage.getTestsContainer(parentUuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startClassContainer(parentUuid, classContainer);
@@ -248,7 +251,7 @@ public class AdapterManagerTest {
 
         when(storage.getClassContainer(uuid)).thenReturn(Optional.of(container));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopClassContainer(uuid);
@@ -267,7 +270,7 @@ public class AdapterManagerTest {
 
         when(storage.getClassContainer(uuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopClassContainer(uuid);
@@ -285,7 +288,7 @@ public class AdapterManagerTest {
 
         when(storage.getClassContainer(uuid)).thenReturn(Optional.of(container));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateClassContainer(uuid, update);
@@ -302,7 +305,7 @@ public class AdapterManagerTest {
 
         when(storage.getClassContainer(uuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateClassContainer(uuid, update);
@@ -320,7 +323,7 @@ public class AdapterManagerTest {
 
         when(storage.getTestResult(uuid)).thenReturn(Optional.of(result));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startTestCase(uuid);
@@ -341,7 +344,7 @@ public class AdapterManagerTest {
 
         when(storage.getTestResult(uuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startTestCase(uuid);
@@ -358,7 +361,7 @@ public class AdapterManagerTest {
         // arrange
         TestResult result = Helper.generateTestResult();
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.scheduleTestCase(result);
@@ -377,7 +380,7 @@ public class AdapterManagerTest {
         when(threadContext.getRoot()).thenReturn(Optional.of(uuid));
         when(storage.getTestResult(uuid)).thenReturn(Optional.of(result));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateTestCase(update);
@@ -393,7 +396,7 @@ public class AdapterManagerTest {
 
         when(threadContext.getRoot()).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateTestCase(update);
@@ -411,7 +414,7 @@ public class AdapterManagerTest {
         when(threadContext.getRoot()).thenReturn(Optional.of(uuid));
         when(storage.getTestResult(uuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateTestCase(update);
@@ -429,7 +432,7 @@ public class AdapterManagerTest {
 
         when(storage.getTestResult(uuid)).thenReturn(Optional.of(result));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopTestCase(uuid);
@@ -450,7 +453,7 @@ public class AdapterManagerTest {
 
         when(storage.getTestResult(uuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopTestCase(uuid);
@@ -475,7 +478,7 @@ public class AdapterManagerTest {
         when(storage.getTestsContainer(parentUuid))
                 .thenReturn(Optional.of(container));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startPrepareFixtureAll(parentUuid, uuid, result);
@@ -502,7 +505,7 @@ public class AdapterManagerTest {
         when(storage.getTestsContainer(parentUuid))
                 .thenReturn(Optional.of(container));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startTearDownFixtureAll(parentUuid, uuid, result);
@@ -529,7 +532,7 @@ public class AdapterManagerTest {
         when(storage.getClassContainer(parentUuid))
                 .thenReturn(Optional.of(container));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startPrepareFixture(parentUuid, uuid, result);
@@ -556,7 +559,7 @@ public class AdapterManagerTest {
         when(storage.getClassContainer(parentUuid))
                 .thenReturn(Optional.of(container));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startTearDownFixture(parentUuid, uuid, result);
@@ -583,7 +586,7 @@ public class AdapterManagerTest {
         when(storage.getClassContainer(parentUuid))
                 .thenReturn(Optional.of(container));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startPrepareFixtureEachTest(parentUuid, uuid, result);
@@ -610,7 +613,7 @@ public class AdapterManagerTest {
         when(storage.getClassContainer(parentUuid))
                 .thenReturn(Optional.of(container));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startTearDownFixtureEachTest(parentUuid, uuid, result);
@@ -632,7 +635,7 @@ public class AdapterManagerTest {
 
         when(storage.getFixture(uuid)).thenReturn(Optional.of(result));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateFixture(uuid, update);
@@ -649,7 +652,7 @@ public class AdapterManagerTest {
 
         when(storage.getFixture(uuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateFixture(uuid, update);
@@ -667,7 +670,7 @@ public class AdapterManagerTest {
 
         when(storage.getFixture(uuid)).thenReturn(Optional.of(result));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopFixture(uuid);
@@ -687,7 +690,7 @@ public class AdapterManagerTest {
 
         when(storage.getFixture(uuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopFixture(uuid);
@@ -709,7 +712,7 @@ public class AdapterManagerTest {
         when(threadContext.getCurrent()).thenReturn(Optional.of(parentUuid));
         when(storage.get(parentUuid, ResultWithSteps.class)).thenReturn(Optional.of(result));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startStep(uuid, result);
@@ -731,7 +734,7 @@ public class AdapterManagerTest {
 
         when(threadContext.getCurrent()).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.startStep(uuid, result);
@@ -753,7 +756,7 @@ public class AdapterManagerTest {
         when(threadContext.getCurrent()).thenReturn(Optional.of(uuid));
         when(storage.getStep(uuid)).thenReturn(Optional.of(result));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateStep(update);
@@ -769,7 +772,7 @@ public class AdapterManagerTest {
 
         when(threadContext.getCurrent()).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateStep(update);
@@ -787,7 +790,7 @@ public class AdapterManagerTest {
         when(threadContext.getCurrent()).thenReturn(Optional.of(uuid));
         when(storage.getStep(uuid)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.updateStep(update);
@@ -808,7 +811,7 @@ public class AdapterManagerTest {
         when(threadContext.getCurrent()).thenReturn(Optional.of(current));
         when(storage.getStep(current)).thenReturn(Optional.of(result));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopStep();
@@ -829,7 +832,7 @@ public class AdapterManagerTest {
         when(threadContext.getRoot()).thenReturn(Optional.of(root));
         when(threadContext.getCurrent()).thenReturn(Optional.of(root));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopStep();
@@ -850,7 +853,7 @@ public class AdapterManagerTest {
         when(threadContext.getRoot()).thenReturn(Optional.empty());
         when(threadContext.getCurrent()).thenReturn(Optional.of(current));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopStep();
@@ -871,7 +874,7 @@ public class AdapterManagerTest {
         when(threadContext.getRoot()).thenReturn(Optional.of(root));
         when(threadContext.getCurrent()).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopStep();
@@ -893,7 +896,7 @@ public class AdapterManagerTest {
         when(threadContext.getCurrent()).thenReturn(Optional.of(root));
         when(storage.getStep(root)).thenReturn(Optional.empty());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.stopStep();
@@ -914,7 +917,7 @@ public class AdapterManagerTest {
         when(threadContext.getCurrent()).thenReturn(Optional.of(result.getUuid()));
         when(storage.get(result.getUuid(), ResultWithAttachments.class)).thenReturn(Optional.of(result));
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         manager.addAttachments(new ArrayList<String>() {{
@@ -931,7 +934,7 @@ public class AdapterManagerTest {
         // arrange
         when(adapterConfig.getMode()).thenReturn(AdapterMode.USE_FILTER);
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         Boolean result = manager.isFilteredMode();
@@ -945,7 +948,7 @@ public class AdapterManagerTest {
         // arrange
         when(adapterConfig.getMode()).thenReturn(AdapterMode.RUN_ALL_TESTS);
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         Boolean result = manager.isFilteredMode();
@@ -963,7 +966,7 @@ public class AdapterManagerTest {
         when(clientConfiguration.getConfigurationId()).thenReturn("4321");
         when(client.getTestFromTestRun("1234", "4321")).thenReturn(testForRuns);
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         List<String> result = manager.getTestFromTestRun();
@@ -980,7 +983,7 @@ public class AdapterManagerTest {
         when(clientConfiguration.getConfigurationId()).thenReturn("4321");
         when(client.getTestFromTestRun("1234", "4321")).thenThrow(new ApiException());
 
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client);
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
         List<String> result = manager.getTestFromTestRun();

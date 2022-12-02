@@ -348,6 +348,8 @@ maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId
 
 If you want to enable debug mode then see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
 
+If you want to add attachment for a failed test then see [How to add an attachment for a failed test?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+
 ### Meta
 
 Use tags to specify information about autotest.

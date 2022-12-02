@@ -8,10 +8,12 @@ import ru.testit.properties.AppProperties;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public final class Adapter {
@@ -99,6 +101,28 @@ public final class Adapter {
             BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset());
             writer.write(content);
             writer.close();
+        } catch (IOException e) {
+            LOGGER.error(String.format("Can not write file '%s':", fileName), e);
+        }
+
+        addAttachments(fileName);
+
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            LOGGER.error(String.format("Can not delete file '%s':", fileName), e);
+        }
+    }
+
+    public static void addAttachments(String fileName, InputStream inputStream) {
+        if (fileName == null) {
+            LOGGER.error("Attachment name is empty");
+            return;
+        }
+
+        Path path = Paths.get(fileName);
+        try {
+            Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LOGGER.error(String.format("Can not write file '%s':", fileName), e);
         }

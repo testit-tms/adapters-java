@@ -8,6 +8,9 @@ import ru.testit.client.model.TestRunV2GetModel;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.TmsApiClient;
+import ru.testit.listener.AdapterListener;
+import ru.testit.listener.ListenerManager;
+import ru.testit.listener.ServiceLoaderListener;
 import ru.testit.models.*;
 import ru.testit.properties.AdapterConfig;
 import ru.testit.properties.AdapterMode;
@@ -32,7 +35,13 @@ public class AdapterManager {
     private final ClientConfiguration clientConfiguration;
     private final AdapterConfig adapterConfig;
 
+    private final ListenerManager listenerManager;
+
     public AdapterManager(ClientConfiguration clientConfiguration, AdapterConfig adapterConfig) {
+        this(clientConfiguration, adapterConfig, getDefaultListenerManager());
+    }
+
+    public AdapterManager(ClientConfiguration clientConfiguration, AdapterConfig adapterConfig, ListenerManager listenerManager) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Client configurations: {}", clientConfiguration);
             LOGGER.debug("Adapter configurations: {}", adapterConfig);
@@ -45,6 +54,7 @@ public class AdapterManager {
         this.threadContext = new ThreadContext();
         this.client = new TmsApiClient(this.clientConfiguration);
         this.writer = new HttpWriter(this.clientConfiguration, this.client, this.storage);
+        this.listenerManager = listenerManager;
     }
 
     public AdapterManager(
@@ -53,7 +63,8 @@ public class AdapterManager {
             ThreadContext threadContext,
             ResultStorage storage,
             Writer writer,
-            ApiClient client
+            ApiClient client,
+            ListenerManager listenerManager
     ) {
         this.adapterConfig = adapterConfig;
         this.clientConfiguration = clientConfiguration;
@@ -61,6 +72,7 @@ public class AdapterManager {
         this.storage = storage;
         this.writer = writer;
         this.client = client;
+        this.listenerManager = listenerManager;
     }
 
     public void startTests() {
@@ -284,6 +296,8 @@ public class AdapterManager {
             return;
         }
         final TestResult testResult = found.get();
+
+        listenerManager.beforeTestStop(testResult);
 
         testResult.setItemStage(ItemStage.FINISHED)
                 .setStop(System.currentTimeMillis());
@@ -665,5 +679,10 @@ public class AdapterManager {
                 LOGGER.error(error);
                 throw new RuntimeException(error);
         }
+    }
+
+    private static ListenerManager getDefaultListenerManager() {
+        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        return new ListenerManager(ServiceLoaderListener.load(AdapterListener.class, classLoader));
     }
 }
