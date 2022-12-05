@@ -345,12 +345,12 @@ test {
    * `PROJECT_ID` - ID of a project in TMS instance.
       1. Create a project.
       2. Open DevTools > Network.
-      3. Go to the project `https://{DOMAIN}/projects/20/tests`.
+      3. Go to the project `https://{DOMAIN}/projects/{PROJECT_GLOBAL_ID}/tests`.
       4. GET-request project, Preview tab, copy iID field.
    * `CONFIGURATION_ID` - ID of a configuration in TMS instance.
       1. Create a project.
       2. Open DevTools > Network.
-      3. Go to the project `https://{DOMAIN}/projects/20/tests`.
+      3. Go to the project `https://{DOMAIN}/projects/{PROJECT_GLOBAL_ID}/tests`.
       4. GET-request configurations, Preview tab, copy id field.
          
    * `TEST_RUN_ID` - ID of the created test-run in TMS instance. `TEST_RUN_ID` is optional. If it is not provided, it is created automatically.
