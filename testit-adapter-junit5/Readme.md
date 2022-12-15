@@ -332,8 +332,8 @@ public class SimpleTest {
    @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
            @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
-   public void itsTrueReallyTrue() {
-       stepWithParams("password", 456);
+   public void itsTrueReallyTrue() { 
+      stepWithParams("password", 456);
       Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
       Assertions.assertTrue(true);
    }
@@ -342,7 +342,7 @@ public class SimpleTest {
    @Title("Step 1 with params: {param1}, {param2}")
    @Description("Step 1 description and params: {param1}, {param2}")
    private void stepWithParams(String param1, int param2) {
-       stepWithoutParams();
+      stepWithoutParams();
       Assertions.assertTrue(true);
       Adapter.addMessage("Message");
    }

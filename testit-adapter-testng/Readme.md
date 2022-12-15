@@ -301,7 +301,7 @@ public class SampleTests {
     @Description("Step 1 description and params: {param1}, {param2}")
     private void stepWithParams(String param1, int param2) {
         stepWithoutParams();
-        Assertions.assertTrue(true);
+        Assert.assertTrue(true);
         Adapter.addMessage("Message");
     }
 
@@ -309,7 +309,7 @@ public class SampleTests {
     @Title("Step 2")
     @Description("Step 2 description")
     private void stepWithoutParams() {
-        Assertions.assertTrue(true);
+        Assert.assertTrue(true);
         Adapter.addAttachment("/Users/user/screen.json");
     }
 
