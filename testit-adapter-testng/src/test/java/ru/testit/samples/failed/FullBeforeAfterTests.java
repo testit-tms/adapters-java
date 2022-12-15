@@ -24,13 +24,15 @@ public class FullBeforeAfterTests {
     }
 
     @Step
-    @Title("Set login")
+    @Title("Set login: {login}")
+    @Description("Login \"{login}\" has been set")
     public boolean setLogin(String login) {
         return login.equals("User_1");
     }
 
     @Step
-    @Title("Set password")
+    @Title("Set password: {password}")
+    @Description("Password \"{password}\" has been set")
     public boolean setPassword(String password) {
         return password.equals("Pass123");
     }
