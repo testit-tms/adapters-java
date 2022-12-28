@@ -125,7 +125,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             InvocationInterceptor.Invocation<Void> invocation,
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
-    ) throws Exception {
+    ) throws Throwable {
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Intercept test template: {}", invocationContext.getExecutable().getName());
@@ -149,7 +149,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             invocation.proceed();
         } catch (Throwable throwable) {
             stopTestCase(executableTest.getUuid(), throwable, ItemStatus.FAILED);
-            throw new Exception(throwable.getMessage());
+            throw throwable;
         }
     }
 
@@ -181,7 +181,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             InvocationInterceptor.Invocation<Void> invocation,
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
-    ) throws Exception {
+    ) throws Throwable {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Intercept test: {}", invocationContext.getExecutable().getName());
         }
@@ -202,7 +202,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             invocation.proceed();
         } catch (Throwable throwable) {
             stopTestCase(executableTest.getUuid(), throwable, ItemStatus.FAILED);
-            throw new Exception(throwable.getMessage());
+            throw throwable;
         }
     }
 
