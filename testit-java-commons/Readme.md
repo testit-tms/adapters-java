@@ -35,7 +35,7 @@ public class AttachmentManager implements AdapterListener {
 }
 ```
 
-After that, you need to add file **ru.testit.listener.AdapterListener** to **resources/META-INT/services** folder:
+After that, you need to add file **ru.testit.listener.AdapterListener** to **resources/META-INF/services** folder:
 ```text
 <your-package>.AttachmentManager
 ```
