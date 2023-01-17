@@ -3,7 +3,7 @@ package ru.testit.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.TestRunStateTypeModel;
+import ru.testit.client.model.TestRunState;
 import ru.testit.client.model.TestRunV2GetModel;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
@@ -102,7 +102,7 @@ public class AdapterManager {
         try {
             TestRunV2GetModel testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
 
-            if (testRun.getStateName() != TestRunStateTypeModel.COMPLETED) {
+            if (testRun.getStateName() != TestRunState.COMPLETED) {
                 this.client.completeTestRun(this.clientConfiguration.getTestRunId());
             }
         } catch (ApiException e) {

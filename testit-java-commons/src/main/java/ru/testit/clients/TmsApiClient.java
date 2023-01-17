@@ -9,10 +9,7 @@ import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TmsApiClient implements ApiClient {
@@ -29,7 +26,7 @@ public class TmsApiClient implements ApiClient {
     private final ClientConfiguration clientConfiguration;
 
     public TmsApiClient(ClientConfiguration config) {
-        ApiClientExtended apiClient = new ApiClientExtended();
+        ru.testit.client.invoker.ApiClient apiClient = new ru.testit.client.invoker.ApiClient();
         apiClient.setBasePath(config.getUrl());
         apiClient.setApiKeyPrefix(AUTH_PREFIX);
         apiClient.setApiKey(config.getPrivateToken());
@@ -81,16 +78,36 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public String createAutoTest(AutoTestPostModel model) throws ApiException {
-        return autoTestsApi.createAutoTest(model).getId().toString();
+        return Objects.requireNonNull(autoTestsApi.createAutoTest(model).getId()).toString();
     }
 
     @Override
     public AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException {
-        List<AutoTestModel> tests = autoTestsApi.getAllAutoTests(UUID.fromString(this.clientConfiguration.getProjectId()),
-                externalId, null, null, null, null,
-                null, null, null, null, null, null,
-                null, null, null, null, null, null,
-                INCLUDE_STEPS, INCLUDE_LABELS, null, null, null, null, null);
+
+        AutotestFilterModel filter = new AutotestFilterModel();
+
+        Set<UUID> projectIds = new HashSet<>();
+        projectIds.add(UUID.fromString(this.clientConfiguration.getProjectId()));
+        filter.setProjectIds(projectIds);
+
+        Set<String> externalIds = new HashSet<>();
+        externalIds.add(externalId);
+        filter.externalIds(externalIds);
+
+        SearchAutoTestsQueryIncludesModel includes = new SearchAutoTestsQueryIncludesModel();
+        includes.setIncludeLabels(INCLUDE_LABELS);
+        includes.setIncludeSteps(INCLUDE_STEPS);
+
+        AutotestsSelectModel model = new AutotestsSelectModel();
+        model.setFilter(filter);
+        model.setIncludes(includes);
+
+        List<AutoTestModel> tests = autoTestsApi.apiV2AutoTestsSearchPost(null,
+                null,
+                null,
+                null,
+                null,
+                model);
 
         if ((long) tests.size() == 0) {
             return null;
@@ -121,12 +138,12 @@ public class TmsApiClient implements ApiClient {
         TestRunV2GetModel model = testRunsApi.getTestRunById(UUID.fromString(testRunUuid));
         UUID configUUID = UUID.fromString(configurationId);
 
-        if (model.getTestResults().size() == 0) {
+        if (Objects.requireNonNull(model.getTestResults()).size() == 0) {
             return new ArrayList<>();
         }
 
         return model.getTestResults().stream()
-                .filter(result -> result.getConfigurationId().equals(configUUID))
-                .map(result -> result.getAutoTest().getExternalId()).collect(Collectors.toList());
+                .filter(result -> Objects.equals(result.getConfigurationId(), configUUID))
+                .map(result -> Objects.requireNonNull(result.getAutoTest()).getExternalId()).collect(Collectors.toList());
     }
 }
