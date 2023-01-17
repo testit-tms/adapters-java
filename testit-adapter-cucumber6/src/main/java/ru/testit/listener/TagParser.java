@@ -31,8 +31,7 @@ public class TagParser {
     private String displayName = "";
     private String description = "";
 
-    TagParser(final Feature feature, final TestCase scenario, final Deque<String> tags) {
-
+    TagParser(final Feature feature, final TestCase scenario, final Deque<String> tags, Map<String, String> parameters) {
         while (tags.peek() != null) {
             final String tag = tags.remove();
 
@@ -48,30 +47,30 @@ public class TagParser {
 
                 switch (tagKey) {
                     case EXTERNAL_ID:
-                        externalId = tagValue;
+                        externalId = Utils.setParameters(tagValue, parameters);
                         break;
                     case TITLE:
-                        title = tagKey;
+                        title = Utils.setParameters(tagValue, parameters);
                         break;
                     case DISPLAY_NAME:
-                        displayName = tagValue;
+                        displayName = Utils.setParameters(tagValue, parameters);
                         break;
                     case DESCRIPTION:
-                        description = tagValue;
+                        description = Utils.setParameters(tagValue, parameters);
                         break;
                     case LABELS:
-                        Arrays.stream(tagValue.split(TAG_VALUE_DELIMITER))
+                        Arrays.stream(Utils.setParameters(tagValue, parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(label -> getScenarioLabels().add(getTagLabel(label)));
                         break;
                     case LINKS:
-                        if (isJson(tagValue)) {
+                        if (isJson(Utils.setParameters(tagValue, parameters))) {
                             getScenarioLinks().add(getLinkItem(tagValue));
-                        } else if (isJsonArray(tagValue)) {
-                            getScenarioLinks().addAll(getLinkItems(tagValue));
+                        } else if (isJsonArray(Utils.setParameters(tagValue, parameters))) {
+                            getScenarioLinks().addAll(getLinkItems(Utils.setParameters(tagValue, parameters)));
                         }
                         break;
                     case WORK_ITEM_IDS:
-                        Arrays.stream(tagValue.split(TAG_VALUE_DELIMITER))
+                        Arrays.stream(Utils.setParameters(tagValue, parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(id -> getWorkItemIds().add(id));
                         break;
                 }

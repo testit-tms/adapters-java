@@ -1,7 +1,9 @@
 package ru.testit.listener;
 
+import io.cucumber.messages.types.Examples;
 import io.cucumber.messages.types.Feature;
 import io.cucumber.messages.types.Scenario;
+import io.cucumber.messages.types.TableRow;
 import io.cucumber.plugin.ConcurrentEventListener;
 import io.cucumber.plugin.event.*;
 import ru.testit.models.*;
@@ -14,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class BaseCucumber7Listener implements ConcurrentEventListener {
@@ -89,10 +92,20 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
         currentTestCase.set(event.getTestCase());
         forbidTestCaseStatusChange.set(false);
 
+        final Scenario scenarioDefinition =
+                scenarioParser.getScenarioDefinition(currentFeatureFile.get(), currentTestCase.get().getLine());
+
+        Map<String, String> parameters = new HashMap<>();
+
+        if (scenarioDefinition.getExamples() != null) {
+            parameters =
+                    getExamplesAsParameters(scenarioDefinition, currentTestCase.get());
+        }
+
         final Deque<String> tags = new LinkedList<>(currentTestCase.get().getTags());
 
         final Feature feature = currentFeature.get();
-        final TagParser tagParser = new TagParser(feature, currentTestCase.get(), tags);
+        final TagParser tagParser = new TagParser(feature, currentTestCase.get(), tags, parameters);
 
         final String featureName = feature.getName();
         final String uuid = getTestCaseUuid(currentTestCase.get());
@@ -106,10 +119,8 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
                 .setWorkItemId(tagParser.getWorkItemIds())
                 .setClassName(featureName)
                 .setLabels(tagParser.getScenarioLabels())
-                .setLinkItems(tagParser.getScenarioLinks());
-
-        final Scenario scenarioDefinition =
-                scenarioParser.getScenarioDefinition(currentFeatureFile.get(), currentTestCase.get().getLine());
+                .setLinkItems(tagParser.getScenarioLinks())
+                .setParameters(parameters);
 
         final String description = Stream.of(feature.getDescription(), scenarioDefinition.getDescription())
                 .filter(Objects::nonNull)
@@ -124,6 +135,44 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
         adapterManager.startTestCase(getTestCaseUuid(currentTestCase.get()));
         adapterManager.updateClassContainer(classUUID.get(),
                 container -> container.getChildren().add(uuid));
+    }
+
+    private Map<String, String> getExamplesAsParameters(
+            final Scenario scenario, final TestCase localCurrentTestCase
+    ) {
+        final Optional<Examples> maybeExample =
+                scenario.getExamples().stream()
+                        .filter(example -> example.getTableBody().stream()
+                                .anyMatch(row -> row.getLocation().getLine()
+                                        == localCurrentTestCase.getLocation().getLine())
+                        )
+                        .findFirst();
+
+        if (!maybeExample.isPresent()) {
+            return Collections.emptyMap();
+        }
+
+        final Examples examples = maybeExample.get();
+
+        final Optional<TableRow> maybeRow = examples.getTableBody().stream()
+                .filter(example -> example.getLocation().getLine() == localCurrentTestCase.getLocation().getLine())
+                .findFirst();
+
+        if (!maybeRow.isPresent()) {
+            return Collections.emptyMap();
+        }
+
+        final TableRow row = maybeRow.get();
+        final Map<String, String> parameters = new HashMap<>();
+
+        IntStream.range(0, examples.getTableHeader().get().getCells().size()).forEach
+                (index -> {
+                    final String name = examples.getTableHeader().get().getCells().get(index).getValue();
+                    final String value = row.getCells().get(index).getValue();
+                    parameters.put(name, value);
+                });
+
+        return parameters;
     }
 
     private void testFinished(final TestCaseFinished event) {
