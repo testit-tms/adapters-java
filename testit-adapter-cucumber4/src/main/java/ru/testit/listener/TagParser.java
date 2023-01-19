@@ -66,10 +66,10 @@ public class TagParser {
                                 .forEach(label -> getScenarioLabels().add(getTagLabel(label)));
                         break;
                     case LINKS:
-                        if (isJson(Utils.setParameters(tagValue, parameters))) {
+                        if (isJson(tagValue)) {
                             getScenarioLinks().add(getLinkItem(tagValue));
-                        } else if (isJsonArray(Utils.setParameters(tagValue, parameters))) {
-                            getScenarioLinks().addAll(getLinkItems(Utils.setParameters(tagValue, parameters)));
+                        } else if (isJsonArray(tagValue)) {
+                            getScenarioLinks().addAll(getLinkItems(tagValue));
                         }
                         break;
                     case WORK_ITEM_IDS:
