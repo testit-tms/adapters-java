@@ -2,8 +2,7 @@ package ru.testit.listener;
 
 import cucumber.api.*;
 import cucumber.api.event.*;
-import gherkin.ast.Feature;
-import gherkin.ast.ScenarioDefinition;
+import gherkin.ast.*;
 import gherkin.pickles.PickleTag;
 import ru.testit.models.*;
 import ru.testit.services.Adapter;
@@ -14,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class BaseCucumber4Listener implements ConcurrentEventListener {
@@ -89,10 +89,20 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
         currentTestCase.set(event.getTestCase());
         forbidTestCaseStatusChange.set(false);
 
+        final ScenarioDefinition scenarioDefinition =
+                scenarioParser.getScenarioDefinition(currentFeatureFile.get(), currentTestCase.get().getLine());
+
+        Map<String, String> parameters = new HashMap<>();
+
+        if (scenarioDefinition instanceof ScenarioOutline) {
+            parameters =
+                    getParameters((ScenarioOutline) scenarioDefinition, currentTestCase.get());
+        }
+
         final Deque<PickleTag> tags = new LinkedList<>(currentTestCase.get().getTags());
 
         final Feature feature = currentFeature.get();
-        final TagParser tagParser = new TagParser(feature, currentTestCase.get(), tags);
+        final TagParser tagParser = new TagParser(feature, currentTestCase.get(), tags, parameters);
 
         final String featureName = feature.getName();
         final String uuid = getTestCaseUuid(currentTestCase.get());
@@ -106,10 +116,8 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
                 .setWorkItemId(tagParser.getWorkItemIds())
                 .setClassName(featureName)
                 .setLabels(tagParser.getScenarioLabels())
-                .setLinkItems(tagParser.getScenarioLinks());
-
-        final ScenarioDefinition scenarioDefinition =
-                scenarioParser.getScenarioDefinition(currentFeatureFile.get(), currentTestCase.get().getLine());
+                .setLinkItems(tagParser.getScenarioLinks())
+                .setParameters(parameters);
 
         final String description = Stream.of(feature.getDescription(), scenarioDefinition.getDescription())
                 .filter(Objects::nonNull)
@@ -124,6 +132,33 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
         adapterManager.startTestCase(getTestCaseUuid(currentTestCase.get()));
         adapterManager.updateClassContainer(classUUID.get(),
                 container -> container.getChildren().add(uuid));
+    }
+
+    private Map<String, String> getParameters(
+            final ScenarioOutline scenarioOutline, final TestCase localCurrentTestCase
+    ) {
+        final Optional<Examples> examplesBlock =
+                scenarioOutline.getExamples().stream()
+                        .filter(example -> example.getTableBody().stream()
+                                .anyMatch(row -> row.getLocation().getLine() == localCurrentTestCase.getLine())
+                        ).findFirst();
+
+        if (examplesBlock.isPresent()) {
+            final TableRow row = examplesBlock.get().getTableBody().stream()
+                    .filter(example -> example.getLocation().getLine() == localCurrentTestCase.getLine())
+                    .findFirst().get();
+            final Map<String, String> parameters = new HashMap<>();
+
+            IntStream.range(0, examplesBlock.get().getTableHeader().getCells().size()).forEach(index -> {
+                final String name = examplesBlock.get().getTableHeader().getCells().get(index).getValue();
+                final String value = row.getCells().get(index).getValue();
+                parameters.put(name, value);
+            });
+
+            return parameters;
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     private void testFinished(final TestCaseFinished event) {

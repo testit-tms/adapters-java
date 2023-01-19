@@ -122,7 +122,7 @@ public class Utils {
         return sb.toString();
     }
 
-    private static String setParameters(String value, Map<String, String> parameters) {
+    public static String setParameters(String value, Map<String, String> parameters) {
         if (!isNull(parameters) && !isNull(value)) {
             Pattern pattern = Pattern.compile("\\{\\s*(\\w+)}");
             Matcher matcher = pattern.matcher(value);
