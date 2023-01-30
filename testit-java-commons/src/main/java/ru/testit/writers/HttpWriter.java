@@ -147,7 +147,7 @@ public class HttpWriter implements Writer {
 
                                             AutoTestPutModel autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
 
-                                            List<AutoTestStepModel> beforeFinish = beforeAll;
+                                            List<AutoTestStepModel> beforeFinish =  new ArrayList<>(beforeAll);
                                             beforeFinish.addAll(autoTestPutModel.getSetup());
                                             autoTestPutModel.setSetup(beforeFinish);
 
