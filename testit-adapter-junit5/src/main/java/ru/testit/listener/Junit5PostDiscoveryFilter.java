@@ -42,8 +42,6 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
             return FilterResult.included("filter only applied for tests");
         }
 
-        LOGGER.info("Object type: " + object.getType());
-
         final Optional<TestSource> testSource = object.getSource();
         if (testSource.isPresent()) {
             final MethodSource methodSource = (MethodSource) testSource.get();
@@ -54,12 +52,8 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
                 return filterTestWithParameters(externalId);
             }
 
-            LOGGER.info("Object filter: true");
-
             return filterSimpleTest(externalId);
         }
-
-        LOGGER.info("Object filter: false");
 
         return FilterResult.excluded("Incorrect type");
     }
