@@ -60,7 +60,7 @@ public class Converter {
         model.setStartedOn(dateToOffsetDateTime(result.getStart()));
         model.setCompletedOn(dateToOffsetDateTime(result.getStop()));
         model.setDuration(result.getStop() - result.getStart());
-        model.setOutcome(result.getItemStatus().value());
+        model.setOutcome(AvailableTestResultOutcome.fromValue(result.getItemStatus().value()));
         model.setStepResults(convertResultStep(result.getSteps()));
         model.attachments(convertAttachments(result.getAttachments()));
         model.setMessage(result.getMessage());
@@ -86,7 +86,7 @@ public class Converter {
                             model.setStartedOn(dateToOffsetDateTime(fixture.getStart()));
                             model.setCompletedOn(dateToOffsetDateTime(fixture.getStop()));
                             model.setDuration(fixture.getStop() - fixture.getStart());
-                            model.setOutcome(fixture.getItemStatus().value());
+                            model.setOutcome(AvailableTestResultOutcome.fromValue(fixture.getItemStatus().value()));
                             model.setStepResults(convertResultStep(fixture.getSteps()));
                             model.attachments(convertAttachments(fixture.getAttachments()));
                             model.parameters(fixture.getParameters());
@@ -184,7 +184,7 @@ public class Converter {
             model.setStartedOn(dateToOffsetDateTime(step.getStart()));
             model.setCompletedOn(dateToOffsetDateTime(step.getStop()));
             model.setDuration(step.getStop() - step.getStart());
-            model.setOutcome(step.getItemStatus().value());
+            model.setOutcome(AvailableTestResultOutcome.fromValue(step.getItemStatus().value()));
             model.setStepResults(convertResultStep(step.getSteps()));
             model.attachments(convertAttachments(step.getAttachments()));
             model.parameters(step.getParameters());

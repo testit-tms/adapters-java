@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.TestRunStateTypeModel;
+import ru.testit.client.model.TestRunState;
 import ru.testit.client.model.TestRunV2GetModel;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
@@ -114,7 +114,7 @@ public class AdapterManagerTest {
     void stopTests_WithCompletedTestRun_NoInvokeCompleteHandler() throws ApiException {
         // arrange
         TestRunV2GetModel response = new TestRunV2GetModel();
-        response.setStateName(TestRunStateTypeModel.COMPLETED);
+        response.setStateName(TestRunState.COMPLETED);
 
         when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
 
@@ -131,7 +131,7 @@ public class AdapterManagerTest {
     void stopTests_WithInProgressTestRun_InvokeCompleteHandler() throws ApiException {
         // arrange
         TestRunV2GetModel response = new TestRunV2GetModel();
-        response.setStateName(TestRunStateTypeModel.INPROGRESS);
+        response.setStateName(TestRunState.INPROGRESS);
 
         when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
 
