@@ -1,6 +1,8 @@
 Feature: Rule
   Tests that use Rule
 
+  @DisplayName=sum:{left}+{right}={result}
+  @ExternalId={result}
   Scenario Outline: Summing
     When Summing <left>+<right>
     Then Result is <result>

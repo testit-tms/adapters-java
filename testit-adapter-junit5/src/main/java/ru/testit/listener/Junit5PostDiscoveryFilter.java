@@ -2,6 +2,7 @@ package ru.testit.listener;
 
 import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 import org.junit.platform.launcher.PostDiscoveryFilter;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import ru.testit.services.AdapterManager;
 import ru.testit.services.Utils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,14 +42,20 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
             return FilterResult.included("filter only applied for tests");
         }
 
-        final MethodSource source = (MethodSource) object.getSource().get();
-        String externalId = Utils.extractExternalID(source.getJavaMethod(), null);
+        final Optional<TestSource> testSource = object.getSource();
+        if (testSource.isPresent()) {
+            final MethodSource methodSource = (MethodSource) testSource.get();
 
-        if (externalId.matches("\\{.*}")) {
-            return filterTestWithParameters(externalId);
+            String externalId = Utils.extractExternalID(methodSource.getJavaMethod(), null);
+
+            if (externalId.matches("\\{.*}")) {
+                return filterTestWithParameters(externalId);
+            }
+
+            return filterSimpleTest(externalId);
         }
 
-        return filterSimpleTest(externalId);
+        return FilterResult.excluded("Incorrect type");
     }
 
     private FilterResult filterSimpleTest(String externalId) {
