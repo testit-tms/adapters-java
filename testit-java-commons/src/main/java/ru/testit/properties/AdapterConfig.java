@@ -7,6 +7,7 @@ import java.util.Properties;
 
 public class AdapterConfig implements Serializable {
     private final AdapterMode mode;
+    private final boolean createTestCases;
 
     public AdapterConfig(Properties properties) {
         String modeValue = String.valueOf(properties.get(AppProperties.ADAPTER_MODE));
@@ -14,10 +15,16 @@ public class AdapterConfig implements Serializable {
             modeValue = "0";
         }
         this.mode = AdapterMode.valueOf(Integer.parseInt(modeValue));
+        this.createTestCases = Boolean.parseBoolean(
+                String.valueOf(properties.get(AppProperties.CREATE_TEST_CASES)));
     }
 
     public AdapterMode getMode() {
         return mode;
+    }
+
+    public boolean mustCreateTestCases() {
+        return createTestCases;
     }
 
     public String toString() {
@@ -25,6 +32,7 @@ public class AdapterConfig implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append("class AdapterConfig {\n");
         sb.append("    mode: ").append(Utils.toIndentedString(this.mode)).append("\n");
+        sb.append("    createTestCases: ").append(Utils.toIndentedString(this.createTestCases)).append("\n");
         sb.append("}");
 
         return sb.toString();

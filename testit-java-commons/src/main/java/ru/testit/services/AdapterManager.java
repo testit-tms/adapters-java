@@ -239,7 +239,8 @@ public class AdapterManager {
      * @param result the test case to schedule.
      */
     public void scheduleTestCase(final TestResult result) {
-        result.setItemStage(ItemStage.SCHEDULED);
+        result.setItemStage(ItemStage.SCHEDULED)
+                .setShouldCreateWorkItem(adapterConfig.mustCreateTestCases());
         storage.put(result.getUuid(), result);
 
         if (LOGGER.isDebugEnabled()) {

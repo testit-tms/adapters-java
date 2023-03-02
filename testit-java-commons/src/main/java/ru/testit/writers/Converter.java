@@ -23,6 +23,7 @@ public class Converter {
         model.setLinks(convertPostLinks(result.getLinkItems()));
         model.setSteps(convertSteps(result.getSteps()));
         model.setLabels(labelsPostConvert(result.getLabels()));
+        model.shouldCreateWorkItem(result.getShouldCreateWorkItem());
 
         return model;
     }

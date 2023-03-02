@@ -31,6 +31,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
     private Long stop;
     private Throwable throwable;
     private Map<String, String> parameters;
+    private boolean shouldCreateWorkItem;
 
     /**
      * Gets uuid.
@@ -432,6 +433,26 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
         return this;
     }
 
+    /**
+     * Gets shouldCreateWorkItem.
+     *
+     * @return the shouldCreateWorkItem
+     */
+    public boolean getShouldCreateWorkItem() {
+        return shouldCreateWorkItem;
+    }
+
+    /**
+     * Sets shouldCreateWorkItem.
+     *
+     * @param shouldCreateWorkItem the value
+     * @return self for method chaining
+     */
+    public TestResult setShouldCreateWorkItem(boolean shouldCreateWorkItem) {
+        this.shouldCreateWorkItem = shouldCreateWorkItem;
+        return this;
+    }
+
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
@@ -456,6 +477,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
         sb.append("    start: ").append(Utils.toIndentedString(this.start)).append("\n");
         sb.append("    stop: ").append(Utils.toIndentedString(this.stop)).append("\n");
         sb.append("    parameters: ").append(Utils.toIndentedString(this.parameters)).append("\n");
+        sb.append("    shouldCreateWorkItem: ").append(Utils.toIndentedString(this.shouldCreateWorkItem)).append("\n");
         sb.append("}");
 
         return sb.toString();
