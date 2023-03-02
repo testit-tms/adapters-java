@@ -19,7 +19,7 @@ public class AppProperties {
     public static final String TEST_RUN_ID = "testRunId";
     public static final String TEST_RUN_NAME = "testRunName";
     public static final String ADAPTER_MODE = "adapterMode";
-    public static final String CREATE_TEST_CASES = "createTestCases";
+    public static final String AUTOMATIC_CREATION_TEST_CASES = "automaticCreationTestCases";
     private static final String ENV_PREFIX = "TMS";
     private static final String CONFIG_FILE = "CONFIG_FILE";
     private static final String PROPERTIES_FILE = "testit.properties";
@@ -96,9 +96,9 @@ public class AppProperties {
             map.put(ADAPTER_MODE, adapterMode);
         }
 
-        String createTestCases = System.getenv(String.format("%s_CREATE_TEST_CASES", ENV_PREFIX));
+        String createTestCases = System.getenv(String.format("%s_AUTOMATIC_CREATION_TEST_CASES", ENV_PREFIX));
         if (createTestCases != null) {
-            map.put(CREATE_TEST_CASES, createTestCases);
+            map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
         }
 
         return map;
@@ -143,9 +143,9 @@ public class AppProperties {
             map.put(ADAPTER_MODE, adapterMode);
         }
 
-        String createTestCases = systemProperties.getProperty(String.format("%sCreateTestCases", ENV_PREFIX.toLowerCase()));
+        String createTestCases = systemProperties.getProperty(String.format("%sAutomaticCreationTestCases", ENV_PREFIX.toLowerCase()));
         if (createTestCases != null) {
-            map.put(CREATE_TEST_CASES, createTestCases);
+            map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
         }
 
         return map;

@@ -31,7 +31,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
     private Long stop;
     private Throwable throwable;
     private Map<String, String> parameters;
-    private boolean shouldCreateWorkItem;
+    private boolean automaticCreationTestCases;
 
     /**
      * Gets uuid.
@@ -434,22 +434,22 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
     }
 
     /**
-     * Gets shouldCreateWorkItem.
+     * Gets automaticCreationTestCases.
      *
-     * @return the shouldCreateWorkItem
+     * @return the automaticCreationTestCases
      */
-    public boolean getShouldCreateWorkItem() {
-        return shouldCreateWorkItem;
+    public boolean getAutomaticCreationTestCases() {
+        return automaticCreationTestCases;
     }
 
     /**
-     * Sets shouldCreateWorkItem.
+     * Sets automaticCreationTestCases.
      *
-     * @param shouldCreateWorkItem the value
+     * @param automaticCreationTestCases the value
      * @return self for method chaining
      */
-    public TestResult setShouldCreateWorkItem(boolean shouldCreateWorkItem) {
-        this.shouldCreateWorkItem = shouldCreateWorkItem;
+    public TestResult setAutomaticCreationTestCases(boolean automaticCreationTestCases) {
+        this.automaticCreationTestCases = automaticCreationTestCases;
         return this;
     }
 
@@ -477,7 +477,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
         sb.append("    start: ").append(Utils.toIndentedString(this.start)).append("\n");
         sb.append("    stop: ").append(Utils.toIndentedString(this.stop)).append("\n");
         sb.append("    parameters: ").append(Utils.toIndentedString(this.parameters)).append("\n");
-        sb.append("    shouldCreateWorkItem: ").append(Utils.toIndentedString(this.shouldCreateWorkItem)).append("\n");
+        sb.append("    automaticCreationTestCases: ").append(Utils.toIndentedString(this.automaticCreationTestCases)).append("\n");
         sb.append("}");
 
         return sb.toString();

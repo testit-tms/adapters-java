@@ -240,7 +240,7 @@ public class AdapterManager {
      */
     public void scheduleTestCase(final TestResult result) {
         result.setItemStage(ItemStage.SCHEDULED)
-                .setShouldCreateWorkItem(adapterConfig.mustCreateTestCases());
+                .setAutomaticCreationTestCases(adapterConfig.shouldAutomaticCreationTestCases());
         storage.put(result.getUuid(), result);
 
         if (LOGGER.isDebugEnabled()) {
