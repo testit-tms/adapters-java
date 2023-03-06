@@ -140,6 +140,7 @@ public class Helper {
         model.setLinks(generatePostLinks());
         model.setLabels(generatePostLabels());
         model.setProjectId(UUID.fromString(projectId));
+        model.shouldCreateWorkItem(false);
 
         return model;
     }
