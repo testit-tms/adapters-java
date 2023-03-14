@@ -13,6 +13,7 @@ public class ClientConfiguration implements Serializable {
     private String configurationId;
     private String testRunId;
     private String testRunName;
+    private Boolean certValidation;
 
     public ClientConfiguration(Properties properties) {
         this.privateToken = String.valueOf(properties.get(AppProperties.PRIVATE_TOKEN));
@@ -21,6 +22,13 @@ public class ClientConfiguration implements Serializable {
         this.configurationId = String.valueOf(properties.get(AppProperties.CONFIGURATION_ID));
         this.testRunId = String.valueOf(properties.get(AppProperties.TEST_RUN_ID));
         this.testRunName = String.valueOf(properties.get(AppProperties.TEST_RUN_NAME));
+
+        String certValidation = String.valueOf(
+                properties.get(AppProperties.CERT_VALIDATION));
+        if (certValidation.equals("null")) {
+            certValidation = "true";
+        }
+        this.certValidation = Boolean.parseBoolean(certValidation);
     }
 
     public String getPrivateToken() {
@@ -51,6 +59,10 @@ public class ClientConfiguration implements Serializable {
         return testRunName;
     }
 
+    public Boolean getCertValidation() {
+        return certValidation;
+    }
+
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
@@ -61,6 +73,7 @@ public class ClientConfiguration implements Serializable {
         sb.append("    configurationId: ").append(Utils.toIndentedString(this.configurationId)).append("\n");
         sb.append("    testRunId: ").append(Utils.toIndentedString(this.testRunId)).append("\n");
         sb.append("    testRunName: ").append(Utils.toIndentedString(this.testRunName)).append("\n");
+        sb.append("    certValidation: ").append(Utils.toIndentedString(this.certValidation)).append("\n");
         sb.append("}");
 
         return sb.toString();

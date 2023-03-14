@@ -172,6 +172,7 @@ test {
     testRunName={%TEST_RUN_NAME%}
     adapterMode={%ADAPTER_MODE%}
     automaticCreationTestCases={%AUTOMATIC_CREATION_TEST_CASES%}
+    certValidation={%CERT_VALIDATION%}
     ```
 2. Fill parameters with your configuration, where:
    * `URL` - location of the TMS instance.
@@ -202,6 +203,8 @@ test {
    * `AUTOMATIC_CREATION_TEST_CASES` - mode of automatic creation test cases. Default value - false. The adapter supports following modes:
        * true - in this mode, the adapter will create a test case linked to the created autotest (not to the updated autotest).
        * false - in this mode, the adapter will not create a test case.
+
+   * `CERT_VALIDATION` - mode of API-client certificate validation. Default value - true.
         
         
 #### ENV
@@ -223,6 +226,8 @@ You can use environment variables (environment variables take precedence over fi
 * `TMS_TEST_RUN_NAME` - name of the new test-run.`TMS_TEST_RUN_NAME` is optional. If it is not provided, it is created automatically.
 
 * `TMS_AUTOMATIC_CREATION_TEST_CASES` - mode of automatic creation test cases. Default value - false.
+
+* `TMS_CERT_VALIDATION` - mode of API-client certificate validation. Default value - true.
 
 * `TMS_CONFIG_FILE` - name of the configuration file. `TMS_CONFIG_FILE` is optional. If it is not provided, it is used default file name.
   
@@ -247,6 +252,8 @@ You also can CLI variables (CLI variables take precedence over environment varia
 
 * `tmsAutomaticCreationTestCases` - mode of automatic creation test cases. Default value - false.
 
+* `tmsCertValidation` - mode of API-client certificate validation. Default value - true.
+
 * `tmsConfigFile` - name of the configuration file. `tmsConfigFile` is optional. If it is not provided, it is used default file name.
 
 #### Examples
@@ -254,13 +261,13 @@ You also can CLI variables (CLI variables take precedence over environment varia
 ##### Gradle
 ```
 gradle test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
--DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true
+-DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsCertValidation=true
 ```
 
 ##### Maven
 ```
 maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
--DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true
+-DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsCertValidation=true
 ```
 
 If you want to enable debug mode then see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
