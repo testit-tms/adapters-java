@@ -20,6 +20,7 @@ public class AppProperties {
     public static final String TEST_RUN_NAME = "testRunName";
     public static final String ADAPTER_MODE = "adapterMode";
     public static final String AUTOMATIC_CREATION_TEST_CASES = "automaticCreationTestCases";
+    public static final String CERT_VALIDATION = "certValidation";
     private static final String ENV_PREFIX = "TMS";
     private static final String CONFIG_FILE = "CONFIG_FILE";
     private static final String PROPERTIES_FILE = "testit.properties";
@@ -101,6 +102,11 @@ public class AppProperties {
             map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
         }
 
+        String certValidation = System.getenv(String.format("%s_CERT_VALIDATION", ENV_PREFIX.toLowerCase()));
+        if (certValidation != null) {
+            map.put(CERT_VALIDATION, certValidation);
+        }
+
         return map;
     }
 
@@ -146,6 +152,11 @@ public class AppProperties {
         String createTestCases = systemProperties.getProperty(String.format("%sAutomaticCreationTestCases", ENV_PREFIX.toLowerCase()));
         if (createTestCases != null) {
             map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
+        }
+
+        String certValidation = systemProperties.getProperty(String.format("%sCertValidation", ENV_PREFIX.toLowerCase()));
+        if (certValidation != null) {
+            map.put(CERT_VALIDATION, certValidation);
         }
 
         return map;
