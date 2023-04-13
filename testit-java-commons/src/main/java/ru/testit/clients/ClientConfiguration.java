@@ -23,12 +23,12 @@ public class ClientConfiguration implements Serializable {
         this.testRunId = String.valueOf(properties.get(AppProperties.TEST_RUN_ID));
         this.testRunName = String.valueOf(properties.get(AppProperties.TEST_RUN_NAME));
 
-        String certValidation = String.valueOf(
+        String validationCert = String.valueOf(
                 properties.get(AppProperties.CERT_VALIDATION));
-        if (certValidation.equals("null")) {
-            certValidation = "true";
+        if (validationCert.equals("null")) {
+            validationCert = "true";
         }
-        this.certValidation = Boolean.parseBoolean(certValidation);
+        this.certValidation = Boolean.parseBoolean(validationCert);
     }
 
     public String getPrivateToken() {

@@ -1,13 +1,10 @@
 package ru.testit.samples;
 
-import org.junit.Test;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import ru.testit.annotations.*;
 import ru.testit.listener.BaseJunit4Runner;
-import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
