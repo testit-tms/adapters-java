@@ -916,6 +916,7 @@ public class AdapterManagerTest {
         when(threadContext.getRoot()).thenReturn(Optional.of(result.getUuid()));
         when(threadContext.getCurrent()).thenReturn(Optional.of(result.getUuid()));
         when(storage.get(result.getUuid(), ResultWithAttachments.class)).thenReturn(Optional.of(result));
+        when(writer.writeAttachment(path)).thenReturn("test");
 
         AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
