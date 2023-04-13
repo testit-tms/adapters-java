@@ -619,7 +619,11 @@ public class AdapterManager {
     public void addAttachments(List<String> attachments) {
         List<String> uuids = new ArrayList<>();
         for (final String attachment : attachments) {
-            uuids.add(writer.writeAttachment(attachment));
+            String attachmentsId = writer.writeAttachment(attachment);
+            if (attachmentsId.isEmpty()){
+                return;
+            }
+            uuids.add(attachmentsId);
         }
 
         final Optional<String> current = threadContext.getCurrent();

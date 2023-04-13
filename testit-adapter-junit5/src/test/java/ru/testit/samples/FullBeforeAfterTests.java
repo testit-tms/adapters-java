@@ -1,8 +1,8 @@
 package ru.testit.samples;
 
 import org.junit.jupiter.api.*;
-import ru.testit.annotations.*;
 import ru.testit.annotations.DisplayName;
+import ru.testit.annotations.*;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
@@ -84,7 +84,7 @@ public class FullBeforeAfterTests {
     @WorkItemIds("123")
     @Title("Title in the autotest card")
     @Description("Test with all Before, After and all annotations")
-    @Labels({"Tag1","Tag2"})
+    @Labels({"Tag1", "Tag2"})
     @Links(links = {
             @Link(url = "https://dumps.example.com/module/repository", title = "Repository", description = "Example of repository", type = LinkType.REPOSITORY),
             @Link(url = "https://dumps.example.com/module/projects", title = "Projects", type = LinkType.REQUIREMENT),
@@ -94,7 +94,7 @@ public class FullBeforeAfterTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
     public void allAnnotationsTest() {
-       Adapter.addLinks("https://testit.ru/", "Test 1","Desc 1", LinkType.ISSUE);
+        Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
         createProject();
         enterProject();
         createSection();
