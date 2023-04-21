@@ -39,9 +39,9 @@ jobs:
     #     arguments: check
     # - name: Execute Gradle build
     #   run: ./gradlew build
-      - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v1
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
+    - name: Validate Gradle wrapper
+      uses: gradle/wrapper-validation-action@v1
+    - name: Build with Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: build
