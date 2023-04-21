@@ -23,3 +23,5 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         arguments: check
+    # - name: Execute Gradle build
+    #   run: ./gradlew build
