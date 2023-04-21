@@ -153,15 +153,18 @@ public class BaseTestNgListener implements
             }
 
             final int indexFromAnnotation = i - skippedCount;
+
+            String value = String.format("%s", parameters[i]);
+
             if (indexFromAnnotation < providedNames.length) {
                 if (parameters[i] != null) {
-                    testParameters.put(providedNames[indexFromAnnotation], parameters[i].toString());
+                    testParameters.put(providedNames[indexFromAnnotation], value);
                 }
                 continue;
             }
 
             if (i < reflectionNames.length) {
-                testParameters.put(reflectionNames[i], parameters[i].toString());
+                testParameters.put(reflectionNames[i], value);
             }
         }
 
