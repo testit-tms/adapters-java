@@ -171,15 +171,15 @@ test {
 
 1. Create **testit.properties** file in the resource directory of the project:
     ``` 
-    url={%URL%}
-    privateToken={%USER_PRIVATE_TOKEN%} 
-    projectId={%PROJECT_ID%} 
-    configurationId={%CONFIGURATION_ID%}
-    testRunId={%TEST_RUN_ID%}
-    testRunName={%TEST_RUN_NAME%}
-    adapterMode={%ADAPTER_MODE%}
-    automaticCreationTestCases={%AUTOMATIC_CREATION_TEST_CASES%}
-    certValidation={%CERT_VALIDATION%}
+    url=URL
+    privateToken=USER_PRIVATE_TOKEN
+    projectId=PROJECT_ID
+    configurationId=CONFIGURATION_ID
+    testRunId=TEST_RUN_ID
+    testRunName=TEST_RUN_NAME
+    adapterMode=ADAPTER_MODE
+    automaticCreationTestCases=AUTOMATIC_CREATION_TEST_CASES
+    certValidation=CERT_VALIDATION
     ```
 2. Fill parameters with your configuration, where:
    * `URL` - location of the TMS instance.
