@@ -54,6 +54,8 @@ public class HttpWriter implements Writer {
                     autoTestPutModel.setProjectId(UUID.fromString(config.getProjectId()));
                 }
 
+                autoTestPutModel.setIsFlaky(test.getIsFlaky());
+
                 apiClient.updateAutoTest(autoTestPutModel);
                 autoTestId = test.getId().toString();
             } else {
@@ -111,6 +113,8 @@ public class HttpWriter implements Writer {
                             autoTestPutModel.setSetup(beforeClass);
                             autoTestPutModel.setTeardown(afterClass);
 
+                            autoTestPutModel.setIsFlaky(autoTestModel.getIsFlaky());
+
                             apiClient.updateAutoTest(autoTestPutModel);
                         } catch (ApiException e) {
                             LOGGER.error("Can not write the class: ".concat(e.getMessage()));
@@ -157,6 +161,8 @@ public class HttpWriter implements Writer {
                                             afterFinish.addAll(afterClass);
                                             afterFinish.addAll(afterAll);
                                             autoTestPutModel.setTeardown(afterFinish);
+
+                                            autoTestPutModel.setIsFlaky(autoTestModel.getIsFlaky());
 
                                             apiClient.updateAutoTest(autoTestPutModel);
 
