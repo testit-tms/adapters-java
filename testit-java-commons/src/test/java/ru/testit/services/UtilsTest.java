@@ -3,7 +3,6 @@ package ru.testit.services;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import ru.testit.Helper;
 import ru.testit.annotations.*;
 import ru.testit.models.Label;
@@ -13,11 +12,12 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UtilsTest {
     private final static String TEXT_WITHOUT_PARAMETERS = "{Text without} {parameters}";
-    private final static String[] LABELS_WITHOUT_PARAMETERS = new String[] {"{Labels", "without}", "{parameters}"};
+    private final static String[] LABELS_WITHOUT_PARAMETERS = new String[]{"{Labels", "without}", "{parameters}"};
 
     private Method atomicTest;
 
@@ -77,23 +77,27 @@ public class UtilsTest {
         Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, externalId);
     }
 
-    // TODO fix test
-//    @Test
-//    void extractExternalID_WithoutExternalID() {
-//        // arrange
-//        Map<String, String> parameters = UtilsHelper.generateParameters();
-//        String hash = "8E698E31EBAB7E751C6A1DF17DAB0113D3C9F6E71D3AE666ECB83D94971EDD8F";
-//        when(atomicTest.getName()).thenReturn("allAnnotationsTest");
-//        when(atomicTest.getAnnotation(ExternalId.class)).thenReturn(null);
-//
-//        // act
-//        String externalIdWithoutInputParameters = Utils.extractExternalID(atomicTest, null);
-//        String externalIdWithInputParameters = Utils.extractExternalID(atomicTest, parameters);
-//
-//        // assert
-//        Assertions.assertEquals(hash, externalIdWithoutInputParameters);
-//        Assertions.assertEquals(hash, externalIdWithInputParameters);
-//    }
+    private class MockTests {
+        public void allAnnotationsTest() {
+
+        }
+    }
+
+    @Test
+    void extractExternalID_WithoutExternalID() throws NoSuchMethodException {
+        // arrange
+        Map<String, String> parameters = UtilsHelper.generateParameters();
+        String hash = "37CFD932DE5B33581E4827CFB5E676C6999B1F05892BFC9333EDEE1EAF4B8D06";
+        Method testMethod = MockTests.class.getMethod("allAnnotationsTest");
+
+        // act
+        String externalIdWithoutInputParameters = Utils.extractExternalID(testMethod, null);
+        String externalIdWithInputParameters = Utils.extractExternalID(testMethod, parameters);
+
+        // assert
+        Assertions.assertEquals(hash, externalIdWithoutInputParameters);
+        Assertions.assertEquals(hash, externalIdWithInputParameters);
+    }
 
     @Test
     void extractDisplayName_WithDisplayNameWithParameters_WithInputParameters() {
