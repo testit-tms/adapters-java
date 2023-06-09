@@ -306,7 +306,7 @@ public class AdapterManager {
         threadContext.clear();
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Stop test case {}", uuid);
+            LOGGER.debug("Stop test case {}", testResult);
         }
 
         writer.writeTest(testResult);

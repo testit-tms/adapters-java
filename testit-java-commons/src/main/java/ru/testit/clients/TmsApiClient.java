@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.client.api.AttachmentsApi;
 import ru.testit.client.api.AutoTestsApi;
+import ru.testit.client.api.TestResultsApi;
 import ru.testit.client.api.TestRunsApi;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
@@ -22,6 +23,7 @@ public class TmsApiClient implements ApiClient {
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
     private final AttachmentsApi attachmentsApi;
+    private final TestResultsApi testResultsApi;
 
     private final ClientConfiguration clientConfiguration;
 
@@ -36,6 +38,7 @@ public class TmsApiClient implements ApiClient {
         testRunsApi = new TestRunsApi(apiClient);
         autoTestsApi = new AutoTestsApi(apiClient);
         attachmentsApi = new AttachmentsApi(apiClient);
+        testResultsApi = new TestResultsApi(apiClient);
     }
 
     @Override
@@ -123,8 +126,8 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public void sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException {
-        testRunsApi.setAutoTestResultsForTestRun(UUID.fromString(testRunUuid), models);
+    public List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException {
+        return testRunsApi.setAutoTestResultsForTestRun(UUID.fromString(testRunUuid), models);
     }
 
     @Override
@@ -146,5 +149,15 @@ public class TmsApiClient implements ApiClient {
         return model.getTestResults().stream()
                 .filter(result -> Objects.equals(result.getConfigurationId(), configUUID))
                 .map(result -> Objects.requireNonNull(result.getAutoTest()).getExternalId()).collect(Collectors.toList());
+    }
+
+    @Override
+    public TestResultModel getTestResult(UUID uuid) throws ApiException {
+        return testResultsApi.apiV2TestResultsIdGet(uuid);
+    }
+
+    @Override
+    public void updateTestResult(UUID uuid, TestResultUpdateModel model) throws ApiException {
+        testResultsApi.apiV2TestResultsIdPut(uuid, model);
     }
 }

@@ -44,6 +44,12 @@ public class Helper {
     private final static String AFTER_ALL_NAME = "After All name";
     private final static String AFTER_ALL_DESCRIPTION = "After All description";
 
+    public static List<UUID> generateListUuid(){
+        List<UUID> uuids = new ArrayList<>();
+        uuids.add(UUID.randomUUID());
+        return uuids;
+    }
+
     public static TestResult generateTestResult() {
         Date startDate = new Date();
         Date stopDate = new Date(startDate.getTime() + 1000);
@@ -87,6 +93,13 @@ public class Helper {
                 .setUrl(LINK_URL);
     }
 
+    public static TestResultModel generateTestResultModel(){
+        TestResultModel model = new TestResultModel();
+
+        model.setDurationInMs(12345L);
+
+        return model;
+    }
     public static AutoTestModel generateAutoTestModel(String projectId) {
         AutoTestModel model = new AutoTestModel();
 

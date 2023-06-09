@@ -4,6 +4,7 @@ import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ApiClient {
     TestRunV2GetModel createTestRun() throws ApiException;
@@ -13,7 +14,9 @@ public interface ApiClient {
     String createAutoTest(AutoTestPostModel model) throws ApiException;
     AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException;
     void linkAutoTestToWorkItem(String id, String workItemId) throws ApiException;
-    void sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException;
+    List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException;
     String addAttachment(String path) throws ApiException;
     List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException;
+    TestResultModel getTestResult(UUID uuid) throws ApiException;
+    void updateTestResult(UUID uuid, TestResultUpdateModel model) throws ApiException;
 }

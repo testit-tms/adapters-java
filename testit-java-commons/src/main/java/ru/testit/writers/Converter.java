@@ -97,6 +97,21 @@ public class Converter {
                 ).collect(Collectors.toList());
     }
 
+    public static TestResultUpdateModel testResultToTestResultUpdateModel(TestResultModel result) {
+        TestResultUpdateModel model = new TestResultUpdateModel();
+
+        model.setDurationInMs(result.getDurationInMs());
+        model.setOutcome(result.getOutcome());
+        model.setLinks(result.getLinks());
+        model.setStepResults(result.getStepResults());
+        model.setFailureClassIds(result.getFailureClassIds());
+        model.setComment(result.getComment());
+        if (result.getAttachments() != null) {
+            model.setAttachments(convertAttachmentsFromModel(result.getAttachments()));
+        }
+        return model;
+    }
+
     public static AutoTestPutModel testResultToAutoTestPutModel(TestResult result) {
         AutoTestPutModel model = new AutoTestPutModel();
 
@@ -224,6 +239,16 @@ public class Converter {
             AttachmentPutModel model = new AttachmentPutModel();
 
             model.setId(UUID.fromString(attach));
+
+            return model;
+        }).collect(Collectors.toList());
+    }
+
+    private static List<AttachmentPutModel> convertAttachmentsFromModel(List<AttachmentModel> models) {
+        return models.stream().map(attach -> {
+            AttachmentPutModel model = new AttachmentPutModel();
+
+            model.setId(attach.getId());
 
             return model;
         }).collect(Collectors.toList());

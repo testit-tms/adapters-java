@@ -12,12 +12,11 @@ import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;
 import ru.testit.services.ResultStorage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class HttpWriter implements Writer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpWriter.class);
+    private final Map<String, UUID> testResults;
     private final ApiClient apiClient;
     private final ResultStorage storage;
     private final ClientConfiguration config;
@@ -26,6 +25,7 @@ public class HttpWriter implements Writer {
         this.config = config;
         this.apiClient = client;
         this.storage = storage;
+        this.testResults = new HashMap<>();
     }
 
     @Override
@@ -68,8 +68,15 @@ public class HttpWriter implements Writer {
                 autoTestId = apiClient.createAutoTest(model);
             }
 
-            if (workItemId.size() == 0 ||
-                    (test != null && testResult.getItemStatus() == ItemStatus.FAILED)) {
+            AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.testResultToAutoTestResultsForTestRunModel(testResult);
+            autoTestResultsForTestRunModel.setConfigurationId(UUID.fromString(config.getConfigurationId()));
+
+            List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
+            results.add(autoTestResultsForTestRunModel);
+            List<UUID> ids = apiClient.sendTestResults(config.getTestRunId(), results);
+            testResults.put(testResult.getUuid(), ids.get(0));
+
+            if (workItemId.size() == 0 || (test != null && testResult.getItemStatus() == ItemStatus.FAILED)) {
                 return;
             }
 
@@ -91,36 +98,34 @@ public class HttpWriter implements Writer {
     @Override
     public void writeClass(ClassContainer container) {
         for (final String testUuid : container.getChildren()) {
-            storage.getTestResult(testUuid).ifPresent(
-                    test -> {
-                        try {
-                            AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(test.getExternalId());
+            storage.getTestResult(testUuid).ifPresent(test -> {
+                try {
+                    AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(test.getExternalId());
 
-                            if (autoTestModel == null) {
-                                return;
-                            }
-
-                            AutoTestPutModel autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
-
-                            List<AutoTestStepModel> beforeClass = Converter.convertFixture(container.getBeforeClassMethods(), null);
-                            List<AutoTestStepModel> beforeEach = Converter.convertFixture(container.getBeforeEachTest(), testUuid);
-                            beforeClass.addAll(beforeEach);
-
-                            List<AutoTestStepModel> afterClass = Converter.convertFixture(container.getAfterClassMethods(), null);
-                            List<AutoTestStepModel> afterEach = Converter.convertFixture(container.getAfterEachTest(), testUuid);
-                            afterClass.addAll(afterEach);
-
-                            autoTestPutModel.setSetup(beforeClass);
-                            autoTestPutModel.setTeardown(afterClass);
-
-                            autoTestPutModel.setIsFlaky(autoTestModel.getIsFlaky());
-
-                            apiClient.updateAutoTest(autoTestPutModel);
-                        } catch (ApiException e) {
-                            LOGGER.error("Can not write the class: ".concat(e.getMessage()));
-                        }
+                    if (autoTestModel == null) {
+                        return;
                     }
-            );
+
+                    AutoTestPutModel autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
+
+                    List<AutoTestStepModel> beforeClass = Converter.convertFixture(container.getBeforeClassMethods(), null);
+                    List<AutoTestStepModel> beforeEach = Converter.convertFixture(container.getBeforeEachTest(), testUuid);
+                    beforeClass.addAll(beforeEach);
+
+                    List<AutoTestStepModel> afterClass = Converter.convertFixture(container.getAfterClassMethods(), null);
+                    List<AutoTestStepModel> afterEach = Converter.convertFixture(container.getAfterEachTest(), testUuid);
+                    afterClass.addAll(afterEach);
+
+                    autoTestPutModel.setSetup(beforeClass);
+                    autoTestPutModel.setTeardown(afterClass);
+
+                    autoTestPutModel.setIsFlaky(autoTestModel.getIsFlaky());
+
+                    apiClient.updateAutoTest(autoTestPutModel);
+                } catch (ApiException e) {
+                    LOGGER.error("Can not write the class: ".concat(e.getMessage()));
+                }
+            });
         }
     }
 
@@ -131,86 +136,71 @@ public class HttpWriter implements Writer {
         List<AttachmentPutModelAutoTestStepResultsModel> beforeResultAll = Converter.convertResultFixture(container.getBeforeMethods(), null);
         List<AttachmentPutModelAutoTestStepResultsModel> afterResultAll = Converter.convertResultFixture(container.getAfterMethods(), null);
 
-        List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
+//        List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
 
         for (final String classUuid : container.getChildren()) {
-            storage.getClassContainer(classUuid).ifPresent(
-                    cl -> {
-                        List<AttachmentPutModelAutoTestStepResultsModel> beforeResultClass = Converter.convertResultFixture(cl.getBeforeClassMethods(), null);
-                        List<AttachmentPutModelAutoTestStepResultsModel> afterResultClass = Converter.convertResultFixture(cl.getAfterClassMethods(), null);
+            storage.getClassContainer(classUuid).ifPresent(cl -> {
+                List<AttachmentPutModelAutoTestStepResultsModel> beforeResultClass = Converter.convertResultFixture(cl.getBeforeClassMethods(), null);
+                List<AttachmentPutModelAutoTestStepResultsModel> afterResultClass = Converter.convertResultFixture(cl.getAfterClassMethods(), null);
 
-                        for (final String testUuid : cl.getChildren()) {
-                            storage.getTestResult(testUuid).ifPresent(
-                                    test -> {
-                                        try {
-                                            AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(test.getExternalId());
+                for (final String testUuid : cl.getChildren()) {
+                    storage.getTestResult(testUuid).ifPresent(test -> {
+                        try {
+                            AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(test.getExternalId());
 
-                                            if (autoTestModel == null) {
-                                                return;
-                                            }
+                            if (autoTestModel == null) {
+                                return;
+                            }
 
-                                            AutoTestPutModel autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
+                            AutoTestPutModel autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
 
-                                            List<AutoTestStepModel> beforeFinish =  new ArrayList<>(beforeAll);
-                                            beforeFinish.addAll(autoTestPutModel.getSetup());
-                                            autoTestPutModel.setSetup(beforeFinish);
+                            List<AutoTestStepModel> beforeFinish = new ArrayList<>(beforeAll);
+                            beforeFinish.addAll(autoTestPutModel.getSetup());
+                            autoTestPutModel.setSetup(beforeFinish);
 
-                                            List<AutoTestStepModel> afterClass = Converter.convertFixture(cl.getAfterClassMethods(), null);
+                            List<AutoTestStepModel> afterClass = Converter.convertFixture(cl.getAfterClassMethods(), null);
 
-                                            List<AutoTestStepModel> afterFinish = autoTestPutModel.getTeardown();
-                                            afterFinish.addAll(afterClass);
-                                            afterFinish.addAll(afterAll);
-                                            autoTestPutModel.setTeardown(afterFinish);
+                            List<AutoTestStepModel> afterFinish = autoTestPutModel.getTeardown();
+                            afterFinish.addAll(afterClass);
+                            afterFinish.addAll(afterAll);
+                            autoTestPutModel.setTeardown(afterFinish);
 
-                                            autoTestPutModel.setIsFlaky(autoTestModel.getIsFlaky());
+                            autoTestPutModel.setIsFlaky(autoTestModel.getIsFlaky());
 
-                                            apiClient.updateAutoTest(autoTestPutModel);
+                            apiClient.updateAutoTest(autoTestPutModel);
 
+                            AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.testResultToAutoTestResultsForTestRunModel(test);
 
-                                            AutoTestResultsForTestRunModel autoTestResultsForTestRunModel =
-                                                    Converter.testResultToAutoTestResultsForTestRunModel(test);
-                                            autoTestResultsForTestRunModel
-                                                    .setConfigurationId(UUID.fromString(config.getConfigurationId()));
+                            List<AttachmentPutModelAutoTestStepResultsModel> beforeResultEach = Converter.convertResultFixture(cl.getBeforeEachTest(), testUuid);
+                            List<AttachmentPutModelAutoTestStepResultsModel> beforeResultFinish = new ArrayList<>();
+                            beforeResultFinish.addAll(beforeResultAll);
+                            beforeResultFinish.addAll(beforeResultClass);
+                            beforeResultFinish.addAll(beforeResultEach);
 
-                                            List<AttachmentPutModelAutoTestStepResultsModel> beforeResultEach =
-                                                    Converter.convertResultFixture(cl.getBeforeEachTest(), testUuid);
-                                            List<AttachmentPutModelAutoTestStepResultsModel> beforeResultFinish = new ArrayList<>();
-                                            beforeResultFinish.addAll(beforeResultAll);
-                                            beforeResultFinish.addAll(beforeResultClass);
-                                            beforeResultFinish.addAll(beforeResultEach);
+                            List<AttachmentPutModelAutoTestStepResultsModel> afterResultEach = Converter.convertResultFixture(cl.getAfterEachTest(), testUuid);
+                            List<AttachmentPutModelAutoTestStepResultsModel> afterResultFinish = new ArrayList<>();
+                            afterResultFinish.addAll(afterResultEach);
+                            afterResultFinish.addAll(afterResultClass);
+                            afterResultFinish.addAll(afterResultAll);
 
-                                            List<AttachmentPutModelAutoTestStepResultsModel> afterResultEach =
-                                                    Converter.convertResultFixture(cl.getAfterEachTest(), testUuid);
-                                            List<AttachmentPutModelAutoTestStepResultsModel> afterResultFinish = new ArrayList<>();
-                                            afterResultFinish.addAll(afterResultEach);
-                                            afterResultFinish.addAll(afterResultClass);
-                                            afterResultFinish.addAll(afterResultAll);
+                            autoTestResultsForTestRunModel.setSetupResults(beforeResultFinish);
+                            autoTestResultsForTestRunModel.setTeardownResults(afterResultFinish);
 
-                                            autoTestResultsForTestRunModel.setSetupResults(beforeResultFinish);
-                                            autoTestResultsForTestRunModel.setTeardownResults(afterResultFinish);
+                            UUID testResultId = testResults.get(test.getUuid());
 
-                                            results.add(autoTestResultsForTestRunModel);
+                            TestResultModel resultModel = apiClient.getTestResult(testResultId);
+                            TestResultUpdateModel model = Converter.testResultToTestResultUpdateModel(resultModel);
+                            model.setSetupResults(beforeResultFinish);
+                            model.setTeardownResults(afterResultFinish);
 
-                                        } catch (ApiException e) {
-                                            LOGGER.error("Can not update the autotest: ".concat(e.getMessage()));
-                                        }
-                                    }
-                            );
+                            apiClient.updateTestResult(testResultId, model);
+
+                        } catch (ApiException e) {
+                            LOGGER.error("Can not update the autotest: ".concat(e.getMessage()));
                         }
-                    }
-            );
-        }
-
-        try {
-            if (results.size() == 0) {
-                return;
-            }
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Write results: {}", results);
-            }
-            apiClient.sendTestResults(config.getTestRunId(), results);
-        } catch (ApiException e) {
-            LOGGER.error("Can not write the test results: ".concat(e.getMessage()));
+                    });
+                }
+            });
         }
     }
 
@@ -223,5 +213,9 @@ public class HttpWriter implements Writer {
 
             return "";
         }
+    }
+
+    void addUuid(String key, UUID uuid) {
+        this.testResults.put(key, uuid);
     }
 }
