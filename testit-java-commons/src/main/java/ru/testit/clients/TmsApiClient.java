@@ -122,7 +122,21 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public void linkAutoTestToWorkItem(String id, String workItemId) throws ApiException {
-        autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
+        int count = 0;
+        int maxTries = 3;
+        while(true) {
+            try {
+                autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
+                return;
+            } catch (ApiException e) {
+                try {
+                    Thread.sleep((long) (Math.random() * 1000));
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                if (++count == maxTries) throw e;
+            }
+        }
     }
 
     @Override
