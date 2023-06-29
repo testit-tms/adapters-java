@@ -145,12 +145,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
                 container -> container.getChildren().add(uuid));
 
-        try {
-            invocation.proceed();
-        } catch (Throwable throwable) {
-            stopTestCase(executableTest.getUuid(), throwable, ItemStatus.FAILED);
-            throw throwable;
-        }
+        invocation.proceed();
     }
 
     private Map<String, String> getParameters(
@@ -198,12 +193,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
                 container -> container.getChildren().add(uuid));
 
-        try {
-            invocation.proceed();
-        } catch (Throwable throwable) {
-            stopTestCase(executableTest.getUuid(), throwable, ItemStatus.FAILED);
-            throw throwable;
-        }
+        invocation.proceed();
     }
 
     protected void startTestCase(Method method, final String uuid, Map<String, String> parameters) {
