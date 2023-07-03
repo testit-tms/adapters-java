@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
     private List<String> testsForRun;
     private final boolean isFilteredMode;
+    private static final String paramRegex = "\\{.*}";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Junit5PostDiscoveryFilter.class);
 
@@ -47,8 +48,10 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
             final MethodSource methodSource = (MethodSource) testSource.get();
 
             String externalId = Utils.extractExternalID(methodSource.getJavaMethod(), null);
+            final Pattern pattern = Pattern.compile(paramRegex, Pattern.MULTILINE);
+            final Matcher matcher = pattern.matcher(externalId);
 
-            if (externalId.matches("\\{.*}")) {
+            if (matcher.find()) {
                 return filterTestWithParameters(externalId);
             }
 
@@ -75,7 +78,7 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
     }
 
     private FilterResult filterTestWithParameters(String externalId) {
-        Pattern pattern = Pattern.compile(externalId.replaceAll("\\{.*}", ".*"));
+        Pattern pattern = Pattern.compile(externalId.replaceAll(paramRegex, ".*"));
 
         for (String test : testsForRun) {
             Matcher matcher = pattern.matcher(test);
@@ -88,7 +91,7 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Test {} exclude for run", externalId);
+            LOGGER.debug("Parametrized test {} exclude for run", externalId);
         }
 
         return FilterResult.excluded("test excluded");
