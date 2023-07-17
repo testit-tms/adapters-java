@@ -17,4 +17,5 @@ Supported test frameworks :
  6. [Cucumber6](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber6)
  7. [Cucumber7](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber7)
  8. [JBehave](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-jbehave)
+ 9. [Selenide](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-selenide)
  
