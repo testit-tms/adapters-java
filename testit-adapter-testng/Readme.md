@@ -1,4 +1,5 @@
 # Test IT TMS Adapter for TestNG
+
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
 ## Getting Started
@@ -10,6 +11,7 @@
 Add this dependency to your project POM:
 
 ```xml
+
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-testng</artifactId>
@@ -112,9 +114,10 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
 #### Gradle Users
 
 1. Add this dependency to your project build file:
+
 ```groovy
 plugins {
-   id 'java'
+    id 'java'
 }
 
 configurations {
@@ -128,12 +131,12 @@ version '1.0-SNAPSHOT'
 
 compileJava.options.encoding = 'utf-8'
 tasks.withType(JavaCompile) {
-   options.encoding = 'utf-8'
+    options.encoding = 'utf-8'
 }
 
 repositories {
-   mavenCentral()
-   mavenLocal()
+    mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -156,6 +159,7 @@ test {
     // systemProperty 'tmsTestRunName', System.getProperty('tmsTestRunName') 
 }
 ```
+
 2. Press the **Reload All Gradle Projects** button.
 
 ### Configuration
@@ -176,6 +180,7 @@ test {
 #### File
 
 Create **testit.properties** file in the resource directory of the project:
+
 ``` 
 url=URL
 privateToken=USER_PRIVATE_TOKEN
@@ -191,26 +196,31 @@ certValidation=CERT_VALIDATION
 #### Examples
 
 ##### Gradle
+
 ```
 gradle test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
 -DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsCertValidation=true
 ```
 
 ##### Maven
+
 ```
 maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
 -DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsCertValidation=true
 ```
 
-If you want to enable debug mode then see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+If you want to enable debug mode then
+see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
 
-If you want to add attachment for a failed test then see [How to add an attachment for a failed test?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+If you want to add attachment for a failed test then
+see [How to add an attachment for a failed test?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
 
 ### Annotations
 
 Use annotations to specify information about autotest.
 
 Description of annotations:
+
 - `WorkItemIds` - linking an autotest to a test case.
 - `DisplayName` - name of the autotest in Test IT.
 - `ExternalId` - ID of the autotest within the project in Test IT.
@@ -219,8 +229,11 @@ Description of annotations:
 - `Labels` - tags in the autotest card.
 - `Links` - links in the autotest card.
 - `Step` - the designation of the step.
+- `Classname` - name of the classname.
+- `Namespace` - name of the package.
 
 Description of methods:
+
 - `Adapter.addLinks` - add links to the autotest result.
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
@@ -264,12 +277,12 @@ public class SampleTests {
     @Test
     @ExternalId("Simple_test_2")
     @DisplayName("Simple test 2")
-    @WorkItemIds({"12345","54321"})
+    @WorkItemIds({"12345", "54321"})
     @Title("Simple test 2")
     @Description("Simple test 2 description")
     @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
-                @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
-                @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
+            @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
+            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
     public void simpleTest2() {
         stepWithParams("password", 456);
         Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
@@ -292,7 +305,7 @@ public class DataProviderParameterizedTests {
 
     @DataProvider
     public static Object[][] allParameters() {
-        return new Object[][] {
+        return new Object[][]{
                 {"Test version 1", 1, "google.com"},
                 {"Test version 2", 2, "yandex.ru"}
         };
@@ -323,11 +336,15 @@ public class DataProviderParameterizedTests {
 
 You can help to develop the project. Any contributions are **greatly appreciated**.
 
-* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/testit-tms/adapters-java/issues/new) to discuss it, or create a direct pull request after you edit the *README.md* file with necessary changes.
+* If you have suggestions for adding or removing projects, feel free
+  to [open an issue](https://github.com/testit-tms/adapters-java/issues/new) to discuss it, or create a direct pull
+  request after you edit the *README.md* file with necessary changes.
 * Make sure to check your spelling and grammar.
 * Create individual PR for each suggestion.
-* Read the [Code Of Conduct](https://github.com/testit-tms/adapters-java/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
+* Read the [Code Of Conduct](https://github.com/testit-tms/adapters-java/blob/main/CODE_OF_CONDUCT.md) before posting
+  your first idea as well.
 
 # License
 
-Distributed under the Apache-2.0 License. See [LICENSE](https://github.com/testit-tms/adapters-java/blob/main/LICENSE.md) for more information.
+Distributed under the Apache-2.0 License.
+See [LICENSE](https://github.com/testit-tms/adapters-java/blob/main/LICENSE.md) for more information.

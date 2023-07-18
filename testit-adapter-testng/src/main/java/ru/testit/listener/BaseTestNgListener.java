@@ -108,10 +108,12 @@ public class BaseTestNgListener implements
                 .setWorkItemId(Utils.extractWorkItemId(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters))
                 .setName(Utils.extractDisplayName(method, parameters))
-                .setClassName(method.getDeclaringClass().getSimpleName())
-                .setSpaceName((method.getDeclaringClass().getPackage() == null
-                        || method.getDeclaringClass().getPackage().getName().equals(""))
-                        ? null : method.getDeclaringClass().getPackage().getName())
+                .setClassName(Utils.extractClassname(method, method.getDeclaringClass().getSimpleName(), parameters))
+                .setSpaceName(Utils.extractNamespace(method,
+                        ((method.getDeclaringClass().getPackage() == null
+                                || method.getDeclaringClass().getPackage().getName().equals(""))
+                                ? null : method.getDeclaringClass().getPackage().getName()),
+                        parameters))
                 .setLinkItems(Utils.extractLinks(method, parameters))
                 .setDescription(Utils.extractDescription(method, parameters))
                 .setParameters(parameters);
