@@ -660,6 +660,10 @@ public class AdapterManager {
         return new ArrayList<>();
     }
 
+    public Optional<String> getCurrentTestCaseOrStep() {
+        return threadContext.getCurrent();
+    }
+
     private void validateAdapterConfig() {
         switch (adapterConfig.getMode()) {
             case USE_FILTER:

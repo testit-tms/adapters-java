@@ -13,7 +13,7 @@ Add this dependency to your project POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-jbehave</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.5</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-jbehave:1.2.0"
+implementation "ru.testit:testit-adapter-jbehave:1.3.5"
 ```
 
 ## Usage
@@ -37,7 +37,7 @@ implementation "ru.testit:testit-adapter-jbehave:1.2.0"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <adapter.version>1.2.0</adapter.version>
+        <adapter.version>1.3.5</adapter.version>
         <jbehave.version>4.8.3</jbehave.version>
     </properties>
     <dependencies>
@@ -73,7 +73,7 @@ implementation "ru.testit:testit-adapter-jbehave:1.2.0"
       <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <adapter.version>1.2.0</adapter.version>
+        <adapter.version>1.3.5</adapter.version>
         <jbehave.version>4.8.3</jbehave.version>
     </properties>
     <dependencies>
@@ -114,7 +114,7 @@ implementation "ru.testit:testit-adapter-jbehave:1.2.0"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <adapter.version>1.2.0</adapter.version>
+        <adapter.version>1.3.5</adapter.version>
         <jbehave.version>4.8.3</jbehave.version>
     </properties>
     <dependencies>
@@ -170,8 +170,8 @@ def jbehaveVersion = "4.8.3"
 def aspectjVersion = "1.9.7"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-jbehave:1.2.0"
-    testImplementation "ru.testit:testit-java-commons:1.2.0"
+    testImplementation "ru.testit:testit-adapter-jbehave:1.3.5"
+    testImplementation "ru.testit:testit-java-commons:1.3.5"
     testImplementation 'org.testng:testng:7.5'
     testImplementation("org.jbehave:jbehave-core:$jbehaveVersion")
     testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
@@ -203,8 +203,8 @@ def jbehaveVersion = "4.8.3"
 def aspectjVersion = "1.9.7"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-jbehave:1.2.0"
-    testImplementation "ru.testit:testit-java-commons:1.2.0"
+    testImplementation "ru.testit:testit-adapter-jbehave:1.3.5"
+    testImplementation "ru.testit:testit-java-commons:1.3.5"
     testImplementation("org.jbehave:jbehave-core:$jbehaveVersion")
     testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.2"
@@ -237,8 +237,8 @@ def jbehaveVersion = "4.8.3"
 def aspectjVersion = "1.9.7"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-jbehave:1.2.0"
-    testImplementation "ru.testit:testit-java-commons:1.2.0"
+    testImplementation "ru.testit:testit-adapter-jbehave:1.3.5"
+    testImplementation "ru.testit:testit-java-commons:1.3.5"
     testImplementation("org.jbehave:jbehave-core:$jbehaveVersion")
     testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
     testImplementation "junit:junit:4.12"

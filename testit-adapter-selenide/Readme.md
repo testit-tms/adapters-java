@@ -1,4 +1,4 @@
-# Test IT TMS adapter for JUnit 4
+# Test IT TMS adapter for Selenide
 
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
@@ -14,7 +14,7 @@ Add this dependency to your project POM:
 
 <dependency>
     <groupId>ru.testit</groupId>
-    <artifactId>testit-adapter-junit4</artifactId>
+    <artifactId>testit-adapter-selenide</artifactId>
     <version>1.3.5</version>
     <scope>compile</scope>
 </dependency>
@@ -25,7 +25,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-junit4:1.3.5"
+implementation "ru.testit:testit-adapter-selenide:1.3.5"
 ```
 
 ## Usage
@@ -42,14 +42,19 @@ implementation "ru.testit:testit-adapter-junit4:1.3.5"
     </properties>
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <version>1.6.3</version>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.7.0</version>
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
@@ -58,7 +63,12 @@ implementation "ru.testit:testit-adapter-junit4:1.3.5"
         </dependency>
         <dependency>
             <groupId>ru.testit</groupId>
-            <artifactId>testit-adapter-junit4</artifactId>
+            <artifactId>testit-adapter-selenide</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-adapter-junit5</artifactId>
             <version>${adapter.version}</version>
         </dependency>
         <dependency>
@@ -85,6 +95,10 @@ implementation "ru.testit:testit-adapter-junit4:1.3.5"
                     <complianceLevel>${maven.compiler.source}</complianceLevel>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.source}</target>
+                    <!--Allows the adapter to accept real parameter names-->
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
                 <executions>
                     <execution>
@@ -110,6 +124,11 @@ implementation "ru.testit:testit-adapter-junit4:1.3.5"
                 <configuration>
                     <argLine>-XX:-UseSplitVerifier</argLine>
                     <argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar</argLine>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.extensions.autodetection.enabled = true
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
         </plugins>
@@ -138,6 +157,8 @@ version '1.0-SNAPSHOT'
 compileJava.options.encoding = 'utf-8'
 tasks.withType(JavaCompile) {
     options.encoding = 'utf-8'
+    // Allows the adapter to accept real parameter names
+    options.compilerArgs.add("-parameters")
 }
 
 repositories {
@@ -147,15 +168,19 @@ repositories {
 
 dependencies {
     testImplementation 'org.aspectj:aspectjrt:1.9.7'
-    testImplementation "ru.testit:testit-adapter-junit4:1.3.5"
+    testImplementation "ru.testit:testit-adapter-selenide:1.3.5"
+    testImplementation "ru.testit:testit-adapter-junit5:1.3.5"
     testImplementation "ru.testit:testit-java-commons:1.3.5"
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.junit.platform:junit-platform-runner:1.6.3'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"
+    testImplementation "org.junit.platform:junit-platform-launcher:1.9.0"
     aspectConfig "org.aspectj:aspectjweaver:1.9.7"
 }
 
 test {
-    useJUnit()
+    useJUnitPlatform()
+    systemProperty 'junit.jupiter.extensions.autodetection.enabled', true
     doFirst {
         def weaver = configurations.aspectConfig.find { it.name.contains("aspectjweaver") }
         jvmArgs += "-javaagent:$weaver"
@@ -163,7 +188,7 @@ test {
     // to enable command line options, specify the option that will be passed like this:
     // systemProperty '<parameter_name>', System.getProperty('<parameter_name>')
     // for example:
-    // systemProperty 'tmsTestRunName', System.getProperty('tmsTestRunName') 
+    // systemProperty 'tmsTestRunName', System.getProperty('tmsTestRunName')
 }
 ```
 
@@ -226,9 +251,8 @@ see [How to add an attachment for a failed test?](https://github.com/testit-tms/
 
 Use annotations to specify information about autotest.
 
-Description of annotations (\* - required):
+Description of annotations:
 
-- \*`RunWith(BaseJunit4Runner.class)` - connect the adapter package to run tests
 - `WorkItemIds` - linking an autotest to a test case.
 - `DisplayName` - name of the autotest in Test IT.
 - `ExternalId` - ID of the autotest within the project in Test IT.
@@ -237,8 +261,6 @@ Description of annotations (\* - required):
 - `Labels` - tags in the autotest card.
 - `Links` - links in the autotest card.
 - `Step` - the designation of the step.
-- `Classname` - name of the classname.
-- `Namespace` - name of the package.
 
 Description of methods:
 
@@ -246,58 +268,77 @@ Description of methods:
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
 
+Description of SelenideListener methods:
+
+- `saveScreenshots(true)` - save screenshots if test fails
+- `savePageSource(true)` - save page source if test fails
+- `saveLogs(LogType.BROWSER, Level.All)` - save logs if test fails
+- `includeSelenideSteps(true)` - add Selenide steps
+
 ### Examples
 
+#### Simple test
+
 ```java
-package ru.testit.samples;
+import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.junit5.TextReportExtension;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import ru.testit.selenide.SelenideListener;
+import ru.testit.annotations.Step;
+import ru.testit.annotations.Title;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import ru.testit.annotations.*;
-import ru.testit.listener.BaseJunit4Runner;
-import ru.testit.models.LinkItem;
-import ru.testit.tms.client.TMSClient;
+import static com.codeborne.selenide.Selectors.byXpath;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
 
-@RunWith(BaseJunit4Runner.class)
-public class SampleTest {
+import static com.codeborne.selenide.Condition.text;
 
-    @Test
-    @ExternalId("Simple_test_1")
-    @DisplayName("Simple test 1")
-    public void simpleTest1() {
-        Assert.assertTrue(true);
+@ExtendWith(TextReportExtension.class)
+public class ExampleTests {
+
+    @BeforeEach
+    public void setUp() {
+        SelenideLogger.addListener(
+                "TmsSelenide",
+                new SelenideListener()
+                        .saveScreenshots(true)
+                        .savePageSource(true)
+                        .includeSelenideSteps(true)
+                        .saveLogs(LogType.BROWSER, Level.All));
+
+        steps = new Steps();
     }
 
     @Test
-    @ExternalId("Simple_test_2")
-    @WorkItemIds({"12345", "54321"})
-    @DisplayName("Simple test 2")
-    @Title("test №2")
-    @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
-            @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
-            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
-    public void itsTrueReallyTrue() {
-        stepWithParams("password", 456);
-        Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
-        Assert.assertTrue(true);
+    public void TestFailed() {
+        openPage();
+
+        SelenideElement searchField = getElementByXpath("//h1[contains(@class,\"title\")]");
+
+        searchField.shouldHave(text("Система для управления тестированием"));
+    }
+
+    @Test
+    public void TestSuccess() {
+        openPage();
+
+        SelenideElement searchField = getElementByXpath("//h1[contains(@class,\"title\")]");
+
+        searchField.shouldHave(text("Система управления тестированием"));
     }
 
     @Step
-    @Title("Step 1 with params: {param1}, {param2}")
-    @Description("Step 1 description")
-    private void stepWithParams(String param1, int param2) {
-        stepWithoutParams();
-        Assert.assertTrue(true);
-        Adapter.addMessage("Message");
+    public void openPage() {
+        open("https://testit.software/");
     }
 
     @Step
-    @Title("Step 2")
-    @Description("Step 2 description")
-    private void stepWithoutParams() {
-        Assert.assertTrue(true);
-        Adapter.addAttachment("/Users/user/screen.json");
+    @Title("Search element by xpath")
+    public SelenideElement getElementByXpath(String xpath) {
+        return $(byXpath(xpath));
     }
 }
 ```

@@ -4,18 +4,21 @@ import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
-import ru.testit.models.*;
-import ru.testit.services.ExecutableTest;
+import ru.testit.models.ClassContainer;
+import ru.testit.models.ItemStatus;
+import ru.testit.models.MainContainer;
+import ru.testit.models.TestResult;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
+import ru.testit.services.ExecutableTest;
+
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import static java.util.Objects.nonNull;
 
 @RunListener.ThreadSafe
-public class BaseJunit4Listener extends RunListener
-{
+public class BaseJunit4Listener extends RunListener {
     private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
     private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
@@ -43,7 +46,7 @@ public class BaseJunit4Listener extends RunListener
 
     @Override
     public void testRunFinished(final Result result) {
-        if (isFinished.get()){
+        if (isFinished.get()) {
             return;
         }
 
@@ -103,7 +106,7 @@ public class BaseJunit4Listener extends RunListener
     }
 
     protected void startTestCase(Description method, final String uuid) {
-        String fullName =  method.getClassName();
+        String fullName = method.getClassName();
         int index = fullName.lastIndexOf(".");
 
         final TestResult result = new TestResult()
@@ -113,8 +116,8 @@ public class BaseJunit4Listener extends RunListener
                 .setWorkItemId(Utils.extractWorkItemId(method))
                 .setTitle(Utils.extractTitle(method))
                 .setName(Utils.extractDisplayName(method))
-                .setClassName((index != -1) ? fullName.substring(index + 1) : fullName)
-                .setSpaceName((index != -1) ? fullName.substring(0, index) : null)
+                .setClassName(Utils.extractClassname(method, (index != -1) ? fullName.substring(index + 1) : fullName))
+                .setSpaceName(Utils.extractNamespace(method, (index != -1) ? fullName.substring(0, index) : null))
                 .setLinkItems(Utils.extractLinks(method))
                 .setDescription(Utils.extractDescription(method));
 
