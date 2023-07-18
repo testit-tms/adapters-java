@@ -1,4 +1,5 @@
 # Test IT TMS adapter for JUnit 4
+
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
 ## Getting Started
@@ -10,6 +11,7 @@
 Add this dependency to your project POM:
 
 ```xml
+
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-junit4</artifactId>
@@ -118,9 +120,10 @@ implementation "ru.testit:testit-adapter-junit4:1.3.5"
 #### Gradle users
 
 1. Add this dependency to your project build file:
+
 ```groovy
 plugins {
-   id 'java'
+    id 'java'
 }
 
 configurations {
@@ -134,12 +137,12 @@ version '1.0-SNAPSHOT'
 
 compileJava.options.encoding = 'utf-8'
 tasks.withType(JavaCompile) {
-   options.encoding = 'utf-8'
+    options.encoding = 'utf-8'
 }
 
 repositories {
-   mavenCentral()
-   mavenLocal()
+    mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -157,12 +160,13 @@ test {
         def weaver = configurations.aspectConfig.find { it.name.contains("aspectjweaver") }
         jvmArgs += "-javaagent:$weaver"
     }
-   // to enable command line options, specify the option that will be passed like this:
-   // systemProperty '<parameter_name>', System.getProperty('<parameter_name>')
-   // for example:
-   // systemProperty 'tmsTestRunName', System.getProperty('tmsTestRunName') 
+    // to enable command line options, specify the option that will be passed like this:
+    // systemProperty '<parameter_name>', System.getProperty('<parameter_name>')
+    // for example:
+    // systemProperty 'tmsTestRunName', System.getProperty('tmsTestRunName') 
 }
 ```
+
 2. Press the **Reload All Gradle Projects** button.
 
 ### Configuration
@@ -183,6 +187,7 @@ test {
 #### File
 
 Create **testit.properties** file in the resource directory of the project:
+
 ``` 
 url=URL
 privateToken=USER_PRIVATE_TOKEN
@@ -198,26 +203,31 @@ certValidation=CERT_VALIDATION
 #### Examples
 
 ##### Gradle
+
 ```
 gradle test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
 -DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsCertValidation=true
 ```
 
 ##### Maven
+
 ```
 maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
 -DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsCertValidation=true
 ```
 
-If you want to enable debug mode then see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+If you want to enable debug mode then
+see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
 
-If you want to add attachment for a failed test then see [How to add an attachment for a failed test?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+If you want to add attachment for a failed test then
+see [How to add an attachment for a failed test?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
 
 ### Annotations
 
 Use annotations to specify information about autotest.
 
 Description of annotations (\* - required):
+
 - \*`RunWith(BaseJunit4Runner.class)` - connect the adapter package to run tests
 - `WorkItemIds` - linking an autotest to a test case.
 - `DisplayName` - name of the autotest in Test IT.
@@ -227,8 +237,11 @@ Description of annotations (\* - required):
 - `Labels` - tags in the autotest card.
 - `Links` - links in the autotest card.
 - `Step` - the designation of the step.
+- `Classname` - name of the classname.
+- `Namespace` - name of the package.
 
 Description of methods:
+
 - `Adapter.addLinks` - add links to the autotest result.
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
@@ -249,43 +262,43 @@ import ru.testit.tms.client.TMSClient;
 @RunWith(BaseJunit4Runner.class)
 public class SampleTest {
 
-   @Test
-   @ExternalId("Simple_test_1")
-   @DisplayName("Simple test 1")
-   public void simpleTest1() {
-      Assert.assertTrue(true);
-   }
+    @Test
+    @ExternalId("Simple_test_1")
+    @DisplayName("Simple test 1")
+    public void simpleTest1() {
+        Assert.assertTrue(true);
+    }
 
-   @Test
-   @ExternalId("Simple_test_2")
-   @WorkItemIds({"12345","54321"})
-   @DisplayName("Simple test 2")
-   @Title("test №2")
-   @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
-           @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
-           @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
-   public void itsTrueReallyTrue() {
-      stepWithParams("password", 456);
-      Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
-      Assert.assertTrue(true);
-   }
+    @Test
+    @ExternalId("Simple_test_2")
+    @WorkItemIds({"12345", "54321"})
+    @DisplayName("Simple test 2")
+    @Title("test №2")
+    @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
+            @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
+            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
+    public void itsTrueReallyTrue() {
+        stepWithParams("password", 456);
+        Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
+        Assert.assertTrue(true);
+    }
 
-   @Step
-   @Title("Step 1 with params: {param1}, {param2}")
-   @Description("Step 1 description")
-   private void stepWithParams(String param1, int param2) {
-      stepWithoutParams();
-      Assert.assertTrue(true);
-      Adapter.addMessage("Message");
-   }
+    @Step
+    @Title("Step 1 with params: {param1}, {param2}")
+    @Description("Step 1 description")
+    private void stepWithParams(String param1, int param2) {
+        stepWithoutParams();
+        Assert.assertTrue(true);
+        Adapter.addMessage("Message");
+    }
 
-   @Step
-   @Title("Step 2")
-   @Description("Step 2 description")
-   private void stepWithoutParams() {
-      Assert.assertTrue(true);
-      Adapter.addAttachment("/Users/user/screen.json");
-   }
+    @Step
+    @Title("Step 2")
+    @Description("Step 2 description")
+    private void stepWithoutParams() {
+        Assert.assertTrue(true);
+        Adapter.addAttachment("/Users/user/screen.json");
+    }
 }
 ```
 
@@ -293,11 +306,15 @@ public class SampleTest {
 
 You can help to develop the project. Any contributions are **greatly appreciated**.
 
-* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/testit-tms/adapters-java/issues/new) to discuss it, or create a direct pull request after you edit the *README.md* file with necessary changes.
+* If you have suggestions for adding or removing projects, feel free
+  to [open an issue](https://github.com/testit-tms/adapters-java/issues/new) to discuss it, or create a direct pull
+  request after you edit the *README.md* file with necessary changes.
 * Make sure to check your spelling and grammar.
 * Create individual PR for each suggestion.
-* Read the [Code Of Conduct](https://github.com/testit-tms/adapters-java/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
+* Read the [Code Of Conduct](https://github.com/testit-tms/adapters-java/blob/main/CODE_OF_CONDUCT.md) before posting
+  your first idea as well.
 
 # License
 
-Distributed under the Apache-2.0 License. See [LICENSE](https://github.com/testit-tms/adapters-java/blob/main/LICENSE.md) for more information.
+Distributed under the Apache-2.0 License.
+See [LICENSE](https://github.com/testit-tms/adapters-java/blob/main/LICENSE.md) for more information.
