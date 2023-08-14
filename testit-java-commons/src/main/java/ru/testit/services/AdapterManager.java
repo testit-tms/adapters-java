@@ -176,7 +176,7 @@ public class AdapterManager {
     public void stopClassContainer(final String uuid) {
         final Optional<ClassContainer> found = storage.getClassContainer(uuid);
         if (!found.isPresent()) {
-            LOGGER.error("Could not stop class container: container with uuid {} not found", uuid);
+            LOGGER.debug("Could not stop class container: container with uuid {} not found", uuid);
             return;
         }
         final ClassContainer container = found.get();
@@ -202,7 +202,7 @@ public class AdapterManager {
 
         final Optional<ClassContainer> found = storage.getClassContainer(uuid);
         if (!found.isPresent()) {
-            LOGGER.error("Could not update class container: container with uuid {} not found", uuid);
+            LOGGER.debug("Could not update class container: container with uuid {} not found", uuid);
             return;
         }
         final ClassContainer container = found.get();
@@ -507,7 +507,7 @@ public class AdapterManager {
     public void startStep(final String uuid, final StepResult result) {
         final Optional<String> current = threadContext.getCurrent();
         if (!current.isPresent()) {
-            LOGGER.error("Could not start step {}: no test case running", uuid);
+            LOGGER.debug("Could not start step {}: no test case running", result);
             return;
         }
         final String parentUuid = current.get();
@@ -547,7 +547,7 @@ public class AdapterManager {
     public void updateStep(final Consumer<StepResult> update) {
         final Optional<String> current = threadContext.getCurrent();
         if (!current.isPresent()) {
-            LOGGER.error("Could not update step: no step running");
+            LOGGER.debug("Could not update step: no step running");
             return;
         }
         final String uuid = current.get();
@@ -584,7 +584,7 @@ public class AdapterManager {
         final Optional<String> current = threadContext.getCurrent()
                 .filter(uuid -> !Objects.equals(uuid, root));
         if (!current.isPresent()) {
-            LOGGER.error("Could not stop step: no step running");
+            LOGGER.debug("Could not stop step: no step running");
             return;
         }
         final String uuid = current.get();
