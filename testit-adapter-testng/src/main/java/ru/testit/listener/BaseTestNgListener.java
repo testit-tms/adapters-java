@@ -56,6 +56,8 @@ public class BaseTestNgListener implements
 
     private final AdapterManager adapterManager;
 
+    private static final String paramRegex = "\\{.*}";
+
     public BaseTestNgListener() {
         adapterManager = Adapter.getAdapterManager();
     }
@@ -403,7 +405,10 @@ public class BaseTestNgListener implements
         return methods.stream().filter(method -> {
             String externalId = Utils.extractExternalID(method.getMethod().getConstructorOrMethod().getMethod(), null);
 
-            if (externalId.matches("\\{.*}")) {
+            final Pattern pattern = Pattern.compile(paramRegex, Pattern.MULTILINE);
+            final Matcher matcher = pattern.matcher(externalId);
+
+            if (matcher.find()) {
                 boolean include = filterTestWithParameters(testsForRun, externalId);
 
                 if (LOGGER.isDebugEnabled()) {
@@ -432,7 +437,7 @@ public class BaseTestNgListener implements
     }
 
     private boolean filterTestWithParameters(List<String> testsForRun, String externalId) {
-        Pattern pattern = Pattern.compile(externalId.replaceAll("\\{.*}", ".*"));
+        Pattern pattern = Pattern.compile(externalId.replaceAll(paramRegex, ".*"));
 
         for (String test : testsForRun) {
             Matcher matcher = pattern.matcher(test);
