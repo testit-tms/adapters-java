@@ -39,6 +39,7 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
         <maven.compiler.target>8</maven.compiler.target>
         <aspectj.version>1.9.7</aspectj.version>
         <adapter.version>1.3.5</adapter.version>
+        <aspectj-maven-plugin.version>1.14.0</aspectj-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -74,11 +75,11 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
-                <version>1.14.0</version>
+                <version>${aspectj-maven-plugin.version}</version>
                 <configuration>
                     <complianceLevel>${maven.compiler.source}</complianceLevel>
                     <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.source}</target>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
                 <executions>
                     <execution>
