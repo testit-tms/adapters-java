@@ -100,7 +100,8 @@ public class Converter {
     public static TestResultUpdateModel testResultToTestResultUpdateModel(TestResultModel result) {
         TestResultUpdateModel model = new TestResultUpdateModel();
 
-        model.setDurationInMs(result.getDurationInMs());
+        // TODO: fix bug
+//        model.setDurationInMs(result.getDurationInMs());
         model.setOutcome(result.getOutcome());
         model.setLinks(result.getLinks());
         model.setStepResults(result.getStepResults());
