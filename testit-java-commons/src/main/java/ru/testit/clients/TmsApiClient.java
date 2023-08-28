@@ -19,6 +19,7 @@ public class TmsApiClient implements ApiClient {
     private static final String AUTH_PREFIX = "PrivateToken";
     private static final boolean INCLUDE_STEPS = true;
     private static final boolean INCLUDE_LABELS = true;
+    private static final boolean INCLUDE_LINKS = true;
 
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
@@ -101,6 +102,7 @@ public class TmsApiClient implements ApiClient {
         SearchAutoTestsQueryIncludesModel includes = new SearchAutoTestsQueryIncludesModel();
         includes.setIncludeLabels(INCLUDE_LABELS);
         includes.setIncludeSteps(INCLUDE_STEPS);
+        includes.setIncludeLinks(INCLUDE_LINKS);
 
         AutotestsSelectModel model = new AutotestsSelectModel();
         model.setFilter(filter);
