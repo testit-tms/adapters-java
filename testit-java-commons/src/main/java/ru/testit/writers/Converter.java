@@ -11,8 +11,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Converter {
-    public static AutoTestPostModel testResultToAutoTestPostModel(TestResult result) {
-        AutoTestPostModel model = new AutoTestPostModel();
+    public static CreateAutoTestRequest testResultToAutoTestPostModel(TestResult result) {
+        CreateAutoTestRequest model = new CreateAutoTestRequest();
 
         model.setExternalId(result.getExternalId());
         model.setDescription(result.getDescription());
@@ -97,8 +97,8 @@ public class Converter {
                 ).collect(Collectors.toList());
     }
 
-    public static TestResultUpdateModel testResultToTestResultUpdateModel(TestResultModel result) {
-        TestResultUpdateModel model = new TestResultUpdateModel();
+    public static ApiV2TestResultsIdPutRequest testResultToTestResultUpdateModel(TestResultModel result) {
+        ApiV2TestResultsIdPutRequest model = new ApiV2TestResultsIdPutRequest();
 
         // TODO: fix bug
 //        model.setDurationInMs(result.getDurationInMs());
@@ -113,8 +113,8 @@ public class Converter {
         return model;
     }
 
-    public static AutoTestPutModel testResultToAutoTestPutModel(TestResult result) {
-        AutoTestPutModel model = new AutoTestPutModel();
+    public static UpdateAutoTestRequest testResultToAutoTestPutModel(TestResult result) {
+        UpdateAutoTestRequest model = new UpdateAutoTestRequest();
 
         model.setExternalId(result.getExternalId());
         model.setDescription(result.getDescription());
@@ -131,8 +131,8 @@ public class Converter {
         return model;
     }
 
-    public static AutoTestPutModel autoTestModelToAutoTestPutModel(AutoTestModel autoTestModel) {
-        AutoTestPutModel model = new AutoTestPutModel();
+    public static UpdateAutoTestRequest autoTestModelToAutoTestPutModel(AutoTestModel autoTestModel) {
+        UpdateAutoTestRequest model = new UpdateAutoTestRequest();
 
         model.setId(autoTestModel.getId());
         model.setExternalId(autoTestModel.getExternalId());

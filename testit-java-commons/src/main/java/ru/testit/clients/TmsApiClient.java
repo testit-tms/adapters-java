@@ -33,7 +33,6 @@ public class TmsApiClient implements ApiClient {
         apiClient.setBasePath(config.getUrl());
         apiClient.setApiKeyPrefix(AUTH_PREFIX);
         apiClient.setApiKey(config.getPrivateToken());
-        apiClient.setVerifyingSsl(config.getCertValidation());
 
         clientConfiguration = config;
         testRunsApi = new TestRunsApi(apiClient);
@@ -45,7 +44,8 @@ public class TmsApiClient implements ApiClient {
     @Override
     public TestRunV2GetModel createTestRun() throws ApiException {
 
-        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
+
+        CreateEmptyRequest model = new CreateEmptyRequest();
         model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
 
         if (!Objects.equals(this.clientConfiguration.getTestRunName(), "null")) {
@@ -77,19 +77,19 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public void updateAutoTest(AutoTestPutModel model) throws ApiException {
+    public void updateAutoTest(UpdateAutoTestRequest model) throws ApiException {
         autoTestsApi.updateAutoTest(model);
     }
 
     @Override
-    public String createAutoTest(AutoTestPostModel model) throws ApiException {
+    public String createAutoTest(CreateAutoTestRequest model) throws ApiException {
         return Objects.requireNonNull(autoTestsApi.createAutoTest(model).getId()).toString();
     }
 
     @Override
     public AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException {
 
-        AutotestFilterModel filter = new AutotestFilterModel();
+        AutotestsSelectModelFilter filter = new AutotestsSelectModelFilter();
 
         Set<UUID> projectIds = new HashSet<>();
         projectIds.add(UUID.fromString(this.clientConfiguration.getProjectId()));
@@ -99,12 +99,12 @@ public class TmsApiClient implements ApiClient {
         externalIds.add(externalId);
         filter.externalIds(externalIds);
 
-        SearchAutoTestsQueryIncludesModel includes = new SearchAutoTestsQueryIncludesModel();
+        AutotestsSelectModelIncludes includes = new AutotestsSelectModelIncludes();
         includes.setIncludeLabels(INCLUDE_LABELS);
         includes.setIncludeSteps(INCLUDE_STEPS);
         includes.setIncludeLinks(INCLUDE_LINKS);
 
-        AutotestsSelectModel model = new AutotestsSelectModel();
+        ApiV2AutoTestsSearchPostRequest model = new ApiV2AutoTestsSearchPostRequest();
         model.setFilter(filter);
         model.setIncludes(includes);
 
@@ -128,7 +128,7 @@ public class TmsApiClient implements ApiClient {
         int maxTries = 3;
         while(true) {
             try {
-                autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
+                autoTestsApi.linkAutoTestToWorkItem(id, new LinkAutoTestToWorkItemRequest().id(workItemId));
                 return;
             } catch (ApiException e) {
                 try {
@@ -173,7 +173,7 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public void updateTestResult(UUID uuid, TestResultUpdateModel model) throws ApiException {
+    public void updateTestResult(UUID uuid, ApiV2TestResultsIdPutRequest model) throws ApiException {
         testResultsApi.apiV2TestResultsIdPut(uuid, model);
     }
 }
