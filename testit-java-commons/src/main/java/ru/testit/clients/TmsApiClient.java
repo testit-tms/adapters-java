@@ -43,8 +43,6 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public TestRunV2GetModel createTestRun() throws ApiException {
-
-
         CreateEmptyRequest model = new CreateEmptyRequest();
         model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
 
@@ -94,6 +92,7 @@ public class TmsApiClient implements ApiClient {
         Set<UUID> projectIds = new HashSet<>();
         projectIds.add(UUID.fromString(this.clientConfiguration.getProjectId()));
         filter.setProjectIds(projectIds);
+        filter.setIsDeleted(false);
 
         Set<String> externalIds = new HashSet<>();
         externalIds.add(externalId);
