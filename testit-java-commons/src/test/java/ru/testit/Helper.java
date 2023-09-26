@@ -120,8 +120,8 @@ public class Helper {
         return model;
     }
 
-    public static AutoTestPutModel generateAutoTestPutModel(String projectId) {
-        AutoTestPutModel model = new AutoTestPutModel();
+    public static UpdateAutoTestRequest generateAutoTestPutModel(String projectId) {
+        UpdateAutoTestRequest model = new UpdateAutoTestRequest();
 
         model.setTitle(TITLE);
         model.setExternalId(EXTERNAL_ID);
@@ -136,12 +136,13 @@ public class Helper {
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
         model.setId(UUID.fromString(TEST_UUID));
+        model.isFlaky(null);
 
         return model;
     }
 
-    public static AutoTestPostModel generateAutoTestPostModel(String projectId) {
-        AutoTestPostModel model = new AutoTestPostModel();
+    public static CreateAutoTestRequest generateAutoTestPostModel(String projectId) {
+        CreateAutoTestRequest model = new CreateAutoTestRequest();
 
         model.setTitle(TITLE);
         model.setExternalId(EXTERNAL_ID);

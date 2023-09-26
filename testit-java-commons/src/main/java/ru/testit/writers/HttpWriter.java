@@ -87,11 +87,11 @@ public class HttpWriter implements Writer {
                     }
                     apiClient.linkAutoTestToWorkItem(autoTestId, i);
                 } catch (ApiException e) {
-                    LOGGER.error("Can not link the autotest: ".concat(e.getMessage()));
+                    LOGGER.error("Can not link the autotest: " + e.getMessage());
                 }
             });
         } catch (ApiException e) {
-            LOGGER.error("Can not write the autotest: ".concat(e.getMessage()));
+            LOGGER.error("Can not write the autotest: " + (e.getMessage()));
         }
     }
 
@@ -123,7 +123,7 @@ public class HttpWriter implements Writer {
 
                     apiClient.updateAutoTest(autoTestPutModel);
                 } catch (ApiException e) {
-                    LOGGER.error("Can not write the class: ".concat(e.getMessage()));
+                    LOGGER.error("Can not write the class: " + (e.getMessage()));
                 }
             });
         }
@@ -196,7 +196,7 @@ public class HttpWriter implements Writer {
                             apiClient.updateTestResult(testResultId, model);
 
                         } catch (ApiException e) {
-                            LOGGER.error("Can not update the autotest: ".concat(e.getMessage()));
+                            LOGGER.error("Can not update the autotest: " + (e.getMessage()));
                         }
                     });
                 }
@@ -209,7 +209,7 @@ public class HttpWriter implements Writer {
         try {
             return apiClient.addAttachment(path);
         } catch (ApiException e) {
-            LOGGER.error("Can not write attachment: ".concat(e.getMessage()));
+            LOGGER.error("Can not write attachment: " + (e.getMessage()));
 
             return "";
         }
