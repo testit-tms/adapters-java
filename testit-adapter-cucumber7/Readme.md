@@ -375,13 +375,13 @@ If you want to add attachment for a failed test then see [How to add an attachme
 Use tags to specify information about autotest.
 
 Description of tags:
-- `WorkItemIds` - linking an autotest to a test case.
-- `DisplayName` - name of the autotest in Test IT.
-- `ExternalId` - ID of the autotest within the project in Test IT.
-- `Title` - title in the autotest card.
-- `Description` - description in the autotest card.
-- `Labels` - tags in the autotest card.
-- `Links` - links in the autotest card.
+- `WorkItemIds` - a method that links autotests with manual tests. Receives the array of manual tests' IDs
+- `DisplayName` - internal autotest name (used in Test IT)
+- `ExternalId` - unique internal autotest ID (used in Test IT)
+- `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
+- `Description` - autotest description specified in the autotest card
+- `Labels` - tags listed in the autotest card
+- `Links` - links listed in the autotest card
 
 Description of methods:
 - `Adapter.addLinks` - add links to the autotest result.
