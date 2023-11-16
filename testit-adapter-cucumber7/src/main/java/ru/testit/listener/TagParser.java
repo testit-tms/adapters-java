@@ -17,6 +17,7 @@ public class TagParser {
     private static final String TAG_VALUE_DELIMITER = ",";
     private static final String EXTERNAL_ID = "@EXTERNALID";
     private static final String TITLE = "@TITLE";
+    private static final String TITLE = "@NAMESPACE";
     private static final String DISPLAY_NAME = "@DISPLAYNAME";
     private static final String DESCRIPTION = "@DESCRIPTION";
     private static final String LABELS = "@LABELS";
@@ -28,6 +29,7 @@ public class TagParser {
     private final List<String> workItemIds = new ArrayList<>();
     private String externalId = "";
     private String title = "";
+    private String nameSpace = "";
     private String displayName = "";
     private String description = "";
 
@@ -52,6 +54,9 @@ public class TagParser {
                         break;
                     case TITLE:
                         title = Utils.setParameters(tagValue, parameters);
+                        break;
+                    case NAMESPACE:
+                        nameSpace = Utils.setParameters(tagValue, parameters);
                         break;
                     case DISPLAY_NAME:
                         displayName = Utils.setParameters(tagValue, parameters);
@@ -108,6 +113,10 @@ public class TagParser {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getNameSpace() {
+        return nameSpace;
     }
 
     public String getDisplayName() {
