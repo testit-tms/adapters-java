@@ -33,6 +33,7 @@ public class TmsApiClient implements ApiClient {
         apiClient.setBasePath(config.getUrl());
         apiClient.setApiKeyPrefix(AUTH_PREFIX);
         apiClient.setApiKey(config.getPrivateToken());
+        apiClient.setVerifyingSsl(config.getCertValidation());
 
         clientConfiguration = config;
         testRunsApi = new TestRunsApi(apiClient);
