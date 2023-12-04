@@ -382,6 +382,8 @@ Description of tags:
 - `Description` - autotest description specified in the autotest card
 - `Labels` - tags listed in the autotest card
 - `Links` - links listed in the autotest card
+- `NameSpace` - directory in the TMS system (default - file's name of test)
+- `ClassName` - subdirectory in the TMS system (default - class's name of test)
 
 Description of methods:
 - `Adapter.addLinks` - add links to the autotest result.
@@ -467,6 +469,8 @@ Feature: Sample
   @Title=Title_in_the_autotest_card
   @Description=Test_with_all_annotations
   @Labels=Tag1,Tag2
+  @NameSpace=Space1
+  @ClassName=Class1
   @Links={"url":"https://dumps.example.com/module/repository","title":"Repository","description":"Example_of_repository","type":"Repository"}
   Scenario: Create new project, section and test case
     When I create a project
