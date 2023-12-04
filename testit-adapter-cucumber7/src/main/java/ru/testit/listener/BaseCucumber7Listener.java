@@ -196,9 +196,22 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
                     scenarioParser.getAction(currentFeatureFile.get(), pickleStep.getStep().getLine())
             ).orElse("UNDEFINED");
 
+            Map<String, String> parameters = new HashMap<>();
+
+            for (Argument argument : pickleStep.getDefinitionArgument()) {
+                parameters.put("arg" + parameters.size(), argument.getValue());
+            }
+
+            parameters = scenarioParser.getParameters(
+                    currentFeatureFile.get(),
+                    pickleStep.getStep().getLine(),
+                    parameters
+            );
+
             final StepResult stepResult = new StepResult()
                     .setName(String.format("%s %s", stepKeyword, pickleStep.getStep().getText()))
-                    .setStart(System.currentTimeMillis());
+                    .setStart(System.currentTimeMillis())
+                    .setParameters(parameters);
 
             adapterManager.startStep(getTestCaseUuid(currentTestCase.get()), getStepUuid(pickleStep), stepResult);
         } else if (event.getTestStep() instanceof HookTestStep) {
