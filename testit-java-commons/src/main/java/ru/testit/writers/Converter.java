@@ -100,8 +100,7 @@ public class Converter {
     public static ApiV2TestResultsIdPutRequest testResultToTestResultUpdateModel(TestResultModel result) {
         ApiV2TestResultsIdPutRequest model = new ApiV2TestResultsIdPutRequest();
 
-        // TODO: fix bug
-//        model.setDurationInMs(result.getDurationInMs());
+        model.setDurationInMs(result.getDurationInMs());
         model.setOutcome(result.getOutcome());
         model.setLinks(result.getLinks());
         model.setStepResults(result.getStepResults());
