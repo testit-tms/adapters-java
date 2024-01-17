@@ -22,6 +22,7 @@ nexusPublishing {
 }
 
 tasks.withType(JavaCompile::class) {
+    options.setIncremental(true)
     options.encoding = "UTF-8"
 }
 

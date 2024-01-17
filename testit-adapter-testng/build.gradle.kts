@@ -26,6 +26,7 @@ tasks.getByName<Test>("test")  {
         suites("src/test/resources/testng.xml")
     })
     exclude("**/samples/*")
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     doFirst {
         jvmArgs("-javaagent:${agent.singleFile}")
     }
@@ -34,6 +35,7 @@ tasks.getByName<Test>("test")  {
 
 tasks.compileTestJava {
     options.encoding = "UTF-8"
+    options.setIncremental(true)
     // Allows the adapter to accept real parameter names
     options.compilerArgs.add("-parameters")
 }

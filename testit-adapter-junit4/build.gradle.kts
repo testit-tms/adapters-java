@@ -34,11 +34,13 @@ tasks.jar {
 
 tasks.compileTestJava {
     options.encoding = "UTF-8"
+    options.setIncremental(true)
 }
 
 tasks.getByName<Test>("test") {
     useJUnit()
     exclude("**/samples/*")
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     doFirst {
         jvmArgs(
             "-javaagent:${agent.singleFile}"
