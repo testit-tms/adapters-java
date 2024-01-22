@@ -30,10 +30,12 @@ tasks.jar {
 
 tasks.compileTestJava {
     options.encoding = "UTF-8"
+    options.setIncremental(true)
     // Allows the adapter to accept real parameter names
     options.compilerArgs.add("-parameters")
 }
 
 tasks.test {
     useJUnitPlatform()
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
 }

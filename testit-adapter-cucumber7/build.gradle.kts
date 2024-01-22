@@ -29,10 +29,12 @@ dependencies {
 tasks.getByName<Test>("test") {
     useTestNG {}
     exclude("**/samples/*")
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
 }
 
 tasks.compileTestJava {
     options.encoding = "UTF-8"
+    options.setIncremental(true)
 }
 
 tasks.jar {

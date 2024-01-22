@@ -38,6 +38,7 @@ tasks.jar {
 
 tasks.compileTestJava {
     options.encoding = "UTF-8"
+    options.setIncremental(true)
     // Allows the adapter to accept real parameter names
     options.compilerArgs.add("-parameters")
 }
@@ -46,6 +47,7 @@ tasks.getByName<Test>("test") {
     useJUnitPlatform()
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
     exclude("**/samples/*")
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     doFirst {
         jvmArgs("-javaagent:${agent.singleFile}")
     }
