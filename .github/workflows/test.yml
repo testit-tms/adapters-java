@@ -153,7 +153,6 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
         run: |
-          ./gradlew init -w
           ./gradlew --no-daemon :${{ matrix.adapter_name }}:jar 
           ./gradlew --no-daemon :${{ env.TMS_ADAPTER_SELENIDE }}:jar
           ./gradlew --no-daemon :${{ env.TMS_ADAPTER_JBEHAVE }}:jar
@@ -171,7 +170,6 @@ jobs:
           echo "ADAPTER_JBEHAVE_JAR=$(find ${{ env.TMS_ADAPTER_JBEHAVE }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
-          ./gradlew init -w
           ./gradlew --no-daemon test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} -DSELENIDE_JAR=${{ env.ADAPTER_SELENIDE_JAR }} -DADAPTER_JBEHAVE=${{ env.ADAPTER_JBEHAVE_JAR }} || exit 0
       - name: Validate
         run: |
@@ -295,7 +293,7 @@ jobs:
           echo "ADAPTER_JAR=$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
-          mvn -e test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} || exit 0
+          mvn --quiet test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
