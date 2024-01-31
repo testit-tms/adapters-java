@@ -141,6 +141,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
       - name: Setup java
         uses: actions/setup-java@v4
         with:
@@ -151,6 +152,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
       - name: Setup environment
         run: |
           ./gradlew --no-daemon :${{ matrix.adapter_name }}:jar 
@@ -268,6 +270,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
       - name: Setup java
         uses: actions/setup-java@v4
         with:
@@ -278,6 +281,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
       - name: Setup environment
         run: |
           ./gradlew --no-daemon :${{ matrix.adapter_name }}:jar 
