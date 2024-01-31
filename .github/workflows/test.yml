@@ -30,6 +30,7 @@ env:
   TMS_JAVA_COMMONS: testit-java-commons
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
   TMS_ADAPTER_SELENIDE: testit-adapter-selenide
+  TMS_ADAPTER_JBEHAVE: testit-adapter-jbehave
   TMS_URL: ${{ secrets.TESTIT_URL }}
 jobs:
   test:
@@ -158,6 +159,7 @@ jobs:
         run: |
           gradle --no-daemon :${{ matrix.adapter_name }}:jar 
           gradle --no-daemon :${{ env.TMS_ADAPTER_SELENIDE }}:jar
+          gradle --no-daemon :${{ env.TMS_ADAPTER_JBEHAVE }}:jar
           gradle --no-daemon :${{ env.TMS_JAVA_COMMONS }}:jar
           dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
@@ -169,9 +171,10 @@ jobs:
         run: |
           echo "ADAPTER_JAR=$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           echo "ADAPTER_SELENIDE_JAR=$(find ${{ env.TMS_ADAPTER_SELENIDE }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
+          echo "ADAPTER_JBEHAVE_JAR=$(find ${{ env.TMS_ADAPTER_JBEHAVE }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
-          gradle --no-daemon test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} -DSELENIDE_JAR=${{ env.ADAPTER_SELENIDE_JAR }} || exit 0
+          gradle --no-daemon test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} -DSELENIDE_JAR=${{ env.ADAPTER_SELENIDE_JAR }} -DADAPTER_JBEHAVE=${{ env.ADAPTER_JBEHAVE_JAR }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
