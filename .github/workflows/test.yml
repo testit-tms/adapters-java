@@ -28,8 +28,6 @@ env:
   TMS_CERT_VALIDATION: false
   TMS_JAVA_COMMONS: testit-java-commons
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
-  TMS_ADAPTER_SELENIDE: testit-adapter-selenide
-  TMS_ADAPTER_JBEHAVE: testit-adapter-jbehave
   TMS_URL: ${{ secrets.TESTIT_URL }}
 jobs:
   test-gradle:
@@ -120,6 +118,8 @@ jobs:
           #  project_id: SERENITY3_GRADLE_JUNIT4_PROJECT_ID
           #  project_name: serenity3-gradle-junit4
     env:
+      TMS_ADAPTER_JBEHAVE: testit-adapter-jbehave
+      TMS_ADAPTER_SELENIDE: testit-adapter-selenide
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
       TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
