@@ -20,7 +20,6 @@ on:
 env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
-  GRADLE_VERSION: 7.4
   JAVA_DISTRIBUTION: "adopt"
   JAVA_VERSION: 8
   PYTHON_VERSION: 3.12
@@ -147,6 +146,7 @@ jobs:
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
+          cache: "gradle"
       - name: Setup python
         uses: actions/setup-python@v5
         with:
@@ -273,6 +273,7 @@ jobs:
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
+          cache: "gradle"
       - name: Setup python
         uses: actions/setup-python@v5
         with:
@@ -292,7 +293,7 @@ jobs:
           echo "ADAPTER_JAR=$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
-          mvn test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} || exit 0
+          mvn -e test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
