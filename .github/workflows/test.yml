@@ -141,7 +141,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          cache: true
       - name: Setup java
         uses: actions/setup-java@v4
         with:
@@ -270,7 +269,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          cache: true
       - name: Setup java
         uses: actions/setup-java@v4
         with:
