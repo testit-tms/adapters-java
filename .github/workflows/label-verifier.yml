@@ -8,6 +8,6 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-      - uses: zwaldowski/match-label-action@v3
+      - uses: zwaldowski/match-label-action@v4
         with:
           allowed_multiple: enhancement, bug, documentation, tests
