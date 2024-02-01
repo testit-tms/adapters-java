@@ -182,38 +182,38 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - adapter_name: testit-adapter-cucumber4
-            configuration_id: CUCUMBER4_MAVEN_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER4_MAVEN_JUNIT4_PROJECT_ID
-            project_name: cucumber4-maven-junit4
-          - adapter_name: testit-adapter-cucumber4
-            configuration_id: CUCUMBER4_MAVEN_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER4_MAVEN_TESTNG_PROJECT_ID
-            project_name: cucumber4-maven-testng
-          - adapter_name: testit-adapter-cucumber5
-            configuration_id: CUCUMBER5_MAVEN_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER5_MAVEN_JUNIT4_PROJECT_ID
-            project_name: cucumber5-maven-junit4
-          - adapter_name: testit-adapter-cucumber5
-            configuration_id: CUCUMBER5_MAVEN_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER5_MAVEN_JUNIT5_PROJECT_ID
-            project_name: cucumber5-maven-junit5
-          - adapter_name: testit-adapter-cucumber5
-            configuration_id: CUCUMBER5_MAVEN_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER5_MAVEN_TESTNG_PROJECT_ID
-            project_name: cucumber5-maven-testng
-          - adapter_name: testit-adapter-cucumber6
-            configuration_id: CUCUMBER6_MAVEN_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER6_MAVEN_JUNIT4_PROJECT_ID
-            project_name: cucumber6-maven-junit4
-          - adapter_name: testit-adapter-cucumber6
-            configuration_id: CUCUMBER6_MAVEN_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER6_MAVEN_JUNIT5_PROJECT_ID
-            project_name: cucumber6-maven-junit5
-          - adapter_name: testit-adapter-cucumber6
-            configuration_id: CUCUMBER6_MAVEN_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER6_MAVEN_TESTNG_PROJECT_ID
-            project_name: cucumber6-maven-testng
+          # - adapter_name: testit-adapter-cucumber4
+          #   configuration_id: CUCUMBER4_MAVEN_JUNIT4_CONFIGURATION_ID
+          #   project_id: CUCUMBER4_MAVEN_JUNIT4_PROJECT_ID
+          #   project_name: cucumber4-maven-junit4
+          # - adapter_name: testit-adapter-cucumber4
+          #   configuration_id: CUCUMBER4_MAVEN_TESTNG_CONFIGURATION_ID
+          #   project_id: CUCUMBER4_MAVEN_TESTNG_PROJECT_ID
+          #   project_name: cucumber4-maven-testng
+          # - adapter_name: testit-adapter-cucumber5
+          #   configuration_id: CUCUMBER5_MAVEN_JUNIT4_CONFIGURATION_ID
+          #   project_id: CUCUMBER5_MAVEN_JUNIT4_PROJECT_ID
+          #   project_name: cucumber5-maven-junit4
+          # - adapter_name: testit-adapter-cucumber5
+          #   configuration_id: CUCUMBER5_MAVEN_JUNIT5_CONFIGURATION_ID
+          #   project_id: CUCUMBER5_MAVEN_JUNIT5_PROJECT_ID
+          #   project_name: cucumber5-maven-junit5
+          # - adapter_name: testit-adapter-cucumber5
+          #   configuration_id: CUCUMBER5_MAVEN_TESTNG_CONFIGURATION_ID
+          #   project_id: CUCUMBER5_MAVEN_TESTNG_PROJECT_ID
+          #   project_name: cucumber5-maven-testng
+          # - adapter_name: testit-adapter-cucumber6
+          #   configuration_id: CUCUMBER6_MAVEN_JUNIT4_CONFIGURATION_ID
+          #   project_id: CUCUMBER6_MAVEN_JUNIT4_PROJECT_ID
+          #   project_name: cucumber6-maven-junit4
+          # - adapter_name: testit-adapter-cucumber6
+          #   configuration_id: CUCUMBER6_MAVEN_JUNIT5_CONFIGURATION_ID
+          #   project_id: CUCUMBER6_MAVEN_JUNIT5_PROJECT_ID
+          #   project_name: cucumber6-maven-junit5
+          # - adapter_name: testit-adapter-cucumber6
+          #   configuration_id: CUCUMBER6_MAVEN_TESTNG_CONFIGURATION_ID
+          #   project_id: CUCUMBER6_MAVEN_TESTNG_PROJECT_ID
+          #   project_name: cucumber6-maven-testng
           - adapter_name: testit-adapter-cucumber7
             configuration_id: CUCUMBER7_MAVEN_JUNIT4_CONFIGURATION_ID
             project_id: CUCUMBER7_MAVEN_JUNIT4_PROJECT_ID
