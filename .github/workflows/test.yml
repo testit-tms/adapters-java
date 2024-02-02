@@ -146,7 +146,6 @@ jobs:
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
-          cache: "gradle"
       - name: Setup python
         uses: actions/setup-python@v5
         with:
@@ -273,7 +272,6 @@ jobs:
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
-          cache: "gradle"
       - name: Setup python
         uses: actions/setup-python@v5
         with:
