@@ -17,6 +17,8 @@ on:
       - "gradle.properties"
       - "settings.gradle.kts"
   workflow_dispatch:
+concurrency:
+  group: ${{ github.head_ref ||  github.ref }}
 env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
