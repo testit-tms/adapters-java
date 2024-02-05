@@ -17,8 +17,6 @@ on:
       - "gradle.properties"
       - "settings.gradle.kts"
   workflow_dispatch:
-concurrency:
-  group: ${{ github.head_ref ||  github.ref }}
 env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
@@ -36,6 +34,7 @@ jobs:
     name: ${{ matrix.project_name }}
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       fail-fast: false
       matrix:
         include:
@@ -180,6 +179,7 @@ jobs:
     name: ${{ matrix.project_name }}
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       fail-fast: false
       matrix:
         include:
