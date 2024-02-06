@@ -169,6 +169,7 @@ jobs:
           echo "ADAPTER_JBEHAVE_JAR=$(find ${{ env.TMS_ADAPTER_JBEHAVE }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
+          chmod +x gradlew
           ./gradlew --no-daemon test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} -DSELENIDE_JAR=${{ env.ADAPTER_SELENIDE_JAR }} -DADAPTER_JBEHAVE=${{ env.ADAPTER_JBEHAVE_JAR }} || exit 0
       - name: Validate
         run: |
