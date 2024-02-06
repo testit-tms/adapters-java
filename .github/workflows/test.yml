@@ -45,10 +45,6 @@ jobs:
             configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
             project_name: cucumber7-gradle-junit4
-          - adapter_name: testit-adapter-cucumber7
-            configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
-            project_name: cucumber7-gradle-junit5
           - adapter_name: testit-adapter-junit4
             configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: GRADLE_JUNIT4_PROJECT_ID
@@ -66,13 +62,17 @@ jobs:
             project_id: JBEHAVE_GRADLE_JUNIT4_PROJECT_ID
             project_name: jbehave-gradle-junit4
           - adapter_name: testit-adapter-jbehave
-            configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
-            project_name: jbehave-gradle-junit5
-          - adapter_name: testit-adapter-jbehave
             configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
             project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
             project_name: jbehave-gradle-testng
+          # - adapter_name: testit-adapter-cucumber7
+          #  configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
+          #  project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
+          #  project_name: cucumber7-gradle-junit5
+          #  - adapter_name: testit-adapter-jbehave
+          #  configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
+          #  project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
+          #  project_name: jbehave-gradle-junit5
           # - adapter_name: testit-adapter-cucumber4
           #  configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
           #  project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
@@ -188,10 +188,6 @@ jobs:
             project_id: CUCUMBER6_MAVEN_JUNIT4_PROJECT_ID
             project_name: cucumber6-maven-junit4
           - adapter_name: testit-adapter-cucumber6
-            configuration_id: CUCUMBER6_MAVEN_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER6_MAVEN_JUNIT5_PROJECT_ID
-            project_name: cucumber6-maven-junit5
-          - adapter_name: testit-adapter-cucumber6
             configuration_id: CUCUMBER6_MAVEN_TESTNG_CONFIGURATION_ID
             project_id: CUCUMBER6_MAVEN_TESTNG_PROJECT_ID
             project_name: cucumber6-maven-testng
@@ -199,10 +195,6 @@ jobs:
             configuration_id: JBEHAVE_MAVEN_JUNIT4_CONFIGURATION_ID
             project_id: JBEHAVE_MAVEN_JUNIT4_PROJECT_ID
             project_name: jbehave-maven-junit4
-          - adapter_name: testit-adapter-jbehave
-            configuration_id: JBEHAVE_MAVEN_JUNIT5_CONFIGURATION_ID
-            project_id: JBEHAVE_MAVEN_JUNIT5_PROJECT_ID
-            project_name: jbehave-maven-junit5
           - adapter_name: testit-adapter-jbehave
             configuration_id: JBEHAVE_MAVEN_TESTNG_CONFIGURATION_ID
             project_id: JBEHAVE_MAVEN_TESTNG_PROJECT_ID
@@ -219,6 +211,14 @@ jobs:
             configuration_id: MAVEN_TESTNG_CONFIGURATION_ID
             project_id: MAVEN_TESTNG_PROJECT_ID
             project_name: maven-testng
+            # - adapter_name: testit-adapter-jbehave
+            #   configuration_id: JBEHAVE_MAVEN_JUNIT5_CONFIGURATION_ID
+            #   project_id: JBEHAVE_MAVEN_JUNIT5_PROJECT_ID
+            #   project_name: jbehave-maven-junit5
+            # - adapter_name: testit-adapter-cucumber6
+            #   configuration_id: CUCUMBER6_MAVEN_JUNIT5_CONFIGURATION_ID
+            #   project_id: CUCUMBER6_MAVEN_JUNIT5_PROJECT_ID
+            #   project_name: cucumber6-maven-junit5
             # - adapter_name: testit-adapter-cucumber4
             #   configuration_id: CUCUMBER4_MAVEN_JUNIT4_CONFIGURATION_ID
             #   project_id: CUCUMBER4_MAVEN_JUNIT4_PROJECT_ID
