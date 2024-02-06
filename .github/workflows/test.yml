@@ -270,7 +270,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Setup Java and Maven
-        uses: s4u/setup-maven-action@1.11.0
+        uses: s4u/setup-maven-action@v1.11.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           maven-version: ${{ env.MAVEN_VERSION }}
