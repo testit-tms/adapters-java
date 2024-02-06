@@ -20,6 +20,7 @@ on:
 env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
+  GRADLE_VERSION: 7.4
   JAVA_DISTRIBUTION: "adopt"
   JAVA_VERSION: 8
   MAVEN_VERSION: 3.9.6
@@ -269,6 +270,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Setup gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Setup Java and Maven
         uses: s4u/setup-maven-action@v1.11.0
         with:
@@ -280,8 +285,8 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
         run: |
-          ./gradlew --no-daemon :${{ matrix.adapter_name }}:jar 
-          ./gradlew --no-daemon :${{ env.TMS_JAVA_COMMONS }}:jar
+          gradle --no-daemon :${{ matrix.adapter_name }}:jar 
+          gradle --no-daemon :${{ env.TMS_JAVA_COMMONS }}:jar
           dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
