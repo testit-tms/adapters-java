@@ -34,7 +34,6 @@ jobs:
     name: ${{ matrix.project_name }}
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 1
       fail-fast: false
       matrix:
         include:
@@ -179,7 +178,6 @@ jobs:
     name: ${{ matrix.project_name }}
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 1
       fail-fast: false
       matrix:
         include:
