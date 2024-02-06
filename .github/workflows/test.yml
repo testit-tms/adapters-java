@@ -22,6 +22,7 @@ env:
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
   JAVA_DISTRIBUTION: "adopt"
   JAVA_VERSION: 8
+  MAVEN_VERSION: 3.9.6
   PYTHON_VERSION: 3.12
   TEMP_FILE: tmp/output.txt
   TMS_ADAPTER_MODE: 1
@@ -268,11 +269,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-      - name: Setup java
-        uses: actions/setup-java@v4
+      - name: Setup Java and Maven
+        uses: s4u/setup-maven-action@1.11.0
         with:
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
+          maven-version: ${{ env.MAVEN_VERSION }}
       - name: Setup python
         uses: actions/setup-python@v5
         with:
@@ -292,7 +293,7 @@ jobs:
           echo "ADAPTER_JAR=$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
-          mvn test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} || exit 0
+          mvn --batch-mode test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
