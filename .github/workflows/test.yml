@@ -294,7 +294,9 @@ jobs:
           echo "ADAPTER_JAR=$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
-          mvn --batch-mode test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} || exit 0
+          mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=${{ env.JAVA_COMMONS_JAR }}
+          mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=${{ env.ADAPTER_JAR }}
+          mvn --batch-mode test || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
