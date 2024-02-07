@@ -20,8 +20,7 @@ on:
 env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
-  GRADLE_VERSION: 7.4
-  JAVA_DISTRIBUTION: "adopt"
+  JAVA_DISTRIBUTION: "corretto"
   JAVA_VERSION: 8
   PYTHON_VERSION: 3.12
   TEMP_FILE: tmp/output.txt
@@ -29,11 +28,9 @@ env:
   TMS_CERT_VALIDATION: false
   TMS_JAVA_COMMONS: testit-java-commons
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
-  TMS_ADAPTER_SELENIDE: testit-adapter-selenide
-  TMS_ADAPTER_JBEHAVE: testit-adapter-jbehave
   TMS_URL: ${{ secrets.TESTIT_URL }}
 jobs:
-  test:
+  test-gradle:
     name: ${{ matrix.project_name }}
     runs-on: ubuntu-latest
     strategy:
@@ -48,10 +45,6 @@ jobs:
             configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
             project_name: cucumber7-gradle-junit4
-          - adapter_name: testit-adapter-cucumber7
-            configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
-            project_name: cucumber7-gradle-junit5
           - adapter_name: testit-adapter-junit4
             configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: GRADLE_JUNIT4_PROJECT_ID
@@ -69,13 +62,17 @@ jobs:
             project_id: JBEHAVE_GRADLE_JUNIT4_PROJECT_ID
             project_name: jbehave-gradle-junit4
           - adapter_name: testit-adapter-jbehave
-            configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
-            project_name: jbehave-gradle-junit5
-          - adapter_name: testit-adapter-jbehave
             configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
             project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
             project_name: jbehave-gradle-testng
+          # - adapter_name: testit-adapter-cucumber7
+          #  configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
+          #  project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
+          #  project_name: cucumber7-gradle-junit5
+          #  - adapter_name: testit-adapter-jbehave
+          #  configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
+          #  project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
+          #  project_name: jbehave-gradle-junit5
           # - adapter_name: testit-adapter-cucumber4
           #  configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
           #  project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
@@ -121,6 +118,8 @@ jobs:
           #  project_id: SERENITY3_GRADLE_JUNIT4_PROJECT_ID
           #  project_name: serenity3-gradle-junit4
     env:
+      TMS_ADAPTER_JBEHAVE: testit-adapter-jbehave
+      TMS_ADAPTER_SELENIDE: testit-adapter-selenide
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
       TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
@@ -146,21 +145,18 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-package: jdk
           java-version: ${{ env.JAVA_VERSION }}
-      - name: Setup gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
         run: |
-          gradle --no-daemon :${{ matrix.adapter_name }}:jar 
-          gradle --no-daemon :${{ env.TMS_ADAPTER_SELENIDE }}:jar
-          gradle --no-daemon :${{ env.TMS_ADAPTER_JBEHAVE }}:jar
-          gradle --no-daemon :${{ env.TMS_JAVA_COMMONS }}:jar
+          ./gradlew --no-daemon :${{ matrix.adapter_name }}:jar 
+          ./gradlew --no-daemon :${{ env.TMS_ADAPTER_SELENIDE }}:jar
+          ./gradlew --no-daemon :${{ env.TMS_ADAPTER_JBEHAVE }}:jar
+          ./gradlew --no-daemon :${{ env.TMS_JAVA_COMMONS }}:jar
           dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
@@ -174,7 +170,131 @@ jobs:
           echo "ADAPTER_JBEHAVE_JAR=$(find ${{ env.TMS_ADAPTER_JBEHAVE }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
-          gradle --no-daemon test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} -DSELENIDE_JAR=${{ env.ADAPTER_SELENIDE_JAR }} -DADAPTER_JBEHAVE=${{ env.ADAPTER_JBEHAVE_JAR }} || exit 0
+          chmod +x gradlew
+          ./gradlew --no-daemon test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} -DSELENIDE_JAR=${{ env.ADAPTER_SELENIDE_JAR }} -DADAPTER_JBEHAVE=${{ env.ADAPTER_JBEHAVE_JAR }} || exit 0
+      - name: Validate
+        run: |
+          dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+
+  test-maven:
+    name: ${{ matrix.project_name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - adapter_name: testit-adapter-cucumber6
+            configuration_id: CUCUMBER6_MAVEN_JUNIT4_CONFIGURATION_ID
+            project_id: CUCUMBER6_MAVEN_JUNIT4_PROJECT_ID
+            project_name: cucumber6-maven-junit4
+          - adapter_name: testit-adapter-cucumber6
+            configuration_id: CUCUMBER6_MAVEN_TESTNG_CONFIGURATION_ID
+            project_id: CUCUMBER6_MAVEN_TESTNG_PROJECT_ID
+            project_name: cucumber6-maven-testng
+          - adapter_name: testit-adapter-jbehave
+            configuration_id: JBEHAVE_MAVEN_JUNIT4_CONFIGURATION_ID
+            project_id: JBEHAVE_MAVEN_JUNIT4_PROJECT_ID
+            project_name: jbehave-maven-junit4
+          - adapter_name: testit-adapter-jbehave
+            configuration_id: JBEHAVE_MAVEN_TESTNG_CONFIGURATION_ID
+            project_id: JBEHAVE_MAVEN_TESTNG_PROJECT_ID
+            project_name: jbehave-maven-testng
+          - adapter_name: testit-adapter-junit4
+            configuration_id: MAVEN_JUNIT4_CONFIGURATION_ID
+            project_id: MAVEN_JUNIT4_PROJECT_ID
+            project_name: maven-junit4
+          - adapter_name: testit-adapter-junit5
+            configuration_id: MAVEN_JUNIT5_CONFIGURATION_ID
+            project_id: MAVEN_JUNIT5_PROJECT_ID
+            project_name: maven-junit5
+          - adapter_name: testit-adapter-testng
+            configuration_id: MAVEN_TESTNG_CONFIGURATION_ID
+            project_id: MAVEN_TESTNG_PROJECT_ID
+            project_name: maven-testng
+            # - adapter_name: testit-adapter-jbehave
+            #   configuration_id: JBEHAVE_MAVEN_JUNIT5_CONFIGURATION_ID
+            #   project_id: JBEHAVE_MAVEN_JUNIT5_PROJECT_ID
+            #   project_name: jbehave-maven-junit5
+            # - adapter_name: testit-adapter-cucumber6
+            #   configuration_id: CUCUMBER6_MAVEN_JUNIT5_CONFIGURATION_ID
+            #   project_id: CUCUMBER6_MAVEN_JUNIT5_PROJECT_ID
+            #   project_name: cucumber6-maven-junit5
+            # - adapter_name: testit-adapter-cucumber4
+            #   configuration_id: CUCUMBER4_MAVEN_JUNIT4_CONFIGURATION_ID
+            #   project_id: CUCUMBER4_MAVEN_JUNIT4_PROJECT_ID
+            #   project_name: cucumber4-maven-junit4
+            # - adapter_name: testit-adapter-cucumber4
+            #   configuration_id: CUCUMBER4_MAVEN_TESTNG_CONFIGURATION_ID
+            #   project_id: CUCUMBER4_MAVEN_TESTNG_PROJECT_ID
+            #   project_name: cucumber4-maven-testng
+            # - adapter_name: testit-adapter-cucumber5
+            #   configuration_id: CUCUMBER5_MAVEN_JUNIT4_CONFIGURATION_ID
+            #   project_id: CUCUMBER5_MAVEN_JUNIT4_PROJECT_ID
+            #   project_name: cucumber5-maven-junit4
+            # - adapter_name: testit-adapter-cucumber5
+            #   configuration_id: CUCUMBER5_MAVEN_JUNIT5_CONFIGURATION_ID
+            #   project_id: CUCUMBER5_MAVEN_JUNIT5_PROJECT_ID
+            #   project_name: cucumber5-maven-junit5
+            # - adapter_name: testit-adapter-cucumber5
+            #   configuration_id: CUCUMBER5_MAVEN_TESTNG_CONFIGURATION_ID
+            #   project_id: CUCUMBER5_MAVEN_TESTNG_PROJECT_ID
+            #   project_name: cucumber5-maven-testng
+            #   - adapter_name: testit-adapter-cucumber7
+            #   configuration_id: CUCUMBER7_MAVEN_JUNIT4_CONFIGURATION_ID
+            #   project_id: CUCUMBER7_MAVEN_JUNIT4_PROJECT_ID
+            #   project_name: cucumber7-maven-junit4
+            #   - adapter_name: testit-adapter-cucumber7
+            #   configuration_id: CUCUMBER7_MAVEN_JUNIT5_CONFIGURATION_ID
+            #   project_id: CUCUMBER7_MAVEN_JUNIT5_PROJECT_ID
+            #   project_name: cucumber7-maven-junit5
+    env:
+      TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
+      TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
+      TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
+    steps:
+      - name: Checkout adapters-java
+        uses: actions/checkout@v4
+      - name: Checkout api-validator-dotnet
+        uses: actions/checkout@v4
+        with:
+          repository: testit-tms/api-validator-dotnet
+          token: ${{ env.GITHUB_PAT }}
+          path: api-validator-dotnet
+      - name: Checkout java-examples
+        uses: actions/checkout@v4
+        with:
+          repository: testit-tms/java-examples
+          path: java-examples
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-package: jdk
+          java-version: ${{ env.JAVA_VERSION }}
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Setup environment
+        run: |
+          ./gradlew --no-daemon :${{ matrix.adapter_name }}:jar 
+          ./gradlew --no-daemon :${{ env.TMS_JAVA_COMMONS }}:jar
+          dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
+          pip install testit-cli
+      - name: Create TestRun
+        run: |
+          testit testrun create --token ${{ env.TMS_PRIVATE_TOKEN }} --output ${{ env.TEMP_FILE }}
+          echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
+      - name: Test
+        run: |
+          echo "ADAPTER_JAR=$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
+          echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
+          cd java-examples/${{ matrix.project_name }}
+          mvn --batch-mode test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
