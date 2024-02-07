@@ -296,7 +296,7 @@ jobs:
           cd java-examples/${{ matrix.project_name }}
           mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=${{ env.JAVA_COMMONS_JAR }}
           mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=${{ env.ADAPTER_JAR }}
-          mvn --batch-mode test || exit 0
+          mvn --batch-mode -P ci test || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
