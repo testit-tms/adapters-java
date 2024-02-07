@@ -291,13 +291,11 @@ jobs:
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
       - name: Test
         run: |
-          echo "ADAPTER_JAR=$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
-          echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
+          mkdir -p "java-examples/${{ matrix.project_name }}/lib"
+          cp "$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" "java-examples/${{ matrix.project_name }}/lib"
+          cp "$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1) "java-examples/${{ matrix.project_name }}/lib"
           cd java-examples/${{ matrix.project_name }}
-          mvn org.apache.maven.plugins:maven-install-plugin:install-file -Dfile=${{ env.JAVA_COMMONS_JAR }}
-          mvn org.apache.maven.plugins:maven-install-plugin:install-file -Dfile=${{ env.ADAPTER_JAR }}
-          mvn --batch-mode install -P ci
-          mvn test || exit 0
+          mvn --batch-mode test || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
