@@ -61,12 +61,22 @@ public class Utils {
     }
 
     public static String extractClassname(final Description method, String className) {
-        final Classname annotation = method.getAnnotation(Classname.class);
+        Classname annotation = method.getAnnotation(Classname.class);
+
+        if (annotation == null) {
+            annotation = method.getTestClass().getAnnotation(Classname.class);
+        }
+
         return (annotation != null) ? annotation.value() : className;
     }
 
     public static String extractNamespace(final Description method, String nameSpace) {
-        final Namespace annotation = method.getAnnotation(Namespace.class);
+        Namespace annotation = method.getAnnotation(Namespace.class);
+
+        if (annotation == null) {
+            annotation = method.getTestClass().getAnnotation(Namespace.class);
+        }
+
         return (annotation != null) ? annotation.value() : nameSpace;
     }
 
