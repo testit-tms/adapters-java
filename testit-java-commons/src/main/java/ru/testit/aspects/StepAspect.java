@@ -46,7 +46,7 @@ public class StepAspect {
             final Parameter parameter = parameters[i];
 
             String name = parameter.getName();
-            String value = joinPoint.getArgs()[i].toString();
+            String value = (joinPoint.getArgs()[i] != null) ? joinPoint.getArgs()[i].toString() : "";
 
             stepParameters.put(name, value);
         }
