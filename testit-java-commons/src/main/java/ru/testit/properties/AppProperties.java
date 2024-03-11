@@ -47,9 +47,21 @@ public class AppProperties {
     }
 
     private static void loadPropertiesFrom(final ClassLoader classLoader, final Properties properties, String fileName) {
+        Properties newProps = new Properties();
+
         try (InputStream stream = classLoader.getResourceAsStream(fileName)) {
             if (stream != null) {
-                properties.load(stream);
+                newProps.load(stream);
+
+                for (String key : newProps.stringPropertyNames()) {
+                    String value = newProps.getProperty(key);
+
+                    if (value != null && !value.isEmpty())
+                    {
+                        properties.setProperty(key, value);
+                    }
+                }
+
                 return;
             }
         } catch (IOException e) {
@@ -63,47 +75,47 @@ public class AppProperties {
         Map<String, String> map = new HashMap<>();
 
         String url = System.getenv(String.format("%s_URL", ENV_PREFIX));
-        if (url != null) {
+        if (url != null && !url.isEmpty()) {
             map.put(URL, url);
         }
 
         String token = System.getenv(String.format("%s_PRIVATE_TOKEN", ENV_PREFIX));
-        if (token != null) {
+        if (token != null && !token.isEmpty()) {
             map.put(PRIVATE_TOKEN, token);
         }
 
         String project = System.getenv(String.format("%s_PROJECT_ID", ENV_PREFIX));
-        if (project != null) {
+        if (project != null && !project.isEmpty()) {
             map.put(PROJECT_ID, project);
         }
 
         String config = System.getenv(String.format("%s_CONFIGURATION_ID", ENV_PREFIX));
-        if (config != null) {
+        if (config != null && !config.isEmpty()) {
             map.put(CONFIGURATION_ID, config);
         }
 
         String testRunId = System.getenv(String.format("%s_TEST_RUN_ID", ENV_PREFIX));
-        if (testRunId != null) {
+        if (testRunId != null && !testRunId.isEmpty()) {
             map.put(TEST_RUN_ID, testRunId);
         }
 
         String testRunName = System.getenv(String.format("%s_TEST_RUN_NAME", ENV_PREFIX));
-        if (testRunName != null) {
+        if (testRunName != null && !testRunName.isEmpty()) {
             map.put(TEST_RUN_NAME, testRunName);
         }
 
         String adapterMode = System.getenv(String.format("%s_ADAPTER_MODE", ENV_PREFIX));
-        if (adapterMode != null) {
+        if (adapterMode != null  && !adapterMode.isEmpty()) {
             map.put(ADAPTER_MODE, adapterMode);
         }
 
         String createTestCases = System.getenv(String.format("%s_AUTOMATIC_CREATION_TEST_CASES", ENV_PREFIX));
-        if (createTestCases != null) {
+        if (createTestCases != null && !createTestCases.isEmpty()) {
             map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
         }
 
         String certValidation = System.getenv(String.format("%s_CERT_VALIDATION", ENV_PREFIX.toLowerCase()));
-        if (certValidation != null) {
+        if (certValidation != null && !certValidation.isEmpty()) {
             map.put(CERT_VALIDATION, certValidation);
         }
 
@@ -115,47 +127,47 @@ public class AppProperties {
         Properties systemProperties = System.getProperties();
 
         String url = systemProperties.getProperty(String.format("%sUrl", ENV_PREFIX.toLowerCase()));
-        if (url != null) {
+        if (url != null && !url.isEmpty()) {
             map.put(URL, url);
         }
 
         String token = systemProperties.getProperty(String.format("%sPrivateToken", ENV_PREFIX.toLowerCase()));
-        if (token != null) {
+        if (token != null && !token.isEmpty()) {
             map.put(PRIVATE_TOKEN, token);
         }
 
         String project = systemProperties.getProperty(String.format("%sProjectId", ENV_PREFIX.toLowerCase()));
-        if (project != null) {
+        if (project != null && !project.isEmpty()) {
             map.put(PROJECT_ID, project);
         }
 
         String config = systemProperties.getProperty(String.format("%sConfigurationId", ENV_PREFIX.toLowerCase()));
-        if (config != null) {
+        if (config != null && !config.isEmpty()) {
             map.put(CONFIGURATION_ID, config);
         }
 
         String testRunId = systemProperties.getProperty(String.format("%sTestRunId", ENV_PREFIX.toLowerCase()));
-        if (testRunId != null) {
+        if (testRunId != null && !testRunId.isEmpty()) {
             map.put(TEST_RUN_ID, testRunId);
         }
 
         String testRunName = systemProperties.getProperty(String.format("%sTestRunName", ENV_PREFIX.toLowerCase()));
-        if (testRunName != null) {
+        if (testRunName != null && !testRunName.isEmpty()) {
             map.put(TEST_RUN_NAME, testRunName);
         }
 
         String adapterMode = systemProperties.getProperty(String.format("%sAdapterMode", ENV_PREFIX.toLowerCase()));
-        if (adapterMode != null) {
+        if (adapterMode != null && !adapterMode.isEmpty()) {
             map.put(ADAPTER_MODE, adapterMode);
         }
 
         String createTestCases = systemProperties.getProperty(String.format("%sAutomaticCreationTestCases", ENV_PREFIX.toLowerCase()));
-        if (createTestCases != null) {
+        if (createTestCases != null && !createTestCases.isEmpty()) {
             map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
         }
 
         String certValidation = systemProperties.getProperty(String.format("%sCertValidation", ENV_PREFIX.toLowerCase()));
-        if (certValidation != null) {
+        if (certValidation != null && !certValidation.isEmpty()) {
             map.put(CERT_VALIDATION, certValidation);
         }
 
@@ -165,12 +177,12 @@ public class AppProperties {
     private static String getConfigFileName() {
         Properties systemProperties = System.getProperties();
         String fileNameFromCli = systemProperties.getProperty(String.format("%sConfigFile", ENV_PREFIX.toLowerCase()));
-        if (fileNameFromCli != null) {
+        if (fileNameFromCli != null && !fileNameFromCli.isEmpty()) {
             return fileNameFromCli;
         }
 
         String fileNameFromEnv = System.getenv(String.format("%s%s", ENV_PREFIX, CONFIG_FILE.toUpperCase(Locale.getDefault())));
-        if (fileNameFromEnv != null) {
+        if (fileNameFromEnv != null && !fileNameFromEnv.isEmpty()) {
             return fileNameFromEnv;
         }
 
