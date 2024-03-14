@@ -7,35 +7,40 @@ org.slf4j.simpleLogger.dateTimeFormat=yyyy-MM-dd'T'HH:mm:ss.SSSZ
 ```
 
 # How to add an attachment for a failed test?
-You need to implement the AdapterListener interface and override the beforeTestStop method.
+You need to implement the AfterTestExecutionCallback interface (depends on test framework).
 For example:
 
 ```java
-import ru.testit.services.Adapter;
-import ru.testit.listener.AdapterListener;
-import ru.testit.models.ItemStatus;
-import ru.testit.models.TestResult;
+import com.codeborne.selenide.Screenshots;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import ru.testit.services.Adapter;
 
-public class AttachmentManager implements AdapterListener {
+import java.util.Objects;
+
+public class AfterTestExtension implements AfterTestExecutionCallback {
 
     @Override
-    public void beforeTestStop(final TestResult result) {
-        if (result.getItemStatus().equals(ItemStatus.FAILED)) {
-            // Add a screenshot
-            Adapter.addAttachments("Screenshot.jpg", new ByteArrayInputStream(((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES)));
-            
-            // Add log file
-            Adapter.addAttachments("/logs/failed.log");
-            
-            // Add any text
+    public void afterTestExecution(ExtensionContext extensionContext) {
+        if(extensionContext.getExecutionException().isPresent())
+        {
             Adapter.addAttachments("any text", "file.txt");
+            Adapter.addAttachments(Objects.requireNonNull(Screenshots.takeScreenShotAsFile()).getPath());
         }
     }
 }
 ```
 
-After that, you need to add file **ru.testit.listener.AdapterListener** to **resources/META-INF/services** folder:
-```text
-<your-package>.AttachmentManager
+Then, add this extension to test class:
+```java
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+@ExtendWith({AfterTestExtension.class})
+public class ExampleTests {
+    
+    @Test
+    public void TestSuccess() {
+    }
+}
 ```
