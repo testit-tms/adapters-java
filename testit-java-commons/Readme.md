@@ -21,9 +21,12 @@ import java.util.Objects;
 public class AfterTestExtension implements AfterTestExecutionCallback {
 
     @Override
-    public void afterTestExecution(ExtensionContext extensionContext) throws Exception {
-        Adapter.addAttachments("any text", "file.txt");
-        Adapter.addAttachments(Objects.requireNonNull(Screenshots.takeScreenShotAsFile()).getPath());
+    public void afterTestExecution(ExtensionContext extensionContext) {
+        if(extensionContext.getExecutionException().isPresent())
+        {
+            Adapter.addAttachments("any text", "file.txt");
+            Adapter.addAttachments(Objects.requireNonNull(Screenshots.takeScreenShotAsFile()).getPath());
+        }
     }
 }
 ```
