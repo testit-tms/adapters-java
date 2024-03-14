@@ -7,7 +7,7 @@ org.slf4j.simpleLogger.dateTimeFormat=yyyy-MM-dd'T'HH:mm:ss.SSSZ
 ```
 
 # How to add an attachment for a failed test?
-You need to implement AfterTestExecutionCallback interface (depends on test framework).
+You need to implement the AfterTestExecutionCallback interface (depends on test framework).
 For example:
 
 ```java
