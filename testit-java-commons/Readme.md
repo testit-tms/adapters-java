@@ -7,35 +7,19 @@ org.slf4j.simpleLogger.dateTimeFormat=yyyy-MM-dd'T'HH:mm:ss.SSSZ
 ```
 
 # How to add an attachment for a failed test?
-You need to implement the AdapterListener interface and override the beforeTestStop method.
+You need to implement AfterEach method (depends on test framework).
 For example:
 
 ```java
-import ru.testit.services.Adapter;
-import ru.testit.listener.AdapterListener;
-import ru.testit.models.ItemStatus;
-import ru.testit.models.TestResult;
+import com.codeborne.selenide.Screenshots;
+import org.junit.jupiter.api.AfterEach;
 import ru.testit.services.Adapter;
 
-public class AttachmentManager implements AdapterListener {
+import java.util.Objects;
 
-    @Override
-    public void beforeTestStop(final TestResult result) {
-        if (result.getItemStatus().equals(ItemStatus.FAILED)) {
-            // Add a screenshot
-            Adapter.addAttachments("Screenshot.jpg", new ByteArrayInputStream(((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES)));
-            
-            // Add log file
-            Adapter.addAttachments("/logs/failed.log");
-            
-            // Add any text
-            Adapter.addAttachments("any text", "file.txt");
-        }
-    }
+@AfterEach()
+public void afterEachMethod() {
+    Adapter.addAttachments("any text", "file.txt");
+    Adapter.addAttachments(Objects.requireNonNull(Screenshots.takeScreenShotAsFile()).getPath());
 }
-```
-
-After that, you need to add file **ru.testit.listener.AdapterListener** to **resources/META-INF/services** folder:
-```text
-<your-package>.AttachmentManager
 ```
