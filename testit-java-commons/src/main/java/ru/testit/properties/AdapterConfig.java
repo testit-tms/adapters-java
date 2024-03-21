@@ -8,7 +8,7 @@ import java.util.Properties;
 public class AdapterConfig implements Serializable {
     private final AdapterMode mode;
     private final boolean automaticCreationTestCases;
-    private final boolean testIt;
+    private final boolean tmsIntegration;
 
 
     public AdapterConfig(Properties properties) {
@@ -25,8 +25,8 @@ public class AdapterConfig implements Serializable {
         }
         this.automaticCreationTestCases = Boolean.parseBoolean(automaticCreationTestCasesValue);
 
-        String testItValue = String.valueOf(properties.get(AppProperties.TEST_IT)).toLowerCase().trim();
-        this.testIt = !testItValue.equals("false");
+        String tmsIntegrationItValue = String.valueOf(properties.get(AppProperties.TMS_INTEGRATION)).toLowerCase().trim();
+        this.tmsIntegration = !tmsIntegrationItValue.equals("false");
     }
 
     public AdapterMode getMode() {
@@ -37,8 +37,8 @@ public class AdapterConfig implements Serializable {
         return automaticCreationTestCases;
     }
 
-    public boolean shouldIntegrateToTestIt() {
-        return testIt;
+    public boolean shouldEnableTmsIntegration() {
+        return tmsIntegration;
     }
 
     public String toString() {
@@ -47,7 +47,7 @@ public class AdapterConfig implements Serializable {
         sb.append("class AdapterConfig {\n");
         sb.append("    mode: ").append(Utils.toIndentedString(this.mode)).append("\n");
         sb.append("    automaticCreationTestCases: ").append(Utils.toIndentedString(this.automaticCreationTestCases)).append("\n");
-        sb.append("    testIt: ").append(Utils.toIndentedString(this.testIt)).append("\n");
+        sb.append("    tmsIntegration: ").append(Utils.toIndentedString(this.tmsIntegration)).append("\n");
         sb.append("}");
 
         return sb.toString();

@@ -21,7 +21,7 @@ public class AppProperties {
     public static final String ADAPTER_MODE = "adapterMode";
     public static final String AUTOMATIC_CREATION_TEST_CASES = "automaticCreationTestCases";
     public static final String CERT_VALIDATION = "certValidation";
-    public static final String TEST_IT = "testIt";
+    public static final String TMS_INTEGRATION = "testIt";
 
     private static final String ENV_PREFIX = "TMS";
     private static final String CONFIG_FILE = "CONFIG_FILE";
@@ -121,9 +121,9 @@ public class AppProperties {
             map.put(CERT_VALIDATION, certValidation);
         }
 
-        String testIt = System.getenv(String.format("%s_TEST_IT", ENV_PREFIX.toLowerCase()));
-        if (testIt != null && !testIt.isEmpty()) {
-            map.put(TEST_IT, testIt);
+        String tmsIntegration = System.getenv(String.format("%s_TEST_IT", ENV_PREFIX.toLowerCase()));
+        if (tmsIntegration != null && !tmsIntegration.isEmpty()) {
+            map.put(TMS_INTEGRATION, tmsIntegration);
         }
 
         return map;
@@ -178,9 +178,9 @@ public class AppProperties {
             map.put(CERT_VALIDATION, certValidation);
         }
 
-        String testIt = systemProperties.getProperty(String.format("%sTestIt", ENV_PREFIX.toLowerCase()));
-        if (testIt != null && !testIt.isEmpty()) {
-            map.put(TEST_IT, testIt);
+        String tmsIntegration = systemProperties.getProperty(String.format("%sTestIt", ENV_PREFIX.toLowerCase()));
+        if (tmsIntegration != null && !tmsIntegration.isEmpty()) {
+            map.put(TMS_INTEGRATION, tmsIntegration);
         }
 
         return map;

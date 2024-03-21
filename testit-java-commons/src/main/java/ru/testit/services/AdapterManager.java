@@ -76,7 +76,7 @@ public class AdapterManager {
     }
 
     public void startTests() {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -123,7 +123,7 @@ public class AdapterManager {
      * @param container the main container.
      */
     public void startMainContainer(final MainContainer container) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -141,7 +141,7 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopMainContainer(final String uuid) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -167,7 +167,7 @@ public class AdapterManager {
      * @param container  the class container.
      */
     public void startClassContainer(final String parentUuid, final ClassContainer container) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -190,7 +190,7 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopClassContainer(final String uuid) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -216,7 +216,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateClassContainer(final String uuid, final Consumer<ClassContainer> update) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -239,7 +239,7 @@ public class AdapterManager {
      * @param uuid the uuid of test case to start.
      */
     public void startTestCase(final String uuid) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -267,7 +267,7 @@ public class AdapterManager {
      * @param result the test case to schedule.
      */
     public void scheduleTestCase(final TestResult result) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -303,7 +303,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateTestCase(final String uuid, final Consumer<TestResult> update) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -327,7 +327,7 @@ public class AdapterManager {
      * @param uuid the uuid of test case to stop.
      */
     public void stopTestCase(final String uuid) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -360,7 +360,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startPrepareFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -384,7 +384,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startTearDownFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -409,7 +409,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startPrepareFixture(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -434,7 +434,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startTearDownFixture(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -459,7 +459,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startPrepareFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -484,7 +484,7 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startTearDownFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -524,7 +524,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateFixture(final String uuid, final Consumer<FixtureResult> update) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -548,7 +548,7 @@ public class AdapterManager {
      * @param uuid the uuid of fixture.
      */
     public void stopFixture(final String uuid) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -594,7 +594,7 @@ public class AdapterManager {
      * @param result     the step.
      */
     public void startStep(final String parentUuid, final String uuid, final StepResult result) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -621,7 +621,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateStep(final Consumer<StepResult> update) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -641,7 +641,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateStep(final String uuid, final Consumer<StepResult> update) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -664,7 +664,7 @@ public class AdapterManager {
      * Stops current running step.
      */
     public void stopStep() {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
@@ -685,7 +685,7 @@ public class AdapterManager {
      * @param uuid the uuid of step to stop.
      */
     public void stopStep(final String uuid) {
-        if (!adapterConfig.shouldIntegrateToTestIt()) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
             return;
         }
 
