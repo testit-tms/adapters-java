@@ -76,6 +76,10 @@ public class AdapterManager {
     }
 
     public void startTests() {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         LOGGER.debug("Start launch");
 
         synchronized (this.clientConfiguration) {
@@ -119,6 +123,10 @@ public class AdapterManager {
      * @param container the main container.
      */
     public void startMainContainer(final MainContainer container) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         container.setStart(System.currentTimeMillis());
         storage.put(container.getUuid(), container);
 
@@ -133,6 +141,10 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopMainContainer(final String uuid) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         final Optional<MainContainer> found = storage.getTestsContainer(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop main container: container with uuid {} not found", uuid);
@@ -155,6 +167,10 @@ public class AdapterManager {
      * @param container  the class container.
      */
     public void startClassContainer(final String parentUuid, final ClassContainer container) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         storage.getTestsContainer(parentUuid).ifPresent(parent -> {
             synchronized (storage) {
                 parent.getChildren().add(container.getUuid());
@@ -174,6 +190,10 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopClassContainer(final String uuid) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         final Optional<ClassContainer> found = storage.getClassContainer(uuid);
         if (!found.isPresent()) {
             LOGGER.debug("Could not stop class container: container with uuid {} not found", uuid);
@@ -196,6 +216,10 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateClassContainer(final String uuid, final Consumer<ClassContainer> update) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Update class container {}", uuid);
         }
@@ -215,6 +239,10 @@ public class AdapterManager {
      * @param uuid the uuid of test case to start.
      */
     public void startTestCase(final String uuid) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         threadContext.clear();
         final Optional<TestResult> found = storage.getTestResult(uuid);
         if (!found.isPresent()) {
@@ -239,6 +267,10 @@ public class AdapterManager {
      * @param result the test case to schedule.
      */
     public void scheduleTestCase(final TestResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         result.setItemStage(ItemStage.SCHEDULED)
                 .setAutomaticCreationTestCases(adapterConfig.shouldAutomaticCreationTestCases());
         storage.put(result.getUuid(), result);
@@ -271,6 +303,10 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateTestCase(final String uuid, final Consumer<TestResult> update) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Update test case {}", uuid);
         }
@@ -291,6 +327,10 @@ public class AdapterManager {
      * @param uuid the uuid of test case to stop.
      */
     public void stopTestCase(final String uuid) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         final Optional<TestResult> found = storage.getTestResult(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop test case: test case with uuid {} not found", uuid);
@@ -320,6 +360,10 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startPrepareFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start prepare all fixture {} for parent {}", result, parentUuid);
         }
@@ -340,6 +384,10 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startTearDownFixtureAll(final String parentUuid, final String uuid, final FixtureResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start tear down all fixture {} for parent {}", result, parentUuid);
         }
@@ -361,6 +409,10 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startPrepareFixture(final String parentUuid, final String uuid, final FixtureResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start prepare fixture {} for parent {}", result, parentUuid);
         }
@@ -382,6 +434,10 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startTearDownFixture(final String parentUuid, final String uuid, final FixtureResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start tear down fixture {} for parent {}", result, parentUuid);
         }
@@ -403,6 +459,10 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startPrepareFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start prepare for each fixture {} for parent {}", result, parentUuid);
         }
@@ -424,6 +484,10 @@ public class AdapterManager {
      * @param result     the fixture.
      */
     public void startTearDownFixtureEachTest(final String parentUuid, final String uuid, final FixtureResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Start tear down for each fixture {} for parent {}", result, parentUuid);
         }
@@ -460,6 +524,10 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateFixture(final String uuid, final Consumer<FixtureResult> update) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Update fixture {}", uuid);
         }
@@ -480,6 +548,10 @@ public class AdapterManager {
      * @param uuid the uuid of fixture.
      */
     public void stopFixture(final String uuid) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         final Optional<FixtureResult> found = storage.getFixture(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop test fixture: test fixture with uuid {} not found", uuid);
@@ -522,6 +594,10 @@ public class AdapterManager {
      * @param result     the step.
      */
     public void startStep(final String parentUuid, final String uuid, final StepResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         result.setItemStage(ItemStage.RUNNING)
                 .setStart(System.currentTimeMillis());
 
@@ -545,6 +621,10 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateStep(final Consumer<StepResult> update) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         final Optional<String> current = threadContext.getCurrent();
         if (!current.isPresent()) {
             LOGGER.debug("Could not update step: no step running");
@@ -561,6 +641,10 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateStep(final String uuid, final Consumer<StepResult> update) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Update step {}", uuid);
         }
@@ -580,6 +664,10 @@ public class AdapterManager {
      * Stops current running step.
      */
     public void stopStep() {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         final String root = threadContext.getRoot().orElse(null);
         final Optional<String> current = threadContext.getCurrent()
                 .filter(uuid -> !Objects.equals(uuid, root));
@@ -597,6 +685,10 @@ public class AdapterManager {
      * @param uuid the uuid of step to stop.
      */
     public void stopStep(final String uuid) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         final Optional<StepResult> found = storage.getStep(uuid);
         if (!found.isPresent()) {
             LOGGER.error("Could not stop step: step with uuid {} not found", uuid);

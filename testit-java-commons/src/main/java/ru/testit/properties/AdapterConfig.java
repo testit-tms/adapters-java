@@ -8,6 +8,8 @@ import java.util.Properties;
 public class AdapterConfig implements Serializable {
     private final AdapterMode mode;
     private final boolean automaticCreationTestCases;
+    private final boolean tmsIntegration;
+
 
     public AdapterConfig(Properties properties) {
         String modeValue = String.valueOf(properties.get(AppProperties.ADAPTER_MODE));
@@ -22,6 +24,9 @@ public class AdapterConfig implements Serializable {
             automaticCreationTestCasesValue = "false";
         }
         this.automaticCreationTestCases = Boolean.parseBoolean(automaticCreationTestCasesValue);
+
+        String tmsIntegrationItValue = String.valueOf(properties.get(AppProperties.TMS_INTEGRATION)).toLowerCase().trim();
+        this.tmsIntegration = !tmsIntegrationItValue.equals("false");
     }
 
     public AdapterMode getMode() {
@@ -32,12 +37,17 @@ public class AdapterConfig implements Serializable {
         return automaticCreationTestCases;
     }
 
+    public boolean shouldEnableTmsIntegration() {
+        return tmsIntegration;
+    }
+
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class AdapterConfig {\n");
         sb.append("    mode: ").append(Utils.toIndentedString(this.mode)).append("\n");
         sb.append("    automaticCreationTestCases: ").append(Utils.toIndentedString(this.automaticCreationTestCases)).append("\n");
+        sb.append("    tmsIntegration: ").append(Utils.toIndentedString(this.tmsIntegration)).append("\n");
         sb.append("}");
 
         return sb.toString();
