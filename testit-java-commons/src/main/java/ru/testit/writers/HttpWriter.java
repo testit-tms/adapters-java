@@ -80,16 +80,7 @@ public class HttpWriter implements Writer {
                 return;
             }
 
-            workItemId.forEach(i -> {
-                try {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Link work item {} to auto test {}", i, testResult.getExternalId());
-                    }
-                    apiClient.linkAutoTestToWorkItem(autoTestId, i);
-                } catch (ApiException e) {
-                    LOGGER.error("Can not link the autotest: " + e.getMessage());
-                }
-            });
+            apiClient.tryLinkAutoTestToWorkItem(autoTestId, workItemId);
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: " + (e.getMessage()));
         }
