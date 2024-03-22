@@ -13,7 +13,7 @@ public interface ApiClient {
     void updateAutoTest(UpdateAutoTestRequest model) throws ApiException;
     String createAutoTest(CreateAutoTestRequest model) throws ApiException;
     AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException;
-    void tryLinkAutoTestToWorkItem(String id, Iterable<String> workItemId);
+    boolean tryLinkAutoTestToWorkItem(String id, Iterable<String> workItemId);
     List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException;
     String addAttachment(String path) throws ApiException;
     List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException;

@@ -26,7 +26,6 @@ tasks.getByName<Test>("test")  {
         suites("src/test/resources/testng.xml")
     })
     exclude("**/samples/*")
-    //maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     doFirst {
         jvmArgs("-javaagent:${agent.singleFile}")
     }

@@ -35,11 +35,11 @@ public class HttpWriter implements Writer {
                 LOGGER.debug("Write auto test {}", testResult.getExternalId());
             }
 
-            AutoTestModel test = apiClient.getAutoTestByExternalId(testResult.getExternalId());
+            AutoTestModel autotest = apiClient.getAutoTestByExternalId(testResult.getExternalId());
             List<String> workItemId = testResult.getWorkItemId();
             String autoTestId;
 
-            if (test != null) {
+            if (autotest != null) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Auto test is exist. Update auto test {}", testResult.getExternalId());
                 }
@@ -47,17 +47,17 @@ public class HttpWriter implements Writer {
                 UpdateAutoTestRequest autoTestPutModel;
 
                 if (testResult.getItemStatus() == ItemStatus.FAILED) {
-                    autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(test);
+                    autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autotest);
                     autoTestPutModel.links(Converter.convertPutLinks(testResult.getLinkItems()));
                 } else {
                     autoTestPutModel = Converter.testResultToAutoTestPutModel(testResult);
                     autoTestPutModel.setProjectId(UUID.fromString(config.getProjectId()));
                 }
 
-                autoTestPutModel.setIsFlaky(test.getIsFlaky());
+                autoTestPutModel.setIsFlaky(autotest.getIsFlaky());
 
                 apiClient.updateAutoTest(autoTestPutModel);
-                autoTestId = test.getId().toString();
+                autoTestId = autotest.getId().toString();
             } else {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Create new auto test {}", testResult.getExternalId());
@@ -68,6 +68,12 @@ public class HttpWriter implements Writer {
                 autoTestId = apiClient.createAutoTest(model);
             }
 
+            if (!workItemId.isEmpty()) {
+                if (!apiClient.tryLinkAutoTestToWorkItem(autoTestId, workItemId)) {
+                    return;
+                }
+            }
+
             AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.testResultToAutoTestResultsForTestRunModel(testResult);
             autoTestResultsForTestRunModel.setConfigurationId(UUID.fromString(config.getConfigurationId()));
 
@@ -75,12 +81,6 @@ public class HttpWriter implements Writer {
             results.add(autoTestResultsForTestRunModel);
             List<UUID> ids = apiClient.sendTestResults(config.getTestRunId(), results);
             testResults.put(testResult.getUuid(), ids.get(0));
-
-            if (workItemId.size() == 0 || (test != null && testResult.getItemStatus() == ItemStatus.FAILED)) {
-                return;
-            }
-
-            apiClient.tryLinkAutoTestToWorkItem(autoTestId, workItemId);
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: " + (e.getMessage()));
         }
