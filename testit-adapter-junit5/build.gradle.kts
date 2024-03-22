@@ -47,7 +47,6 @@ tasks.getByName<Test>("test") {
     useJUnitPlatform()
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
     exclude("**/samples/*")
-    //maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     doFirst {
         jvmArgs("-javaagent:${agent.singleFile}")
     }

@@ -125,13 +125,16 @@ public class TmsApiClient implements ApiClient {
     @Override
     public void tryLinkAutoTestToWorkItem(String id, Iterable<String> workItemIds) {
         for (String workItemId : workItemIds) {
-            LOGGER.debug("Linking autotest {} to workitem {}", id, workItemId);
+            LOGGER.debug("Link autotest {} to workitem {}", id, workItemId);
 
             try {
                 autoTestsApi.linkAutoTestToWorkItem(id, new LinkAutoTestToWorkItemRequest().id(workItemId));
             } catch (ApiException e) {
                 LOGGER.error("Cannot link autotest {} to work item {}: work item does not exist", id, workItemId);
+                return;
             }
+
+            LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
         }
     }
 

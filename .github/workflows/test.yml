@@ -153,10 +153,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
         run: |
-          ./gradlew --no-daemon :${{ matrix.adapter_name }}:jar 
-          ./gradlew --no-daemon :${{ env.TMS_ADAPTER_SELENIDE }}:jar
-          ./gradlew --no-daemon :${{ env.TMS_ADAPTER_JBEHAVE }}:jar
-          ./gradlew --no-daemon :${{ env.TMS_JAVA_COMMONS }}:jar
+          ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
           dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
@@ -165,13 +162,9 @@ jobs:
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
       - name: Test
         run: |
-          echo "ADAPTER_JAR=$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
-          echo "ADAPTER_SELENIDE_JAR=$(find ${{ env.TMS_ADAPTER_SELENIDE }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
-          echo "ADAPTER_JBEHAVE_JAR=$(find ${{ env.TMS_ADAPTER_JBEHAVE }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
-          echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
           chmod +x ./gradlew
-          ./gradlew --no-daemon test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} -DSELENIDE_JAR=${{ env.ADAPTER_SELENIDE_JAR }} -DADAPTER_JBEHAVE=${{ env.ADAPTER_JBEHAVE_JAR }} || exit 0
+          ./gradlew --no-daemon test || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
@@ -281,8 +274,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
         run: |
-          ./gradlew --no-daemon :${{ matrix.adapter_name }}:jar 
-          ./gradlew --no-daemon :${{ env.TMS_JAVA_COMMONS }}:jar
+          ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
           dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
@@ -291,10 +283,8 @@ jobs:
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
       - name: Test
         run: |
-          echo "ADAPTER_JAR=$(find ${{ matrix.adapter_name }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
-          echo "JAVA_COMMONS_JAR=$(find ${{ env.TMS_JAVA_COMMONS }} -type f -name "*.jar" 2>/dev/null | head -n 1)" >> $GITHUB_ENV
           cd java-examples/${{ matrix.project_name }}
-          mvn --batch-mode test -DJAVA_COMMONS_JAR=${{ env.JAVA_COMMONS_JAR }} -DADAPTER_JAR=${{ env.ADAPTER_JAR }} || exit 0
+          mvn --batch-mode test || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
