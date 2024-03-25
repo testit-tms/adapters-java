@@ -20,4 +20,7 @@ Supported test frameworks :
  7. [Cucumber7](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber7)
  8. [JBehave](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-jbehave)
  9. [Selenide](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-selenide)
- 
+
+# 🚀 Warning
+Since 2.2.0 version:
+- If value from @WorkItemIds annotation not found in TMS then test result will NOT be uploaded.
