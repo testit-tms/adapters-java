@@ -15,10 +15,7 @@ import ru.testit.properties.AdapterConfig;
 import ru.testit.properties.AdapterMode;
 import ru.testit.writers.HttpWriter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static org.mockito.Mockito.*;
@@ -44,7 +41,7 @@ public class AdapterManagerTest {
         this.writer = mock(HttpWriter.class);
         this.update = mock(Consumer.class);
         this.client = mock(ApiClient.class);
-        this.adapterConfig = mock(AdapterConfig.class);
+        this.adapterConfig = spy(new AdapterConfig(new Properties()));
         this.clientConfiguration = mock(ClientConfiguration.class);
         this.listenerManager = mock(ListenerManager.class);
 

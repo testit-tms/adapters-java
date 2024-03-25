@@ -40,7 +40,6 @@ tasks.compileTestJava {
 tasks.getByName<Test>("test") {
     useJUnit()
     exclude("**/samples/*")
-    //maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     doFirst {
         jvmArgs(
             "-javaagent:${agent.singleFile}"

@@ -11,10 +11,7 @@ import ru.testit.models.*;
 import ru.testit.models.LinkType;
 import ru.testit.services.ResultStorage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -97,7 +94,7 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, times(1)).linkAutoTestToWorkItem(autotestId, workItemGlobalId.get(0));
+        verify(client, times(1)).tryLinkAutoTestToWorkItem(autotestId, Collections.singletonList(workItemGlobalId.get(0)));
     }
 
     @Test
@@ -114,7 +111,7 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, never()).linkAutoTestToWorkItem(anyString(), anyString());
+        verify(client, never()).tryLinkAutoTestToWorkItem(anyString(), Collections.singletonList(anyString()));
     }
 
     @Test
@@ -133,7 +130,7 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, never()).linkAutoTestToWorkItem(anyString(), anyString());
+        verify(client, never()).tryLinkAutoTestToWorkItem(anyString(), Collections.singletonList(anyString()));
     }
 
     @Test

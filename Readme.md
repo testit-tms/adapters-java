@@ -4,11 +4,11 @@ The repository contains new versions of adaptors for JVM-based test frameworks.
 ## Compatibility
 
 | Test IT | Cucumber | JBehave | JUnit | TestNG |
-|---------|----------|---------|-------|--------|
-| 3.5     | 1.1      | 1.1     | 1.1   | 1.1    |
-| 4.0     | 1.2      | 1.2     | 1.2   | 1.2    |
-| 4.5     | 1.5      | 1.5     | 1.5   | 1.5    |
-| 4.6     | 1.6      | 1.6     | 1.6   | 1.6    |
+|---------|----------|--------|-------|--------|
+| 3.5     | 1.1      | 1.1    | 1.1   | 1.1    |
+| 4.0     | 1.2      | 1.2    | 1.2   | 1.2    |
+| 4.5     | 1.5      | 1.5    | 1.5   | 1.5    |
+| 4.6     | 1.6+     | 1.6+   | 1.6+  | 1.6+   |
 
 Supported test frameworks :
  1. [TestNG](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-testng)
@@ -20,4 +20,7 @@ Supported test frameworks :
  7. [Cucumber7](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber7)
  8. [JBehave](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-jbehave)
  9. [Selenide](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-selenide)
- 
+
+# 🚀 Warning
+Since 2.2.0 version:
+- If value from @WorkItemIds annotation not found in TMS then test result will NOT be uploaded.
