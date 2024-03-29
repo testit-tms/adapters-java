@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -35,6 +38,11 @@ public class AppProperties {
         String configFile = getConfigFileName();
 
         Properties properties = new Properties();
+        properties.put(ADAPTER_MODE, "0");
+        properties.put(AUTOMATIC_CREATION_TEST_CASES, "false");
+        properties.put(CERT_VALIDATION, "true");
+        properties.put(TMS_INTEGRATION, "true");
+
         loadPropertiesFrom(Thread.currentThread().getContextClassLoader(), properties, configFile);
         loadPropertiesFrom(ClassLoader.getSystemClassLoader(), properties, configFile);
 
@@ -58,27 +66,26 @@ public class AppProperties {
                 for (String key : newProps.stringPropertyNames()) {
                     String value = newProps.getProperty(key);
 
-                    if (value != null && !value.isEmpty())
-                    {
+                    if (value != null && !value.isEmpty()) {
                         properties.setProperty(key, value);
                     }
                 }
 
-                return;
             }
         } catch (IOException e) {
             log.error("Exception while read properties: {}", e.getMessage());
         }
-
-        throw new RuntimeException(String.format("Config file '%s' not found", fileName));
     }
 
     private static Map<String, String> loadPropertiesFromEnv() {
         Map<String, String> map = new HashMap<>();
 
-        String url = System.getenv(String.format("%s_URL", ENV_PREFIX));
-        if (url != null && !url.isEmpty()) {
+
+        try {
+            String url = System.getenv(String.format("%s_URL", ENV_PREFIX));
+            URI ignored = new java.net.URL(url).toURI();
             map.put(URL, url);
+        } catch (MalformedURLException | URISyntaxException ignored) {
         }
 
         String token = System.getenv(String.format("%s_PRIVATE_TOKEN", ENV_PREFIX));
@@ -86,19 +93,26 @@ public class AppProperties {
             map.put(PRIVATE_TOKEN, token);
         }
 
-        String project = System.getenv(String.format("%s_PROJECT_ID", ENV_PREFIX));
-        if (project != null && !project.isEmpty()) {
-            map.put(PROJECT_ID, project);
+        try {
+            String projectId = System.getenv(String.format("%s_PROJECT_ID", ENV_PREFIX));
+            java.util.UUID ignored = java.util.UUID.fromString(projectId);
+            map.put(PROJECT_ID, projectId);
+        } catch (IllegalArgumentException ignored) {
         }
 
-        String config = System.getenv(String.format("%s_CONFIGURATION_ID", ENV_PREFIX));
-        if (config != null && !config.isEmpty()) {
-            map.put(CONFIGURATION_ID, config);
+        try {
+            String configurationId = System.getenv(String.format("%s_CONFIGURATION_ID", ENV_PREFIX));
+            java.util.UUID ignored = java.util.UUID.fromString(configurationId);
+            map.put(CONFIGURATION_ID, configurationId);
+
+        } catch (IllegalArgumentException ignored) {
         }
 
-        String testRunId = System.getenv(String.format("%s_TEST_RUN_ID", ENV_PREFIX));
-        if (testRunId != null && !testRunId.isEmpty()) {
+        try {
+            String testRunId = System.getenv(String.format("%s_TEST_RUN_ID", ENV_PREFIX));
+            java.util.UUID ignored = java.util.UUID.fromString(testRunId);
             map.put(TEST_RUN_ID, testRunId);
+        } catch (IllegalArgumentException ignored) {
         }
 
         String testRunName = System.getenv(String.format("%s_TEST_RUN_NAME", ENV_PREFIX));
@@ -106,23 +120,28 @@ public class AppProperties {
             map.put(TEST_RUN_NAME, testRunName);
         }
 
-        String adapterMode = System.getenv(String.format("%s_ADAPTER_MODE", ENV_PREFIX));
-        if (adapterMode != null  && !adapterMode.isEmpty()) {
-            map.put(ADAPTER_MODE, adapterMode);
+        try {
+            String adapterMode = System.getenv(String.format("%s_ADAPTER_MODE", ENV_PREFIX));
+            int mode = Integer.parseInt(adapterMode);
+
+            if (0 < mode && mode <= 2) {
+                map.put(ADAPTER_MODE, adapterMode);
+            }
+        } catch (NumberFormatException | NullPointerException ignored) {
         }
 
         String createTestCases = System.getenv(String.format("%s_AUTOMATIC_CREATION_TEST_CASES", ENV_PREFIX));
-        if (createTestCases != null && !createTestCases.isEmpty()) {
+        if (Boolean.parseBoolean(createTestCases)) {
             map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
         }
 
         String certValidation = System.getenv(String.format("%s_CERT_VALIDATION", ENV_PREFIX.toLowerCase()));
-        if (certValidation != null && !certValidation.isEmpty()) {
+        if (!Boolean.parseBoolean(certValidation)) {
             map.put(CERT_VALIDATION, certValidation);
         }
 
         String tmsIntegration = System.getenv(String.format("%s_TEST_IT", ENV_PREFIX.toLowerCase()));
-        if (tmsIntegration != null && !tmsIntegration.isEmpty()) {
+        if (!Boolean.parseBoolean(tmsIntegration)) {
             map.put(TMS_INTEGRATION, tmsIntegration);
         }
 
@@ -133,9 +152,11 @@ public class AppProperties {
         Map<String, String> map = new HashMap<>();
         Properties systemProperties = System.getProperties();
 
-        String url = systemProperties.getProperty(String.format("%sUrl", ENV_PREFIX.toLowerCase()));
-        if (url != null && !url.isEmpty()) {
+        try {
+            String url = systemProperties.getProperty(String.format("%sUrl", ENV_PREFIX.toLowerCase()));
+            URI ignored = new java.net.URL(url).toURI();
             map.put(URL, url);
+        } catch (MalformedURLException | URISyntaxException ignored) {
         }
 
         String token = systemProperties.getProperty(String.format("%sPrivateToken", ENV_PREFIX.toLowerCase()));
@@ -143,19 +164,25 @@ public class AppProperties {
             map.put(PRIVATE_TOKEN, token);
         }
 
-        String project = systemProperties.getProperty(String.format("%sProjectId", ENV_PREFIX.toLowerCase()));
-        if (project != null && !project.isEmpty()) {
-            map.put(PROJECT_ID, project);
+        try {
+            String projectId = systemProperties.getProperty(String.format("%sProjectId", ENV_PREFIX.toLowerCase()));
+            java.util.UUID ignored = java.util.UUID.fromString(projectId);
+            map.put(PROJECT_ID, projectId);
+        } catch (IllegalArgumentException ignored) {
         }
 
-        String config = systemProperties.getProperty(String.format("%sConfigurationId", ENV_PREFIX.toLowerCase()));
-        if (config != null && !config.isEmpty()) {
-            map.put(CONFIGURATION_ID, config);
+        try {
+            String configurationId = systemProperties.getProperty(String.format("%sConfigurationId", ENV_PREFIX.toLowerCase()));
+            java.util.UUID ignored = java.util.UUID.fromString(configurationId);
+            map.put(CONFIGURATION_ID, configurationId);
+        } catch (IllegalArgumentException ignored) {
         }
 
-        String testRunId = systemProperties.getProperty(String.format("%sTestRunId", ENV_PREFIX.toLowerCase()));
-        if (testRunId != null && !testRunId.isEmpty()) {
+        try {
+            String testRunId = systemProperties.getProperty(String.format("%sTestRunId", ENV_PREFIX.toLowerCase()));
+            java.util.UUID ignored = java.util.UUID.fromString(testRunId);
             map.put(TEST_RUN_ID, testRunId);
+        } catch (IllegalArgumentException ignored) {
         }
 
         String testRunName = systemProperties.getProperty(String.format("%sTestRunName", ENV_PREFIX.toLowerCase()));
@@ -163,23 +190,28 @@ public class AppProperties {
             map.put(TEST_RUN_NAME, testRunName);
         }
 
-        String adapterMode = systemProperties.getProperty(String.format("%sAdapterMode", ENV_PREFIX.toLowerCase()));
-        if (adapterMode != null && !adapterMode.isEmpty()) {
-            map.put(ADAPTER_MODE, adapterMode);
+        try {
+            String adapterMode = systemProperties.getProperty(String.format("%sAdapterMode", ENV_PREFIX.toLowerCase()));
+            int mode = Integer.parseInt(adapterMode);
+
+            if (0 < mode && mode <= 2) {
+                map.put(ADAPTER_MODE, adapterMode);
+            }
+        } catch (NumberFormatException | NullPointerException ignored) {
         }
 
         String createTestCases = systemProperties.getProperty(String.format("%sAutomaticCreationTestCases", ENV_PREFIX.toLowerCase()));
-        if (createTestCases != null && !createTestCases.isEmpty()) {
+        if (Boolean.parseBoolean(createTestCases)) {
             map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
         }
 
         String certValidation = systemProperties.getProperty(String.format("%sCertValidation", ENV_PREFIX.toLowerCase()));
-        if (certValidation != null && !certValidation.isEmpty()) {
+        if (!Boolean.parseBoolean(certValidation)) {
             map.put(CERT_VALIDATION, certValidation);
         }
 
         String tmsIntegration = systemProperties.getProperty(String.format("%sTestIt", ENV_PREFIX.toLowerCase()));
-        if (tmsIntegration != null && !tmsIntegration.isEmpty()) {
+        if (!Boolean.parseBoolean(tmsIntegration)) {
             map.put(TMS_INTEGRATION, tmsIntegration);
         }
 

@@ -17,10 +17,7 @@ import ru.testit.properties.AdapterMode;
 import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -759,20 +756,40 @@ public class AdapterManager {
     private void validateAdapterConfig() {
         switch (adapterConfig.getMode()) {
             case USE_FILTER:
-            case RUN_ALL_TESTS:
-                if (clientConfiguration.getTestRunId().equals("null") || clientConfiguration.getConfigurationId().equals("null")) {
+                try{
+                    UUID ignored = UUID.fromString(clientConfiguration.getTestRunId());
+                    UUID ignored2 = UUID.fromString(clientConfiguration.getConfigurationId());
+                } catch (IllegalArgumentException exception){
                     String error = "Adapter works in mode 0. Config should contains test run id and configuration id.";
                     LOGGER.error(error);
                     throw new RuntimeException(error);
                 }
                 break;
-            case NEW_TEST_RUN:
-                if (clientConfiguration.getProjectId().equals("null")
-                        || clientConfiguration.getConfigurationId().equals("null")
-                        || !clientConfiguration.getTestRunId().equals("null")) {
-                    String error = "Adapter works in mode 2. Config should contains project id and configuration id. Also doesn't contains test run id.";
+            case RUN_ALL_TESTS:
+                try{
+                    UUID ignored = UUID.fromString(clientConfiguration.getTestRunId());
+                    UUID ignored2 = UUID.fromString(clientConfiguration.getConfigurationId());
+                } catch (IllegalArgumentException exception){
+                    String error = "Adapter works in mode 1. Config should contains test run id and configuration id.";
                     LOGGER.error(error);
                     throw new RuntimeException(error);
+                }
+                break;
+            case NEW_TEST_RUN:
+                try{
+                    UUID ignored = UUID.fromString(clientConfiguration.getProjectId());
+                    UUID ignored2 = UUID.fromString(clientConfiguration.getConfigurationId());
+                } catch (IllegalArgumentException exception){
+                    String error = "Adapter works in mode 2. Config should contains project id and configuration id.";
+                    LOGGER.error(error);
+                    throw new RuntimeException(error);
+                }
+                try{
+                    UUID ignored = UUID.fromString(clientConfiguration.getTestRunId());
+                    String error = "Adapter works in mode 2. Config should not contains test run id.";
+                    LOGGER.error(error);
+                    throw new RuntimeException(error);
+                } catch (IllegalArgumentException ignored){
                 }
                 break;
             default:
