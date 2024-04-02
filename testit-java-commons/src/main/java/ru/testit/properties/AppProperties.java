@@ -80,7 +80,6 @@ public class AppProperties {
     private static Map<String, String> loadPropertiesFromEnv() {
         Map<String, String> map = new HashMap<>();
 
-
         try {
             String url = System.getenv(String.format("%s_URL", ENV_PREFIX));
             URI ignored = new java.net.URL(url).toURI();
@@ -93,26 +92,31 @@ public class AppProperties {
             map.put(PRIVATE_TOKEN, token);
         }
 
-        try {
-            String projectId = System.getenv(String.format("%s_PROJECT_ID", ENV_PREFIX));
-            java.util.UUID ignored = java.util.UUID.fromString(projectId);
-            map.put(PROJECT_ID, projectId);
-        } catch (IllegalArgumentException ignored) {
+        String projectId = System.getenv(String.format("%s_PROJECT_ID", ENV_PREFIX));
+        if (projectId != null && !projectId.isEmpty()) {
+            try {
+                java.util.UUID ignored = java.util.UUID.fromString(projectId);
+                map.put(PROJECT_ID, projectId);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
 
-        try {
-            String configurationId = System.getenv(String.format("%s_CONFIGURATION_ID", ENV_PREFIX));
-            java.util.UUID ignored = java.util.UUID.fromString(configurationId);
-            map.put(CONFIGURATION_ID, configurationId);
-
-        } catch (IllegalArgumentException ignored) {
+        String configurationId = System.getenv(String.format("%s_CONFIGURATION_ID", ENV_PREFIX));
+        if (configurationId != null && !configurationId.isEmpty()) {
+            try {
+                java.util.UUID ignored = java.util.UUID.fromString(configurationId);
+                map.put(CONFIGURATION_ID, configurationId);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
 
-        try {
-            String testRunId = System.getenv(String.format("%s_TEST_RUN_ID", ENV_PREFIX));
-            java.util.UUID ignored = java.util.UUID.fromString(testRunId);
-            map.put(TEST_RUN_ID, testRunId);
-        } catch (IllegalArgumentException ignored) {
+        String testRunId = System.getenv(String.format("%s_TEST_RUN_ID", ENV_PREFIX));
+        if (testRunId != null && !testRunId.isEmpty()) {
+            try {
+                java.util.UUID ignored = java.util.UUID.fromString(testRunId);
+                map.put(TEST_RUN_ID, testRunId);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
 
         String testRunName = System.getenv(String.format("%s_TEST_RUN_NAME", ENV_PREFIX));
@@ -164,25 +168,32 @@ public class AppProperties {
             map.put(PRIVATE_TOKEN, token);
         }
 
-        try {
-            String projectId = systemProperties.getProperty(String.format("%sProjectId", ENV_PREFIX.toLowerCase()));
-            java.util.UUID ignored = java.util.UUID.fromString(projectId);
-            map.put(PROJECT_ID, projectId);
-        } catch (IllegalArgumentException ignored) {
+        String projectId = systemProperties.getProperty(String.format("%sProjectId", ENV_PREFIX.toLowerCase()));
+        if (projectId != null && !projectId.isEmpty()) {
+            try {
+                java.util.UUID ignored = java.util.UUID.fromString(projectId);
+                map.put(PROJECT_ID, projectId);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
 
-        try {
-            String configurationId = systemProperties.getProperty(String.format("%sConfigurationId", ENV_PREFIX.toLowerCase()));
-            java.util.UUID ignored = java.util.UUID.fromString(configurationId);
-            map.put(CONFIGURATION_ID, configurationId);
-        } catch (IllegalArgumentException ignored) {
+        String configurationId = systemProperties.getProperty(String.format("%sConfigurationId", ENV_PREFIX.toLowerCase()));
+        if (configurationId != null && !configurationId.isEmpty()) {
+            try {
+                java.util.UUID ignored = java.util.UUID.fromString(configurationId);
+                map.put(CONFIGURATION_ID, configurationId);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
 
-        try {
-            String testRunId = systemProperties.getProperty(String.format("%sTestRunId", ENV_PREFIX.toLowerCase()));
-            java.util.UUID ignored = java.util.UUID.fromString(testRunId);
-            map.put(TEST_RUN_ID, testRunId);
-        } catch (IllegalArgumentException ignored) {
+        String testRunId = systemProperties.getProperty(String.format("%sTestRunId", ENV_PREFIX.toLowerCase()));
+        if (testRunId != null && !testRunId.isEmpty()) {
+
+            try {
+                java.util.UUID ignored = java.util.UUID.fromString(testRunId);
+                map.put(TEST_RUN_ID, testRunId);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
 
         String testRunName = systemProperties.getProperty(String.format("%sTestRunName", ENV_PREFIX.toLowerCase()));
