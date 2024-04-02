@@ -3,30 +3,36 @@ package ru.testit.properties;
 import ru.testit.services.Utils;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Properties;
 
 public class AdapterConfig implements Serializable {
-    private final AdapterMode mode;
-    private final boolean automaticCreationTestCases;
-    private final boolean tmsIntegration;
+    private AdapterMode mode;
+    private boolean automaticCreationTestCases;
+    private boolean tmsIntegration;
 
 
     public AdapterConfig(Properties properties) {
-        String modeValue = String.valueOf(properties.get(AppProperties.ADAPTER_MODE));
-        if (modeValue.equals("null")) {
-            modeValue = "0";
+        try {
+            String modeValue = String.valueOf(properties.get(AppProperties.ADAPTER_MODE));
+            this.mode = AdapterMode.valueOf(Integer.parseInt(modeValue));
+        } catch (NullPointerException | NumberFormatException ignored) {
+            this.mode = AdapterMode.USE_FILTER;
         }
-        this.mode = AdapterMode.valueOf(Integer.parseInt(modeValue));
 
-        String automaticCreationTestCasesValue = String.valueOf(
-                properties.get(AppProperties.AUTOMATIC_CREATION_TEST_CASES));
-        if (automaticCreationTestCasesValue.equals("null")) {
-            automaticCreationTestCasesValue = "false";
+        try {
+            String automaticCreationTestCasesValue = String.valueOf(properties.get(AppProperties.AUTOMATIC_CREATION_TEST_CASES));
+            this.automaticCreationTestCases = Objects.equals(automaticCreationTestCasesValue, "true");
+        } catch (NullPointerException ignored) {
+            this.automaticCreationTestCases = false;
         }
-        this.automaticCreationTestCases = Boolean.parseBoolean(automaticCreationTestCasesValue);
 
-        String tmsIntegrationItValue = String.valueOf(properties.get(AppProperties.TMS_INTEGRATION)).toLowerCase().trim();
-        this.tmsIntegration = !tmsIntegrationItValue.equals("false");
+        try {
+            String tmsIntegrationItValue = String.valueOf(properties.get(AppProperties.TMS_INTEGRATION));
+            this.tmsIntegration = !Objects.equals(tmsIntegrationItValue, "false");
+        } catch (NullPointerException ignored) {
+            this.tmsIntegration = true;
+        }
     }
 
     public AdapterMode getMode() {
