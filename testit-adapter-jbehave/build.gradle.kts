@@ -35,6 +35,7 @@ tasks.jar {
 
 tasks.compileTestJava {
     options.encoding = "UTF-8"
+    options.setIncremental(true)
 }
 
 tasks.getByName<Test>("test") {

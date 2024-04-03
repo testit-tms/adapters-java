@@ -11,8 +11,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Converter {
-    public static AutoTestPostModel testResultToAutoTestPostModel(TestResult result) {
-        AutoTestPostModel model = new AutoTestPostModel();
+    public static CreateAutoTestRequest testResultToAutoTestPostModel(TestResult result) {
+        CreateAutoTestRequest model = new CreateAutoTestRequest();
 
         model.setExternalId(result.getExternalId());
         model.setDescription(result.getDescription());
@@ -97,8 +97,23 @@ public class Converter {
                 ).collect(Collectors.toList());
     }
 
-    public static AutoTestPutModel testResultToAutoTestPutModel(TestResult result) {
-        AutoTestPutModel model = new AutoTestPutModel();
+    public static ApiV2TestResultsIdPutRequest testResultToTestResultUpdateModel(TestResultModel result) {
+        ApiV2TestResultsIdPutRequest model = new ApiV2TestResultsIdPutRequest();
+
+        model.setDurationInMs(result.getDurationInMs());
+        model.setOutcome(result.getOutcome());
+        model.setLinks(result.getLinks());
+        model.setStepResults(result.getStepResults());
+        model.setFailureClassIds(result.getFailureClassIds());
+        model.setComment(result.getComment());
+        if (result.getAttachments() != null) {
+            model.setAttachments(convertAttachmentsFromModel(result.getAttachments()));
+        }
+        return model;
+    }
+
+    public static UpdateAutoTestRequest testResultToAutoTestPutModel(TestResult result) {
+        UpdateAutoTestRequest model = new UpdateAutoTestRequest();
 
         model.setExternalId(result.getExternalId());
         model.setDescription(result.getDescription());
@@ -115,8 +130,8 @@ public class Converter {
         return model;
     }
 
-    public static AutoTestPutModel autoTestModelToAutoTestPutModel(AutoTestModel autoTestModel) {
-        AutoTestPutModel model = new AutoTestPutModel();
+    public static UpdateAutoTestRequest autoTestModelToAutoTestPutModel(AutoTestModel autoTestModel) {
+        UpdateAutoTestRequest model = new UpdateAutoTestRequest();
 
         model.setId(autoTestModel.getId());
         model.setExternalId(autoTestModel.getExternalId());
@@ -224,6 +239,16 @@ public class Converter {
             AttachmentPutModel model = new AttachmentPutModel();
 
             model.setId(UUID.fromString(attach));
+
+            return model;
+        }).collect(Collectors.toList());
+    }
+
+    private static List<AttachmentPutModel> convertAttachmentsFromModel(List<AttachmentModel> models) {
+        return models.stream().map(attach -> {
+            AttachmentPutModel model = new AttachmentPutModel();
+
+            model.setId(attach.getId());
 
             return model;
         }).collect(Collectors.toList());

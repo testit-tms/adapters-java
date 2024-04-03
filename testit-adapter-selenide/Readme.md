@@ -1,4 +1,4 @@
-# Test IT TMS adapter for JUnit 5
+# Test IT TMS adapter for Selenide
 
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
@@ -14,7 +14,7 @@ Add this dependency to your project POM:
 
 <dependency>
     <groupId>ru.testit</groupId>
-    <artifactId>testit-adapter-junit5</artifactId>
+    <artifactId>testit-adapter-selenide</artifactId>
     <version>1.3.5</version>
     <scope>compile</scope>
 </dependency>
@@ -25,7 +25,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-junit5:1.3.5"
+implementation "ru.testit:testit-adapter-selenide:1.3.5"
 ```
 
 ## Usage
@@ -59,6 +59,11 @@ implementation "ru.testit:testit-adapter-junit5:1.3.5"
         <dependency>
             <groupId>ru.testit</groupId>
             <artifactId>testit-java-commons</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-adapter-selenide</artifactId>
             <version>${adapter.version}</version>
         </dependency>
         <dependency>
@@ -163,6 +168,7 @@ repositories {
 
 dependencies {
     testImplementation "org.aspectj:aspectjrt:1.9.7"
+    testImplementation "ru.testit:testit-adapter-selenide:1.3.5"
     testImplementation "ru.testit:testit-adapter-junit5:1.3.5"
     testImplementation "ru.testit:testit-java-commons:1.3.5"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
@@ -260,9 +266,7 @@ Description of annotations:
 - `Description` - autotest description specified in the autotest card
 - `Labels` - tags listed in the autotest card
 - `Links` - links listed in the autotest card
-- `Step` - the designation of the step
-- `Classname` - name of the classname
-- `Namespace` - name of the package
+- `Step` - the designation of the step.
 
 Description of methods:
 
@@ -270,106 +274,77 @@ Description of methods:
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
 
+Description of SelenideListener methods:
+
+- `saveScreenshots(true)` - save screenshots if test fails
+- `savePageSource(true)` - save page source if test fails
+- `saveLogs(LogType.BROWSER, Level.All)` - save logs if test fails
+- `includeSelenideSteps(true)` - add Selenide steps
+
 ### Examples
 
 #### Simple test
 
 ```java
+import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.junit5.TextReportExtension;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
-import ru.testit.annotations.*;
-import ru.testit.models.LinkItem;
-import ru.testit.tms.client.TMSClient;
+import org.junit.jupiter.api.extension.ExtendWith;
+import ru.testit.selenide.SelenideListener;
+import ru.testit.annotations.Step;
+import ru.testit.annotations.Title;
 
-public class SimpleTest {
+import static com.codeborne.selenide.Selectors.byXpath;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
 
-    @Test
-    @ExternalId("Simple_test_1")
-    @DisplayName("Simple test 1")
-    public void simpleTest1() {
-        Assertions.assertTrue(true);
+import static com.codeborne.selenide.Condition.text;
+
+@ExtendWith(TextReportExtension.class)
+public class ExampleTests {
+
+    @BeforeEach
+    public void setUp() {
+        SelenideLogger.addListener(
+                "TmsSelenide",
+                new SelenideListener()
+                        .saveScreenshots(true)
+                        .savePageSource(true)
+                        .includeSelenideSteps(true)
+                        .saveLogs(LogType.BROWSER, Level.All));
+
+        steps = new Steps();
     }
 
     @Test
-    @ExternalId("Simple_test_2")
-    @WorkItemIds({"12345", "54321"})
-    @DisplayName("Simple test 2")
-    @Title("test №2")
-    @Description("Description")
-    @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
-            @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
-            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
-    public void itsTrueReallyTrue() {
-        stepWithParams("password", 456);
-        Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
-        Assertions.assertTrue(true);
+    public void TestFailed() {
+        openPage();
+
+        SelenideElement searchField = getElementByXpath("//h1[contains(@class,\"title\")]");
+
+        searchField.shouldHave(text("Система для управления тестированием"));
+    }
+
+    @Test
+    public void TestSuccess() {
+        openPage();
+
+        SelenideElement searchField = getElementByXpath("//h1[contains(@class,\"title\")]");
+
+        searchField.shouldHave(text("Система управления тестированием"));
     }
 
     @Step
-    @Title("Step 1 with params: {param1}, {param2}")
-    @Description("Step 1 description and params: {param1}, {param2}")
-    private void stepWithParams(String param1, int param2) {
-        stepWithoutParams();
-        Assertions.assertTrue(true);
-        Adapter.addMessage("Message");
+    public void openPage() {
+        open("https://testit.software/");
     }
 
     @Step
-    @Title("Step 2")
-    @Description("Step 2 description")
-    private void stepWithoutParams() {
-        Assertions.assertTrue(true);
-        Adapter.addAttachment("/Users/user/screen.json");
-    }
-}
-```
-
-#### Parameterized test
-
-```java
-package ru.testit.samples;
-
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.*;
-import ru.testit.annotations.*;
-import ru.testit.models.LinkType;
-
-import java.util.stream.Stream;
-
-public class ParameterizedTests {
-
-    @ParameterizedTest
-    @ValueSource(shorts = {1, 2, 3})
-    @ExternalId("Parameterized_test_with_one_parameter_{number}")
-    @DisplayName("Test with number = {number} parameter")
-    @WorkItemIds("{number}")
-    @Title("Title in the autotest card {number}")
-    @Description("Test with BeforeEach, AfterEach and all annotations {number}")
-    @Labels({"Tag{number}"})
-    void testWithOneParameter(int number) {
-
-    }
-
-    @ParameterizedTest
-    @MethodSource("arguments")
-    @ExternalId("Parameterized_test_with_multiple_parameters_{number}")
-    @DisplayName("Parameterized test with number = {number}, title = {title}, expected = {expected}, url = {url}")
-    @Links(links = {
-            @Link(url = "https://{url}/module/repository", title = "{title} Repository", description = "Example of repository", type = LinkType.REPOSITORY),
-            @Link(url = "https://{url}/module/projects", title = "{title} Projects", type = LinkType.REQUIREMENT),
-            @Link(url = "https://{url}/module/", type = LinkType.BLOCKED_BY),
-            @Link(url = "https://{url}/module/docs", title = "{title} Documentation", type = LinkType.RELATED),
-            @Link(url = "https://{url}/module/JCP-777", title = "{title} JCP-777", type = LinkType.DEFECT),
-            @Link(url = "https://{url}/module/issue/5", title = "{title} Issue-5", type = LinkType.ISSUE),
-    })
-    void testWithMultipleParameters(int number, String title, boolean expected, String url) {
-    }
-
-    static Stream<Arguments> arguments() {
-        return Stream.of(
-                Arguments.of(1, "Test version 1", true, "google.com"),
-                Arguments.of(2, "Test version 2", false, "yandex.ru")
-        );
+    @Title("Search element by xpath")
+    public SelenideElement getElementByXpath(String xpath) {
+        return $(byXpath(xpath));
     }
 }
 ```

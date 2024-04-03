@@ -145,12 +145,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
                 container -> container.getChildren().add(uuid));
 
-        try {
-            invocation.proceed();
-        } catch (Throwable throwable) {
-            stopTestCase(executableTest.getUuid(), throwable, ItemStatus.FAILED);
-            throw throwable;
-        }
+        invocation.proceed();
     }
 
     private Map<String, String> getParameters(
@@ -198,12 +193,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
                 container -> container.getChildren().add(uuid));
 
-        try {
-            invocation.proceed();
-        } catch (Throwable throwable) {
-            stopTestCase(executableTest.getUuid(), throwable, ItemStatus.FAILED);
-            throw throwable;
-        }
+        invocation.proceed();
     }
 
     protected void startTestCase(Method method, final String uuid, Map<String, String> parameters) {
@@ -214,9 +204,12 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
                 .setWorkItemId(Utils.extractWorkItemId(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters))
                 .setName(Utils.extractDisplayName(method, parameters))
-                .setClassName(method.getDeclaringClass().getSimpleName())
-                .setSpaceName((method.getDeclaringClass().getPackage() == null)
-                        ? null : method.getDeclaringClass().getPackage().getName())
+                .setClassName(Utils.extractClassname(method, method.getDeclaringClass().getSimpleName(), parameters))
+                .setSpaceName(Utils.extractNamespace(method,
+                        (method.getDeclaringClass().getPackage() == null)
+                                ? null : method.getDeclaringClass().getPackage().getName(),
+                        parameters)
+                )
                 .setLinkItems(Utils.extractLinks(method, parameters))
                 .setDescription(Utils.extractDescription(method, parameters))
                 .setParameters(parameters);

@@ -22,6 +22,8 @@ public class TagParser {
     private static final String LABELS = "@LABELS";
     private static final String LINKS = "@LINKS";
     private static final String WORK_ITEM_IDS = "@WORKITEMIDS";
+    private static final String NAMESPACE = "@NAMESPACE";
+    private static final String CLASS_NAME = "@CLASSNAME";
 
     private final List<Label> labels = new ArrayList<>();
     private final List<LinkItem> links = new ArrayList<>();
@@ -30,8 +32,12 @@ public class TagParser {
     private String title = "";
     private String displayName = "";
     private String description = "";
+    private String nameSpace = "";
+    private String className;
 
     TagParser(final Feature feature, final TestCase scenario, final Deque<String> tags, Map<String, String> parameters) {
+        nameSpace = getFileName(scenario);
+        className = feature.getName();
 
         while (tags.peek() != null) {
             final String tag = tags.remove();
@@ -58,6 +64,12 @@ public class TagParser {
                         break;
                     case DESCRIPTION:
                         description = Utils.setParameters(tagValue, parameters);
+                        break;
+                    case NAMESPACE:
+                        nameSpace = Utils.setParameters(tagValue, parameters);
+                        break;
+                    case CLASS_NAME:
+                        className = Utils.setParameters(tagValue, parameters);
                         break;
                     case LABELS:
                         Arrays.stream(Utils.setParameters(tagValue, parameters).split(TAG_VALUE_DELIMITER))
@@ -118,6 +130,14 @@ public class TagParser {
         return description;
     }
 
+    public String getNameSpace() {
+        return nameSpace;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
     private Label getTagLabel(final String tag) {
         return new Label().setName(tag);
     }
@@ -164,5 +184,11 @@ public class TagParser {
             );
         }
         return items;
+    }
+
+    private String getFileName(TestCase scenario) {
+        String[] directories = scenario.getUri().toString().split("/");
+
+        return directories[directories.length - 1];
     }
 }

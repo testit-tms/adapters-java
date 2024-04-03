@@ -60,13 +60,32 @@ public class Utils {
         return links;
     }
 
+    public static String extractClassname(final Description method, String className) {
+        Classname annotation = method.getAnnotation(Classname.class);
+
+        if (annotation == null) {
+            annotation = method.getTestClass().getAnnotation(Classname.class);
+        }
+
+        return (annotation != null) ? annotation.value() : className;
+    }
+
+    public static String extractNamespace(final Description method, String nameSpace) {
+        Namespace annotation = method.getAnnotation(Namespace.class);
+
+        if (annotation == null) {
+            annotation = method.getTestClass().getAnnotation(Namespace.class);
+        }
+
+        return (annotation != null) ? annotation.value() : nameSpace;
+    }
+
     public static List<Label> extractLabels(final Description method) {
         final List<Label> labels = new LinkedList<>();
         final Labels annotation = method.getAnnotation(Labels.class);
         if (annotation != null) {
             for (final String s : annotation.value()) {
-                final Label label = new Label()
-                        .setName(s);
+                final Label label = new Label().setName(s);
                 labels.add(label);
             }
         }
@@ -87,11 +106,7 @@ public class Utils {
     }
 
     private static LinkItem makeLink(final Link linkAnnotation) {
-        return new LinkItem()
-                .setTitle(linkAnnotation.title())
-                .setDescription(linkAnnotation.description())
-                .setUrl(linkAnnotation.url())
-                .setType(linkAnnotation.type());
+        return new LinkItem().setTitle(linkAnnotation.title()).setDescription(linkAnnotation.description()).setUrl(linkAnnotation.url()).setType(linkAnnotation.type());
     }
 
     public static String extractDescription(final Description method) {

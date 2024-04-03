@@ -22,6 +22,7 @@ nexusPublishing {
 }
 
 tasks.withType(JavaCompile::class) {
+    options.setIncremental(true)
     options.encoding = "UTF-8"
 }
 
@@ -95,6 +96,11 @@ configure(subprojects) {
     }
 
     tasks.withType<Sign>().configureEach {
+        if (System.getProperty("disableSign") == "true")
+        {
+            enabled = false;
+        }
+
         onlyIf { !project.version.toString().endsWith("-SNAPSHOT") }
     }
 

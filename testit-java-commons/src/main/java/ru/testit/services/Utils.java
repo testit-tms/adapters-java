@@ -76,6 +76,26 @@ public class Utils {
         return labels;
     }
 
+    public static String extractClassname(final Method atomicTest, String className, Map<String, String> parameters) {
+        Classname annotation = atomicTest.getAnnotation(Classname.class);
+
+        if (annotation == null) {
+            annotation = atomicTest.getDeclaringClass().getAnnotation(Classname.class);
+        }
+
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : setParameters(className, parameters);
+    }
+
+    public static String extractNamespace(final Method atomicTest, String nameSpace, Map<String, String> parameters) {
+        Namespace annotation = atomicTest.getAnnotation(Namespace.class);
+
+        if (annotation == null) {
+            annotation = atomicTest.getDeclaringClass().getAnnotation(Namespace.class);
+        }
+
+        return (annotation != null) ? setParameters(annotation.value(), parameters) : setParameters(nameSpace, parameters);
+    }
+
     public static String extractDescription(final Method atomicTest, Map<String, String> parameters) {
         final Description annotation = atomicTest.getAnnotation(Description.class);
         return (annotation != null) ? setParameters(annotation.value(), parameters) : "";

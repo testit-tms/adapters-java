@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.client.api.AttachmentsApi;
 import ru.testit.client.api.AutoTestsApi;
+import ru.testit.client.api.TestResultsApi;
 import ru.testit.client.api.TestRunsApi;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
@@ -18,10 +19,12 @@ public class TmsApiClient implements ApiClient {
     private static final String AUTH_PREFIX = "PrivateToken";
     private static final boolean INCLUDE_STEPS = true;
     private static final boolean INCLUDE_LABELS = true;
+    private static final boolean INCLUDE_LINKS = true;
 
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
     private final AttachmentsApi attachmentsApi;
+    private final TestResultsApi testResultsApi;
 
     private final ClientConfiguration clientConfiguration;
 
@@ -36,12 +39,12 @@ public class TmsApiClient implements ApiClient {
         testRunsApi = new TestRunsApi(apiClient);
         autoTestsApi = new AutoTestsApi(apiClient);
         attachmentsApi = new AttachmentsApi(apiClient);
+        testResultsApi = new TestResultsApi(apiClient);
     }
 
     @Override
     public TestRunV2GetModel createTestRun() throws ApiException {
-
-        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
+        CreateEmptyRequest model = new CreateEmptyRequest();
         model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
 
         if (!Objects.equals(this.clientConfiguration.getTestRunName(), "null")) {
@@ -73,33 +76,35 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public void updateAutoTest(AutoTestPutModel model) throws ApiException {
+    public void updateAutoTest(UpdateAutoTestRequest model) throws ApiException {
         autoTestsApi.updateAutoTest(model);
     }
 
     @Override
-    public String createAutoTest(AutoTestPostModel model) throws ApiException {
+    public String createAutoTest(CreateAutoTestRequest model) throws ApiException {
         return Objects.requireNonNull(autoTestsApi.createAutoTest(model).getId()).toString();
     }
 
     @Override
     public AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException {
 
-        AutotestFilterModel filter = new AutotestFilterModel();
+        AutotestsSelectModelFilter filter = new AutotestsSelectModelFilter();
 
         Set<UUID> projectIds = new HashSet<>();
         projectIds.add(UUID.fromString(this.clientConfiguration.getProjectId()));
         filter.setProjectIds(projectIds);
+        filter.setIsDeleted(false);
 
         Set<String> externalIds = new HashSet<>();
         externalIds.add(externalId);
         filter.externalIds(externalIds);
 
-        SearchAutoTestsQueryIncludesModel includes = new SearchAutoTestsQueryIncludesModel();
+        AutotestsSelectModelIncludes includes = new AutotestsSelectModelIncludes();
         includes.setIncludeLabels(INCLUDE_LABELS);
         includes.setIncludeSteps(INCLUDE_STEPS);
+        includes.setIncludeLinks(INCLUDE_LINKS);
 
-        AutotestsSelectModel model = new AutotestsSelectModel();
+        ApiV2AutoTestsSearchPostRequest model = new ApiV2AutoTestsSearchPostRequest();
         model.setFilter(filter);
         model.setIncludes(includes);
 
@@ -118,13 +123,26 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public void linkAutoTestToWorkItem(String id, String workItemId) throws ApiException {
-        autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
+    public boolean tryLinkAutoTestToWorkItem(String id, Iterable<String> workItemIds) {
+        for (String workItemId : workItemIds) {
+            LOGGER.debug("Link autotest {} to workitem {}", id, workItemId);
+
+            try {
+                autoTestsApi.linkAutoTestToWorkItem(id, new LinkAutoTestToWorkItemRequest().id(workItemId));
+            } catch (ApiException e) {
+                LOGGER.error("Cannot link autotest {} to work item {}: work item does not exist", id, workItemId);
+                return false;
+            }
+
+            LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
+        }
+
+        return true;
     }
 
     @Override
-    public void sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException {
-        testRunsApi.setAutoTestResultsForTestRun(UUID.fromString(testRunUuid), models);
+    public List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException {
+        return testRunsApi.setAutoTestResultsForTestRun(UUID.fromString(testRunUuid), models);
     }
 
     @Override
@@ -146,5 +164,15 @@ public class TmsApiClient implements ApiClient {
         return model.getTestResults().stream()
                 .filter(result -> Objects.equals(result.getConfigurationId(), configUUID))
                 .map(result -> Objects.requireNonNull(result.getAutoTest()).getExternalId()).collect(Collectors.toList());
+    }
+
+    @Override
+    public TestResultModel getTestResult(UUID uuid) throws ApiException {
+        return testResultsApi.apiV2TestResultsIdGet(uuid);
+    }
+
+    @Override
+    public void updateTestResult(UUID uuid, ApiV2TestResultsIdPutRequest model) throws ApiException {
+        testResultsApi.apiV2TestResultsIdPut(uuid, model);
     }
 }
