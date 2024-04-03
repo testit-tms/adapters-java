@@ -118,7 +118,7 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
 
 ```groovy
 plugins {
-    id 'java'
+    id "java"
 }
 
 configurations {
@@ -127,12 +127,12 @@ configurations {
 
 sourceCompatibility = 1.8
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group "org.example"
+version "1.0-SNAPSHOT"
 
-compileJava.options.encoding = 'utf-8'
+compileJava.options.encoding = "utf-8"
 tasks.withType(JavaCompile) {
-    options.encoding = 'utf-8'
+    options.encoding = "utf-8"
 }
 
 repositories {
@@ -141,10 +141,10 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.aspectj:aspectjrt:1.9.7'
+    testImplementation "org.aspectj:aspectjrt:1.9.7"
     testImplementation "ru.testit:testit-adapter-testng:1.3.5"
     testImplementation "ru.testit:testit-java-commons:1.3.5"
-    testImplementation 'org.testng:testng:7.5'
+    testImplementation "org.testng:testng:7.5"
     aspectConfig "org.aspectj:aspectjweaver:1.9.7"
 }
 
@@ -154,10 +154,17 @@ test {
         def weaver = configurations.aspectConfig.find { it.name.contains("aspectjweaver") }
         jvmArgs += "-javaagent:$weaver"
     }
-    // to enable command line options, specify the option that will be passed like this:
-    // systemProperty '<parameter_name>', System.getProperty('<parameter_name>')
-    // for example:
-    // systemProperty 'tmsTestRunName', System.getProperty('tmsTestRunName') 
+
+    environment "TMS_URL", System.getProperty("tmsUrl")
+    environment "TMS_PRIVATE_TOKEN", System.getProperty("tmsPrivateToken")
+    environment "TMS_PROJECT_ID", System.getProperty("tmsProjectId")
+    environment "TMS_CONFIGURATION_ID", System.getProperty("tmsConfigurationId")
+    environment "TMS_TEST_RUN_ID", System.getProperty("tmsTestRunId")
+    environment "TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName")
+    environment "TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode")
+    environment "TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation")
+    environment "TMS_TEST_IT", System.getProperty("tmsTestIt")
+    environment "TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases")
 }
 ```
 
@@ -165,19 +172,19 @@ test {
 
 ### Configuration
 
-| Description                                                                                                                                                                                                                                                                                                                                                                            | Property                   | Environment variable              | CLI argument                  |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|-----------------------------------|-------------------------------|
-| Location of the TMS instance                                                                                                                                                                                                                                                                                                                                                           | url                        | TMS_URL                           | tmsUrl                        |
-| API secret key [How to getting API secret key?](https://github.com/testit-tms/.github/tree/main/configuration#privatetoken)                                                                                                                                                                                                                                                            | privateToken               | TMS_PRIVATE_TOKEN                 | tmsPrivateToken               |
-| ID of project in TMS instance [How to getting project ID?](https://github.com/testit-tms/.github/tree/main/configuration#projectid)                                                                                                                                                                                                                                                    | projectId                  | TMS_PROJECT_ID                    | tmsProjectId                  |
-| ID of configuration in TMS instance [How to getting configuration ID?](https://github.com/testit-tms/.github/tree/main/configuration#configurationid)                                                                                                                                                                                                                                  | configurationId            | TMS_CONFIGURATION_ID              | tmsConfigurationId            |
-| ID of the created test run in TMS instance.<br/>It's necessary for **adapterMode** 0 or 1                                                                                                                                                                                                                                                                                              | testRunId                  | TMS_TEST_RUN_ID                   | tmsTestRunId                  |
-| Parameter for specifying the name of test run in TMS instance (**It's optional**). If it is not provided, it is created automatically                                                                                                                                                                                                                                                  | testRunName                | TMS_TEST_RUN_NAME                 | tmsTestRunName                |
-| Adapter mode. Default value - 0. The adapter supports following modes:<br/>0 - in this mode, the adapter filters tests by test run ID and configuration ID, and sends the results to the test run<br/>1 - in this mode, the adapter sends all results to the test run without filtering<br/>2 - in this mode, the adapter creates a new test run and sends results to the new test run | adapterMode                | TMS_ADAPTER_MODE                  | tmsAdapterMode                |
-| It enables/disables certificate validation (**It's optional**). Default value - true                                                                                                                                                                                                                                                                                                   | certValidation             | TMS_CERT_VALIDATION               | tmsCertValidation             |
-| It enables/disables TMS integration (**It's optional**). Default value - true                                                                                                                                                                                                                                                                                                          | testIt                     | TMS_TEST_IT                       | tmsTestIt                     |
-| Mode of automatic creation test cases (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will create a test case linked to the created autotest (not to the updated autotest)<br/>false - in this mode, the adapter will not create a test case                                                                    | automaticCreationTestCases | TMS_AUTOMATIC_CREATION_TEST_CASES | tmsAutomaticCreationTestCases |
-| Name of the configuration file If it is not provided, it is used default file name (**It's optional**)                                                                                                                                                                                                                                                                                 | -                          | TMS_CONFIG_FILE                   | tmsConfigFile                 |
+| Description                                                                                                                                                                                                                                                                                                                                                                            | Property                   | Environment variable              | System property                 |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|-----------------------------------|---------------------------------|
+| Location of the TMS instance                                                                                                                                                                                                                                                                                                                                                           | url                        | TMS_URL                           | tmsUrl                          |
+| API secret key [How to getting API secret key?](https://github.com/testit-tms/.github/tree/main/configuration#privatetoken)                                                                                                                                                                                                                                                                                                                                   | privateToken               | TMS_PRIVATE_TOKEN                 | tmsPrivateToken                 |
+| ID of project in TMS instance [How to getting project ID?](https://github.com/testit-tms/.github/tree/main/configuration#projectid)                                                                                                                                                                                                                                                                                                                        | projectId                  | TMS_PROJECT_ID                    | tmsProjectId                    |
+| ID of configuration in TMS instance [How to getting configuration ID?](https://github.com/testit-tms/.github/tree/main/configuration#configurationid)                                                                                                                                                                                                                                                                                                            | configurationId            | TMS_CONFIGURATION_ID              | tmsConfigurationId              |
+| ID of the created test run in TMS instance.<br/>It's necessary for **adapterMode** 0 or 1                                                                                                                                                                                                                                                                                              | testRunId                  | TMS_TEST_RUN_ID                   | tmsTestRunId                    |
+| Parameter for specifying the name of test run in TMS instance (**It's optional**). If it is not provided, it is created automatically                                                                                                                                                                                                                                                  | testRunName                | TMS_TEST_RUN_NAME                 | tmsTestRunName                  |
+| Adapter mode. Default value - 0. The adapter supports following modes:<br/>0 - in this mode, the adapter filters tests by test run ID and configuration ID, and sends the results to the test run<br/>1 - in this mode, the adapter sends all results to the test run without filtering<br/>2 - in this mode, the adapter creates a new test run and sends results to the new test run | adapterMode                | TMS_ADAPTER_MODE                  | tmsAdapterMode                  |
+| It enables/disables certificate validation (**It's optional**). Default value - true                                                                                                                                                                                                                                                                                                   | certValidation             | TMS_CERT_VALIDATION               | tmsCertValidation               |
+| It enables/disables TMS integration (**It's optional**). Default value - true                                                                                                                                                                                                                                                                                                          | testIt                     | TMS_TEST_IT                       | tmsTestIt                       |
+| Mode of automatic creation test cases (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will create a test case linked to the created autotest (not to the updated autotest)<br/>false - in this mode, the adapter will not create a test case                                                                    | automaticCreationTestCases | TMS_AUTOMATIC_CREATION_TEST_CASES | tmsAutomaticCreationTestCases   |
+| Name of the configuration file If it is not provided, it is used default file name (**It's optional**)                                                                                                                                                                                                                                                                                 | -                          | TMS_CONFIG_FILE                   | tmsConfigFile                   |
 
 #### File
 

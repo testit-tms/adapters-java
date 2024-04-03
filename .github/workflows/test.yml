@@ -26,7 +26,6 @@ env:
   TEMP_FILE: tmp/output.txt
   TMS_ADAPTER_MODE: 1
   TMS_CERT_VALIDATION: false
-  TMS_JAVA_COMMONS: testit-java-commons
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
   TMS_URL: ${{ secrets.TESTIT_URL }}
 jobs:
@@ -37,92 +36,70 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - adapter_name: testit-adapter-cucumber7
+          - project_name: cucubmer7-gradle-testng
             configuration_id: CUCUMBER7_GRADLE_TESTNG_CONFIGURATION_ID
             project_id: CUCUMBER7_GRADLE_TESTNG_PROJECT_ID
-            project_name: cucubmer7-gradle-testng
-          - adapter_name: testit-adapter-cucumber7
+          - project_name: cucumber7-gradle-junit4
             configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
-            project_name: cucumber7-gradle-junit4
-          - adapter_name: testit-adapter-junit4
+          - project_name: gradle-junit4
             configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: GRADLE_JUNIT4_PROJECT_ID
-            project_name: gradle-junit4
-          - adapter_name: testit-adapter-junit5
+          - project_name: gradle-junit5
             configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
             project_id: GRADLE_JUNIT5_PROJECT_ID
-            project_name: gradle-junit5
-          - adapter_name: testit-adapter-testng
+          - project_name: gradle-testng
             configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
             project_id: GRADLE_TESTNG_PROJECT_ID
-            project_name: gradle-testng
-          - adapter_name: testit-adapter-junit4
+          - project_name: jbehave-gradle-junit4
             configuration_id: JBEHAVE_GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: JBEHAVE_GRADLE_JUNIT4_PROJECT_ID
-            project_name: jbehave-gradle-junit4
-          - adapter_name: testit-adapter-jbehave
+          - project_name: jbehave-gradle-testng
             configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
             project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
-            project_name: jbehave-gradle-testng
-          # - adapter_name: testit-adapter-cucumber7
+          # - project_name: cucumber7-gradle-junit5
           #  configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
           #  project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
-          #  project_name: cucumber7-gradle-junit5
-          #  - adapter_name: testit-adapter-jbehave
+          #  - project_name: jbehave-gradle-junit5
           #  configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
           #  project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
-          #  project_name: jbehave-gradle-junit5
-          # - adapter_name: testit-adapter-cucumber4
+          # - project_name: cucubmer4-gradle-testng
           #  configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
           #  project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
-          #  project_name: cucubmer4-gradle-testng
-          # - adapter_name: testit-adapter-cucumber5
+          # - project_name: cucubmer5-gradle-testng
           #  configuration_id: CUCUMBER5_GRADLE_TESTNG_CONFIGURATION_ID
           #  project_id: CUCUMBER5_GRADLE_TESTNG_PROJECT_ID
-          #  project_name: cucubmer5-gradle-testng
-          # - adapter_name: testit-adapter-cucumber6
+          # - project_name: cucubmer6-gradle-testng
           #  configuration_id: CUCUMBER6_GRADLE_TESTNG_CONFIGURATION_ID
           #  project_id: CUCUMBER6_GRADLE_TESTNG_PROJECT_ID
-          #  project_name: cucubmer6-gradle-testng
-          # - adapter_name: testit-adapter-cucumber4
+          # - project_name: cucumber4-gradle-junit4
           #  configuration_id: CUCUMBER4_GRADLE_JUNIT4_CONFIGURATION_ID
           #  project_id: CUCUMBER4_GRADLE_JUNIT4_PROJECT_ID
-          #  project_name: cucumber4-gradle-junit4
-          # - adapter_name: testit-adapter-cucumber5
+          # - project_name: cucumber5-gradle-junit4
           #  configuration_id: CUCUMBER5_GRADLE_JUNIT4_CONFIGURATION_ID
           #  project_id: CUCUMBER5_GRADLE_JUNIT4_PROJECT_ID
-          #  project_name: cucumber5-gradle-junit4
-          # - adapter_name: testit-adapter-cucumber5
+          # - project_name: cucumber5-gradle-junit5
           #  configuration_id: CUCUMBER5_GRADLE_JUNIT5_CONFIGURATION_ID
           #  project_id: CUCUMBER5_GRADLE_JUNIT5_PROJECT_ID
-          #  project_name: cucumber5-gradle-junit5
-          # - adapter_name: testit-adapter-cucumber6
+          # - project_name: cucumber6-gradle-junit4
           #  configuration_id: CUCUMBER6_GRADLE_JUNIT4_CONFIGURATION_ID
           #  project_id: CUCUMBER6_GRADLE_JUNIT4_PROJECT_ID
-          #  project_name: cucumber6-gradle-junit4
-          # - adapter_name: testit-adapter-cucumber6
+          # - project_name: cucumber6-gradle-junit5
           #  configuration_id: CUCUMBER6_GRADLE_JUNIT5_CONFIGURATION_ID
           #  project_id: CUCUMBER6_GRADLE_JUNIT5_PROJECT_ID
-          #  project_name: cucumber6-gradle-junit5
-          # - adapter_name: testit-adapter-junit5
+          # - project_name: selenide-gradle-junit5
           #  configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
           #  project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
-          #  project_name: selenide-gradle-junit5
-          # - adapter_name: testit-adapter-cucumber6
+          # - project_name: serenity2-gradle-junit4
           #  configuration_id: SERENITY2_GRADLE_JUNIT4_CONFIGURATION_ID
           #  project_id: SERENITY2_GRADLE_JUNIT4_PROJECT_ID
-          #  project_name: serenity2-gradle-junit4
-          # - adapter_name: testit-adapter-cucumber7
+          # - project_name: serenity3-gradle-junit4
           #  configuration_id: SERENITY3_GRADLE_JUNIT4_CONFIGURATION_ID
           #  project_id: SERENITY3_GRADLE_JUNIT4_PROJECT_ID
-          #  project_name: serenity3-gradle-junit4
     env:
-      TMS_ADAPTER_JBEHAVE: testit-adapter-jbehave
-      TMS_ADAPTER_SELENIDE: testit-adapter-selenide
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
-      TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
+      TMS_TEST_RUN_NAME: ${{ matrix.project_name }}
     steps:
       - name: Checkout adapters-java
         uses: actions/checkout@v4
@@ -164,7 +141,7 @@ jobs:
         run: |
           cd java-examples/${{ matrix.project_name }}
           chmod +x ./gradlew
-          ./gradlew --no-daemon test || exit 0
+          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsTestRunName=${{ env.TMS_TEST_RUN_NAME }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
@@ -176,74 +153,58 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - adapter_name: testit-adapter-cucumber6
+          - project_name: cucumber6-maven-junit4
             configuration_id: CUCUMBER6_MAVEN_JUNIT4_CONFIGURATION_ID
             project_id: CUCUMBER6_MAVEN_JUNIT4_PROJECT_ID
-            project_name: cucumber6-maven-junit4
-          - adapter_name: testit-adapter-cucumber6
+          - project_id: CUCUMBER6_MAVEN_TESTNG_PROJECT_ID
             configuration_id: CUCUMBER6_MAVEN_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER6_MAVEN_TESTNG_PROJECT_ID
             project_name: cucumber6-maven-testng
-          - adapter_name: testit-adapter-jbehave
+          - project_name: jbehave-maven-junit4
             configuration_id: JBEHAVE_MAVEN_JUNIT4_CONFIGURATION_ID
             project_id: JBEHAVE_MAVEN_JUNIT4_PROJECT_ID
-            project_name: jbehave-maven-junit4
-          - adapter_name: testit-adapter-jbehave
+          - project_name: jbehave-maven-testng
             configuration_id: JBEHAVE_MAVEN_TESTNG_CONFIGURATION_ID
             project_id: JBEHAVE_MAVEN_TESTNG_PROJECT_ID
-            project_name: jbehave-maven-testng
-          - adapter_name: testit-adapter-junit4
+          - project_name: maven-junit4
             configuration_id: MAVEN_JUNIT4_CONFIGURATION_ID
             project_id: MAVEN_JUNIT4_PROJECT_ID
-            project_name: maven-junit4
-          - adapter_name: testit-adapter-junit5
+          - project_name: maven-junit5
             configuration_id: MAVEN_JUNIT5_CONFIGURATION_ID
             project_id: MAVEN_JUNIT5_PROJECT_ID
-            project_name: maven-junit5
-          - adapter_name: testit-adapter-testng
+          - project_name: maven-testng
             configuration_id: MAVEN_TESTNG_CONFIGURATION_ID
             project_id: MAVEN_TESTNG_PROJECT_ID
-            project_name: maven-testng
-            # - adapter_name: testit-adapter-jbehave
+            # - project_name: jbehave-maven-junit5
             #   configuration_id: JBEHAVE_MAVEN_JUNIT5_CONFIGURATION_ID
             #   project_id: JBEHAVE_MAVEN_JUNIT5_PROJECT_ID
-            #   project_name: jbehave-maven-junit5
-            # - adapter_name: testit-adapter-cucumber6
+            # - project_name: cucumber6-maven-junit5
             #   configuration_id: CUCUMBER6_MAVEN_JUNIT5_CONFIGURATION_ID
             #   project_id: CUCUMBER6_MAVEN_JUNIT5_PROJECT_ID
-            #   project_name: cucumber6-maven-junit5
-            # - adapter_name: testit-adapter-cucumber4
+            # - project_name: cucumber4-maven-junit4
             #   configuration_id: CUCUMBER4_MAVEN_JUNIT4_CONFIGURATION_ID
             #   project_id: CUCUMBER4_MAVEN_JUNIT4_PROJECT_ID
-            #   project_name: cucumber4-maven-junit4
-            # - adapter_name: testit-adapter-cucumber4
+            # - project_name: cucumber4-maven-testng
             #   configuration_id: CUCUMBER4_MAVEN_TESTNG_CONFIGURATION_ID
             #   project_id: CUCUMBER4_MAVEN_TESTNG_PROJECT_ID
-            #   project_name: cucumber4-maven-testng
-            # - adapter_name: testit-adapter-cucumber5
+            # - project_name: cucumber5-maven-junit4
             #   configuration_id: CUCUMBER5_MAVEN_JUNIT4_CONFIGURATION_ID
             #   project_id: CUCUMBER5_MAVEN_JUNIT4_PROJECT_ID
-            #   project_name: cucumber5-maven-junit4
-            # - adapter_name: testit-adapter-cucumber5
+            # - project_name: cucumber5-maven-junit5
             #   configuration_id: CUCUMBER5_MAVEN_JUNIT5_CONFIGURATION_ID
             #   project_id: CUCUMBER5_MAVEN_JUNIT5_PROJECT_ID
-            #   project_name: cucumber5-maven-junit5
-            # - adapter_name: testit-adapter-cucumber5
+            # - project_name: cucumber5-maven-testng
             #   configuration_id: CUCUMBER5_MAVEN_TESTNG_CONFIGURATION_ID
             #   project_id: CUCUMBER5_MAVEN_TESTNG_PROJECT_ID
-            #   project_name: cucumber5-maven-testng
-            #   - adapter_name: testit-adapter-cucumber7
+            #   - project_name: cucumber7-maven-junit4
             #   configuration_id: CUCUMBER7_MAVEN_JUNIT4_CONFIGURATION_ID
             #   project_id: CUCUMBER7_MAVEN_JUNIT4_PROJECT_ID
-            #   project_name: cucumber7-maven-junit4
-            #   - adapter_name: testit-adapter-cucumber7
+            #   - project_name: cucumber7-maven-junit5
             #   configuration_id: CUCUMBER7_MAVEN_JUNIT5_CONFIGURATION_ID
             #   project_id: CUCUMBER7_MAVEN_JUNIT5_PROJECT_ID
-            #   project_name: cucumber7-maven-junit5
     env:
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
-      TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
+      TMS_TEST_RUN_NAME: ${{ matrix.project_name }}
     steps:
       - name: Checkout adapters-java
         uses: actions/checkout@v4
@@ -284,7 +245,7 @@ jobs:
       - name: Test
         run: |
           cd java-examples/${{ matrix.project_name }}
-          mvn --batch-mode test || exit 0
+          mvn test -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsTestRunName=${{ env.TMS_TEST_RUN_NAME }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
