@@ -16,6 +16,7 @@ on:
       - "build.gradle.kts"
       - "gradle.properties"
       - "settings.gradle.kts"
+      - ".github/**/test.yml"
   workflow_dispatch:
 env:
   DOTNET_VERSION: 8
@@ -131,7 +132,7 @@ jobs:
       - name: Setup environment
         run: |
           ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
-          dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
+          dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
         run: |
@@ -144,7 +145,7 @@ jobs:
           ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
       - name: Validate
         run: |
-          dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+          dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
 
   test-maven:
     name: ${{ matrix.project_name }}
@@ -236,7 +237,7 @@ jobs:
       - name: Setup environment
         run: |
           ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
-          dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
+          dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
         run: |
@@ -248,4 +249,4 @@ jobs:
           mvn test -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
       - name: Validate
         run: |
-          dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+          dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
