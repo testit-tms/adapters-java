@@ -99,7 +99,7 @@ jobs:
     env:
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
-      TMS_TEST_RUN_NAME: ${{ matrix.project_name }}
+      TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
     steps:
       - name: Checkout adapters-java
         uses: actions/checkout@v4
@@ -141,7 +141,7 @@ jobs:
         run: |
           cd java-examples/${{ matrix.project_name }}
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsTestRunName=${{ env.TMS_TEST_RUN_NAME }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
+          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
@@ -204,7 +204,7 @@ jobs:
     env:
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
-      TMS_TEST_RUN_NAME: ${{ matrix.project_name }}
+      TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
     steps:
       - name: Checkout adapters-java
         uses: actions/checkout@v4
@@ -245,7 +245,7 @@ jobs:
       - name: Test
         run: |
           cd java-examples/${{ matrix.project_name }}
-          mvn test -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsTestRunName=${{ env.TMS_TEST_RUN_NAME }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
+          mvn test -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
