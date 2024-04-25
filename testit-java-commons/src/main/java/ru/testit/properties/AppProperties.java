@@ -209,11 +209,21 @@ public class AppProperties {
             properties.setProperty(ADAPTER_MODE, "0");
         }
 
+        int adapterMode = 0;
+
+        try {
+            adapterMode = Integer.parseInt(properties.getProperty(ADAPTER_MODE));
+        } catch (Exception ignored) { }
+
         try {
             String testRunId = properties.getProperty(TEST_RUN_ID);
             java.util.UUID ignored = java.util.UUID.fromString(testRunId);
+
+            if (adapterMode == 2) {
+                String message = "Adapter works in mode 2. Config should not contains test run id.";
+                errorsBuilder.append(message).append(System.lineSeparator());
+            }
         } catch (Exception e) {
-            int adapterMode = Integer.parseInt(properties.getProperty(ADAPTER_MODE));
             if (adapterMode == 0 || adapterMode == 1) {
                 String message = "Invalid testRunId: " + e.getMessage();
                 log.error(message);
