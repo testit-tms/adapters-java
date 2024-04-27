@@ -44,7 +44,7 @@ public class AppProperties {
 
         properties.putAll(loadPropertiesFromEnv());
 
-        return ValidateProperties(properties);
+        return validateProperties(properties);
     }
 
     private static void loadPropertiesFrom(final ClassLoader classLoader, final Properties properties, String fileName) {
@@ -61,7 +61,6 @@ public class AppProperties {
                         properties.setProperty(key, value);
                     }
                 }
-
             }
         } catch (IOException e) {
             log.error("Exception while read properties: {}", e.getMessage());
@@ -159,7 +158,7 @@ public class AppProperties {
         return map;
     }
 
-    private static Properties ValidateProperties(Properties properties) {
+    private static Properties validateProperties(Properties properties) {
         StringBuilder errorsBuilder = new StringBuilder();
 
         try {
