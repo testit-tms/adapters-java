@@ -2,7 +2,7 @@ plugins {
     java
     `maven-publish`
     signing
-    id("io.codearte.nexus-staging") version "0.30.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
 group = "ru.testit"
@@ -12,10 +12,15 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-nexusStaging  {
-    serverUrl = "https://s01.oss.sonatype.org/service/local/"
-    username = project.properties["ossrhUsername"].toString()
-    password = project.properties["ossrhPassword"].toString()
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username.set(System.getenv("MAVEN_USERNAME"))
+            password.set(System.getenv("MAVEN_PASSWORD"))
+        }
+    }
 }
 
 tasks.withType(JavaCompile::class) {
@@ -34,6 +39,7 @@ configure(subprojects) {
     publishing {
         publications {
             create<MavenPublication>("maven") {
+                from(components["java"])
                 suppressAllPomMetadataWarnings()
                 versionMapping {
                     allVariants {
@@ -72,14 +78,12 @@ configure(subprojects) {
     }
 
     signing {
-        sign(publishing.publications["maven"])
-    }
+        val signingKeyId: String? by project
+        val signingKey: String? by project
+        val signingPassword: String? by project
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
 
-    java {
-        withJavadocJar()
-        withSourcesJar()
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sign(publishing.publications["maven"])
     }
 
     tasks.withType<Sign>().configureEach {
@@ -91,8 +95,11 @@ configure(subprojects) {
         onlyIf { !project.version.toString().endsWith("-SNAPSHOT") }
     }
 
-    tasks.withType<GenerateModuleMetadata> {
-        enabled = false
+    java {
+        withJavadocJar()
+        withSourcesJar()
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     tasks.jar {
@@ -107,20 +114,17 @@ configure(subprojects) {
 
     repositories {
         maven {
-            val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
+            val releasesUrl = uri("https://s01.oss.sonatype.org/content/repositories/releases")
+            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
+            url = if (version.toString().toLowerCase().contains("snapshot")) snapshotsUrl else releasesUrl
+
             credentials {
-                username = project.properties["ossrhUsername"].toString()
-                password = project.properties["ossrhPassword"].toString()
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
-    }
-
-    publishing.publications.named<MavenPublication>("maven") {
-        pom {
-            from(components["java"])
-        }
+        mavenLocal()
+        mavenCentral()
     }
 }
 
