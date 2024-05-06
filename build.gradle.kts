@@ -2,7 +2,7 @@ plugins {
     java
     `maven-publish`
     signing
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("io.codearte.nexus-staging") version "0.30.0"
 }
 
 group = "ru.testit"
@@ -12,13 +12,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
-    }
+nexusStaging  {
+    serverUrl = "https://s01.oss.sonatype.org/service/local/"
+    username = project.properties["ossrhUsername"].toString()
+    password = project.properties["ossrhPassword"].toString()
 }
 
 tasks.withType(JavaCompile::class) {
@@ -109,8 +106,15 @@ configure(subprojects) {
     }
 
     repositories {
-        mavenLocal()
-        mavenCentral()
+        maven {
+            val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
+            credentials {
+                username = project.properties["ossrhUsername"].toString()
+                password = project.properties["ossrhPassword"].toString()
+            }
+        }
     }
 
     publishing.publications.named<MavenPublication>("maven") {
