@@ -17,8 +17,8 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(System.getProperty("MAVEN_USERNAME"))
-            password.set(System.getProperty("MAVEN_PASSWORD"))
+            username.set(System.getenv("MAVEN_USERNAME"))
+            password.set(System.getenv("MAVEN_PASSWORD"))
         }
     }
 }
@@ -119,8 +119,8 @@ configure(subprojects) {
             url = if (version.toString().toLowerCase().contains("snapshot")) snapshotsUrl else releasesUrl
 
             credentials {
-                username = System.getProperty("MAVEN_USERNAME")
-                password = System.getProperty("MAVEN_PASSWORD")
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
         mavenLocal()
