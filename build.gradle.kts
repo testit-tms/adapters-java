@@ -87,8 +87,7 @@ configure(subprojects) {
     }
 
     tasks.withType<Sign>().configureEach {
-        if (System.getProperty("disableSign") == "true")
-        {
+        if (System.getProperty("disableSign") == "true") {
             enabled = false;
         }
 
