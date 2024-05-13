@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     java
     `maven-publish`
@@ -13,6 +15,14 @@ java {
 }
 
 nexusPublishing {
+    connectTimeout.set(Duration.ofMinutes(7))
+    clientTimeout.set(Duration.ofMinutes(7))
+
+    transitionCheckOptions {
+        maxRetries.set(100)
+        delayBetween.set(Duration.ofSeconds(10))
+    }
+
     repositories {
         sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
@@ -87,8 +97,7 @@ configure(subprojects) {
     }
 
     tasks.withType<Sign>().configureEach {
-        if (System.getProperty("disableSign") == "true")
-        {
+        if (System.getProperty("disableSign") == "true") {
             enabled = false;
         }
 
