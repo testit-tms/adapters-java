@@ -17,6 +17,8 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username.set(System.getenv("MAVEN_USERNAME"))
+            password.set(System.getenv("MAVEN_PASSWORD"))
         }
     }
 }
@@ -37,6 +39,7 @@ configure(subprojects) {
     publishing {
         publications {
             create<MavenPublication>("maven") {
+                from(components["java"])
                 suppressAllPomMetadataWarnings()
                 versionMapping {
                     allVariants {
@@ -75,14 +78,12 @@ configure(subprojects) {
     }
 
     signing {
-        sign(publishing.publications["maven"])
-    }
+        val signingKeyId: String? by project
+        val signingKey: String? by project
+        val signingPassword: String? by project
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
 
-    java {
-        withJavadocJar()
-        withSourcesJar()
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sign(publishing.publications["maven"])
     }
 
     tasks.withType<Sign>().configureEach {
@@ -94,8 +95,11 @@ configure(subprojects) {
         onlyIf { !project.version.toString().endsWith("-SNAPSHOT") }
     }
 
-    tasks.withType<GenerateModuleMetadata> {
-        enabled = false
+    java {
+        withJavadocJar()
+        withSourcesJar()
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     tasks.jar {
@@ -109,14 +113,18 @@ configure(subprojects) {
     }
 
     repositories {
+        maven {
+            val releasesUrl = uri("https://s01.oss.sonatype.org/content/repositories/releases")
+            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
+            url = if (version.toString().toLowerCase().contains("snapshot")) snapshotsUrl else releasesUrl
+
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
         mavenLocal()
         mavenCentral()
-    }
-
-    publishing.publications.named<MavenPublication>("maven") {
-        pom {
-            from(components["java"])
-        }
     }
 }
 
