@@ -15,8 +15,8 @@ java {
 nexusPublishing {
     repositories {
         sonatype {
-            username.set(System.getenv("MAVEN_USERNAME"))
-            password.set(System.getenv("MAVEN_PASSWORD"))
+            username.set(System.getProperty("MAVEN_USERNAME"))
+            password.set(System.getProperty("MAVEN_PASSWORD"))
         }
     }
 }
@@ -117,8 +117,8 @@ configure(subprojects) {
             url = if (version.toString().toLowerCase().contains("snapshot")) snapshotsUrl else releasesUrl
 
             credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
+                username = System.getProperty("MAVEN_USERNAME")
+                password = System.getProperty("MAVEN_PASSWORD")
             }
         }
         mavenLocal()
