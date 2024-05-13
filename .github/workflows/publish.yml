@@ -22,4 +22,4 @@ jobs:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_KEY_CONTENT }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.SONATYPE_TOKEN }}
+          MAVEN_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
