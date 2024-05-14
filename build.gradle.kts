@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     java
     `maven-publish`
@@ -13,12 +15,20 @@ java {
 }
 
 nexusPublishing {
+    connectTimeout.set(Duration.ofMinutes(7))
+    clientTimeout.set(Duration.ofMinutes(7))
+
+    transitionCheckOptions {
+        maxRetries.set(100)
+        delayBetween.set(Duration.ofSeconds(10))
+    }
+
     repositories {
         sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(System.getProperty("MAVEN_USERNAME"))
-            password.set(System.getProperty("MAVEN_PASSWORD"))
+            username.set(System.getenv("MAVEN_USERNAME"))
+            password.set(System.getenv("MAVEN_PASSWORD"))
         }
     }
 }
@@ -104,9 +114,9 @@ configure(subprojects) {
     tasks.jar {
         manifest {
             attributes(mapOf(
-            "Specification-Title" to project.name,
-            "Implementation-Title" to project.name,
-            "Implementation-Version" to project.version
+                "Specification-Title" to project.name,
+                "Implementation-Title" to project.name,
+                "Implementation-Version" to project.version
             ))
         }
     }
@@ -118,8 +128,8 @@ configure(subprojects) {
             url = if (version.toString().toLowerCase().contains("snapshot")) snapshotsUrl else releasesUrl
 
             credentials {
-                username = System.getProperty("MAVEN_USERNAME")
-                password = System.getProperty("MAVEN_PASSWORD")
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
         mavenLocal()
