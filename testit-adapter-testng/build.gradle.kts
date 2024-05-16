@@ -1,10 +1,12 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 description = "TestIT TestNG Integration"
 
 plugins {
-    id("java")
+    java
 }
 
-val testNgVersion = "7.5"
+val testNgVersion = "7.5.1"
 val aspectjVersion = "1.9.7"
 val slf4jVersion = "1.7.36"
 val agent: Configuration by configurations.creating
@@ -18,24 +20,35 @@ dependencies {
     implementation(project(":testit-java-commons"))
 
     testImplementation("org.aspectj:aspectjrt:$aspectjVersion")
-    testImplementation("org.testng:testng:$testNgVersion")
 }
 
-tasks.getByName<Test>("test")  {
+tasks.test {
     useTestNG(closureOf<TestNGOptions> {
         suites("src/test/resources/testng.xml")
     })
-    exclude("**/samples/*")
+    testLogging {
+        events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED)
+        showCauses = false
+        showStackTraces = false
+        showStandardStreams = true
+    }
     doFirst {
         jvmArgs("-javaagent:${agent.singleFile}")
     }
-    systemProperties(System.getProperties().toMap() as Map<String,Object>)
+
+    environment("TMS_URL", System.getProperty("tmsUrl"))
+    environment("TMS_PRIVATE_TOKEN", System.getProperty("tmsPrivateToken"))
+    environment("TMS_PROJECT_ID", System.getProperty("tmsProjectId"))
+    environment("TMS_CONFIGURATION_ID", System.getProperty("tmsConfigurationId"))
+    environment("TMS_TEST_RUN_ID", System.getProperty("tmsTestRunId"))
+    environment("TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName"))
+    environment("TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode"))
+    environment("TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation"))
+    environment("TMS_TEST_IT", System.getProperty("testIt"))
+    environment("TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases"))
 }
 
 tasks.compileTestJava {
-    options.encoding = "UTF-8"
-    options.setIncremental(true)
-    // Allows the adapter to accept real parameter names
     options.compilerArgs.add("-parameters")
 }
 

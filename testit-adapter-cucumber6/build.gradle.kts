@@ -1,38 +1,50 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 description = "TestIT Cucumber6 Integration"
 
 plugins {
-    id("java")
+    java
 }
 
 val cucumberVersion = "6.10.2"
 val cucumberGherkinVersion = "18.0.0"
 val slf4jVersion = "1.7.36"
-val testngVersion = "6.14.3"
+val testngVersion = "7.5.1"
 
 dependencies {
     implementation(project(":testit-java-commons"))
     implementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
-    implementation("org.json:json:20220924")
+    implementation("org.json:json:20231013")
 
     compileOnly("io.cucumber:cucumber-plugin:$cucumberVersion")
 
-    testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-testng:$cucumberVersion")
     testImplementation("org.testng:testng:$testngVersion")
 }
 
-tasks.getByName<Test>("test") {
-    useTestNG {}
-    exclude("**/samples/*")
-}
+tasks.test {
+    useTestNG()
+    testLogging {
+        events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED)
+        showCauses = false
+        showStackTraces = false
+        showStandardStreams = true
+    }
 
-tasks.compileTestJava {
-    options.encoding = "UTF-8"
-    options.setIncremental(true)
+    environment("TMS_URL", System.getProperty("tmsUrl"))
+    environment("TMS_PRIVATE_TOKEN", System.getProperty("tmsPrivateToken"))
+    environment("TMS_PROJECT_ID", System.getProperty("tmsProjectId"))
+    environment("TMS_CONFIGURATION_ID", System.getProperty("tmsConfigurationId"))
+    environment("TMS_TEST_RUN_ID", System.getProperty("tmsTestRunId"))
+    environment("TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName"))
+    environment("TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode"))
+    environment("TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation"))
+    environment("TMS_TEST_IT", System.getProperty("testIt"))
+    environment("TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases"))
 }
 
 tasks.jar {

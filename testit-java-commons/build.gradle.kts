@@ -1,9 +1,11 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 plugins {
-    id("java")
+    java
 }
 
 val slf4jVersion = "1.7.36"
-val jacksonVersion = "2.13.3"
+val jacksonVersion = "2.17.1"
 
 dependencies {
     implementation("org.aspectj:aspectjrt:1.9.7")
@@ -20,6 +22,14 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:3.4.6")
 }
 
-tasks.getByName<Test>("test") {
+tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED)
+        showCauses = false
+        showStackTraces = false
+        showStandardStreams = true
+    }
+
+    systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
 }

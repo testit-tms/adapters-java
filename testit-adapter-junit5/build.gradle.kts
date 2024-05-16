@@ -1,7 +1,9 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 description = "TestIT JUnit 5 Integration"
 
 plugins {
-    id("java")
+    java
 }
 
 val junitVersion = "5.8.2"
@@ -37,18 +39,30 @@ tasks.jar {
 }
 
 tasks.compileTestJava {
-    options.encoding = "UTF-8"
-    options.setIncremental(true)
-    // Allows the adapter to accept real parameter names
     options.compilerArgs.add("-parameters")
 }
 
-tasks.getByName<Test>("test") {
+tasks.test {
     useJUnitPlatform()
-    systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
-    exclude("**/samples/*")
+    testLogging {
+        events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED)
+        showCauses = false
+        showStackTraces = false
+        showStandardStreams = true
+    }
     doFirst {
         jvmArgs("-javaagent:${agent.singleFile}")
     }
-    systemProperties(System.getProperties().toMap() as Map<String,Object>)
+
+    systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+    environment("TMS_URL", System.getProperty("tmsUrl"))
+    environment("TMS_PRIVATE_TOKEN", System.getProperty("tmsPrivateToken"))
+    environment("TMS_PROJECT_ID", System.getProperty("tmsProjectId"))
+    environment("TMS_CONFIGURATION_ID", System.getProperty("tmsConfigurationId"))
+    environment("TMS_TEST_RUN_ID", System.getProperty("tmsTestRunId"))
+    environment("TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName"))
+    environment("TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode"))
+    environment("TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation"))
+    environment("TMS_TEST_IT", System.getProperty("testIt"))
+    environment("TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases"))
 }
