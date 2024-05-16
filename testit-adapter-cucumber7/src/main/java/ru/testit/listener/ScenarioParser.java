@@ -2,16 +2,12 @@ package ru.testit.listener;
 
 import io.cucumber.gherkin.GherkinDialect;
 import io.cucumber.gherkin.GherkinDialectProvider;
-import io.cucumber.messages.types.Feature;
-import io.cucumber.messages.types.Scenario;
-import io.cucumber.messages.types.Step;
-import io.cucumber.messages.types.DataTable;
-import io.cucumber.messages.types.TableRow;
-import io.cucumber.messages.types.TableCell;
+import io.cucumber.messages.types.*;
 import io.cucumber.plugin.event.TestSourceRead;
 
 import java.net.URI;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class ScenarioParser {
     private final ScenarioStorage scenarioStorage;

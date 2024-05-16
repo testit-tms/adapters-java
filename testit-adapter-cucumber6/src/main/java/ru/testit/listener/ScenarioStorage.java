@@ -4,13 +4,9 @@ import io.cucumber.gherkin.Gherkin;
 import io.cucumber.messages.Messages;
 import io.cucumber.messages.Messages.GherkinDocument;
 import io.cucumber.messages.Messages.GherkinDocument.Feature;
-import io.cucumber.messages.Messages.GherkinDocument.Feature.Background;
-import io.cucumber.messages.Messages.GherkinDocument.Feature.FeatureChild;
+import io.cucumber.messages.Messages.GherkinDocument.Feature.*;
 import io.cucumber.messages.Messages.GherkinDocument.Feature.FeatureChild.RuleChild;
-import io.cucumber.messages.Messages.GherkinDocument.Feature.Scenario;
 import io.cucumber.messages.Messages.GherkinDocument.Feature.Scenario.Examples;
-import io.cucumber.messages.Messages.GherkinDocument.Feature.Step;
-import io.cucumber.messages.Messages.GherkinDocument.Feature.TableRow;
 import io.cucumber.messages.internal.com.google.protobuf.GeneratedMessageV3;
 import io.cucumber.plugin.event.TestSourceRead;
 
@@ -20,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static java.util.stream.Collectors.toList;
 import static io.cucumber.gherkin.Gherkin.makeSourceEnvelope;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
 public class ScenarioStorage {
     private final Map<URI, TestSourceRead> pathToScenarioMap = new HashMap<>();

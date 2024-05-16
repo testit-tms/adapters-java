@@ -1,9 +1,10 @@
 package ru.testit.samples.failed;
 
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import ru.testit.annotations.*;
-import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
@@ -101,7 +102,7 @@ public class OnlyBeforeAfterEachTests {
     @ExternalId("failed_BeforeEach_AfterEach_with_required_annotations")
     @DisplayName("Failed test with required annotations")
     public void requiredAnnotationsTest() {
-        Assert.assertTrue(false);
+        Assert.fail();
     }
 
     @AfterMethod

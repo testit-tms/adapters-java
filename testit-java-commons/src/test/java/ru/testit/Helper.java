@@ -1,8 +1,8 @@
 package ru.testit;
 
 import ru.testit.client.model.*;
-import ru.testit.models.*;
 import ru.testit.models.LinkType;
+import ru.testit.models.*;
 
 import java.util.ArrayList;
 import java.util.Date;
