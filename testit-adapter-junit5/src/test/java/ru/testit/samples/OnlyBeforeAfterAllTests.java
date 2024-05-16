@@ -1,8 +1,10 @@
 package ru.testit.samples;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import ru.testit.annotations.*;
-import ru.testit.annotations.DisplayName;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 

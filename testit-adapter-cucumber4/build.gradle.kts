@@ -1,12 +1,14 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 description = "TestIT Cucumber4 Integration"
 
 plugins {
-    id("java")
+    java
 }
 
-val cucumberVersion = "4.8.0"
+val cucumberVersion = "4.8.1"
 val slf4jVersion = "1.7.36"
-val testngVersion = "6.14.3"
+val testngVersion = "7.5.1"
 
 dependencies {
     implementation(project(":testit-java-commons"))
@@ -14,7 +16,7 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
     implementation("io.cucumber:cucumber-core:$cucumberVersion")
     implementation("io.cucumber:cucumber-java:$cucumberVersion")
-    implementation("org.json:json:20220924")
+    implementation("org.json:json:20231013")
 
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
@@ -22,14 +24,25 @@ dependencies {
     testImplementation("org.testng:testng:$testngVersion")
 }
 
-tasks.getByName<Test>("test") {
-    useTestNG {}
-    exclude("**/samples/*")
-}
+tasks.test {
+    useTestNG()
+    testLogging {
+        events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED)
+        showCauses = false
+        showStackTraces = false
+        showStandardStreams = true
+    }
 
-tasks.compileTestJava {
-    options.encoding = "UTF-8"
-    options.setIncremental(true)
+    environment("TMS_URL", System.getProperty("tmsUrl"))
+    environment("TMS_PRIVATE_TOKEN", System.getProperty("tmsPrivateToken"))
+    environment("TMS_PROJECT_ID", System.getProperty("tmsProjectId"))
+    environment("TMS_CONFIGURATION_ID", System.getProperty("tmsConfigurationId"))
+    environment("TMS_TEST_RUN_ID", System.getProperty("tmsTestRunId"))
+    environment("TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName"))
+    environment("TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode"))
+    environment("TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation"))
+    environment("TMS_TEST_IT", System.getProperty("testIt"))
+    environment("TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases"))
 }
 
 tasks.jar {

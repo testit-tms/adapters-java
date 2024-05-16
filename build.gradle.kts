@@ -9,9 +9,12 @@ plugins {
 
 group = "ru.testit"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+tasks.withType(JavaCompile::class.java).configureEach {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+    options.encoding = "utf-8"
+    options.setIncremental(true)
+    options.isFork = true
 }
 
 nexusPublishing {
@@ -31,11 +34,6 @@ nexusPublishing {
             password.set(System.getenv("MAVEN_PASSWORD"))
         }
     }
-}
-
-tasks.withType(JavaCompile::class) {
-    options.setIncremental(true)
-    options.encoding = "UTF-8"
 }
 
 configure(subprojects) {
@@ -107,8 +105,14 @@ configure(subprojects) {
     java {
         withJavadocJar()
         withSourcesJar()
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    tasks.withType(JavaCompile::class.java).configureEach {
+        sourceCompatibility = "1.8"
+        targetCompatibility = "1.8"
+        options.encoding = "utf-8"
+        options.setIncremental(true)
+        options.isFork = true
     }
 
     tasks.jar {

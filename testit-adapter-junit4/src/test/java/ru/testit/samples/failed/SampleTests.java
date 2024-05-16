@@ -1,13 +1,10 @@
 package ru.testit.samples.failed;
 
-import org.junit.Test;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import ru.testit.annotations.*;
 import ru.testit.listener.BaseJunit4Runner;
-import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
@@ -53,7 +50,7 @@ public class SampleTests {
     @Title("Create a section")
     @Description("Section was created")
     public void createSection() {
-        Assert.assertTrue(false);
+        Assert.fail();
     }
 
     @Step
@@ -101,6 +98,6 @@ public class SampleTests {
     @ExternalId("failed_with_required_annotations")
     @DisplayName("Failed test with required annotations")
     public void requiredAnnotationsTest() {
-        Assert.assertTrue(false);
+        Assert.fail();
     }
 }

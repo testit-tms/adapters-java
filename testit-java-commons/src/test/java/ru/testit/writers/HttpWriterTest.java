@@ -4,11 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.*;
+import ru.testit.client.model.AutoTestModel;
+import ru.testit.client.model.CreateAutoTestRequest;
+import ru.testit.client.model.LinkPutModel;
+import ru.testit.client.model.UpdateAutoTestRequest;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.models.*;
-import ru.testit.models.LinkType;
 import ru.testit.services.ResultStorage;
 
 import java.util.*;

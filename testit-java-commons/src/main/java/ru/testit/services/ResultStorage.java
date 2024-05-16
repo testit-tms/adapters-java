@@ -1,10 +1,6 @@
 package ru.testit.services;
 
-import ru.testit.models.FixtureResult;
-import ru.testit.models.StepResult;
-import ru.testit.models.TestResult;
-import ru.testit.models.ClassContainer;
-import ru.testit.models.MainContainer;
+import ru.testit.models.*;
 
 import java.util.Map;
 import java.util.Objects;

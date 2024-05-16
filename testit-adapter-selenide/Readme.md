@@ -292,9 +292,12 @@ import com.codeborne.selenide.logevents.SelenideLogger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import ru.testit.selenide.LogType;
 import ru.testit.selenide.SelenideListener;
 import ru.testit.annotations.Step;
 import ru.testit.annotations.Title;
+
+import java.util.logging.Level;
 
 import static com.codeborne.selenide.Selectors.byXpath;
 import static com.codeborne.selenide.Selenide.$;
@@ -314,8 +317,6 @@ public class ExampleTests {
                         .savePageSource(true)
                         .includeSelenideSteps(true)
                         .saveLogs(LogType.BROWSER, Level.All));
-
-        steps = new Steps();
     }
 
     @Test

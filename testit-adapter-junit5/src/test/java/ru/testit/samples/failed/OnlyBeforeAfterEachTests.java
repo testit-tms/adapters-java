@@ -49,7 +49,7 @@ public class OnlyBeforeAfterEachTests {
     @Title("Create a section")
     @Description("Section was created")
     public void createSection() {
-        Assertions.assertTrue(false);
+        Assertions.fail();
     }
 
     @Step
@@ -102,7 +102,7 @@ public class OnlyBeforeAfterEachTests {
     @ExternalId("failed_BeforeEach_AfterEach_with_required_annotations")
     @DisplayName("Failed test with required annotations")
     public void requiredAnnotationsTest() {
-        Assertions.assertTrue(false);
+        Assertions.fail();
     }
 
     @AfterEach

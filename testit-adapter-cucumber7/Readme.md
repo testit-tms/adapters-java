@@ -471,7 +471,7 @@ public class SampleTests {
 
     @And("I create a section - failed")
     public void createFailedSection() {
-        Assert.assertTrue(false);
+        Assert.fail();
     }
 
     @Then("I create a test case")
@@ -487,7 +487,7 @@ public class SampleTests {
 
     @Then("I check something - failed")
     public void requiredAnnotationsFailedTest() {
-        Assert.assertTrue(false);
+        Assert.fail();
     }
 }
 ```
