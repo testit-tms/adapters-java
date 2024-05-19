@@ -14,7 +14,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
-    implementation("ru.testit:testit-api-client:0.3.6")
+    implementation("ru.testit:testit-api-client:0.4.0")
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:3.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")

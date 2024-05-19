@@ -44,7 +44,7 @@ public class HttpWriter implements Writer {
                     LOGGER.debug("Auto test is exist. Update auto test {}", testResult.getExternalId());
                 }
 
-                UpdateAutoTestRequest autoTestPutModel;
+                AutoTestPutModel autoTestPutModel;
 
                 if (testResult.getItemStatus() == ItemStatus.FAILED) {
                     autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autotest);
@@ -63,7 +63,7 @@ public class HttpWriter implements Writer {
                     LOGGER.debug("Create new auto test {}", testResult.getExternalId());
                 }
 
-                CreateAutoTestRequest model = Converter.testResultToAutoTestPostModel(testResult);
+                AutoTestPostModel model = Converter.testResultToAutoTestPostModel(testResult);
                 model.setProjectId(UUID.fromString(config.getProjectId()));
                 autoTestId = apiClient.createAutoTest(model);
             }
@@ -97,7 +97,7 @@ public class HttpWriter implements Writer {
                         return;
                     }
 
-                    UpdateAutoTestRequest autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
+                    AutoTestPutModel autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
 
                     List<AutoTestStepModel> beforeClass = Converter.convertFixture(container.getBeforeClassMethods(), null);
                     List<AutoTestStepModel> beforeEach = Converter.convertFixture(container.getBeforeEachTest(), testUuid);
@@ -143,7 +143,7 @@ public class HttpWriter implements Writer {
                                 return;
                             }
 
-                            UpdateAutoTestRequest autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
+                            AutoTestPutModel autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
 
                             List<AutoTestStepModel> beforeFinish = new ArrayList<>(beforeAll);
                             beforeFinish.addAll(autoTestPutModel.getSetup());
@@ -180,7 +180,7 @@ public class HttpWriter implements Writer {
                             UUID testResultId = testResults.get(test.getUuid());
 
                             TestResultModel resultModel = apiClient.getTestResult(testResultId);
-                            ApiV2TestResultsIdPutRequest model = Converter.testResultToTestResultUpdateModel(resultModel);
+                            TestResultUpdateModel model = Converter.testResultToTestResultUpdateModel(resultModel);
                             model.setSetupResults(beforeResultFinish);
                             model.setTeardownResults(afterResultFinish);
 

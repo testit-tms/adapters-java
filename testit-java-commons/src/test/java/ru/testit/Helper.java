@@ -120,8 +120,8 @@ public class Helper {
         return model;
     }
 
-    public static UpdateAutoTestRequest generateAutoTestPutModel(String projectId) {
-        UpdateAutoTestRequest model = new UpdateAutoTestRequest();
+    public static AutoTestPutModel generateAutoTestPutModel(String projectId) {
+        AutoTestPutModel model = new AutoTestPutModel();
 
         model.setTitle(TITLE);
         model.setExternalId(EXTERNAL_ID);
@@ -141,8 +141,8 @@ public class Helper {
         return model;
     }
 
-    public static CreateAutoTestRequest generateAutoTestPostModel(String projectId) {
-        CreateAutoTestRequest model = new CreateAutoTestRequest();
+    public static AutoTestPostModel generateAutoTestPostModel(String projectId) {
+        AutoTestPostModel model = new AutoTestPostModel();
 
         model.setTitle(TITLE);
         model.setExternalId(EXTERNAL_ID);
