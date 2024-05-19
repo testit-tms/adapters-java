@@ -4,11 +4,12 @@ The repository contains new versions of adaptors for JVM-based test frameworks.
 ## Compatibility
 
 | Test IT | Cucumber | JBehave | JUnit | TestNG |
-|---------|----------|--------|-------|--------|
-| 3.5     | 1.1      | 1.1    | 1.1   | 1.1    |
-| 4.0     | 1.2      | 1.2    | 1.2   | 1.2    |
-| 4.5     | 1.5      | 1.5    | 1.5   | 1.5    |
-| 4.6     | 1.6+     | 1.6+   | 1.6+  | 1.6+   |
+|---------|----------|---------|-------|--------|
+| 3.5     | 1.1      | 1.1     | 1.1   | 1.1    |
+| 4.0     | 1.2      | 1.2     | 1.2   | 1.2    |
+| 4.5     | 1.5      | 1.5     | 1.5   | 1.5    |
+| 4.6     | 1.6      | 1.6     | 1.6   | 1.6    |
+| 5.0     | 2.3      | 2.3     | 2.3   | 2.3    |
 
 Supported test frameworks :
  1. [TestNG](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-testng)

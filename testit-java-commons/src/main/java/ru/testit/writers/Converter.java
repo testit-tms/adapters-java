@@ -11,8 +11,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Converter {
-    public static CreateAutoTestRequest testResultToAutoTestPostModel(TestResult result) {
-        CreateAutoTestRequest model = new CreateAutoTestRequest();
+    public static AutoTestPostModel testResultToAutoTestPostModel(TestResult result) {
+        AutoTestPostModel model = new AutoTestPostModel();
 
         model.setExternalId(result.getExternalId());
         model.setDescription(result.getDescription());
@@ -97,10 +97,10 @@ public class Converter {
                 ).collect(Collectors.toList());
     }
 
-    public static ApiV2TestResultsIdPutRequest testResultToTestResultUpdateModel(TestResultModel result) {
-        ApiV2TestResultsIdPutRequest model = new ApiV2TestResultsIdPutRequest();
+    public static TestResultUpdateModel testResultToTestResultUpdateModel(TestResultModel result) {
+        TestResultUpdateModel model = new TestResultUpdateModel();
 
-        model.setDurationInMs(result.getDurationInMs());
+        model.setDuration(result.getDurationInMs());
         model.setOutcome(result.getOutcome());
         model.setLinks(result.getLinks());
         model.setStepResults(result.getStepResults());
@@ -112,8 +112,8 @@ public class Converter {
         return model;
     }
 
-    public static UpdateAutoTestRequest testResultToAutoTestPutModel(TestResult result) {
-        UpdateAutoTestRequest model = new UpdateAutoTestRequest();
+    public static AutoTestPutModel testResultToAutoTestPutModel(TestResult result) {
+        AutoTestPutModel model = new AutoTestPutModel();
 
         model.setExternalId(result.getExternalId());
         model.setDescription(result.getDescription());
@@ -130,8 +130,8 @@ public class Converter {
         return model;
     }
 
-    public static UpdateAutoTestRequest autoTestModelToAutoTestPutModel(AutoTestModel autoTestModel) {
-        UpdateAutoTestRequest model = new UpdateAutoTestRequest();
+    public static AutoTestPutModel autoTestModelToAutoTestPutModel(AutoTestModel autoTestModel) {
+        AutoTestPutModel model = new AutoTestPutModel();
 
         model.setId(autoTestModel.getId());
         model.setExternalId(autoTestModel.getExternalId());

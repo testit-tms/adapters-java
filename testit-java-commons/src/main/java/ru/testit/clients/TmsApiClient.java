@@ -44,7 +44,7 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public TestRunV2GetModel createTestRun() throws ApiException {
-        CreateEmptyRequest model = new CreateEmptyRequest();
+        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
         model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
 
         if (!Objects.equals(this.clientConfiguration.getTestRunName(), "null")) {
@@ -76,19 +76,19 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public void updateAutoTest(UpdateAutoTestRequest model) throws ApiException {
+    public void updateAutoTest(AutoTestPutModel model) throws ApiException {
         autoTestsApi.updateAutoTest(model);
     }
 
     @Override
-    public String createAutoTest(CreateAutoTestRequest model) throws ApiException {
+    public String createAutoTest(AutoTestPostModel model) throws ApiException {
         return Objects.requireNonNull(autoTestsApi.createAutoTest(model).getId()).toString();
     }
 
     @Override
     public AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException {
 
-        AutotestsSelectModelFilter filter = new AutotestsSelectModelFilter();
+        AutotestFilterModel filter = new AutotestFilterModel();
 
         Set<UUID> projectIds = new HashSet<>();
         projectIds.add(UUID.fromString(this.clientConfiguration.getProjectId()));
@@ -99,12 +99,12 @@ public class TmsApiClient implements ApiClient {
         externalIds.add(externalId);
         filter.externalIds(externalIds);
 
-        AutotestsSelectModelIncludes includes = new AutotestsSelectModelIncludes();
+        SearchAutoTestsQueryIncludesModel includes = new SearchAutoTestsQueryIncludesModel();
         includes.setIncludeLabels(INCLUDE_LABELS);
         includes.setIncludeSteps(INCLUDE_STEPS);
         includes.setIncludeLinks(INCLUDE_LINKS);
 
-        ApiV2AutoTestsSearchPostRequest model = new ApiV2AutoTestsSearchPostRequest();
+        AutotestsSelectModel model = new AutotestsSelectModel();
         model.setFilter(filter);
         model.setIncludes(includes);
 
@@ -128,7 +128,7 @@ public class TmsApiClient implements ApiClient {
             LOGGER.debug("Link autotest {} to workitem {}", id, workItemId);
 
             try {
-                autoTestsApi.linkAutoTestToWorkItem(id, new LinkAutoTestToWorkItemRequest().id(workItemId));
+                autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
             } catch (ApiException e) {
                 LOGGER.error("Cannot link autotest {} to work item {}: work item does not exist", id, workItemId);
                 return false;
@@ -172,7 +172,7 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public void updateTestResult(UUID uuid, ApiV2TestResultsIdPutRequest model) throws ApiException {
+    public void updateTestResult(UUID uuid, TestResultUpdateModel model) throws ApiException {
         testResultsApi.apiV2TestResultsIdPut(uuid, model);
     }
 }

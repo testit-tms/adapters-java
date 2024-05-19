@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.AutoTestModel;
-import ru.testit.client.model.CreateAutoTestRequest;
+import ru.testit.client.model.AutoTestPostModel;
 import ru.testit.client.model.LinkPutModel;
-import ru.testit.client.model.UpdateAutoTestRequest;
+import ru.testit.client.model.AutoTestPutModel;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.models.*;
@@ -43,7 +43,7 @@ class HttpWriterTest {
         // arrange
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-        UpdateAutoTestRequest request = Helper.generateAutoTestPutModel(config.getProjectId());
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
         List<UUID> uuids = Helper.generateListUuid();
         request.setId(null);
 
@@ -63,7 +63,7 @@ class HttpWriterTest {
     void writeTest_WithCreatingAutoTest_InvokeCreateHandler() throws ApiException {
         // arrange
         TestResult testResult = Helper.generateTestResult();
-        CreateAutoTestRequest request = Helper.generateAutoTestPostModel(config.getProjectId());
+        AutoTestPostModel request = Helper.generateAutoTestPostModel(config.getProjectId());
         List<UUID> uuids = Helper.generateListUuid();
 
         when(client.getAutoTestByExternalId(testResult.getExternalId())).thenReturn(null);
@@ -155,7 +155,7 @@ class HttpWriterTest {
         putLink.setType(ru.testit.client.model.LinkType.DEFECT);
         putLinks.add(putLink);
 
-        UpdateAutoTestRequest putModel = Helper.generateAutoTestPutModel(config.getProjectId());
+        AutoTestPutModel putModel = Helper.generateAutoTestPutModel(config.getProjectId());
         putModel.links(putLinks);
 
         when(client.getAutoTestByExternalId(testResult.getExternalId())).thenReturn(response);
@@ -175,7 +175,7 @@ class HttpWriterTest {
         // arrange
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-        UpdateAutoTestRequest request = Helper.generateAutoTestPutModel(config.getProjectId());
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
         request.setId(null);
 
         when(client.getAutoTestByExternalId(testResult.getExternalId())).thenReturn(response);
@@ -205,7 +205,7 @@ class HttpWriterTest {
         writer.writeClass(container);
 
         // assert
-        verify(client, never()).updateAutoTest(any(UpdateAutoTestRequest.class));
+        verify(client, never()).updateAutoTest(any(AutoTestPutModel.class));
     }
 
     @Test
@@ -214,7 +214,7 @@ class HttpWriterTest {
         ClassContainer container = Helper.generateClassContainer();
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-        UpdateAutoTestRequest request = Helper.generateAutoTestPutModel(config.getProjectId());
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
         request.getSetup().add(Helper.generateBeforeEachSetup());
         request.getTeardown().add(Helper.generateAfterEachSetup());
 
@@ -247,7 +247,7 @@ class HttpWriterTest {
         writer.writeTests(container);
 
         // assert
-        verify(client, never()).updateAutoTest(any(UpdateAutoTestRequest.class));
+        verify(client, never()).updateAutoTest(any(AutoTestPutModel.class));
         verify(client, never()).updateTestResult(any(), any());
     }
 
@@ -263,7 +263,7 @@ class HttpWriterTest {
         response.getSetup().add(Helper.generateBeforeEachSetup());
         response.getTeardown().add(Helper.generateAfterEachSetup());
 
-        UpdateAutoTestRequest request = Helper.generateAutoTestPutModel(config.getProjectId());
+        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
         request.getSetup().add(Helper.generateBeforeAllSetup());
         request.getSetup().add(Helper.generateBeforeEachSetup());
         request.getTeardown().add(Helper.generateAfterEachSetup());
