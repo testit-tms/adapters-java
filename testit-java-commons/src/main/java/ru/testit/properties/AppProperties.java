@@ -47,7 +47,11 @@ public class AppProperties {
 
         properties.putAll(loadPropertiesFromEnv());
 
-        return validateProperties(properties);
+        if (Objects.equals(properties.getProperty(TMS_INTEGRATION, "true"), "false")) {
+            return properties;
+        } else {
+            return validateProperties(properties);
+        }
     }
 
     private static void loadPropertiesFrom(final ClassLoader classLoader, final Properties properties, String fileName) {
