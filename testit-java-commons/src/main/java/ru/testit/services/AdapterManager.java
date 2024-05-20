@@ -777,6 +777,10 @@ public class AdapterManager {
     }
 
     private void validateAdapterConfig() {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         switch (adapterConfig.getMode()) {
             case USE_FILTER:
                 try{
