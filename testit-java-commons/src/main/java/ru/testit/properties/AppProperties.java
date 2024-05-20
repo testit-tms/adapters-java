@@ -74,7 +74,7 @@ public class AppProperties {
         Map<String, String> map = new HashMap<>();
 
         try {
-            String url = System.getenv(String.format("%s_URL", ENV_PREFIX));
+            String url = System.getProperty(String.format("%s_URL", ENV_PREFIX));
             URI ignored = new java.net.URL(url).toURI();
             map.put(URL, url);
         } catch (MalformedURLException | URISyntaxException | SecurityException | NullPointerException |
@@ -82,7 +82,7 @@ public class AppProperties {
         }
 
         try {
-            String token = System.getenv(String.format("%s_PRIVATE_TOKEN", ENV_PREFIX));
+            String token = System.getProperty(String.format("%s_PRIVATE_TOKEN", ENV_PREFIX));
             if (token != null && !token.isEmpty() && !token.equals("null")) {
                 map.put(PRIVATE_TOKEN, token);
             }
@@ -90,7 +90,7 @@ public class AppProperties {
         }
 
         try {
-            String projectId = System.getenv(String.format("%s_PROJECT_ID", ENV_PREFIX));
+            String projectId = System.getProperty(String.format("%s_PROJECT_ID", ENV_PREFIX));
             if (projectId != null && !projectId.isEmpty()) {
                 java.util.UUID ignored = java.util.UUID.fromString(projectId);
                 map.put(PROJECT_ID, projectId);
@@ -99,7 +99,7 @@ public class AppProperties {
         }
 
         try {
-            String configurationId = System.getenv(String.format("%s_CONFIGURATION_ID", ENV_PREFIX));
+            String configurationId = System.getProperty(String.format("%s_CONFIGURATION_ID", ENV_PREFIX));
             if (configurationId != null && !configurationId.isEmpty()) {
                 java.util.UUID ignored = java.util.UUID.fromString(configurationId);
                 map.put(CONFIGURATION_ID, configurationId);
@@ -108,7 +108,7 @@ public class AppProperties {
         }
 
         try {
-            String testRunId = System.getenv(String.format("%s_TEST_RUN_ID", ENV_PREFIX));
+            String testRunId = System.getProperty(String.format("%s_TEST_RUN_ID", ENV_PREFIX));
             if (testRunId != null && !testRunId.isEmpty()) {
                 java.util.UUID ignored = java.util.UUID.fromString(testRunId);
                 map.put(TEST_RUN_ID, testRunId);
@@ -117,7 +117,7 @@ public class AppProperties {
         }
 
         try {
-            String testRunName = System.getenv(String.format("%s_TEST_RUN_NAME", ENV_PREFIX));
+            String testRunName = System.getProperty(String.format("%s_TEST_RUN_NAME", ENV_PREFIX));
             if (testRunName != null && !testRunName.isEmpty() && !testRunName.equals("null")) {
                 map.put(TEST_RUN_NAME, testRunName);
             }
@@ -125,7 +125,7 @@ public class AppProperties {
         }
 
         try {
-            String adapterMode = System.getenv(String.format("%s_ADAPTER_MODE", ENV_PREFIX));
+            String adapterMode = System.getProperty(String.format("%s_ADAPTER_MODE", ENV_PREFIX));
             int mode = Integer.parseInt(adapterMode);
 
             if (0 <= mode && mode <= 2) {
@@ -135,7 +135,7 @@ public class AppProperties {
         }
 
         try {
-            String createTestCases = System.getenv(String.format("%s_AUTOMATIC_CREATION_TEST_CASES", ENV_PREFIX));
+            String createTestCases = System.getProperty(String.format("%s_AUTOMATIC_CREATION_TEST_CASES", ENV_PREFIX));
             if (Objects.equals(createTestCases, "false") || Objects.equals(createTestCases, "true")) {
                 map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
             }
@@ -143,7 +143,7 @@ public class AppProperties {
         }
 
         try {
-            String certValidation = System.getenv(String.format("%s_CERT_VALIDATION", ENV_PREFIX));
+            String certValidation = System.getProperty(String.format("%s_CERT_VALIDATION", ENV_PREFIX));
             if (Objects.equals(certValidation, "false") || Objects.equals(certValidation, "true")) {
                 map.put(CERT_VALIDATION, certValidation);
             }
@@ -151,7 +151,7 @@ public class AppProperties {
         }
 
         try {
-            String tmsIntegration = System.getenv(String.format("%s_TEST_IT", ENV_PREFIX));
+            String tmsIntegration = System.getProperty(String.format("%s_TEST_IT", ENV_PREFIX));
             if (Objects.equals(tmsIntegration, "false") || Objects.equals(tmsIntegration, "true")) {
                 map.put(TMS_INTEGRATION, tmsIntegration);
             }
