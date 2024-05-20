@@ -24,7 +24,7 @@ public class AppProperties {
     public static final String ADAPTER_MODE = "adapterMode";
     public static final String AUTOMATIC_CREATION_TEST_CASES = "automaticCreationTestCases";
     public static final String CERT_VALIDATION = "certValidation";
-    public static final String TMS_INTEGRATION = "tmsTestIt";
+    public static final String TMS_INTEGRATION = "testIt";
 
     private static final String ENV_PREFIX = "TMS";
     private static final String PROPERTIES_FILE = "testit.properties";

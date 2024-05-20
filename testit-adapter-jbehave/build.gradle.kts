@@ -55,6 +55,6 @@ tasks.test {
     environment("TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName"))
     environment("TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode"))
     environment("TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation"))
-    environment("TMS_TEST_IT", System.getProperty("testIt"))
+    environment("TMS_TEST_IT", System.getProperty("tmsTestIt"))
     environment("TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases"))
 }
