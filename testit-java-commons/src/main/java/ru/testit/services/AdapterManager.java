@@ -98,6 +98,10 @@ public class AdapterManager {
     }
 
     public void stopTests() {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         LOGGER.debug("Stop launch");
 
         try {
@@ -283,6 +287,10 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateTestCase(final Consumer<TestResult> update) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         final Optional<String> root = threadContext.getRoot();
         if (!root.isPresent()) {
             LOGGER.error("Could not update test case: no test case running");
@@ -505,6 +513,10 @@ public class AdapterManager {
      * @param result the test fixture.
      */
     private void startFixture(final String uuid, final FixtureResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         storage.put(uuid, result);
 
         result.setItemStage(ItemStage.RUNNING).
@@ -574,6 +586,10 @@ public class AdapterManager {
      * @param result the step.
      */
     public void startStep(final String uuid, final StepResult result) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         final Optional<String> current = threadContext.getCurrent();
         if (!current.isPresent()) {
             LOGGER.debug("Could not start step {}: no test case running", result);
@@ -706,6 +722,10 @@ public class AdapterManager {
     }
 
     public void addAttachments(List<String> attachments) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
         List<String> uuids = new ArrayList<>();
         for (final String attachment : attachments) {
             String attachmentsId = writer.writeAttachment(attachment);
@@ -735,17 +755,20 @@ public class AdapterManager {
     }
 
     public List<String> getTestFromTestRun() {
-        try {
-            List<String> testsForRun = client.getTestFromTestRun(clientConfiguration.getTestRunId(), clientConfiguration.getConfigurationId());
+        if (adapterConfig.shouldEnableTmsIntegration()) {
+            try {
+                List<String> testsForRun = client.getTestFromTestRun(clientConfiguration.getTestRunId(), clientConfiguration.getConfigurationId());
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("List of tests from test run: {}", testsForRun);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("List of tests from test run: {}", testsForRun);
+                }
+
+                return testsForRun;
+            } catch (ApiException e) {
+                LOGGER.error("Could not get tests from test run", e);
             }
-
-            return testsForRun;
-        } catch (ApiException e) {
-            LOGGER.error("Could not get tests from test run", e);
         }
+
         return new ArrayList<>();
     }
 

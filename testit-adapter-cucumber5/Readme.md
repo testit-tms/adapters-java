@@ -249,7 +249,7 @@ test {
     environment "TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName")
     environment "TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode")
     environment "TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation")
-    environment "TMS_TEST_IT", System.getProperty("testIt")
+    environment("TMS_TEST_IT", System.getProperty("tmsTestIt"))
     environment "TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases")
 }
 ```
@@ -297,7 +297,7 @@ test {
     environment "TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName")
     environment "TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode")
     environment "TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation")
-    environment "TMS_TEST_IT", System.getProperty("testIt")
+    environment("TMS_TEST_IT", System.getProperty("tmsTestIt"))
     environment "TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases")
 }
 ```
@@ -387,7 +387,7 @@ testIt=TEST_IT
 ##### Gradle
 ```
 gradle test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
--DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsCertValidation=true -DtestIt=true
+-DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsCertValidation=true -DtmsTestIt=true
 ```
 
 ##### Maven
