@@ -58,9 +58,13 @@ public class ScenarioParser {
     }
 
     private Step getStep(final URI uri, final int stepLine) {
-        return getScenarioDefinition(uri, stepLine)
-                .getSteps().stream()
-                .filter(s -> s.getLocation().getLine().equals((long) stepLine)).findFirst().orElse(null);
+        Scenario scenario = getScenarioDefinition(uri, stepLine);
+
+        if (scenario == null) {
+            return null;
+        }
+
+        return scenario.getSteps().stream().filter(s -> s.getLocation().getLine().equals((long) stepLine)).findFirst().orElse(null);
     }
 
     private Map<String, String> updateParameters(DataTable dataTable, Map<String, String> parameters) {
