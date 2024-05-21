@@ -96,7 +96,7 @@ configure(subprojects) {
 
     tasks.withType<Sign>().configureEach {
         if (System.getProperty("disableSign") == "true") {
-            enabled = false;
+            enabled = false
         }
 
         onlyIf { !project.version.toString().endsWith("-SNAPSHOT") }
