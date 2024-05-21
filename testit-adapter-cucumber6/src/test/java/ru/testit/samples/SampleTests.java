@@ -39,11 +39,6 @@ public class SampleTests {
         Assert.assertTrue(true);
     }
 
-    @And("I create a section - failed")
-    public void createFailedSection() {
-        Assert.assertTrue(true);
-    }
-
     @Then("I create a test case")
     public void createTestCase() {
         Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
@@ -52,11 +47,6 @@ public class SampleTests {
 
     @Then("I check something")
     public void requiredAnnotationsTest() {
-        Assert.assertTrue(true);
-    }
-
-    @Then("I check something - failed")
-    public void requiredAnnotationsFailedTest() {
         Assert.assertTrue(true);
     }
 }
