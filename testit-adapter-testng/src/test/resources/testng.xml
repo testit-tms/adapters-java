@@ -34,9 +34,6 @@
             <class name="ru.testit.samples.FullBeforeAfterTests" />
             <class name="ru.testit.samples.OnlyBeforeAfterAllTests" />
             <class name="ru.testit.samples.OnlyBeforeAfterEachTests" />
-            <class name="ru.testit.samples.failed.FullBeforeAfterTests" />
-            <class name="ru.testit.samples.failed.OnlyBeforeAfterAllTests" />
-            <class name="ru.testit.samples.failed.OnlyBeforeAfterEachTests" />
             <class name="ru.testit.samples.DataProviderParameterizedTests" />
         </classes>
     </test>

@@ -20,6 +20,7 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
     - name: Setup and execute Gradle 'test' task
-      uses: gradle/gradle-build-action@v3
+      uses: gradle/actions/setup-gradle@v3
       with:
-        arguments: check
+        gradle-version: 7.4
+    - run: gradle check -DtmsUrl=${{ secrets.TESTIT_URL }} -DtmsPrivateToken=${{ secrets.TESTIT_PRIVATE_TOKEN }} -DtmsProjectId=${{ secrets.UNIT_JAVA_ADAPTER_PROJECT_ID }} -DtmsConfigurationId=${{ secrets.UNIT_JAVA_ADAPTER_CONFIGURATION_ID }} -DtmsAdapterMode=2 -DtmsCertValidation=false

@@ -9,5 +9,5 @@ Feature: Rule
 
     Examples:
       | left | right | result |
-      | 1    | 1     | 3      |
+      | 1    | 1     | 2      |
       | 9    | 9     | 18     |

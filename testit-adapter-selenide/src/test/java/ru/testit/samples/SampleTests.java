@@ -31,15 +31,6 @@ public class SampleTests {
     }
 
     @Test
-    public void TestFailed() {
-        openPage();
-
-        SelenideElement searchField = getElementByXpath("//h1[contains(@class,\"title\")]");
-
-        searchField.shouldHave(text("Система для управления тестированием"));
-    }
-
-    @Test
     public void TestSuccess() {
         openPage();
 

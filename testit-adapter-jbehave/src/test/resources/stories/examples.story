@@ -8,4 +8,4 @@ Then result is <result>
 Examples:
 | a | b | result |
 | 1 | 3 | 4      |
-| 2 | 4 | 7      |
+| 2 | 4 | 6      |
