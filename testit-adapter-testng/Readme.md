@@ -15,7 +15,7 @@ Add this dependency to your project POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-testng</artifactId>
-    <version>1.3.5</version>
+    <version>2.3.3</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -25,7 +25,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-testng:1.3.5"
+implementation "ru.testit:testit-adapter-testng:2.3.3"
 ```
 
 ## Usage
@@ -39,7 +39,7 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <aspectj.version>1.9.22</aspectj.version>
-        <adapter.version>1.3.5</adapter.version>
+        <adapter.version>2.3.3</adapter.version>
         <aspectj-maven-plugin.version>1.14</aspectj-maven-plugin.version>
     </properties>
     <dependencies>
@@ -143,8 +143,8 @@ repositories {
 
 dependencies {
     testImplementation "org.aspectj:aspectjrt:1.9.22"
-    testImplementation "ru.testit:testit-adapter-testng:1.3.5"
-    testImplementation "ru.testit:testit-java-commons:1.3.5"
+    testImplementation "ru.testit:testit-adapter-testng:2.3.3"
+    testImplementation "ru.testit:testit-java-commons:2.3.3"
     testImplementation "org.testng:testng:7.5"
     aspectConfig "org.aspectj:aspectjweaver:1.9.22"
 }
