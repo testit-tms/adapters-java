@@ -9,10 +9,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 public class AppProperties {
     public static final String URL = "url";
@@ -26,9 +23,34 @@ public class AppProperties {
     public static final String CERT_VALIDATION = "certValidation";
     public static final String TMS_INTEGRATION = "testIt";
 
-    private static final String ENV_PREFIX = "TMS";
     private static final String PROPERTIES_FILE = "testit.properties";
     private static final Logger log = LoggerFactory.getLogger(AppProperties.class);
+    private static final HashMap<String, HashMap<String, String>> envVarsNames  = new HashMap<String, HashMap<String, String>>() {{
+        put("env", new HashMap<String, String>() {{
+            put(URL, "TMS_URL");
+            put(PRIVATE_TOKEN, "TMS_PRIVATE_TOKEN");
+            put(PROJECT_ID, "TMS_PROJECT_ID");
+            put(CONFIGURATION_ID, "TMS_CONFIGURATION_ID");
+            put(TEST_RUN_ID, "TMS_TEST_RUN_ID");
+            put(TEST_RUN_NAME, "TMS_TEST_RUN_NAME");
+            put(ADAPTER_MODE, "TMS_ADAPTER_MODE");
+            put(AUTOMATIC_CREATION_TEST_CASES, "TMS_AUTOMATIC_CREATION_TEST_CASES");
+            put(CERT_VALIDATION, "TMS_CERT_VALIDATION");
+            put(TMS_INTEGRATION, "TMS_TEST_IT");
+        }});
+        put("cli", new HashMap<String, String>() {{
+            put(URL, "tmsUrl");
+            put(PRIVATE_TOKEN, "tmsPrivateToken");
+            put(PROJECT_ID, "tmsProjectId");
+            put(CONFIGURATION_ID, "tmsConfigurationId");
+            put(TEST_RUN_ID, "tmsTestRunId");
+            put(TEST_RUN_NAME, "tmsTestRunName");
+            put(ADAPTER_MODE, "tmsAdapterMode");
+            put(AUTOMATIC_CREATION_TEST_CASES, "tmsAutomaticCreationTestCases");
+            put(CERT_VALIDATION, "tmsCertValidation");
+            put(TMS_INTEGRATION, "tmsTestIt");
+        }});
+    }};
 
     public AppProperties() {
     }
@@ -45,7 +67,8 @@ public class AppProperties {
             log.warn("The configuration file specifies a private token. It is not safe. Use TMS_PRIVATE_TOKEN environment variable");
         }
 
-        properties.putAll(loadPropertiesFromEnv());
+        properties.putAll(loadPropertiesFromEnv(envVarsNames.getOrDefault("env", new HashMap<>())));
+        properties.putAll(loadPropertiesFromEnv(envVarsNames.getOrDefault("cli", new HashMap<>())));
 
         if (Objects.equals(properties.getProperty(TMS_INTEGRATION, "true"), "false")) {
             return properties;
@@ -74,11 +97,12 @@ public class AppProperties {
         }
     }
 
-    private static Map<String, String> loadPropertiesFromEnv() {
+    private static Map<String, String> loadPropertiesFromEnv(HashMap<String, String> varNames) {
         Map<String, String> map = new HashMap<>();
+        Properties properties = System.getProperties();
 
         try {
-            String url = System.getenv(String.format("%s_URL", ENV_PREFIX));
+            String url = properties.getProperty(varNames.get(URL), null);
             URI ignored = new java.net.URL(url).toURI();
             map.put(URL, url);
         } catch (MalformedURLException | URISyntaxException | SecurityException | NullPointerException |
@@ -86,7 +110,7 @@ public class AppProperties {
         }
 
         try {
-            String token = System.getenv(String.format("%s_PRIVATE_TOKEN", ENV_PREFIX));
+            String token = properties.getProperty(varNames.get(PRIVATE_TOKEN), null);
             if (token != null && !token.isEmpty() && !token.equals("null")) {
                 map.put(PRIVATE_TOKEN, token);
             }
@@ -94,7 +118,7 @@ public class AppProperties {
         }
 
         try {
-            String projectId = System.getenv(String.format("%s_PROJECT_ID", ENV_PREFIX));
+            String projectId = properties.getProperty(varNames.get(PROJECT_ID), null);
             if (projectId != null && !projectId.isEmpty()) {
                 java.util.UUID ignored = java.util.UUID.fromString(projectId);
                 map.put(PROJECT_ID, projectId);
@@ -103,7 +127,7 @@ public class AppProperties {
         }
 
         try {
-            String configurationId = System.getenv(String.format("%s_CONFIGURATION_ID", ENV_PREFIX));
+            String configurationId = properties.getProperty(varNames.get(CONFIGURATION_ID), null);
             if (configurationId != null && !configurationId.isEmpty()) {
                 java.util.UUID ignored = java.util.UUID.fromString(configurationId);
                 map.put(CONFIGURATION_ID, configurationId);
@@ -112,7 +136,7 @@ public class AppProperties {
         }
 
         try {
-            String testRunId = System.getenv(String.format("%s_TEST_RUN_ID", ENV_PREFIX));
+            String testRunId = properties.getProperty(varNames.get(TEST_RUN_ID), null);
             if (testRunId != null && !testRunId.isEmpty()) {
                 java.util.UUID ignored = java.util.UUID.fromString(testRunId);
                 map.put(TEST_RUN_ID, testRunId);
@@ -121,7 +145,7 @@ public class AppProperties {
         }
 
         try {
-            String testRunName = System.getenv(String.format("%s_TEST_RUN_NAME", ENV_PREFIX));
+            String testRunName = properties.getProperty(varNames.get(TEST_RUN_NAME), null);
             if (testRunName != null && !testRunName.isEmpty() && !testRunName.equals("null")) {
                 map.put(TEST_RUN_NAME, testRunName);
             }
@@ -129,7 +153,7 @@ public class AppProperties {
         }
 
         try {
-            String adapterMode = System.getenv(String.format("%s_ADAPTER_MODE", ENV_PREFIX));
+            String adapterMode = properties.getProperty(varNames.get(ADAPTER_MODE), null);
             int mode = Integer.parseInt(adapterMode);
 
             if (0 <= mode && mode <= 2) {
@@ -139,7 +163,7 @@ public class AppProperties {
         }
 
         try {
-            String createTestCases = System.getenv(String.format("%s_AUTOMATIC_CREATION_TEST_CASES", ENV_PREFIX));
+            String createTestCases = properties.getProperty(varNames.get(AUTOMATIC_CREATION_TEST_CASES), null);
             if (Objects.equals(createTestCases, "false") || Objects.equals(createTestCases, "true")) {
                 map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
             }
@@ -147,7 +171,7 @@ public class AppProperties {
         }
 
         try {
-            String certValidation = System.getenv(String.format("%s_CERT_VALIDATION", ENV_PREFIX));
+            String certValidation = properties.getProperty(varNames.get(CERT_VALIDATION), null);
             if (Objects.equals(certValidation, "false") || Objects.equals(certValidation, "true")) {
                 map.put(CERT_VALIDATION, certValidation);
             }
@@ -155,7 +179,7 @@ public class AppProperties {
         }
 
         try {
-            String tmsIntegration = System.getenv(String.format("%s_TEST_IT", ENV_PREFIX));
+            String tmsIntegration = properties.getProperty(varNames.get(TMS_INTEGRATION), null);
             if (Objects.equals(tmsIntegration, "false") || Objects.equals(tmsIntegration, "true")) {
                 map.put(TMS_INTEGRATION, tmsIntegration);
             }
@@ -265,7 +289,7 @@ public class AppProperties {
 
     private static String getConfigFileName() {
         try {
-            String fileName = System.getProperty(String.format("%s_CONFIG_FILE", ENV_PREFIX));
+            String fileName = System.getProperty("TMS_CONFIG_FILE");
             if (fileName != null && !fileName.isEmpty() && !fileName.equals("null")) {
                 return fileName;
             }

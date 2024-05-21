@@ -46,7 +46,6 @@ public class AdapterManager {
 
         this.clientConfiguration = clientConfiguration;
         this.adapterConfig = adapterConfig;
-        validateAdapterConfig();
         this.storage = Adapter.getResultStorage();
         this.threadContext = new ThreadContext();
         this.client = new TmsApiClient(this.clientConfiguration);
@@ -774,56 +773,6 @@ public class AdapterManager {
 
     public Optional<String> getCurrentTestCaseOrStep() {
         return threadContext.getCurrent();
-    }
-
-    private void validateAdapterConfig() {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        switch (adapterConfig.getMode()) {
-            case USE_FILTER:
-                try{
-                    UUID ignored = UUID.fromString(clientConfiguration.getTestRunId());
-                    UUID ignored2 = UUID.fromString(clientConfiguration.getConfigurationId());
-                } catch (IllegalArgumentException exception){
-                    String error = "Adapter works in mode 0. Config should contains test run id and configuration id.";
-                    LOGGER.error(error);
-                    throw new RuntimeException(error);
-                }
-                break;
-            case RUN_ALL_TESTS:
-                try{
-                    UUID ignored = UUID.fromString(clientConfiguration.getTestRunId());
-                    UUID ignored2 = UUID.fromString(clientConfiguration.getConfigurationId());
-                } catch (IllegalArgumentException exception){
-                    String error = "Adapter works in mode 1. Config should contains test run id and configuration id.";
-                    LOGGER.error(error);
-                    throw new RuntimeException(error);
-                }
-                break;
-            case NEW_TEST_RUN:
-                try{
-                    UUID ignored = UUID.fromString(clientConfiguration.getProjectId());
-                    UUID ignored2 = UUID.fromString(clientConfiguration.getConfigurationId());
-                } catch (IllegalArgumentException exception){
-                    String error = "Adapter works in mode 2. Config should contains project id and configuration id.";
-                    LOGGER.error(error);
-                    throw new RuntimeException(error);
-                }
-                try{
-                    UUID ignored = UUID.fromString(clientConfiguration.getTestRunId());
-                    String error = "Adapter works in mode 2. Config should not contains test run id.";
-                    LOGGER.error(error);
-                    throw new RuntimeException(error);
-                } catch (IllegalArgumentException ignored){
-                }
-                break;
-            default:
-                String error = String.format("Unknown mode: %s", adapterConfig.getMode());
-                LOGGER.error(error);
-                throw new RuntimeException(error);
-        }
     }
 
     private static ListenerManager getDefaultListenerManager() {

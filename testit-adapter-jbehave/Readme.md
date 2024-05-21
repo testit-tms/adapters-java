@@ -179,17 +179,7 @@ dependencies {
 
 test {
     useTestNG()
-
-    environment "TMS_URL", System.getProperty("tmsUrl")
-    environment "TMS_PRIVATE_TOKEN", System.getProperty("tmsPrivateToken")
-    environment "TMS_PROJECT_ID", System.getProperty("tmsProjectId")
-    environment "TMS_CONFIGURATION_ID", System.getProperty("tmsConfigurationId")
-    environment "TMS_TEST_RUN_ID", System.getProperty("tmsTestRunId")
-    environment "TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName")
-    environment "TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode")
-    environment "TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation")
-    environment "TMS_TEST_IT", System.getProperty("tmsTestIt")
-    environment "TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases")
+    systemProperties(System.getProperties())
 }
 ```
 2. Press the **Reload All Gradle Projects** button.
@@ -224,17 +214,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
-
-    environment "TMS_URL", System.getProperty("tmsUrl")
-    environment "TMS_PRIVATE_TOKEN", System.getProperty("tmsPrivateToken")
-    environment "TMS_PROJECT_ID", System.getProperty("tmsProjectId")
-    environment "TMS_CONFIGURATION_ID", System.getProperty("tmsConfigurationId")
-    environment "TMS_TEST_RUN_ID", System.getProperty("tmsTestRunId")
-    environment "TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName")
-    environment "TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode")
-    environment "TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation")
-    environment("TMS_TEST_IT", System.getProperty("tmsTestIt"))
-    environment "TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases")
+    systemProperties(System.getProperties())
 }
 ```
 2. Press the **Reload All Gradle Projects** button.
@@ -268,17 +248,7 @@ dependencies {
 
 test {
     useJUnit()
-
-    environment "TMS_URL", System.getProperty("tmsUrl")
-    environment "TMS_PRIVATE_TOKEN", System.getProperty("tmsPrivateToken")
-    environment "TMS_PROJECT_ID", System.getProperty("tmsProjectId")
-    environment "TMS_CONFIGURATION_ID", System.getProperty("tmsConfigurationId")
-    environment "TMS_TEST_RUN_ID", System.getProperty("tmsTestRunId")
-    environment "TMS_TEST_RUN_NAME", System.getProperty("tmsTestRunName")
-    environment "TMS_ADAPTER_MODE", System.getProperty("tmsAdapterMode")
-    environment "TMS_CERT_VALIDATION", System.getProperty("tmsCertValidation")
-    environment("TMS_TEST_IT", System.getProperty("tmsTestIt"))
-    environment "TMS_AUTOMATIC_CREATION_TEST_CASES", System.getProperty("tmsAutomaticCreationTestCases")
+    systemProperties(System.getProperties())
 }
 ```
 2. Press the **Reload All Gradle Projects** button.
