@@ -37,6 +37,7 @@ implementation "ru.testit:testit-adapter-jbehave:1.3.5"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adapter.version>1.3.5</adapter.version>
         <jbehave.version>4.8.3</jbehave.version>
     </properties>
@@ -73,6 +74,7 @@ implementation "ru.testit:testit-adapter-jbehave:1.3.5"
       <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adapter.version>1.3.5</adapter.version>
         <jbehave.version>4.8.3</jbehave.version>
     </properties>
@@ -114,6 +116,7 @@ implementation "ru.testit:testit-adapter-jbehave:1.3.5"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adapter.version>1.3.5</adapter.version>
         <jbehave.version>4.8.3</jbehave.version>
     </properties>
@@ -167,7 +170,7 @@ repositories {
 }
 
 def jbehaveVersion = "4.8.3"
-def aspectjVersion = "1.9.7"
+def aspectjVersion = "1.9.22"
 
 dependencies {
     testImplementation "ru.testit:testit-adapter-jbehave:1.3.5"
@@ -201,7 +204,7 @@ repositories {
 }
 
 def jbehaveVersion = "4.8.3"
-def aspectjVersion = "1.9.7"
+def aspectjVersion = "1.9.22"
 
 dependencies {
     testImplementation "ru.testit:testit-adapter-jbehave:1.3.5"
@@ -236,7 +239,7 @@ repositories {
 }
 
 def jbehaveVersion = "4.8.3"
-def aspectjVersion = "1.9.7"
+def aspectjVersion = "1.9.22"
 
 dependencies {
     testImplementation "ru.testit:testit-adapter-jbehave:1.3.5"

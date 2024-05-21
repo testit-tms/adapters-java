@@ -37,9 +37,10 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <aspectj.version>1.9.7</aspectj.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <aspectj.version>1.9.22</aspectj.version>
         <adapter.version>1.3.5</adapter.version>
-        <aspectj-maven-plugin.version>1.14.0</aspectj-maven-plugin.version>
+        <aspectj-maven-plugin.version>1.14</aspectj-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -73,7 +74,7 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>dev.aspectj</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <version>${aspectj-maven-plugin.version}</version>
                 <configuration>
@@ -101,9 +102,9 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M7</version>
+                <version>3.2.5</version>
                 <configuration>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
+                    <argLine>-noverify</argLine>
                     <argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar</argLine>
                 </configuration>
             </plugin>
@@ -141,11 +142,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation "org.aspectj:aspectjrt:1.9.7"
+    testImplementation "org.aspectj:aspectjrt:1.9.22"
     testImplementation "ru.testit:testit-adapter-testng:1.3.5"
     testImplementation "ru.testit:testit-java-commons:1.3.5"
     testImplementation "org.testng:testng:7.5"
-    aspectConfig "org.aspectj:aspectjweaver:1.9.7"
+    aspectConfig "org.aspectj:aspectjweaver:1.9.22"
 }
 
 test {

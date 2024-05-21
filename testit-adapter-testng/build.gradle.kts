@@ -7,7 +7,7 @@ plugins {
 }
 
 val testNgVersion = "7.5.1"
-val aspectjVersion = "1.9.7"
+val aspectjVersion = "1.9.22"
 val slf4jVersion = "1.7.36"
 val agent: Configuration by configurations.creating
 

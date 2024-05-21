@@ -8,7 +8,7 @@ plugins {
 
 val junitVersion = "5.8.2"
 val junitLauncherVersion = "1.9.0"
-val aspectjVersion = "1.9.7"
+val aspectjVersion = "1.9.22"
 val slf4jVersion = "1.7.36"
 
 val agent: Configuration by configurations.creating

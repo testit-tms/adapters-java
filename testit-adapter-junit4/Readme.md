@@ -37,7 +37,8 @@ implementation "ru.testit:testit-adapter-junit4:1.3.5"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <aspectj.version>1.9.7</aspectj.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <aspectj.version>1.9.22</aspectj.version>
         <adapter.version>1.3.5</adapter.version>
     </properties>
     <dependencies>
@@ -78,9 +79,9 @@ implementation "ru.testit:testit-adapter-junit4:1.3.5"
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>dev.aspectj</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
-                <version>1.14.0</version>
+                <version>1.14</version>
                 <configuration>
                     <complianceLevel>${maven.compiler.source}</complianceLevel>
                     <source>${maven.compiler.source}</source>
@@ -106,9 +107,9 @@ implementation "ru.testit:testit-adapter-junit4:1.3.5"
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M7</version>
+                <version>3.2.5</version>
                 <configuration>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
+                    <argLine>-noverify</argLine>
                     <argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar</argLine>
                 </configuration>
             </plugin>
@@ -146,12 +147,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation "org.aspectj:aspectjrt:1.9.7"
+    testImplementation "org.aspectj:aspectjrt:1.9.22"
     testImplementation "ru.testit:testit-adapter-junit4:1.3.5"
     testImplementation "ru.testit:testit-java-commons:1.3.5"
     testImplementation "junit:junit:4.12"
     testImplementation "org.junit.platform:junit-platform-runner:1.6.3"
-    aspectConfig "org.aspectj:aspectjweaver:1.9.7"
+    aspectConfig "org.aspectj:aspectjweaver:1.9.22"
 }
 
 test {

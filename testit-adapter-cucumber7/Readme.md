@@ -37,6 +37,7 @@ implementation "ru.testit:testit-adapter-cucumber7:1.3.5"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adapter.version>1.3.5</adapter.version>
         <gherkin.version>23.0.1</gherkin.version>
         <cucumber.version>7.3.2</cucumber.version>
@@ -92,6 +93,7 @@ implementation "ru.testit:testit-adapter-cucumber7:1.3.5"
       <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adapter.version>1.3.5</adapter.version>
         <gherkin.version>23.0.1</gherkin.version>
         <cucumber.version>7.3.2</cucumber.version>
@@ -158,6 +160,7 @@ implementation "ru.testit:testit-adapter-cucumber7:1.3.5"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adapter.version>1.3.5</adapter.version>
         <gherkin.version>23.0.1</gherkin.version>
         <cucumber.version>7.3.2</cucumber.version>
