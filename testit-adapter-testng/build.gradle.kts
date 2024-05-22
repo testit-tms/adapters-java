@@ -26,6 +26,7 @@ tasks.test {
     useTestNG(closureOf<TestNGOptions> {
         suites("src/test/resources/testng.xml")
     })
+    exclude("**/samples/*")
     testLogging {
         events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED)
         showCauses = true

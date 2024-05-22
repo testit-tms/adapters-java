@@ -44,6 +44,7 @@ tasks.compileTestJava {
 
 tasks.test {
     useJUnitPlatform()
+    exclude("**/samples/*")
     testLogging {
         events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED)
         showCauses = true

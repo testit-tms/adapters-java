@@ -15,7 +15,7 @@ Add this dependency to your project POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-testng</artifactId>
-    <version>1.3.5</version>
+    <version>2.3.3</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -25,7 +25,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-testng:1.3.5"
+implementation "ru.testit:testit-adapter-testng:2.3.3"
 ```
 
 ## Usage
@@ -37,8 +37,9 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <aspectj.version>1.9.7</aspectj.version>
-        <adapter.version>1.3.5</adapter.version>
+        <adapter.version>2.3.3</adapter.version>
         <aspectj-maven-plugin.version>1.14.0</aspectj-maven-plugin.version>
     </properties>
     <dependencies>
@@ -101,9 +102,9 @@ implementation "ru.testit:testit-adapter-testng:1.3.5"
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M7</version>
+                <version>3.2.5</version>
                 <configuration>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
+                    <argLine>-noverify</argLine>
                     <argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar</argLine>
                 </configuration>
             </plugin>
@@ -142,8 +143,8 @@ repositories {
 
 dependencies {
     testImplementation "org.aspectj:aspectjrt:1.9.7"
-    testImplementation "ru.testit:testit-adapter-testng:1.3.5"
-    testImplementation "ru.testit:testit-java-commons:1.3.5"
+    testImplementation "ru.testit:testit-adapter-testng:2.3.3"
+    testImplementation "ru.testit:testit-java-commons:2.3.3"
     testImplementation "org.testng:testng:7.5"
     aspectConfig "org.aspectj:aspectjweaver:1.9.7"
 }

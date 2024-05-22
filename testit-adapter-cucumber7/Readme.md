@@ -13,7 +13,7 @@ Add this dependency to your project POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-cucumber7</artifactId>
-    <version>1.3.5</version>
+    <version>2.3.3</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-cucumber7:1.3.5"
+implementation "ru.testit:testit-adapter-cucumber7:2.3.3"
 ```
 
 ## Usage
@@ -37,7 +37,8 @@ implementation "ru.testit:testit-adapter-cucumber7:1.3.5"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <adapter.version>1.3.5</adapter.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <adapter.version>2.3.3</adapter.version>
         <gherkin.version>23.0.1</gherkin.version>
         <cucumber.version>7.3.2</cucumber.version>
     </properties>
@@ -92,7 +93,8 @@ implementation "ru.testit:testit-adapter-cucumber7:1.3.5"
       <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <adapter.version>1.3.5</adapter.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <adapter.version>2.3.3</adapter.version>
         <gherkin.version>23.0.1</gherkin.version>
         <cucumber.version>7.3.2</cucumber.version>
     </properties>
@@ -158,7 +160,8 @@ implementation "ru.testit:testit-adapter-cucumber7:1.3.5"
      <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <adapter.version>1.3.5</adapter.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <adapter.version>2.3.3</adapter.version>
         <gherkin.version>23.0.1</gherkin.version>
         <cucumber.version>7.3.2</cucumber.version>
     </properties>
@@ -233,8 +236,8 @@ def cucumberVersion = "7.3.2"
 def cucumberGherkinVersion = "23.0.1"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber7:1.3.5"
-    testImplementation "ru.testit:testit-java-commons:1.3.5"
+    testImplementation "ru.testit:testit-adapter-cucumber7:2.3.3"
+    testImplementation "ru.testit:testit-java-commons:2.3.3"
     testImplementation "org.testng:testng:7.5"
     testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
@@ -269,8 +272,8 @@ def cucumberVersion = "7.3.2"
 def cucumberGherkinVersion = "23.0.1"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber7:1.3.5"
-    testImplementation "ru.testit:testit-java-commons:1.3.5"
+    testImplementation "ru.testit:testit-adapter-cucumber7:2.3.3"
+    testImplementation "ru.testit:testit-java-commons:2.3.3"
     testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
@@ -309,8 +312,8 @@ def cucumberGherkinVersion = "23.0.1"
 def junit4Version = "4.12"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber7:1.3.5"
-    testImplementation "ru.testit:testit-java-commons:1.3.5"
+    testImplementation "ru.testit:testit-adapter-cucumber7:2.3.3"
+    testImplementation "ru.testit:testit-java-commons:2.3.3"
     testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
