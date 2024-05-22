@@ -26,6 +26,7 @@ dependencies {
 
 tasks.test {
     useTestNG()
+    exclude("**/samples/*")
     testLogging {
         events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED)
         showCauses = true

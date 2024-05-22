@@ -35,6 +35,7 @@ tasks.jar {
 
 tasks.test {
     useJUnit()
+    exclude("**/samples/*")
     testLogging {
         events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED)
         showCauses = true
