@@ -114,6 +114,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: testit-tms/java-examples
+          ref: feature/support_java_17
           path: java-examples
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
