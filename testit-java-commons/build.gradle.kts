@@ -8,7 +8,7 @@ val slf4jVersion = "1.7.36"
 val jacksonVersion = "2.17.1"
 
 dependencies {
-    implementation("org.aspectj:aspectjrt:1.9.7")
+    implementation("org.aspectj:aspectjrt:1.9.22")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("org.apache.commons:commons-lang3:3.12.0")

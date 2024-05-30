@@ -13,7 +13,7 @@ Add this dependency to your project POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-cucumber4</artifactId>
-    <version>2.3.3</version>
+    <version>2.3.4</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-cucumber4:2.3.3"
+implementation "ru.testit:testit-adapter-cucumber4:2.3.4"
 ```
 
 ## Usage
@@ -38,7 +38,7 @@ implementation "ru.testit:testit-adapter-cucumber4:2.3.3"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <adapter.version>2.3.3</adapter.version>
+        <adapter.version>2.3.4</adapter.version>
         <cucumber.version>4.8.0</cucumber.version>
     </properties>
     <dependencies>
@@ -87,7 +87,7 @@ implementation "ru.testit:testit-adapter-cucumber4:2.3.3"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <adapter.version>2.3.3</adapter.version>
+        <adapter.version>2.3.4</adapter.version>
         <cucumber.version>4.8.0</cucumber.version>
     </properties>
     <dependencies>
@@ -156,8 +156,8 @@ repositories {
 def cucumberVersion = "4.8.0"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber4:2.3.3"
-    testImplementation "ru.testit:testit-java-commons:2.3.3"
+    testImplementation "ru.testit:testit-adapter-cucumber4:2.3.4"
+    testImplementation "ru.testit:testit-java-commons:2.3.4"
     testImplementation "org.testng:testng:7.5"
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
@@ -191,8 +191,8 @@ def cucumberVersion = "4.8.0"
 def junit4Version = "4.12"
 
 dependencies {
-    testImplementation "ru.testit:testit-adapter-cucumber4:2.3.3"
-    testImplementation "ru.testit:testit-java-commons:2.3.3"
+    testImplementation "ru.testit:testit-adapter-cucumber4:2.3.4"
+    testImplementation "ru.testit:testit-java-commons:2.3.4"
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-junit:$cucumberVersion")

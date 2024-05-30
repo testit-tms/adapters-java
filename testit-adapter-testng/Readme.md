@@ -15,7 +15,7 @@ Add this dependency to your project POM:
 <dependency>
     <groupId>ru.testit</groupId>
     <artifactId>testit-adapter-testng</artifactId>
-    <version>2.3.3</version>
+    <version>2.3.4</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -25,7 +25,7 @@ Add this dependency to your project POM:
 Add this dependency to your project build file:
 
 ```groovy
-implementation "ru.testit:testit-adapter-testng:2.3.3"
+implementation "ru.testit:testit-adapter-testng:2.3.4"
 ```
 
 ## Usage
@@ -38,9 +38,9 @@ implementation "ru.testit:testit-adapter-testng:2.3.3"
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <aspectj.version>1.9.7</aspectj.version>
-        <adapter.version>2.3.3</adapter.version>
-        <aspectj-maven-plugin.version>1.14.0</aspectj-maven-plugin.version>
+        <aspectj.version>1.9.22</aspectj.version>
+        <adapter.version>2.3.4</adapter.version>
+        <aspectj-maven-plugin.version>1.14</aspectj-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -74,7 +74,7 @@ implementation "ru.testit:testit-adapter-testng:2.3.3"
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>dev.aspectj</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <version>${aspectj-maven-plugin.version}</version>
                 <configuration>
@@ -142,11 +142,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation "org.aspectj:aspectjrt:1.9.7"
-    testImplementation "ru.testit:testit-adapter-testng:2.3.3"
-    testImplementation "ru.testit:testit-java-commons:2.3.3"
+    testImplementation "org.aspectj:aspectjrt:1.9.22"
+    testImplementation "ru.testit:testit-adapter-testng:2.3.4"
+    testImplementation "ru.testit:testit-java-commons:2.3.4"
     testImplementation "org.testng:testng:7.5"
-    aspectConfig "org.aspectj:aspectjweaver:1.9.7"
+    aspectConfig "org.aspectj:aspectjweaver:1.9.22"
 }
 
 test {
