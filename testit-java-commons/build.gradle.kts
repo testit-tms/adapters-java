@@ -19,7 +19,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
-    testImplementation("org.mockito:mockito-inline:3.4.6")
+    testImplementation("org.mockito:mockito-inline:4.4.0")
 }
 
 tasks.test {
