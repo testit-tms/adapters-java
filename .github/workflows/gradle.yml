@@ -20,6 +20,4 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     - name: Setup and execute Gradle 'test' task
-      uses: gradle/gradle-build-action@v3
-      with:
-        arguments: check
+      run: ./gradlew :testit-java-commons:check
