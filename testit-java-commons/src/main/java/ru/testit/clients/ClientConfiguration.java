@@ -4,6 +4,7 @@ import ru.testit.properties.AppProperties;
 import ru.testit.services.Utils;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Properties;
 
 public class ClientConfiguration implements Serializable {
@@ -14,6 +15,7 @@ public class ClientConfiguration implements Serializable {
     private String testRunId;
     private String testRunName;
     private Boolean certValidation;
+    private boolean automaticUpdationLinksToTestCases;
 
     public ClientConfiguration(Properties properties) {
         this.privateToken = String.valueOf(properties.get(AppProperties.PRIVATE_TOKEN));
@@ -28,6 +30,14 @@ public class ClientConfiguration implements Serializable {
         if (validationCert.equals("null")) {
             validationCert = "true";
         }
+
+        try {
+            String automaticUpdationLinksToTestCasesValue = String.valueOf(properties.get(AppProperties.AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES));
+            this.automaticUpdationLinksToTestCases = Objects.equals(automaticUpdationLinksToTestCasesValue, "true");
+        } catch (NullPointerException ignored) {
+            this.automaticUpdationLinksToTestCases = false;
+        }
+
         this.certValidation = Boolean.parseBoolean(validationCert);
     }
 
@@ -63,6 +73,10 @@ public class ClientConfiguration implements Serializable {
         return certValidation;
     }
 
+    public boolean shouldAutomaticUpdationLinksToTestCases() {
+        return automaticUpdationLinksToTestCases;
+    }
+
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
@@ -74,6 +88,7 @@ public class ClientConfiguration implements Serializable {
         sb.append("    testRunId: ").append(Utils.toIndentedString(this.testRunId)).append("\n");
         sb.append("    testRunName: ").append(Utils.toIndentedString(this.testRunName)).append("\n");
         sb.append("    certValidation: ").append(Utils.toIndentedString(this.certValidation)).append("\n");
+        sb.append("    automaticUpdationLinksToTestCases: ").append(Utils.toIndentedString(this.automaticUpdationLinksToTestCases)).append("\n");
         sb.append("}");
 
         return sb.toString();

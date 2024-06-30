@@ -78,7 +78,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      *
      * @return the work item id
      */
-    public List<String> getWorkItemId() {
+    public List<String> getWorkItemIds() {
         return workItemIds;
     }
 
@@ -88,7 +88,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @param workItemIds the value
      * @return self for method chaining
      */
-    public TestResult setWorkItemId(List<String> workItemIds) {
+    public TestResult setWorkItemIds(List<String> workItemIds) {
         this.workItemIds = workItemIds;
         return this;
     }

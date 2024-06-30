@@ -20,6 +20,7 @@ public class AppProperties {
     public static final String TEST_RUN_NAME = "testRunName";
     public static final String ADAPTER_MODE = "adapterMode";
     public static final String AUTOMATIC_CREATION_TEST_CASES = "automaticCreationTestCases";
+    public static final String AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES = "automaticUpdationLinksToTestCases";
     public static final String CERT_VALIDATION = "certValidation";
     public static final String TMS_INTEGRATION = "testIt";
 
@@ -171,6 +172,14 @@ public class AppProperties {
         }
 
         try {
+            String updateLinksToTestCases = properties.getProperty(varNames.get(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES), null);
+            if (Objects.equals(updateLinksToTestCases, "false") || Objects.equals(updateLinksToTestCases, "true")) {
+                map.put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, updateLinksToTestCases);
+            }
+        } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+        }
+
+        try {
             String certValidation = properties.getProperty(varNames.get(CERT_VALIDATION), null);
             if (Objects.equals(certValidation, "false") || Objects.equals(certValidation, "true")) {
                 map.put(CERT_VALIDATION, certValidation);
@@ -264,6 +273,12 @@ public class AppProperties {
         String createTestCases = properties.getProperty(AUTOMATIC_CREATION_TEST_CASES);
         if (!Objects.equals(createTestCases, "false") && !Objects.equals(createTestCases, "true")) {
             log.warn("Invalid autoCreateTestCases: {}. Use default value instead: false", createTestCases);
+            properties.setProperty(AUTOMATIC_CREATION_TEST_CASES, "false");
+        }
+
+        String updateLinksToTestCases = properties.getProperty(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES);
+        if (!Objects.equals(updateLinksToTestCases, "false") && !Objects.equals(updateLinksToTestCases, "true")) {
+            log.warn("Invalid autoUpdateLinksToTestCases: {}. Use default value instead: false", updateLinksToTestCases);
             properties.setProperty(AUTOMATIC_CREATION_TEST_CASES, "false");
         }
 

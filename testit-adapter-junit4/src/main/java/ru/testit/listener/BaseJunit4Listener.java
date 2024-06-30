@@ -113,7 +113,7 @@ public class BaseJunit4Listener extends RunListener {
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method))
                 .setExternalId(Utils.extractExternalID(method))
-                .setWorkItemId(Utils.extractWorkItemId(method))
+                .setWorkItemIds(Utils.extractWorkItemId(method))
                 .setTitle(Utils.extractTitle(method))
                 .setName(Utils.extractDisplayName(method))
                 .setClassName(Utils.extractClassname(method, (index != -1) ? fullName.substring(index + 1) : fullName))

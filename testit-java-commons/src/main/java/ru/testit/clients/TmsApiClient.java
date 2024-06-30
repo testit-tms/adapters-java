@@ -10,6 +10,7 @@ import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,8 @@ public class TmsApiClient implements ApiClient {
     private static final boolean INCLUDE_STEPS = true;
     private static final boolean INCLUDE_LABELS = true;
     private static final boolean INCLUDE_LINKS = true;
+    private static final int MAX_TRIES = 10;
+    private static final int WAITING_TIME = 100;
 
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
@@ -87,7 +90,6 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException {
-
         AutotestFilterModel filter = new AutotestFilterModel();
 
         Set<UUID> projectIds = new HashSet<>();
@@ -123,21 +125,56 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public boolean tryLinkAutoTestToWorkItem(String id, Iterable<String> workItemIds) {
+    public void linkAutoTestToWorkItems(String id, Iterable<String> workItemIds) {
         for (String workItemId : workItemIds) {
             LOGGER.debug("Link autotest {} to workitem {}", id, workItemId);
 
-            try {
-                autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
-            } catch (ApiException e) {
-                LOGGER.error("Cannot link autotest {} to work item {}: work item does not exist", id, workItemId);
-                return false;
+            for (int attempts = 0; attempts < MAX_TRIES; attempts++) {
+                try {
+                    autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
+                    LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
+
+                    attempts = MAX_TRIES;
+                } catch (ApiException e) {
+                    LOGGER.error("Cannot link autotest {} to work item {}", id, workItemId);
+
+                    try {
+                        Thread.sleep(Duration.ofMillis(100).toMillis());
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
             }
-
-            LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
         }
+    }
 
-        return true;
+    @Override
+    public void unlinkAutoTestToWorkItem(String id, String workItemId) {
+        LOGGER.debug("Unlink autotest {} from workitem {}", id, workItemId);
+
+        for (int attempts = 0; attempts < MAX_TRIES; attempts++) {
+            try {
+                autoTestsApi.deleteAutoTestLinkFromWorkItem(id, workItemId);
+                LOGGER.debug("Unlink autotest {} from workitem {} is successfully", id, workItemId);
+
+                return;
+            } catch (ApiException e) {
+                LOGGER.error("Cannot unlink autotest {} from work item {}", id, workItemId);
+
+                try {
+                    Thread.sleep(Duration.ofMillis(WAITING_TIME).toMillis());
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<WorkItemIdentifierModel> getWorkItemsLinkedToTest(String id) throws ApiException {
+        return autoTestsApi.getWorkItemsLinkedToAutoTest(id, false, false);
     }
 
     @Override

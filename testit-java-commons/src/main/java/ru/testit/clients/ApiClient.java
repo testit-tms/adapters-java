@@ -13,7 +13,9 @@ public interface ApiClient {
     void updateAutoTest(AutoTestPutModel model) throws ApiException;
     String createAutoTest(AutoTestPostModel model) throws ApiException;
     AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException;
-    boolean tryLinkAutoTestToWorkItem(String id, Iterable<String> workItemId);
+    void linkAutoTestToWorkItems(String id, Iterable<String> workItemIds) throws ApiException;
+    void unlinkAutoTestToWorkItem(String id, String workItemId) throws ApiException;
+    List<WorkItemIdentifierModel> getWorkItemsLinkedToTest(String id) throws ApiException;
     List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException;
     String addAttachment(String path) throws ApiException;
     List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException;

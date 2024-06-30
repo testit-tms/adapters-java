@@ -76,7 +76,7 @@ public class Helper {
                 .setSpaceName(SPACE_NAME)
                 .setStart(startDate.getTime())
                 .setStop(stopDate.getTime())
-                .setWorkItemId(workItems)
+                .setWorkItemIds(workItems)
                 .setItemStatus(ITEM_STATUS)
                 .setLinkItems(links)
                 .setSteps(steps)

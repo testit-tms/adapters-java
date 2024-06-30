@@ -107,7 +107,7 @@ public class BaseTestNgListener implements
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
-                .setWorkItemId(Utils.extractWorkItemId(method, parameters))
+                .setWorkItemIds(Utils.extractWorkItemId(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters))
                 .setName(Utils.extractDisplayName(method, parameters))
                 .setClassName(Utils.extractClassname(method, method.getDeclaringClass().getSimpleName(), parameters))

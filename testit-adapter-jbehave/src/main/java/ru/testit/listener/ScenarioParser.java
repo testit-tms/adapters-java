@@ -20,7 +20,7 @@ public class ScenarioParser {
                 .setName(tagParser.getDisplayName())
                 .setTitle(tagParser.getTitle())
                 .setDescription(tagParser.getDescription())
-                .setWorkItemId(tagParser.getWorkItemIds())
+                .setWorkItemIds(tagParser.getWorkItemIds())
                 .setClassName(featureName)
                 .setSpaceName(nameSpace)
                 .setLabels(tagParser.getLabels())
