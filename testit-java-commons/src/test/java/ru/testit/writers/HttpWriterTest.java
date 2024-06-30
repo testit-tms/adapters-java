@@ -84,7 +84,7 @@ class HttpWriterTest {
         TestResult testResult = Helper.generateTestResult();
         AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
         String autotestId = response.getId().toString();
-        List<String> workItemGlobalId = testResult.getWorkItemId();
+        List<String> workItemGlobalId = testResult.getWorkItemIds();
         List<UUID> uuids = Helper.generateListUuid();
 
         when(client.getAutoTestByExternalId(testResult.getExternalId())).thenReturn(response);
@@ -96,13 +96,13 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, times(1)).tryLinkAutoTestToWorkItem(autotestId, Collections.singletonList(workItemGlobalId.get(0)));
+        verify(client, times(1)).linkAutoTestToWorkItems(autotestId, Collections.singletonList(workItemGlobalId.get(0)));
     }
 
     @Test
     void writeTest_WithoutWorkItemId_NoInvokeLinkHandler() throws ApiException {
         // arrange
-        TestResult testResult = Helper.generateTestResult().setWorkItemId(new ArrayList<>());
+        TestResult testResult = Helper.generateTestResult().setWorkItemIds(new ArrayList<>());
         List<UUID> uuids = Helper.generateListUuid();
 
         when(client.sendTestResults(any(), any())).thenReturn(uuids);
@@ -113,7 +113,7 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, never()).tryLinkAutoTestToWorkItem(anyString(), Collections.singletonList(anyString()));
+        verify(client, never()).linkAutoTestToWorkItems(anyString(), Collections.singletonList(anyString()));
     }
 
     @Test
@@ -132,7 +132,7 @@ class HttpWriterTest {
         writer.writeTest(testResult);
 
         // assert
-        verify(client, never()).tryLinkAutoTestToWorkItem(anyString(), Collections.singletonList(anyString()));
+        verify(client, never()).linkAutoTestToWorkItems(anyString(), Collections.singletonList(anyString()));
     }
 
     @Test

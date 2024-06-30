@@ -36,7 +36,7 @@ public class HttpWriter implements Writer {
             }
 
             AutoTestModel autotest = apiClient.getAutoTestByExternalId(testResult.getExternalId());
-            List<String> workItemId = testResult.getWorkItemId();
+            List<String> workItemIds = testResult.getWorkItemIds();
             String autoTestId;
 
             if (autotest != null) {
@@ -68,10 +68,8 @@ public class HttpWriter implements Writer {
                 autoTestId = apiClient.createAutoTest(model);
             }
 
-            if (!workItemId.isEmpty()) {
-                if (!apiClient.tryLinkAutoTestToWorkItem(autoTestId, workItemId)) {
-                    return;
-                }
+            if (!workItemIds.isEmpty()) {
+                updateTestLinkToWorkItems(autoTestId, workItemIds);
             }
 
             AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.testResultToAutoTestResultsForTestRunModel(testResult);
@@ -84,6 +82,26 @@ public class HttpWriter implements Writer {
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: " + (e.getMessage()));
         }
+    }
+
+    private void updateTestLinkToWorkItems(String autoTestId, List<String> workItemIds) throws ApiException {
+        List<WorkItemIdentifierModel> linkedWorkItems = apiClient.getWorkItemsLinkedToTest(autoTestId);
+
+        for (WorkItemIdentifierModel linkedWorkItem : linkedWorkItems) {
+            String linkedWorkItemId = linkedWorkItem.getGlobalId().toString();
+
+            if (workItemIds.contains(linkedWorkItemId)) {
+                workItemIds.remove(linkedWorkItemId);
+
+                continue;
+            }
+
+            if (config.shouldAutomaticUpdationLinksToTestCases()) {
+                apiClient.unlinkAutoTestToWorkItem(autoTestId, linkedWorkItemId);
+            }
+        }
+
+        apiClient.linkAutoTestToWorkItems(autoTestId, workItemIds);
     }
 
     @Override
