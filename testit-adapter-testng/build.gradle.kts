@@ -37,6 +37,7 @@ tasks.test {
         jvmArgs("-javaagent:${agent.singleFile}")
     }
     systemProperties(systemProperties)
+    environment(environment)
 }
 
 tasks.compileTestJava {
