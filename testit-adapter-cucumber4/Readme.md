@@ -167,6 +167,7 @@ dependencies {
 test {
     useTestNG()
     systemProperties(System.getProperties())
+    environment(System.getenv())
 }
 ```
 2. Press the **Reload All Gradle Projects** button.
@@ -202,6 +203,7 @@ dependencies {
 test {
     useJUnit()
     systemProperties(System.getProperties())
+    environment(System.getenv())
 }
 ```
 2. Press the **Reload All Gradle Projects** button.

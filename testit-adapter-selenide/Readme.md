@@ -187,6 +187,7 @@ test {
         jvmArgs += "-javaagent:$weaver"
     }
     systemProperties(System.getProperties())
+    environment(System.getenv())
 }
 ```
 
