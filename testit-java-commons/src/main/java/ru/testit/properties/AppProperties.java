@@ -69,6 +69,7 @@ public class AppProperties {
         }
 
         Properties systemProps = System.getProperties();
+
         Properties envProps = new Properties();
         envProps.putAll(System.getenv());
 
@@ -105,12 +106,12 @@ public class AppProperties {
     }
 
     private static Map<String, String> loadPropertiesFromEnv(Properties properties, HashMap<String, String> varNames) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> result = new HashMap<>();
 
         try {
             String url = properties.getProperty(varNames.get(URL), null);
             URI ignored = new java.net.URL(url).toURI();
-            map.put(URL, url);
+            result.put(URL, url);
         } catch (MalformedURLException | URISyntaxException | SecurityException | NullPointerException |
                  IllegalArgumentException ignored) {
         }
@@ -118,7 +119,7 @@ public class AppProperties {
         try {
             String token = properties.getProperty(varNames.get(PRIVATE_TOKEN), null);
             if (token != null && !token.isEmpty() && !token.equals("null")) {
-                map.put(PRIVATE_TOKEN, token);
+                result.put(PRIVATE_TOKEN, token);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
@@ -127,7 +128,7 @@ public class AppProperties {
             String projectId = properties.getProperty(varNames.get(PROJECT_ID), null);
             if (projectId != null && !projectId.isEmpty()) {
                 java.util.UUID ignored = java.util.UUID.fromString(projectId);
-                map.put(PROJECT_ID, projectId);
+                result.put(PROJECT_ID, projectId);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
@@ -136,7 +137,7 @@ public class AppProperties {
             String configurationId = properties.getProperty(varNames.get(CONFIGURATION_ID), null);
             if (configurationId != null && !configurationId.isEmpty()) {
                 java.util.UUID ignored = java.util.UUID.fromString(configurationId);
-                map.put(CONFIGURATION_ID, configurationId);
+                result.put(CONFIGURATION_ID, configurationId);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
@@ -145,7 +146,7 @@ public class AppProperties {
             String testRunId = properties.getProperty(varNames.get(TEST_RUN_ID), null);
             if (testRunId != null && !testRunId.isEmpty()) {
                 java.util.UUID ignored = java.util.UUID.fromString(testRunId);
-                map.put(TEST_RUN_ID, testRunId);
+                result.put(TEST_RUN_ID, testRunId);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
@@ -153,7 +154,7 @@ public class AppProperties {
         try {
             String testRunName = properties.getProperty(varNames.get(TEST_RUN_NAME), null);
             if (testRunName != null && !testRunName.isEmpty() && !testRunName.equals("null")) {
-                map.put(TEST_RUN_NAME, testRunName);
+                result.put(TEST_RUN_NAME, testRunName);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
@@ -163,7 +164,7 @@ public class AppProperties {
             int mode = Integer.parseInt(adapterMode);
 
             if (0 <= mode && mode <= 2) {
-                map.put(ADAPTER_MODE, adapterMode);
+                result.put(ADAPTER_MODE, adapterMode);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
@@ -171,7 +172,7 @@ public class AppProperties {
         try {
             String createTestCases = properties.getProperty(varNames.get(AUTOMATIC_CREATION_TEST_CASES), null);
             if (Objects.equals(createTestCases, "false") || Objects.equals(createTestCases, "true")) {
-                map.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
+                result.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
@@ -179,7 +180,7 @@ public class AppProperties {
         try {
             String updateLinksToTestCases = properties.getProperty(varNames.get(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES), null);
             if (Objects.equals(updateLinksToTestCases, "false") || Objects.equals(updateLinksToTestCases, "true")) {
-                map.put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, updateLinksToTestCases);
+                result.put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, updateLinksToTestCases);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
@@ -187,7 +188,7 @@ public class AppProperties {
         try {
             String certValidation = properties.getProperty(varNames.get(CERT_VALIDATION), null);
             if (Objects.equals(certValidation, "false") || Objects.equals(certValidation, "true")) {
-                map.put(CERT_VALIDATION, certValidation);
+                result.put(CERT_VALIDATION, certValidation);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
@@ -195,12 +196,12 @@ public class AppProperties {
         try {
             String tmsIntegration = properties.getProperty(varNames.get(TMS_INTEGRATION), null);
             if (Objects.equals(tmsIntegration, "false") || Objects.equals(tmsIntegration, "true")) {
-                map.put(TMS_INTEGRATION, tmsIntegration);
+                result.put(TMS_INTEGRATION, tmsIntegration);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
 
-        return map;
+        return result;
     }
 
     private static Properties validateProperties(Properties properties) {
