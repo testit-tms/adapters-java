@@ -32,4 +32,6 @@ tasks.test {
     }
 
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+    systemProperties(systemProperties)
+    environment(environment)
 }

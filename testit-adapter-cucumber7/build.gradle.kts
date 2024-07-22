@@ -37,6 +37,7 @@ tasks.test {
         showStandardStreams = true
     }
     systemProperties(systemProperties)
+    environment(environment)
 }
 
 
