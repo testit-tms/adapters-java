@@ -68,8 +68,14 @@ public class AppProperties {
             log.warn("The configuration file specifies a private token. It is not safe. Use TMS_PRIVATE_TOKEN environment variable");
         }
 
-        properties.putAll(loadPropertiesFromEnv(envVarsNames.getOrDefault("env", new HashMap<>())));
-        properties.putAll(loadPropertiesFromEnv(envVarsNames.getOrDefault("cli", new HashMap<>())));
+        Properties systemProps = System.getProperties();
+        Properties envProps = new Properties();
+        envProps.putAll(System.getenv());
+
+        properties.putAll(loadPropertiesFromEnv(systemProps, envVarsNames.getOrDefault("env", new HashMap<>())));
+        properties.putAll(loadPropertiesFromEnv(envProps, envVarsNames.getOrDefault("env", new HashMap<>())));
+        properties.putAll(loadPropertiesFromEnv(systemProps, envVarsNames.getOrDefault("cli", new HashMap<>())));
+        properties.putAll(loadPropertiesFromEnv(envProps, envVarsNames.getOrDefault("cli", new HashMap<>())));
 
         if (Objects.equals(properties.getProperty(TMS_INTEGRATION, "true"), "false")) {
             return properties;
@@ -98,9 +104,8 @@ public class AppProperties {
         }
     }
 
-    private static Map<String, String> loadPropertiesFromEnv(HashMap<String, String> varNames) {
+    private static Map<String, String> loadPropertiesFromEnv(Properties properties, HashMap<String, String> varNames) {
         Map<String, String> map = new HashMap<>();
-        Properties properties = System.getProperties();
 
         try {
             String url = properties.getProperty(varNames.get(URL), null);
