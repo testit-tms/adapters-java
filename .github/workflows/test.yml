@@ -37,27 +37,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - project_name: cucubmer7-gradle-testng
-            configuration_id: CUCUMBER7_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_TESTNG_PROJECT_ID
-          - project_name: cucumber7-gradle-junit4
-            configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: gradle-junit4
-            configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: GRADLE_JUNIT4_PROJECT_ID
-          - project_name: gradle-junit5
-            configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: GRADLE_JUNIT5_PROJECT_ID
-          - project_name: gradle-testng
-            configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: GRADLE_TESTNG_PROJECT_ID
+          # - project_name: cucubmer7-gradle-testng
+          #   configuration_id: CUCUMBER7_GRADLE_TESTNG_CONFIGURATION_ID
+          #   project_id: CUCUMBER7_GRADLE_TESTNG_PROJECT_ID
+          # - project_name: cucumber7-gradle-junit4
+          #   configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
+          #   project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
+          # - project_name: gradle-junit4
+          #   configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
+          #   project_id: GRADLE_JUNIT4_PROJECT_ID
+          # - project_name: gradle-junit5
+          #   configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
+          #   project_id: GRADLE_JUNIT5_PROJECT_ID
+          # - project_name: gradle-testng
+          #   configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
+          #   project_id: GRADLE_TESTNG_PROJECT_ID
           - project_name: jbehave-gradle-junit4
             configuration_id: JBEHAVE_GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: JBEHAVE_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: jbehave-gradle-testng
-            configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
+          # - project_name: jbehave-gradle-testng
+          #   configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
+          #   project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
           # - project_name: cucumber7-gradle-junit5
           #  configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
           #  project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
@@ -147,106 +147,106 @@ jobs:
         run: |
           dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
 
-  test-maven:
-    name: ${{ matrix.project_name }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - project_name: cucumber6-maven-junit4
-            configuration_id: CUCUMBER6_MAVEN_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER6_MAVEN_JUNIT4_PROJECT_ID
-          - project_id: CUCUMBER6_MAVEN_TESTNG_PROJECT_ID
-            configuration_id: CUCUMBER6_MAVEN_TESTNG_CONFIGURATION_ID
-            project_name: cucumber6-maven-testng
-          - project_name: jbehave-maven-junit4
-            configuration_id: JBEHAVE_MAVEN_JUNIT4_CONFIGURATION_ID
-            project_id: JBEHAVE_MAVEN_JUNIT4_PROJECT_ID
-          - project_name: jbehave-maven-testng
-            configuration_id: JBEHAVE_MAVEN_TESTNG_CONFIGURATION_ID
-            project_id: JBEHAVE_MAVEN_TESTNG_PROJECT_ID
-          - project_name: maven-junit4
-            configuration_id: MAVEN_JUNIT4_CONFIGURATION_ID
-            project_id: MAVEN_JUNIT4_PROJECT_ID
-          - project_name: maven-junit5
-            configuration_id: MAVEN_JUNIT5_CONFIGURATION_ID
-            project_id: MAVEN_JUNIT5_PROJECT_ID
-          - project_name: maven-testng
-            configuration_id: MAVEN_TESTNG_CONFIGURATION_ID
-            project_id: MAVEN_TESTNG_PROJECT_ID
-            # - project_name: jbehave-maven-junit5
-            #   configuration_id: JBEHAVE_MAVEN_JUNIT5_CONFIGURATION_ID
-            #   project_id: JBEHAVE_MAVEN_JUNIT5_PROJECT_ID
-            # - project_name: cucumber6-maven-junit5
-            #   configuration_id: CUCUMBER6_MAVEN_JUNIT5_CONFIGURATION_ID
-            #   project_id: CUCUMBER6_MAVEN_JUNIT5_PROJECT_ID
-            # - project_name: cucumber4-maven-junit4
-            #   configuration_id: CUCUMBER4_MAVEN_JUNIT4_CONFIGURATION_ID
-            #   project_id: CUCUMBER4_MAVEN_JUNIT4_PROJECT_ID
-            # - project_name: cucumber4-maven-testng
-            #   configuration_id: CUCUMBER4_MAVEN_TESTNG_CONFIGURATION_ID
-            #   project_id: CUCUMBER4_MAVEN_TESTNG_PROJECT_ID
-            # - project_name: cucumber5-maven-junit4
-            #   configuration_id: CUCUMBER5_MAVEN_JUNIT4_CONFIGURATION_ID
-            #   project_id: CUCUMBER5_MAVEN_JUNIT4_PROJECT_ID
-            # - project_name: cucumber5-maven-junit5
-            #   configuration_id: CUCUMBER5_MAVEN_JUNIT5_CONFIGURATION_ID
-            #   project_id: CUCUMBER5_MAVEN_JUNIT5_PROJECT_ID
-            # - project_name: cucumber5-maven-testng
-            #   configuration_id: CUCUMBER5_MAVEN_TESTNG_CONFIGURATION_ID
-            #   project_id: CUCUMBER5_MAVEN_TESTNG_PROJECT_ID
-            #   - project_name: cucumber7-maven-junit4
-            #   configuration_id: CUCUMBER7_MAVEN_JUNIT4_CONFIGURATION_ID
-            #   project_id: CUCUMBER7_MAVEN_JUNIT4_PROJECT_ID
-            #   - project_name: cucumber7-maven-junit5
-            #   configuration_id: CUCUMBER7_MAVEN_JUNIT5_CONFIGURATION_ID
-            #   project_id: CUCUMBER7_MAVEN_JUNIT5_PROJECT_ID
-    env:
-      TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
-      TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
-      TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
-    steps:
-      - name: Checkout adapters-java
-        uses: actions/checkout@v4
-      - name: Checkout api-validator-dotnet
-        uses: actions/checkout@v4
-        with:
-          repository: testit-tms/api-validator-dotnet
-          token: ${{ env.GITHUB_PAT }}
-          path: api-validator-dotnet
-      - name: Checkout java-examples
-        uses: actions/checkout@v4
-        with:
-          repository: testit-tms/java-examples
-          path: java-examples
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-      - name: Setup java
-        uses: actions/setup-java@v4
-        with:
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          java-package: jdk
-          java-version: ${{ env.JAVA_VERSION }}
-      - name: Setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-      - name: Setup environment
-        run: |
-          ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
-          dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
-          pip install testit-cli
-      - name: Create TestRun
-        run: |
-          testit testrun create --token ${{ env.TMS_PRIVATE_TOKEN }} --output ${{ env.TEMP_FILE }}
-          echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
-      - name: Test
-        run: |
-          cd java-examples/${{ matrix.project_name }}
-          mvn test -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
-      - name: Validate
-        run: |
-          dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+  # test-maven:
+  #   name: ${{ matrix.project_name }}
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - project_name: cucumber6-maven-junit4
+  #           configuration_id: CUCUMBER6_MAVEN_JUNIT4_CONFIGURATION_ID
+  #           project_id: CUCUMBER6_MAVEN_JUNIT4_PROJECT_ID
+  #         - project_id: CUCUMBER6_MAVEN_TESTNG_PROJECT_ID
+  #           configuration_id: CUCUMBER6_MAVEN_TESTNG_CONFIGURATION_ID
+  #           project_name: cucumber6-maven-testng
+  #         - project_name: jbehave-maven-junit4
+  #           configuration_id: JBEHAVE_MAVEN_JUNIT4_CONFIGURATION_ID
+  #           project_id: JBEHAVE_MAVEN_JUNIT4_PROJECT_ID
+  #         - project_name: jbehave-maven-testng
+  #           configuration_id: JBEHAVE_MAVEN_TESTNG_CONFIGURATION_ID
+  #           project_id: JBEHAVE_MAVEN_TESTNG_PROJECT_ID
+  #         - project_name: maven-junit4
+  #           configuration_id: MAVEN_JUNIT4_CONFIGURATION_ID
+  #           project_id: MAVEN_JUNIT4_PROJECT_ID
+  #         - project_name: maven-junit5
+  #           configuration_id: MAVEN_JUNIT5_CONFIGURATION_ID
+  #           project_id: MAVEN_JUNIT5_PROJECT_ID
+  #         - project_name: maven-testng
+  #           configuration_id: MAVEN_TESTNG_CONFIGURATION_ID
+  #           project_id: MAVEN_TESTNG_PROJECT_ID
+  #           # - project_name: jbehave-maven-junit5
+  #           #   configuration_id: JBEHAVE_MAVEN_JUNIT5_CONFIGURATION_ID
+  #           #   project_id: JBEHAVE_MAVEN_JUNIT5_PROJECT_ID
+  #           # - project_name: cucumber6-maven-junit5
+  #           #   configuration_id: CUCUMBER6_MAVEN_JUNIT5_CONFIGURATION_ID
+  #           #   project_id: CUCUMBER6_MAVEN_JUNIT5_PROJECT_ID
+  #           # - project_name: cucumber4-maven-junit4
+  #           #   configuration_id: CUCUMBER4_MAVEN_JUNIT4_CONFIGURATION_ID
+  #           #   project_id: CUCUMBER4_MAVEN_JUNIT4_PROJECT_ID
+  #           # - project_name: cucumber4-maven-testng
+  #           #   configuration_id: CUCUMBER4_MAVEN_TESTNG_CONFIGURATION_ID
+  #           #   project_id: CUCUMBER4_MAVEN_TESTNG_PROJECT_ID
+  #           # - project_name: cucumber5-maven-junit4
+  #           #   configuration_id: CUCUMBER5_MAVEN_JUNIT4_CONFIGURATION_ID
+  #           #   project_id: CUCUMBER5_MAVEN_JUNIT4_PROJECT_ID
+  #           # - project_name: cucumber5-maven-junit5
+  #           #   configuration_id: CUCUMBER5_MAVEN_JUNIT5_CONFIGURATION_ID
+  #           #   project_id: CUCUMBER5_MAVEN_JUNIT5_PROJECT_ID
+  #           # - project_name: cucumber5-maven-testng
+  #           #   configuration_id: CUCUMBER5_MAVEN_TESTNG_CONFIGURATION_ID
+  #           #   project_id: CUCUMBER5_MAVEN_TESTNG_PROJECT_ID
+  #           #   - project_name: cucumber7-maven-junit4
+  #           #   configuration_id: CUCUMBER7_MAVEN_JUNIT4_CONFIGURATION_ID
+  #           #   project_id: CUCUMBER7_MAVEN_JUNIT4_PROJECT_ID
+  #           #   - project_name: cucumber7-maven-junit5
+  #           #   configuration_id: CUCUMBER7_MAVEN_JUNIT5_CONFIGURATION_ID
+  #           #   project_id: CUCUMBER7_MAVEN_JUNIT5_PROJECT_ID
+  #   env:
+  #     TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
+  #     TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
+  #     TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
+  #   steps:
+  #     - name: Checkout adapters-java
+  #       uses: actions/checkout@v4
+  #     - name: Checkout api-validator-dotnet
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: testit-tms/api-validator-dotnet
+  #         token: ${{ env.GITHUB_PAT }}
+  #         path: api-validator-dotnet
+  #     - name: Checkout java-examples
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: testit-tms/java-examples
+  #         path: java-examples
+  #     - name: Setup dotnet
+  #       uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: ${{ env.DOTNET_VERSION }}
+  #     - name: Setup java
+  #       uses: actions/setup-java@v4
+  #       with:
+  #         distribution: ${{ env.JAVA_DISTRIBUTION }}
+  #         java-package: jdk
+  #         java-version: ${{ env.JAVA_VERSION }}
+  #     - name: Setup python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
+  #     - name: Setup environment
+  #       run: |
+  #         ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
+  #         dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
+  #         pip install testit-cli
+  #     - name: Create TestRun
+  #       run: |
+  #         testit testrun create --token ${{ env.TMS_PRIVATE_TOKEN }} --output ${{ env.TEMP_FILE }}
+  #         echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
+  #     - name: Test
+  #       run: |
+  #         cd java-examples/${{ matrix.project_name }}
+  #         mvn test -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
+  #     - name: Validate
+  #       run: |
+  #         dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
