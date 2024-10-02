@@ -150,6 +150,29 @@ public class Converter {
         return model;
     }
 
+    public static Map<String, List<String>> getRelationWorkItemIdsToAutotestIdsByExternalIds(
+            Map<String, List<String>> relationWorkItemIdsToAutotestExternalIdsBeingCreated,
+            List<AutoTestModel> autoTestModels) {
+        Map<String, List<String>> relationWorkItemIdsToAutotestIds = new HashMap<>();
+        Set<String> externalIds = relationWorkItemIdsToAutotestExternalIdsBeingCreated.keySet();
+
+        for (String externalId : externalIds) {
+            AutoTestModel autotest = autoTestModels.stream()
+                    .filter(m -> m.getExternalId().equals(externalId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (autotest != null)
+            {
+                relationWorkItemIdsToAutotestIds.put(
+                        autotest.getId().toString(),
+                        relationWorkItemIdsToAutotestExternalIdsBeingCreated.get(externalId));
+            }
+        }
+
+        return relationWorkItemIdsToAutotestIds;
+    }
+
     private static List<LinkPostModel> convertPostLinks(List<LinkItem> links) {
         return links.stream().map(
                 link -> {

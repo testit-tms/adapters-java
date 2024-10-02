@@ -16,6 +16,7 @@ public class ClientConfiguration implements Serializable {
     private String testRunName;
     private Boolean certValidation;
     private boolean automaticUpdationLinksToTestCases;
+    private boolean tmsImportRealtime;
 
     public ClientConfiguration(Properties properties) {
         this.privateToken = String.valueOf(properties.get(AppProperties.PRIVATE_TOKEN));
@@ -36,6 +37,13 @@ public class ClientConfiguration implements Serializable {
             this.automaticUpdationLinksToTestCases = Objects.equals(automaticUpdationLinksToTestCasesValue, "true");
         } catch (NullPointerException ignored) {
             this.automaticUpdationLinksToTestCases = false;
+        }
+
+        try {
+            String tmsImportRealtime = String.valueOf(properties.get(AppProperties.TMS_IMPORT_REALTIME));
+            this.tmsImportRealtime = Objects.equals(tmsImportRealtime, "true");
+        } catch (NullPointerException ignored) {
+            this.tmsImportRealtime = true;
         }
 
         this.certValidation = Boolean.parseBoolean(validationCert);
@@ -77,6 +85,10 @@ public class ClientConfiguration implements Serializable {
         return automaticUpdationLinksToTestCases;
     }
 
+    public boolean shouldImportRealtime() {
+        return tmsImportRealtime;
+    }
+
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
@@ -89,6 +101,7 @@ public class ClientConfiguration implements Serializable {
         sb.append("    testRunName: ").append(Utils.toIndentedString(this.testRunName)).append("\n");
         sb.append("    certValidation: ").append(Utils.toIndentedString(this.certValidation)).append("\n");
         sb.append("    automaticUpdationLinksToTestCases: ").append(Utils.toIndentedString(this.automaticUpdationLinksToTestCases)).append("\n");
+        sb.append("    tmsImportRealtime: ").append(Utils.toIndentedString(this.tmsImportRealtime)).append("\n");
         sb.append("}");
 
         return sb.toString();
