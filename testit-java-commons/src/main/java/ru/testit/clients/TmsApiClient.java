@@ -2,10 +2,7 @@ package ru.testit.clients;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.testit.client.api.AttachmentsApi;
-import ru.testit.client.api.AutoTestsApi;
-import ru.testit.client.api.TestResultsApi;
-import ru.testit.client.api.TestRunsApi;
+import ru.testit.client.api.*;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 
@@ -28,6 +25,7 @@ public class TmsApiClient implements ApiClient {
     private final AutoTestsApi autoTestsApi;
     private final AttachmentsApi attachmentsApi;
     private final TestResultsApi testResultsApi;
+    private final WorkItemsApi workItemsApi;
 
     private final ClientConfiguration clientConfiguration;
 
@@ -43,6 +41,7 @@ public class TmsApiClient implements ApiClient {
         autoTestsApi = new AutoTestsApi(apiClient);
         attachmentsApi = new AttachmentsApi(apiClient);
         testResultsApi = new TestResultsApi(apiClient);
+        workItemsApi = new WorkItemsApi(apiClient);
     }
 
     @Override
@@ -86,6 +85,34 @@ public class TmsApiClient implements ApiClient {
     @Override
     public String createAutoTest(AutoTestPostModel model) throws ApiException {
         return Objects.requireNonNull(autoTestsApi.createAutoTest(model).getId()).toString();
+    }
+
+    @Override
+    public void updateAutoTests(List<AutoTestPutModel> models) throws ApiException {
+        autoTestsApi.updateMultiple(models);
+    }
+
+    @Override
+    public List<AutoTestModel> createAutoTests(List<AutoTestPostModel> models) throws ApiException {
+        return autoTestsApi.createMultiple(models);
+    }
+
+    @Override
+    public List<UUID> GetWorkItemUuidsByIds(Iterable<String> workItemIds) {
+        List<UUID> workItemUuids = new ArrayList<>();
+
+        for (String workItemId : workItemIds) {
+            try
+            {
+                WorkItemModel workItem = workItemsApi.getWorkItemById(workItemId, null, null);
+
+                workItemUuids.add(workItem.getId());
+            } catch (ApiException e) {
+                LOGGER.error("Cannot get work item by id {}" + (e.getMessage()), workItemId);
+            }
+        }
+
+        return workItemUuids;
     }
 
     @Override

@@ -23,6 +23,7 @@ public class AppProperties {
     public static final String AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES = "automaticUpdationLinksToTestCases";
     public static final String CERT_VALIDATION = "certValidation";
     public static final String TMS_INTEGRATION = "testIt";
+    public static final String TMS_IMPORT_REALTIME = "importRealtime";
 
     private static final String PROPERTIES_FILE = "testit.properties";
     private static final Logger log = LoggerFactory.getLogger(AppProperties.class);
@@ -39,6 +40,7 @@ public class AppProperties {
             put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, "TMS_AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES");
             put(CERT_VALIDATION, "TMS_CERT_VALIDATION");
             put(TMS_INTEGRATION, "TMS_TEST_IT");
+            put(TMS_IMPORT_REALTIME, "TMS_IMPORT_REALTIME");
         }});
         put("cli", new HashMap<String, String>() {{
             put(URL, "tmsUrl");
@@ -52,6 +54,7 @@ public class AppProperties {
             put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, "tmsAutomaticUpdationLinksToTestCases");
             put(CERT_VALIDATION, "tmsCertValidation");
             put(TMS_INTEGRATION, "tmsTestIt");
+            put(TMS_IMPORT_REALTIME, "tmsImportRealtime");
         }});
     }};
 
@@ -203,6 +206,14 @@ public class AppProperties {
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
         }
 
+        try {
+            String tmsImportRealtime = properties.getProperty(varNames.get(TMS_IMPORT_REALTIME), null);
+            if (Objects.equals(tmsImportRealtime, "false") || Objects.equals(tmsImportRealtime, "true")) {
+                result.put(TMS_IMPORT_REALTIME, tmsImportRealtime);
+            }
+        } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+        }
+
         return result;
     }
 
@@ -300,6 +311,12 @@ public class AppProperties {
         if (!Objects.equals(tmsIntegration, "false") && !Objects.equals(tmsIntegration, "true")) {
             log.warn("Invalid tmsIntegration: {}. Use default value instead: true", tmsIntegration);
             properties.setProperty(TMS_INTEGRATION, "true");
+        }
+
+        String tmsImportRealtime = properties.getProperty(TMS_IMPORT_REALTIME);
+        if (!Objects.equals(tmsImportRealtime, "false") && !Objects.equals(tmsImportRealtime, "true")) {
+            log.warn("Invalid tmsImportRealtime: {}. Use default value instead: true", tmsImportRealtime);
+            properties.setProperty(TMS_IMPORT_REALTIME, "true");
         }
 
         String errors = errorsBuilder.toString();
