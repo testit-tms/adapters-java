@@ -36,6 +36,7 @@ public class AppProperties {
             put(TEST_RUN_NAME, "TMS_TEST_RUN_NAME");
             put(ADAPTER_MODE, "TMS_ADAPTER_MODE");
             put(AUTOMATIC_CREATION_TEST_CASES, "TMS_AUTOMATIC_CREATION_TEST_CASES");
+            put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, "TMS_AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES");
             put(CERT_VALIDATION, "TMS_CERT_VALIDATION");
             put(TMS_INTEGRATION, "TMS_TEST_IT");
         }});
@@ -48,6 +49,7 @@ public class AppProperties {
             put(TEST_RUN_NAME, "tmsTestRunName");
             put(ADAPTER_MODE, "tmsAdapterMode");
             put(AUTOMATIC_CREATION_TEST_CASES, "tmsAutomaticCreationTestCases");
+            put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, "tmsAutomaticUpdationLinksToTestCases");
             put(CERT_VALIDATION, "tmsCertValidation");
             put(TMS_INTEGRATION, "tmsTestIt");
         }});
@@ -285,7 +287,7 @@ public class AppProperties {
         String updateLinksToTestCases = properties.getProperty(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES);
         if (!Objects.equals(updateLinksToTestCases, "false") && !Objects.equals(updateLinksToTestCases, "true")) {
             log.warn("Invalid autoUpdateLinksToTestCases: {}. Use default value instead: false", updateLinksToTestCases);
-            properties.setProperty(AUTOMATIC_CREATION_TEST_CASES, "false");
+            properties.setProperty(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, "false");
         }
 
         String certValidation = properties.getProperty(CERT_VALIDATION);
