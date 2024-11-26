@@ -278,8 +278,8 @@ public class HttpWriter implements Writer {
 
                             UUID testResultId = testResults.get(test.getUuid());
 
-                            TestResultModel resultModel = apiClient.getTestResult(testResultId);
-                            TestResultUpdateModel model = Converter.testResultToTestResultUpdateModel(resultModel);
+                            TestResultResponse resultModel = apiClient.getTestResult(testResultId);
+                            TestResultUpdateV2Request model = Converter.testResultToTestResultUpdateModel(resultModel);
                             model.setSetupResults(beforeResultFinish);
                             model.setTeardownResults(afterResultFinish);
 
