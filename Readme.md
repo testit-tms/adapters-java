@@ -10,6 +10,7 @@ The repository contains new versions of adaptors for JVM-based test frameworks.
 | 4.5     | 1.5      | 1.5     | 1.5   | 1.5    |
 | 4.6     | 1.6      | 1.6     | 1.6   | 1.6    |
 | 5.0     | 2.3      | 2.3     | 2.3   | 2.3    |
+| 5.2     | 2.4      | 2.4     | 2.4   | 2.4    |
 
 Supported test frameworks :
  1. [TestNG](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-testng)

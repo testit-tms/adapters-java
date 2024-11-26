@@ -4,6 +4,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ru.testit.client.model.LinkType;
 import ru.testit.client.model.*;
 import ru.testit.models.*;
+import ru.testit.models.StepResult;
+import ru.testit.models.Label;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -97,8 +99,8 @@ public class Converter {
                 ).collect(Collectors.toList());
     }
 
-    public static TestResultUpdateModel testResultToTestResultUpdateModel(TestResultModel result) {
-        TestResultUpdateModel model = new TestResultUpdateModel();
+    public static TestResultUpdateV2Request testResultToTestResultUpdateModel(TestResultResponse result) {
+        TestResultUpdateV2Request model = new TestResultUpdateV2Request();
 
         model.setDuration(result.getDurationInMs());
         model.setOutcome(result.getOutcome());
@@ -267,9 +269,9 @@ public class Converter {
         }).collect(Collectors.toList());
     }
 
-    private static List<AttachmentPutModel> convertAttachmentsFromModel(List<AttachmentModel> models) {
+    private static List<AttachmentUpdateRequest> convertAttachmentsFromModel(List<Attachment> models) {
         return models.stream().map(attach -> {
-            AttachmentPutModel model = new AttachmentPutModel();
+            AttachmentUpdateRequest model = new AttachmentUpdateRequest();
 
             model.setId(attach.getId());
 

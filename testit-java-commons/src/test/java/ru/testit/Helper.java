@@ -1,8 +1,10 @@
 package ru.testit;
 
 import ru.testit.client.model.*;
+import ru.testit.models.Label;
 import ru.testit.models.LinkType;
 import ru.testit.models.*;
+import ru.testit.models.StepResult;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -93,8 +95,8 @@ public class Helper {
                 .setUrl(LINK_URL);
     }
 
-    public static TestResultModel generateTestResultModel(){
-        TestResultModel model = new TestResultModel();
+    public static TestResultResponse generateTestResultModel(){
+        TestResultResponse model = new TestResultResponse();
 
         model.setDurationInMs(12345L);
 

@@ -22,6 +22,6 @@ public interface ApiClient {
     List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException;
     String addAttachment(String path) throws ApiException;
     List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException;
-    TestResultModel getTestResult(UUID uuid) throws ApiException;
-    void updateTestResult(UUID uuid, TestResultUpdateModel model) throws ApiException;
+    TestResultResponse getTestResult(UUID uuid) throws ApiException;
+    void updateTestResult(UUID uuid, TestResultUpdateV2Request model) throws ApiException;
 }

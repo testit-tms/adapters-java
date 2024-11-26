@@ -117,7 +117,7 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException {
-        AutotestFilterModel filter = new AutotestFilterModel();
+        AutotestsSelectModelFilter filter = new AutotestsSelectModelFilter();
 
         Set<UUID> projectIds = new HashSet<>();
         projectIds.add(UUID.fromString(this.clientConfiguration.getProjectId()));
@@ -128,12 +128,12 @@ public class TmsApiClient implements ApiClient {
         externalIds.add(externalId);
         filter.externalIds(externalIds);
 
-        SearchAutoTestsQueryIncludesModel includes = new SearchAutoTestsQueryIncludesModel();
+        AutotestsSelectModelIncludes includes = new AutotestsSelectModelIncludes();
         includes.setIncludeLabels(INCLUDE_LABELS);
         includes.setIncludeSteps(INCLUDE_STEPS);
         includes.setIncludeLinks(INCLUDE_LINKS);
 
-        AutotestsSelectModel model = new AutotestsSelectModel();
+        ApiV2AutoTestsSearchPostRequest model = new ApiV2AutoTestsSearchPostRequest();
         model.setFilter(filter);
         model.setIncludes(includes);
 
@@ -231,12 +231,12 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public TestResultModel getTestResult(UUID uuid) throws ApiException {
+    public TestResultResponse getTestResult(UUID uuid) throws ApiException {
         return testResultsApi.apiV2TestResultsIdGet(uuid);
     }
 
     @Override
-    public void updateTestResult(UUID uuid, TestResultUpdateModel model) throws ApiException {
+    public void updateTestResult(UUID uuid, TestResultUpdateV2Request model) throws ApiException {
         testResultsApi.apiV2TestResultsIdPut(uuid, model);
     }
 }
