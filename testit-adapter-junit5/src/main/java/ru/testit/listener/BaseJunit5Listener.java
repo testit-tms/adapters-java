@@ -146,7 +146,6 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) throws Throwable {
-
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Intercept test template: {}", invocationContext.getExecutable().getName());
         }
@@ -306,10 +305,13 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        if (BeforeEachThrowable != null || BeforeAllThrowable != null)
+        if (BeforeEachThrowable != null)
         {
             BeforeEachThrowable = null;
+        }
 
+        if (BeforeAllThrowable != null)
+        {
             invocation.skip();
 
             return;
@@ -344,10 +346,6 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         if (BeforeAllThrowable != null)
         {
             BeforeAllThrowable = null;
-
-            invocation.skip();
-
-            return;
         }
 
         if (LOGGER.isDebugEnabled()) {
