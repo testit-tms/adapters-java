@@ -106,7 +106,7 @@ public class Utils {
 
         String title;
         if (annotation == null) {
-            title = atomicTest.getName();
+            title = null;
         } else {
             title = annotation.value();
         }
