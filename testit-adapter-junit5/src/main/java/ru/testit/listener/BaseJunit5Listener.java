@@ -218,6 +218,8 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     }
 
     protected void startTestCase(Method method, final String uuid, Map<String, String> parameters) {
+        String testNode = method.getDeclaringClass().getCanonicalName() + "." + method.getName();
+
         final TestResult result = new TestResult()
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method, parameters))
@@ -233,7 +235,8 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
                 )
                 .setLinkItems(Utils.extractLinks(method, parameters))
                 .setDescription(Utils.extractDescription(method, parameters))
-                .setParameters(parameters);
+                .setParameters(parameters)
+                .setExternalKey(testNode);
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);

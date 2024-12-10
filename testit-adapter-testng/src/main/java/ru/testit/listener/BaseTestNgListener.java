@@ -101,6 +101,7 @@ public class BaseTestNgListener implements
     protected void startTestCase(final ITestResult testResult,
                                  final String uuid) {
         Map<String, String> parameters = getParameters(testResult);
+        String testNode = testResult.getInstanceName() + "." + testResult.getName();
 
         Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
         final TestResult result = new TestResult()
@@ -118,7 +119,8 @@ public class BaseTestNgListener implements
                         parameters))
                 .setLinkItems(Utils.extractLinks(method, parameters))
                 .setDescription(Utils.extractDescription(method, parameters))
-                .setParameters(parameters);
+                .setParameters(parameters)
+                .setExternalKey(testNode);
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);

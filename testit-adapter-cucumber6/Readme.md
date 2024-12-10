@@ -376,6 +376,35 @@ If you want to enable debug mode then see [How to enable debug logging?](https:/
 
 If you want to add attachment for a failed test then see [How to add an attachment for a failed test?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
 
+#### Run with filter
+To create filter by autotests you can use the Test IT CLI (use adapterMode 1 for run with filter):
+
+##### Gradle
+```
+$ export TMS_TOKEN=<YOUR_TOKEN>
+$ testit autotests_filter 
+  --url https://tms.testit.software \
+  --configuration-id 5236eb3f-7c05-46f9-a609-dc0278896464 \
+  --testrun-id 6d4ac4b7-dd67-4805-b879-18da0b89d4a8 \
+  --framework gradle-cucumber \
+  --output tmp/filter.txt
+
+$ gradle test -DtmsTestRunId=6d4ac4b7-dd67-4805-b879-18da0b89d4a8 -DtmsAdapterMode=1 -Dcucumber.filter.name="$(cat tmp/filter.txt)"
+```
+
+##### Maven
+```
+$ export TMS_TOKEN=<YOUR_TOKEN>
+$ testit autotests_filter 
+  --url https://tms.testit.software \
+  --configuration-id 5236eb3f-7c05-46f9-a609-dc0278896464 \
+  --testrun-id 6d4ac4b7-dd67-4805-b879-18da0b89d4a8 \
+  --framework maven-cucumber \
+  --output tmp/filter.txt
+
+$ maven test -DtmsTestRunId=6d4ac4b7-dd67-4805-b879-18da0b89d4a8 -DtmsAdapterMode=1 -Dcucumber.filter.name="$(cat tmp/filter.txt)"
+```
+
 ### Tags
 
 Use tags to specify information about autotest.

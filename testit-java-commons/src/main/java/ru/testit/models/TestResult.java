@@ -32,6 +32,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
     private Throwable throwable;
     private Map<String, String> parameters;
     private boolean automaticCreationTestCases;
+    private String externalKey;
 
     /**
      * Gets uuid.
@@ -453,6 +454,26 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
         return this;
     }
 
+    /**
+     * Gets externalKey.
+     *
+     * @return the externalKey
+     */
+    public String getExternalKey() {
+        return externalKey;
+    }
+
+    /**
+     * Sets externalKey.
+     *
+     * @param externalKey the value
+     * @return self for method chaining
+     */
+    public TestResult setExternalKey(String externalKey) {
+        this.externalKey = externalKey;
+        return this;
+    }
+
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
@@ -478,6 +499,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
         sb.append("    stop: ").append(Utils.toIndentedString(this.stop)).append("\n");
         sb.append("    parameters: ").append(Utils.toIndentedString(this.parameters)).append("\n");
         sb.append("    automaticCreationTestCases: ").append(Utils.toIndentedString(this.automaticCreationTestCases)).append("\n");
+        sb.append("    externalKey: ").append(Utils.toIndentedString(this.externalKey)).append("\n");
         sb.append("}");
 
         return sb.toString();

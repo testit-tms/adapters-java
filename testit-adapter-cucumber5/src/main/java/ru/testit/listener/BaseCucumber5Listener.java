@@ -106,6 +106,7 @@ public class BaseCucumber5Listener implements ConcurrentEventListener {
 
         final String featureName = feature.getName();
         final String uuid = getTestCaseUuid(currentTestCase.get());
+        final String scenarioName = currentTestCase.get().getName();
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
@@ -117,7 +118,8 @@ public class BaseCucumber5Listener implements ConcurrentEventListener {
                 .setClassName(featureName)
                 .setLabels(tagParser.getScenarioLabels())
                 .setLinkItems(tagParser.getScenarioLinks())
-                .setParameters(parameters);
+                .setParameters(parameters)
+                .setExternalKey(scenarioName);
 
         final String description = Stream.of(feature.getDescription(), scenarioDefinition.getDescription())
                 .filter(Objects::nonNull)
