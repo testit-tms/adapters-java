@@ -26,6 +26,7 @@ public class Converter {
         model.setSteps(convertSteps(result.getSteps()));
         model.setLabels(labelsPostConvert(result.getLabels()));
         model.shouldCreateWorkItem(result.getAutomaticCreationTestCases());
+        model.externalKey(result.getExternalKey());
 
         return model;
     }
@@ -128,6 +129,7 @@ public class Converter {
         model.setLabels(labelsPostConvert(result.getLabels()));
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
+        model.externalKey(result.getExternalKey());
 
         return model;
     }
@@ -148,6 +150,7 @@ public class Converter {
         model.setTitle(autoTestModel.getTitle());
         model.setDescription(autoTestModel.getDescription());
         model.setLabels(labelsConvert(autoTestModel.getLabels()));
+        model.externalKey(autoTestModel.getExternalKey());
 
         return model;
     }

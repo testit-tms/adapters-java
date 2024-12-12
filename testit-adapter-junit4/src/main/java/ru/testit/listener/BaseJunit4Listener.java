@@ -108,6 +108,7 @@ public class BaseJunit4Listener extends RunListener {
     protected void startTestCase(Description method, final String uuid) {
         String fullName = method.getClassName();
         int index = fullName.lastIndexOf(".");
+        String testNode = fullName + "." + method.getMethodName();
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
@@ -119,7 +120,8 @@ public class BaseJunit4Listener extends RunListener {
                 .setClassName(Utils.extractClassname(method, (index != -1) ? fullName.substring(index + 1) : fullName))
                 .setSpaceName(Utils.extractNamespace(method, (index != -1) ? fullName.substring(0, index) : null))
                 .setLinkItems(Utils.extractLinks(method))
-                .setDescription(Utils.extractDescription(method));
+                .setDescription(Utils.extractDescription(method))
+                .setExternalKey(testNode);
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);
