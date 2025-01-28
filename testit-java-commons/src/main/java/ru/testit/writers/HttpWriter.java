@@ -45,8 +45,10 @@ public class HttpWriter implements Writer {
                 LOGGER.debug("Write the auto test {}", testResult.getExternalId());
             }
 
-            AutoTestModel autotest = apiClient.getAutoTestByExternalId(testResult.getExternalId());
+            AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(testResult.getExternalId());
             String autoTestId;
+
+            AutoTestModel autotest = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
 
             if (autotest != null) {
                 if (LOGGER.isDebugEnabled()) {
@@ -180,7 +182,9 @@ public class HttpWriter implements Writer {
         for (final String testUuid : container.getChildren()) {
             storage.getTestResult(testUuid).ifPresent(test -> {
                 try {
-                    AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(test.getExternalId());
+                    AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
+
+                    AutoTestModel autoTestModel = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
 
                     if (autoTestModel == null) {
                         return;
@@ -238,7 +242,9 @@ public class HttpWriter implements Writer {
                 for (final String testUuid : cl.getChildren()) {
                     storage.getTestResult(testUuid).ifPresent(test -> {
                         try {
-                            AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(test.getExternalId());
+                            AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
+
+                            AutoTestModel autoTestModel = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
 
                             if (autoTestModel == null) {
                                 return;
@@ -339,7 +345,10 @@ public class HttpWriter implements Writer {
                             afterFinish.addAll(afterClass);
                             afterFinish.addAll(afterAll);
 
-                            AutoTestModel autoTestModel = apiClient.getAutoTestByExternalId(test.getExternalId());
+                            AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
+
+                            AutoTestModel autoTestModel = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
+
                             AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = prepareTestResultForTestRun(test);
 
                             autoTestResultsForTestRunModel.setSetupResults(beforeResultFinish);

@@ -281,4 +281,83 @@ public class Converter {
             return model;
         }).collect(Collectors.toList());
     }
+
+    public static AutoTestModel convertAutoTestApiResultToAutoTestModel(AutoTestApiResult autoTestApiResult) {
+        if (autoTestApiResult.getExternalId() == null) {
+            return null;
+        }
+
+        AutoTestModel model = new AutoTestModel();
+
+        model.setId(autoTestApiResult.getId());
+        model.setExternalId(autoTestApiResult.getExternalId());
+        model.setLinks(convertLinkApiResultsToPutLinks(autoTestApiResult.getLinks()));
+        model.setProjectId(autoTestApiResult.getProjectId());
+        model.setName(autoTestApiResult.getName());
+        model.setNamespace(autoTestApiResult.getNamespace());
+        model.setClassname(autoTestApiResult.getClassname());
+        model.setSteps(convertAutoTestStepApiResultsToSteps(autoTestApiResult.getSteps()));
+        model.setSetup(convertAutoTestStepApiResultsToSteps(autoTestApiResult.getSetup()));
+        model.setTeardown(convertAutoTestStepApiResultsToSteps(autoTestApiResult.getTeardown()));
+        model.setTitle(autoTestApiResult.getTitle());
+        model.setDescription(autoTestApiResult.getDescription());
+        model.setLabels(convertLabelApiResultsToLabelShortModels(autoTestApiResult.getLabels()));
+        model.externalKey(autoTestApiResult.getExternalKey());
+
+        return model;
+    }
+
+    private static List<AutoTestStepModel> convertAutoTestStepApiResultsToSteps(List<AutoTestStepApiResult> steps) {
+        if (steps == null) {
+            return new ArrayList<>();
+        }
+
+        return steps.stream().map(step -> {
+            AutoTestStepModel model = new AutoTestStepModel();
+            model.setTitle(step.getTitle());
+            model.setDescription(step.getDescription());
+
+            if (step.getSteps() != null) {
+                model.setSteps(convertAutoTestStepApiResultsToSteps(step.getSteps()));
+            }
+
+            return model;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<LinkPutModel> convertLinkApiResultsToPutLinks(List<LinkApiResult> links) {
+        if (links == null) {
+            return new ArrayList<>();
+        }
+
+        return links.stream().map(
+                link -> {
+                    LinkPutModel model = new LinkPutModel();
+
+                    model.setTitle(link.getTitle());
+                    model.setDescription(link.getDescription());
+                    model.setUrl(link.getUrl());
+
+                    if (link.getType() != null) {
+                        model.setType(LinkType.fromValue(link.getType().getValue()));
+                    }
+
+                    return model;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    private static List<LabelShortModel> convertLabelApiResultsToLabelShortModels(List<LabelApiResult> labels) {
+        if (labels == null) {
+            return new ArrayList<>();
+        }
+
+        return labels.stream().map(label -> {
+            LabelShortModel model = new LabelShortModel();
+
+            model.setName(label.getName());
+
+            return model;
+        }).collect(Collectors.toList());
+    }
 }

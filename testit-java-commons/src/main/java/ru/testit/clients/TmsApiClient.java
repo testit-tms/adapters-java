@@ -45,8 +45,8 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public TestRunV2GetModel createTestRun() throws ApiException {
-        TestRunV2PostShortModel model = new TestRunV2PostShortModel();
+    public TestRunV2ApiResult createTestRun() throws ApiException {
+        CreateEmptyTestRunApiModel model = new CreateEmptyTestRunApiModel();
         model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
 
         if (!Objects.equals(this.clientConfiguration.getTestRunName(), "null")) {
@@ -57,7 +57,7 @@ public class TmsApiClient implements ApiClient {
             LOGGER.debug("Create new test run: {}", model);
         }
 
-        TestRunV2GetModel response = testRunsApi.createEmpty(model);
+        TestRunV2ApiResult response = testRunsApi.createEmpty(model);
         testRunsApi.startTestRun(response.getId());
 
         if (LOGGER.isDebugEnabled()) {
@@ -68,7 +68,7 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public TestRunV2GetModel getTestRun(String uuid) throws ApiException {
+    public TestRunV2ApiResult getTestRun(String uuid) throws ApiException {
         return testRunsApi.getTestRunById(UUID.fromString(uuid));
     }
 
@@ -116,8 +116,8 @@ public class TmsApiClient implements ApiClient {
     }
 
     @Override
-    public AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException {
-        AutotestsSelectModelFilter filter = new AutotestsSelectModelFilter();
+    public AutoTestApiResult getAutoTestByExternalId(String externalId) throws ApiException {
+        AutoTestFilterApiModel filter = new AutoTestFilterApiModel();
 
         Set<UUID> projectIds = new HashSet<>();
         projectIds.add(UUID.fromString(this.clientConfiguration.getProjectId()));
@@ -128,16 +128,16 @@ public class TmsApiClient implements ApiClient {
         externalIds.add(externalId);
         filter.externalIds(externalIds);
 
-        AutotestsSelectModelIncludes includes = new AutotestsSelectModelIncludes();
+        AutoTestSearchIncludeApiModel includes = new AutoTestSearchIncludeApiModel();
         includes.setIncludeLabels(INCLUDE_LABELS);
         includes.setIncludeSteps(INCLUDE_STEPS);
         includes.setIncludeLinks(INCLUDE_LINKS);
 
-        ApiV2AutoTestsSearchPostRequest model = new ApiV2AutoTestsSearchPostRequest();
+        AutoTestSearchApiModel model = new AutoTestSearchApiModel();
         model.setFilter(filter);
         model.setIncludes(includes);
 
-        List<AutoTestModel> tests = autoTestsApi.apiV2AutoTestsSearchPost(null,
+        List<AutoTestApiResult> tests = autoTestsApi.apiV2AutoTestsSearchPost(null,
                 null,
                 null,
                 null,
@@ -218,10 +218,10 @@ public class TmsApiClient implements ApiClient {
     }
 
     public List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException {
-        TestRunV2GetModel model = testRunsApi.getTestRunById(UUID.fromString(testRunUuid));
+        TestRunV2ApiResult model = testRunsApi.getTestRunById(UUID.fromString(testRunUuid));
         UUID configUUID = UUID.fromString(configurationId);
 
-        if (Objects.requireNonNull(model.getTestResults()).size() == 0) {
+        if (Objects.requireNonNull(model.getTestResults()).isEmpty()) {
             return new ArrayList<>();
         }
 
