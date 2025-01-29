@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ApiClient {
-    TestRunV2GetModel createTestRun() throws ApiException;
-    TestRunV2GetModel getTestRun(String uuid) throws ApiException;
+    TestRunV2ApiResult createTestRun() throws ApiException;
+    TestRunV2ApiResult getTestRun(String uuid) throws ApiException;
     void completeTestRun(String uuid) throws ApiException;
     void updateAutoTest(AutoTestPutModel model) throws ApiException;
     String createAutoTest(AutoTestPostModel model) throws ApiException;
     void updateAutoTests(List<AutoTestPutModel> models) throws ApiException;
     List<AutoTestModel> createAutoTests(List<AutoTestPostModel> models) throws ApiException;
     List<UUID> GetWorkItemUuidsByIds(Iterable<String> workItemIds);
-    AutoTestModel getAutoTestByExternalId(String externalId) throws ApiException;
+    AutoTestApiResult getAutoTestByExternalId(String externalId) throws ApiException;
     void linkAutoTestToWorkItems(String id, Iterable<String> workItemIds);
     void unlinkAutoTestToWorkItem(String id, String workItemId);
     List<WorkItemIdentifierModel> getWorkItemsLinkedToTest(String id) throws ApiException;

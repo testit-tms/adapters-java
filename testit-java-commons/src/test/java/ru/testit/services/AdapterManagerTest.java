@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.TestRunState;
-import ru.testit.client.model.TestRunV2GetModel;
+import ru.testit.client.model.TestRunV2ApiResult;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.listener.ListenerManager;
@@ -70,7 +70,7 @@ public class AdapterManagerTest {
         when(clientConfiguration.getTestRunId()).thenReturn("null");
         when(clientConfiguration.getTestRunName()).thenReturn("null");
 
-        TestRunV2GetModel response = new TestRunV2GetModel();
+        TestRunV2ApiResult response = new TestRunV2ApiResult();
         response.setId(UUID.fromString(TEST_RUN_ID));
 
         when(client.createTestRun()).thenReturn(response);
@@ -91,7 +91,7 @@ public class AdapterManagerTest {
         when(clientConfiguration.getTestRunId()).thenReturn("null");
         when(clientConfiguration.getTestRunName()).thenReturn("Test run name");
 
-        TestRunV2GetModel response = new TestRunV2GetModel();
+        TestRunV2ApiResult response = new TestRunV2ApiResult();
         response.setId(UUID.fromString(TEST_RUN_ID));
         response.setName("Test run name");
 
@@ -110,7 +110,7 @@ public class AdapterManagerTest {
     @Test
     void stopTests_WithCompletedTestRun_NoInvokeCompleteHandler() throws ApiException {
         // arrange
-        TestRunV2GetModel response = new TestRunV2GetModel();
+        TestRunV2ApiResult response = new TestRunV2ApiResult();
         response.setStateName(TestRunState.COMPLETED);
 
         when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
@@ -127,8 +127,8 @@ public class AdapterManagerTest {
     @Test
     void stopTests_WithInProgressTestRun_InvokeCompleteHandler() throws ApiException {
         // arrange
-        TestRunV2GetModel response = new TestRunV2GetModel();
-        response.setStateName(TestRunState.INPROGRESS);
+        TestRunV2ApiResult response = new TestRunV2ApiResult();
+        response.setStateName(TestRunState.IN_PROGRESS);
 
         when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
 

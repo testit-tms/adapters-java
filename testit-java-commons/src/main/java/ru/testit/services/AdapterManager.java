@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.TestRunState;
-import ru.testit.client.model.TestRunV2GetModel;
+import ru.testit.client.model.TestRunV2ApiResult;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.TmsApiClient;
@@ -87,7 +87,7 @@ public class AdapterManager {
             }
 
             try {
-                TestRunV2GetModel response = this.client.createTestRun();
+                TestRunV2ApiResult response = this.client.createTestRun();
                 this.clientConfiguration.setTestRunId(response.getId().toString());
 
             } catch (ApiException e) {
@@ -104,7 +104,7 @@ public class AdapterManager {
         LOGGER.debug("Stop launch");
 
         try {
-            TestRunV2GetModel testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
+            TestRunV2ApiResult testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
 
             if (testRun.getStateName() != TestRunState.COMPLETED) {
                 this.client.completeTestRun(this.clientConfiguration.getTestRunId());
