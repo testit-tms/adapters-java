@@ -283,7 +283,7 @@ public class Converter {
     }
 
     public static AutoTestModel convertAutoTestApiResultToAutoTestModel(AutoTestApiResult autoTestApiResult) {
-        if (autoTestApiResult.getExternalId() == null) {
+        if (autoTestApiResult == null || autoTestApiResult.getExternalId() == null) {
             return null;
         }
 
