@@ -94,7 +94,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
     private FixtureResult getFixtureResult(final Method method) {
         return new FixtureResult()
-                .setName(Utils.extractTitle(method, null))
+                .setName(Utils.extractTitle(method, null, false))
                 .setDescription(Utils.extractDescription(method, null))
                 .setStart(System.currentTimeMillis())
                 .setItemStage(ItemStage.RUNNING);
@@ -225,7 +225,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
                 .setLabels(Utils.extractLabels(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
                 .setWorkItemIds(Utils.extractWorkItemId(method, parameters))
-                .setTitle(Utils.extractTitle(method, parameters))
+                .setTitle(Utils.extractTitle(method, parameters, true))
                 .setName(Utils.extractDisplayName(method, parameters))
                 .setClassName(Utils.extractClassname(method, method.getDeclaringClass().getSimpleName(), parameters))
                 .setSpaceName(Utils.extractNamespace(method,

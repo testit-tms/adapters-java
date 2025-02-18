@@ -109,7 +109,7 @@ public class BaseTestNgListener implements
                 .setLabels(Utils.extractLabels(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
                 .setWorkItemIds(Utils.extractWorkItemId(method, parameters))
-                .setTitle(Utils.extractTitle(method, parameters))
+                .setTitle(Utils.extractTitle(method, parameters, true))
                 .setName(Utils.extractDisplayName(method, parameters))
                 .setClassName(Utils.extractClassname(method, method.getDeclaringClass().getSimpleName(), parameters))
                 .setSpaceName(Utils.extractNamespace(method,
@@ -308,7 +308,7 @@ public class BaseTestNgListener implements
         final Method method = testMethod.getConstructorOrMethod().getMethod();
 
         return new FixtureResult()
-                .setName(Utils.extractTitle(method, null))
+                .setName(Utils.extractTitle(method, null, false))
                 .setDescription(Utils.extractDescription(method, null))
                 .setStart(System.currentTimeMillis())
                 .setItemStage(ItemStage.RUNNING);
