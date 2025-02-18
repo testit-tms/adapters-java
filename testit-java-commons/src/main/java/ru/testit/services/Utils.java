@@ -101,14 +101,17 @@ public class Utils {
         return (annotation != null) ? setParameters(annotation.value(), parameters) : "";
     }
 
-    public static String extractTitle(final Method atomicTest, Map<String, String> parameters) {
+    public static String extractTitle(final Method atomicTest, Map<String, String> parameters, boolean isTestMehhod) {
         final Title annotation = atomicTest.getAnnotation(Title.class);
 
         String title;
-        if (annotation == null) {
-            title = null;
-        } else {
+        if (annotation != null) {
             title = annotation.value();
+        } else if (isTestMehhod) {
+            title = null;
+        }
+        else {
+            title = atomicTest.getName();
         }
 
         return setParameters(title, parameters);

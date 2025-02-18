@@ -548,7 +548,7 @@ public class UtilsTest {
         when(annotation.value()).thenReturn(textBeforeSetParameters);
 
         // act
-        String title = Utils.extractTitle(atomicTest, parameters);
+        String title = Utils.extractTitle(atomicTest, parameters, true);
 
         // assert
         Assertions.assertEquals(textAfterSetParameters, title);
@@ -565,7 +565,7 @@ public class UtilsTest {
         when(annotation.value()).thenReturn(textBeforeSetParameters);
 
         // act
-        String title = Utils.extractTitle(atomicTest, null);
+        String title = Utils.extractTitle(atomicTest, null, true);
 
         // assert
         Assertions.assertEquals(textBeforeSetParameters, title);
@@ -581,7 +581,7 @@ public class UtilsTest {
         when(annotation.value()).thenReturn(TEXT_WITHOUT_PARAMETERS);
 
         // act
-        String title = Utils.extractTitle(atomicTest, parameters);
+        String title = Utils.extractTitle(atomicTest, parameters, true);
 
         // assert
         Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, title);
@@ -596,8 +596,8 @@ public class UtilsTest {
         when(atomicTest.getName()).thenReturn("class name");
 
         // act
-        String titleWithoutInputParameters = Utils.extractTitle(atomicTest, null);
-        String titleWithInputParameters = Utils.extractTitle(atomicTest, parameters);
+        String titleWithoutInputParameters = Utils.extractTitle(atomicTest, null, true);
+        String titleWithInputParameters = Utils.extractTitle(atomicTest, parameters, true);
 
         // assert
         Assertions.assertEquals("class name", titleWithoutInputParameters);
