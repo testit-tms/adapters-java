@@ -272,7 +272,7 @@ public class Converter {
         }).collect(Collectors.toList());
     }
 
-    private static List<AttachmentUpdateRequest> convertAttachmentsFromModel(List<Attachment> models) {
+    private static List<AttachmentUpdateRequest> convertAttachmentsFromModel(List<AttachmentApiResult> models) {
         return models.stream().map(attach -> {
             AttachmentUpdateRequest model = new AttachmentUpdateRequest();
 
