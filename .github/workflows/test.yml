@@ -1,4 +1,4 @@
-name: Test
+name: e2e tests
 run-name: "#${{ github.run_number }} test by ${{ github.triggering_actor }}"
 on:
   pull_request:
@@ -18,6 +18,12 @@ on:
       - "settings.gradle.kts"
       - ".github/**/test.yml"
   workflow_dispatch:
+    inputs:
+      run_tests:
+        description: 'Запустить тесты'
+        required: true
+        type: boolean
+        default: true
 env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
@@ -30,73 +36,96 @@ env:
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
   TMS_URL: ${{ secrets.TESTIT_URL }}
 jobs:
+  # should control launch of everything else depending on this step
+  check-label:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Check if run-e2e label is present
+        id: check
+        run: |
+          if [ "${{ contains(github.event.pull_request.labels.*.name, 'run-e2e') }}" = "true" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
   test-gradle:
+    needs: check-label
+    if: ${{ needs.check-label.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch' }}
     name: ${{ matrix.project_name }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          # - project_name: cucubmer7-gradle-testng
-          #   configuration_id: CUCUMBER7_GRADLE_TESTNG_CONFIGURATION_ID
-          #   project_id: CUCUMBER7_GRADLE_TESTNG_PROJECT_ID
-          # - project_name: cucumber7-gradle-junit4
-          #   configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
-          #   project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
-          # - project_name: gradle-junit4
-          #   configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
-          #   project_id: GRADLE_JUNIT4_PROJECT_ID
-          # - project_name: gradle-junit5
-          #   configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
-          #   project_id: GRADLE_JUNIT5_PROJECT_ID
-          # - project_name: gradle-testng
-          #   configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
-          #   project_id: GRADLE_TESTNG_PROJECT_ID
+          - project_name: gradle-junit4
+            configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
+            project_id: GRADLE_JUNIT4_PROJECT_ID
+          - project_name: gradle-junit5
+            configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
+            project_id: GRADLE_JUNIT5_PROJECT_ID
+          - project_name: gradle-testng
+            configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
+            project_id: GRADLE_TESTNG_PROJECT_ID
+
+          - project_name: jbehave-gradle-junit5
+            configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
+            project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
           - project_name: jbehave-gradle-junit4
             configuration_id: JBEHAVE_GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: JBEHAVE_GRADLE_JUNIT4_PROJECT_ID
-          # - project_name: jbehave-gradle-testng
-          #   configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
-          #   project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
-          # - project_name: cucumber7-gradle-junit5
-          #  configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
-          #  project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
-          #  - project_name: jbehave-gradle-junit5
-          #  configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
-          #  project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
-          # - project_name: cucubmer4-gradle-testng
-          #  configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
-          #  project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
-          # - project_name: cucubmer5-gradle-testng
-          #  configuration_id: CUCUMBER5_GRADLE_TESTNG_CONFIGURATION_ID
-          #  project_id: CUCUMBER5_GRADLE_TESTNG_PROJECT_ID
-          # - project_name: cucubmer6-gradle-testng
-          #  configuration_id: CUCUMBER6_GRADLE_TESTNG_CONFIGURATION_ID
-          #  project_id: CUCUMBER6_GRADLE_TESTNG_PROJECT_ID
-          # - project_name: cucumber4-gradle-junit4
-          #  configuration_id: CUCUMBER4_GRADLE_JUNIT4_CONFIGURATION_ID
-          #  project_id: CUCUMBER4_GRADLE_JUNIT4_PROJECT_ID
-          # - project_name: cucumber5-gradle-junit4
-          #  configuration_id: CUCUMBER5_GRADLE_JUNIT4_CONFIGURATION_ID
-          #  project_id: CUCUMBER5_GRADLE_JUNIT4_PROJECT_ID
-          # - project_name: cucumber5-gradle-junit5
-          #  configuration_id: CUCUMBER5_GRADLE_JUNIT5_CONFIGURATION_ID
-          #  project_id: CUCUMBER5_GRADLE_JUNIT5_PROJECT_ID
-          # - project_name: cucumber6-gradle-junit4
-          #  configuration_id: CUCUMBER6_GRADLE_JUNIT4_CONFIGURATION_ID
-          #  project_id: CUCUMBER6_GRADLE_JUNIT4_PROJECT_ID
-          # - project_name: cucumber6-gradle-junit5
-          #  configuration_id: CUCUMBER6_GRADLE_JUNIT5_CONFIGURATION_ID
-          #  project_id: CUCUMBER6_GRADLE_JUNIT5_PROJECT_ID
-          # - project_name: selenide-gradle-junit5
-          #  configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
-          #  project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
-          # - project_name: serenity2-gradle-junit4
-          #  configuration_id: SERENITY2_GRADLE_JUNIT4_CONFIGURATION_ID
-          #  project_id: SERENITY2_GRADLE_JUNIT4_PROJECT_ID
-          # - project_name: serenity3-gradle-junit4
-          #  configuration_id: SERENITY3_GRADLE_JUNIT4_CONFIGURATION_ID
-          #  project_id: SERENITY3_GRADLE_JUNIT4_PROJECT_ID
+          - project_name: jbehave-gradle-testng
+            configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
+            project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
+
+          - project_name: cucumber7-gradle-testng
+            configuration_id: CUCUMBER7_GRADLE_TESTNG_CONFIGURATION_ID
+            project_id: CUCUMBER7_GRADLE_TESTNG_PROJECT_ID
+          - project_name: cucumber7-gradle-junit4
+            configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
+            project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
+          - project_name: cucumber7-gradle-junit5
+            configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
+            project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
+
+          - project_name: cucumber6-gradle-junit5
+            configuration_id: CUCUMBER6_GRADLE_JUNIT5_CONFIGURATION_ID
+            project_id: CUCUMBER6_GRADLE_JUNIT5_PROJECT_ID
+          - project_name: cucumber6-gradle-junit4
+            configuration_id: CUCUMBER6_GRADLE_JUNIT4_CONFIGURATION_ID
+            project_id: CUCUMBER6_GRADLE_JUNIT4_PROJECT_ID
+          - project_name: cucumber6-gradle-testng
+            configuration_id: CUCUMBER6_GRADLE_TESTNG_CONFIGURATION_ID
+            project_id: CUCUMBER6_GRADLE_TESTNG_PROJECT_ID
+          
+          - project_name: cucumber5-gradle-junit4
+            configuration_id: CUCUMBER5_GRADLE_JUNIT4_CONFIGURATION_ID
+            project_id: CUCUMBER5_GRADLE_JUNIT4_PROJECT_ID
+          - project_name: cucumber5-gradle-junit5
+            configuration_id: CUCUMBER5_GRADLE_JUNIT5_CONFIGURATION_ID
+            project_id: CUCUMBER5_GRADLE_JUNIT5_PROJECT_ID
+          - project_name: cucumber5-gradle-testng
+            configuration_id: CUCUMBER5_GRADLE_TESTNG_CONFIGURATION_ID
+            project_id: CUCUMBER5_GRADLE_TESTNG_PROJECT_ID
+
+          - project_name: cucumber4-gradle-junit4
+            configuration_id: CUCUMBER4_GRADLE_JUNIT4_CONFIGURATION_ID
+            project_id: CUCUMBER4_GRADLE_JUNIT4_PROJECT_ID
+          - project_name: cucumber4-gradle-testng
+            configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
+            project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
+          
+          - project_name: selenide-gradle-junit5
+            configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
+            project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
+          - project_name: serenity2-gradle-junit4
+            configuration_id: SERENITY2_GRADLE_JUNIT4_CONFIGURATION_ID
+            project_id: SERENITY2_GRADLE_JUNIT4_PROJECT_ID
+          - project_name: serenity3-gradle-junit4
+            configuration_id: SERENITY3_GRADLE_JUNIT4_CONFIGURATION_ID
+            project_id: SERENITY3_GRADLE_JUNIT4_PROJECT_ID
     env:
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
@@ -148,60 +177,20 @@ jobs:
           dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
 
   # test-maven:
+  #   needs: check-label
+  #   if: ${{ needs.check-label.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch' }}
   #   name: ${{ matrix.project_name }}
   #   runs-on: ubuntu-latest
   #   strategy:
   #     fail-fast: false
   #     matrix:
   #       include:
-  #         - project_name: cucumber6-maven-junit4
-  #           configuration_id: CUCUMBER6_MAVEN_JUNIT4_CONFIGURATION_ID
-  #           project_id: CUCUMBER6_MAVEN_JUNIT4_PROJECT_ID
-  #         - project_id: CUCUMBER6_MAVEN_TESTNG_PROJECT_ID
-  #           configuration_id: CUCUMBER6_MAVEN_TESTNG_CONFIGURATION_ID
-  #           project_name: cucumber6-maven-testng
-  #         - project_name: jbehave-maven-junit4
-  #           configuration_id: JBEHAVE_MAVEN_JUNIT4_CONFIGURATION_ID
-  #           project_id: JBEHAVE_MAVEN_JUNIT4_PROJECT_ID
-  #         - project_name: jbehave-maven-testng
-  #           configuration_id: JBEHAVE_MAVEN_TESTNG_CONFIGURATION_ID
-  #           project_id: JBEHAVE_MAVEN_TESTNG_PROJECT_ID
   #         - project_name: maven-junit4
   #           configuration_id: MAVEN_JUNIT4_CONFIGURATION_ID
   #           project_id: MAVEN_JUNIT4_PROJECT_ID
   #         - project_name: maven-junit5
   #           configuration_id: MAVEN_JUNIT5_CONFIGURATION_ID
   #           project_id: MAVEN_JUNIT5_PROJECT_ID
-  #         - project_name: maven-testng
-  #           configuration_id: MAVEN_TESTNG_CONFIGURATION_ID
-  #           project_id: MAVEN_TESTNG_PROJECT_ID
-  #           # - project_name: jbehave-maven-junit5
-  #           #   configuration_id: JBEHAVE_MAVEN_JUNIT5_CONFIGURATION_ID
-  #           #   project_id: JBEHAVE_MAVEN_JUNIT5_PROJECT_ID
-  #           # - project_name: cucumber6-maven-junit5
-  #           #   configuration_id: CUCUMBER6_MAVEN_JUNIT5_CONFIGURATION_ID
-  #           #   project_id: CUCUMBER6_MAVEN_JUNIT5_PROJECT_ID
-  #           # - project_name: cucumber4-maven-junit4
-  #           #   configuration_id: CUCUMBER4_MAVEN_JUNIT4_CONFIGURATION_ID
-  #           #   project_id: CUCUMBER4_MAVEN_JUNIT4_PROJECT_ID
-  #           # - project_name: cucumber4-maven-testng
-  #           #   configuration_id: CUCUMBER4_MAVEN_TESTNG_CONFIGURATION_ID
-  #           #   project_id: CUCUMBER4_MAVEN_TESTNG_PROJECT_ID
-  #           # - project_name: cucumber5-maven-junit4
-  #           #   configuration_id: CUCUMBER5_MAVEN_JUNIT4_CONFIGURATION_ID
-  #           #   project_id: CUCUMBER5_MAVEN_JUNIT4_PROJECT_ID
-  #           # - project_name: cucumber5-maven-junit5
-  #           #   configuration_id: CUCUMBER5_MAVEN_JUNIT5_CONFIGURATION_ID
-  #           #   project_id: CUCUMBER5_MAVEN_JUNIT5_PROJECT_ID
-  #           # - project_name: cucumber5-maven-testng
-  #           #   configuration_id: CUCUMBER5_MAVEN_TESTNG_CONFIGURATION_ID
-  #           #   project_id: CUCUMBER5_MAVEN_TESTNG_PROJECT_ID
-  #           #   - project_name: cucumber7-maven-junit4
-  #           #   configuration_id: CUCUMBER7_MAVEN_JUNIT4_CONFIGURATION_ID
-  #           #   project_id: CUCUMBER7_MAVEN_JUNIT4_PROJECT_ID
-  #           #   - project_name: cucumber7-maven-junit5
-  #           #   configuration_id: CUCUMBER7_MAVEN_JUNIT5_CONFIGURATION_ID
-  #           #   project_id: CUCUMBER7_MAVEN_JUNIT5_PROJECT_ID
   #   env:
   #     TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
   #     TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
