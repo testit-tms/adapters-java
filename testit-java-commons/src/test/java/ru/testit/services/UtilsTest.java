@@ -7,6 +7,7 @@ import ru.testit.Helper;
 import ru.testit.annotations.*;
 import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
+import ru.testit.models.LinkType;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -16,7 +17,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UtilsTest {
-    private final static String TEXT_WITHOUT_PARAMETERS = "{Text without} {parameters}";
     private final static String[] LABELS_WITHOUT_PARAMETERS = new String[]{"{Labels", "without}", "{parameters}"};
 
     private Method atomicTest;
@@ -30,12 +30,16 @@ public class UtilsTest {
     void extractExternalID_WithExternalIDWithParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
         String textAfterSetParameters = UtilsHelper.generateTextAfterSetParameters(parameters);
-        ExternalId annotation = mock(ExternalId.class);
 
-        when(atomicTest.getAnnotation(ExternalId.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @ExternalId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(ExternalId.class)).thenReturn(testMethod.getAnnotation(ExternalId.class));
 
         // act
         String externalId = Utils.extractExternalID(atomicTest, parameters);
@@ -49,10 +53,15 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
         String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
-        ExternalId annotation = mock(ExternalId.class);
 
-        when(atomicTest.getAnnotation(ExternalId.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @ExternalId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(ExternalId.class)).thenReturn(testMethod.getAnnotation(ExternalId.class));
 
         // act
         String externalId = Utils.extractExternalID(atomicTest, null);
@@ -65,29 +74,31 @@ public class UtilsTest {
     void extractExternalID_WithExternalIDWithoutParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        ExternalId annotation = mock(ExternalId.class);
 
-        when(atomicTest.getAnnotation(ExternalId.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(TEXT_WITHOUT_PARAMETERS);
+        class TestClass {
+            @ExternalId("Text without parameters")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(ExternalId.class)).thenReturn(testMethod.getAnnotation(ExternalId.class));
 
         // act
         String externalId = Utils.extractExternalID(atomicTest, parameters);
 
         // assert
-        Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, externalId);
-    }
-
-    private class MockTests {
-        public void allAnnotationsTest() {
-
-        }
+        Assertions.assertEquals("Text without parameters", externalId);
     }
 
     @Test
     void extractExternalID_WithoutExternalID() throws NoSuchMethodException {
+        class MockTests {
+            public void allAnnotationsTest() {}
+        }
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        String hash = "37CFD932DE5B33581E4827CFB5E676C6999B1F05892BFC9333EDEE1EAF4B8D06";
+        String hash = "FAC87DA410D46D36EFFAD262B98C6FBC8D0F284E4586FCED13841EBB008FBD47";
         Method testMethod = MockTests.class.getMethod("allAnnotationsTest");
 
         // act
@@ -103,12 +114,16 @@ public class UtilsTest {
     void extractDisplayName_WithDisplayNameWithParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
         String textAfterSetParameters = UtilsHelper.generateTextAfterSetParameters(parameters);
-        DisplayName annotation = mock(DisplayName.class);
 
-        when(atomicTest.getAnnotation(DisplayName.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @DisplayName("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(DisplayName.class)).thenReturn(testMethod.getAnnotation(DisplayName.class));
 
         // act
         String displayName = Utils.extractDisplayName(atomicTest, parameters);
@@ -122,10 +137,15 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
         String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
-        DisplayName annotation = mock(DisplayName.class);
 
-        when(atomicTest.getAnnotation(DisplayName.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @DisplayName("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(DisplayName.class)).thenReturn(testMethod.getAnnotation(DisplayName.class));
 
         // act
         String displayName = Utils.extractDisplayName(atomicTest, null);
@@ -138,17 +158,21 @@ public class UtilsTest {
     void extractDisplayName_WithDisplayNameWithoutParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        DisplayName annotation = mock(DisplayName.class);
 
+        class TestClass {
+            @DisplayName("Text without parameters")
+            void testMethod() {
+            }
+        }
 
-        when(atomicTest.getAnnotation(DisplayName.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(TEXT_WITHOUT_PARAMETERS);
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(DisplayName.class)).thenReturn(testMethod.getAnnotation(DisplayName.class));
 
         // act
         String displayName = Utils.extractDisplayName(atomicTest, parameters);
 
         // assert
-        Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, displayName);
+        Assertions.assertEquals("Text without parameters", displayName);
     }
 
     @Test
@@ -172,12 +196,16 @@ public class UtilsTest {
     void extractWorkItemId_WithWorkItemIdWithParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
         String textAfterSetParameters = UtilsHelper.generateTextAfterSetParameters(parameters);
-        WorkItemId annotation = mock(WorkItemId.class);
 
-        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @WorkItemId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(testMethod.getAnnotation(WorkItemId.class));
 
         // act
         List<String> workItemIds = Utils.extractWorkItemId(atomicTest, parameters);
@@ -191,10 +219,15 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
         String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
-        WorkItemId annotation = mock(WorkItemId.class);
 
-        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @WorkItemId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(testMethod.getAnnotation(WorkItemId.class));
 
         // act
         List<String> workItemIds = Utils.extractWorkItemId(atomicTest, null);
@@ -207,16 +240,21 @@ public class UtilsTest {
     void extractWorkItemId_WithWorkItemIdWithoutParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        WorkItemId annotation = mock(WorkItemId.class);
 
-        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(TEXT_WITHOUT_PARAMETERS);
+        class TestClass {
+            @WorkItemId("Text without parameters")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(testMethod.getAnnotation(WorkItemId.class));
 
         // act
         List<String> workItemIds = Utils.extractWorkItemId(atomicTest, parameters);
 
         // assert
-        Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, workItemIds.get(0));
+        Assertions.assertEquals("Text without parameters", workItemIds.get(0));
     }
 
     @Test
@@ -239,33 +277,46 @@ public class UtilsTest {
     void extractLinks_WithOnlyUrlLinksWithParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        List<LinkItem> putLinks = UtilsHelper.generateLinkItemsBeforeSetParameters(parameters);
         List<LinkItem> expectedLinks = UtilsHelper.generateLinkItemsAfterSetParameters(parameters);
-        Links annotation = mock(Links.class);
-        Link[] arrayLinks = new Link[putLinks.size()];
 
-        for (int i = 0; i < putLinks.size(); i++) {
-            arrayLinks[i] = mock(Link.class);
-            when(arrayLinks[i].url()).thenReturn(putLinks.get(i).getUrl());
-            when(arrayLinks[i].title()).thenReturn(null);
-            when(arrayLinks[i].description()).thenReturn(null);
-            when(arrayLinks[i].type()).thenReturn(null);
+        class TestClass {
+            @Links(links = {
+                    @Link(
+                            url = "{Url date} = {date}; ",
+                            title = "",
+                            description = "",
+                            type = ru.testit.models.LinkType.ISSUE
+                    ),
+                    @Link(
+                            url = "{Url number} = {number}; ",
+                            title = "",
+                            description = "",
+                            type = ru.testit.models.LinkType.ISSUE
+                    ),
+                    @Link(
+                            url = "{Url name} = {name}; ",
+                            title = "",
+                            description = "",
+                            type = ru.testit.models.LinkType.ISSUE
+                    )
+            })
+            void testMethod() {
+            }
         }
 
-        when(atomicTest.getAnnotation(Links.class)).thenReturn(annotation);
-        when(annotation.links()).thenReturn(arrayLinks);
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Links.class)).thenReturn(testMethod.getAnnotation(Links.class));
 
         // act
         List<LinkItem> links = Utils.extractLinks(atomicTest, parameters);
 
         // assert
         Assertions.assertEquals(expectedLinks.size(), links.size());
-
         for (int i = 0; i < expectedLinks.size(); i++) {
             Assertions.assertEquals(expectedLinks.get(i).getUrl(), links.get(i).getUrl());
-            Assertions.assertNull(links.get(i).getTitle());
-            Assertions.assertNull(links.get(i).getDescription());
-            Assertions.assertNull(links.get(i).getType());
+            Assertions.assertEquals("", links.get(i).getTitle());
+            Assertions.assertEquals("", links.get(i).getDescription());
+            Assertions.assertEquals(ru.testit.models.LinkType.ISSUE, links.get(i).getType());
         }
     }
 
@@ -274,30 +325,44 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
         List<LinkItem> putLinks = UtilsHelper.generateLinkItemsBeforeSetParameters(parameters);
-        Links annotation = mock(Links.class);
-        Link[] arrayLinks = new Link[putLinks.size()];
 
-        for (int i = 0; i < putLinks.size(); i++) {
-            arrayLinks[i] = mock(Link.class);
-            when(arrayLinks[i].url()).thenReturn(putLinks.get(i).getUrl());
-            when(arrayLinks[i].title()).thenReturn(putLinks.get(i).getTitle());
-            when(arrayLinks[i].description()).thenReturn(putLinks.get(i).getDescription());
-            when(arrayLinks[i].type()).thenReturn(putLinks.get(i).getType());
+        class TestClass {
+            @Links(links = {
+                    @Link(
+                            url = "{Url date} = {date}; ",
+                            title = "{Title date} = {date}; ",
+                            description = "{Description date} = {date}; ",
+                            type = ru.testit.models.LinkType.ISSUE
+                    ),
+                    @Link(
+                            url = "{Url number} = {number}; ",
+                            title = "{Title number} = {number}; ",
+                            description = "{Description number} = {number}; ",
+                            type = ru.testit.models.LinkType.ISSUE
+                    ),
+                    @Link(
+                            url = "{Url name} = {name}; ",
+                            title = "{Title name} = {name}; ",
+                            description = "{Description name} = {name}; ",
+                            type = ru.testit.models.LinkType.ISSUE
+                    ),
+            })
+            void testMethod() {
+            }
         }
 
-        when(atomicTest.getAnnotation(Links.class)).thenReturn(annotation);
-        when(annotation.links()).thenReturn(arrayLinks);
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Links.class)).thenReturn(testMethod.getAnnotation(Links.class));
 
         // act
         List<LinkItem> links = Utils.extractLinks(atomicTest, null);
 
         // assert
         Assertions.assertEquals(putLinks.size(), links.size());
-
         for (int i = 0; i < putLinks.size(); i++) {
             Assertions.assertEquals(putLinks.get(i).getUrl(), links.get(i).getUrl());
-            Assertions.assertEquals(putLinks.get(i).getDescription(), links.get(i).getDescription());
             Assertions.assertEquals(putLinks.get(i).getTitle(), links.get(i).getTitle());
+            Assertions.assertEquals(putLinks.get(i).getDescription(), links.get(i).getDescription());
             Assertions.assertEquals(putLinks.get(i).getType(), links.get(i).getType());
         }
     }
@@ -307,14 +372,21 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
         LinkItem putLink = UtilsHelper.generateLinkItemsBeforeSetParameters(parameters).get(0);
-        Link annotation = mock(Link.class);
 
+        class TestClass {
+            @Link(
+                    url = "{Url date} = {date}; ",
+                    title = "",
+                    description = "",
+                    type = LinkType.ISSUE
+            )
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
         when(atomicTest.getAnnotation(Links.class)).thenReturn(null);
-        when(atomicTest.getAnnotation(Link.class)).thenReturn(annotation);
-        when(annotation.url()).thenReturn(putLink.getUrl());
-        when(annotation.title()).thenReturn(null);
-        when(annotation.description()).thenReturn(null);
-        when(annotation.type()).thenReturn(null);
+        when(atomicTest.getAnnotation(Link.class)).thenReturn(testMethod.getAnnotation(Link.class));
 
         // act
         List<LinkItem> links = Utils.extractLinks(atomicTest, null);
@@ -322,9 +394,9 @@ public class UtilsTest {
         // assert
         Assertions.assertEquals(1, links.size());
         Assertions.assertEquals(putLink.getUrl(), links.get(0).getUrl());
-        Assertions.assertNull(links.get(0).getTitle());
-        Assertions.assertNull(links.get(0).getDescription());
-        Assertions.assertNull(links.get(0).getType());
+        Assertions.assertEquals("", links.get(0).getTitle());
+        Assertions.assertEquals("", links.get(0).getDescription());
+        Assertions.assertEquals(LinkType.ISSUE, links.get(0).getType());
     }
 
     @Test
@@ -332,24 +404,31 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
         LinkItem link = Helper.generateLinkItem();
-        Link annotation = mock(Link.class);
 
+        class TestClass {
+            @Link(
+                    url = "https://example.com",
+                    title = "Test Title",
+                    description = "Test Description",
+                    type = ru.testit.models.LinkType.ISSUE
+            )
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
         when(atomicTest.getAnnotation(Links.class)).thenReturn(null);
-        when(atomicTest.getAnnotation(Link.class)).thenReturn(annotation);
-        when(annotation.url()).thenReturn(link.getUrl());
-        when(annotation.title()).thenReturn(link.getTitle());
-        when(annotation.description()).thenReturn(link.getDescription());
-        when(annotation.type()).thenReturn(link.getType());
+        when(atomicTest.getAnnotation(Link.class)).thenReturn(testMethod.getAnnotation(Link.class));
 
         // act
         List<LinkItem> links = Utils.extractLinks(atomicTest, parameters);
 
         // assert
         Assertions.assertEquals(1, links.size());
-        Assertions.assertEquals(link.getUrl(), links.get(0).getUrl());
-        Assertions.assertEquals(link.getDescription(), links.get(0).getDescription());
-        Assertions.assertEquals(link.getTitle(), links.get(0).getTitle());
-        Assertions.assertEquals(link.getType(), links.get(0).getType());
+        Assertions.assertEquals("https://example.com", links.get(0).getUrl());
+        Assertions.assertEquals("Test Description", links.get(0).getDescription());
+        Assertions.assertEquals("Test Title", links.get(0).getTitle());
+        Assertions.assertEquals(ru.testit.models.LinkType.ISSUE, links.get(0).getType());
     }
 
     @Test
@@ -397,12 +476,20 @@ public class UtilsTest {
     void extractLabels_WithLabelsWithParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        String[] putLabels = UtilsHelper.generateLabelsBeforeSetParameters(parameters);
         List<Label> expectedLabels = UtilsHelper.generateLabelsAfterSetParameters(parameters);
-        Labels annotation = mock(Labels.class);
 
-        when(atomicTest.getAnnotation(Labels.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(putLabels);
+        class TestClass {
+            @Labels(value = {
+                    "{Param date} = {date}; ",
+                    "{Param number} = {number}; ",
+                    "{Param name} = {name}; "
+            })
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Labels.class)).thenReturn(testMethod.getAnnotation(Labels.class));
 
         // act
         List<Label> getLabels = Utils.extractLabels(atomicTest, parameters);
@@ -419,10 +506,19 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
         String[] putLabels = UtilsHelper.generateLabelsBeforeSetParameters(parameters);
-        Labels annotation = mock(Labels.class);
 
-        when(atomicTest.getAnnotation(Labels.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(putLabels);
+        class TestClass {
+            @Labels(value = {
+                    "{Param date} = {date}; ",
+                    "{Param number} = {number}; ",
+                    "{Param name} = {name}; "
+            })
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Labels.class)).thenReturn(testMethod.getAnnotation(Labels.class));
 
         // act
         List<Label> getLabels = Utils.extractLabels(atomicTest, null);
@@ -438,10 +534,19 @@ public class UtilsTest {
     void extractLabels_WithLabelsWithoutParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        Labels annotation = mock(Labels.class);
 
-        when(atomicTest.getAnnotation(Labels.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(LABELS_WITHOUT_PARAMETERS);
+        class TestClass {
+            @Labels(value = {
+                    "{Labels",
+                    "without}",
+                    "{parameters}"
+            })
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Labels.class)).thenReturn(testMethod.getAnnotation(Labels.class));
 
         // act
         List<Label> getLabels = Utils.extractLabels(atomicTest, parameters);
@@ -473,12 +578,16 @@ public class UtilsTest {
     void extractDescription_WithDescriptionWithParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
         String textAfterSetParameters = UtilsHelper.generateTextAfterSetParameters(parameters);
-        Description annotation = mock(Description.class);
 
-        when(atomicTest.getAnnotation(Description.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @Description("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Description.class)).thenReturn(testMethod.getAnnotation(Description.class));
 
         // act
         String description = Utils.extractDescription(atomicTest, parameters);
@@ -492,10 +601,15 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
         String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
-        Description annotation = mock(Description.class);
 
-        when(atomicTest.getAnnotation(Description.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @Description("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Description.class)).thenReturn(testMethod.getAnnotation(Description.class));
 
         // act
         String description = Utils.extractDescription(atomicTest, null);
@@ -508,16 +622,21 @@ public class UtilsTest {
     void extractDescription_WithDescriptionWithoutParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        Description annotation = mock(Description.class);
 
-        when(atomicTest.getAnnotation(Description.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(TEXT_WITHOUT_PARAMETERS);
+        class TestClass {
+            @Description("{Text without} {parameters}")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Description.class)).thenReturn(testMethod.getAnnotation(Description.class));
 
         // act
         String description = Utils.extractDescription(atomicTest, parameters);
 
         // assert
-        Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, description);
+        Assertions.assertEquals("{Text without} {parameters}", description);
     }
 
     @Test
@@ -540,12 +659,16 @@ public class UtilsTest {
     void extractTitle_WithTitleWithParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
         String textAfterSetParameters = UtilsHelper.generateTextAfterSetParameters(parameters);
-        Title annotation = mock(Title.class);
 
-        when(atomicTest.getAnnotation(Title.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @Title("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Title.class)).thenReturn(testMethod.getAnnotation(Title.class));
 
         // act
         String title = Utils.extractTitle(atomicTest, parameters, true);
@@ -559,10 +682,15 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
         String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
-        Title annotation = mock(Title.class);
 
-        when(atomicTest.getAnnotation(Title.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(textBeforeSetParameters);
+        class TestClass {
+            @Title("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Title.class)).thenReturn(testMethod.getAnnotation(Title.class));
 
         // act
         String title = Utils.extractTitle(atomicTest, null, true);
@@ -575,16 +703,21 @@ public class UtilsTest {
     void extractTitle_WithTitleWithoutParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        Title annotation = mock(Title.class);
 
-        when(atomicTest.getAnnotation(Title.class)).thenReturn(annotation);
-        when(annotation.value()).thenReturn(TEXT_WITHOUT_PARAMETERS);
+        class TestClass {
+            @Title("{Text without} {parameters}")
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(Title.class)).thenReturn(testMethod.getAnnotation(Title.class));
 
         // act
         String title = Utils.extractTitle(atomicTest, parameters, true);
 
         // assert
-        Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, title);
+        Assertions.assertEquals("{Text without} {parameters}", title);
     }
 
     @Test
@@ -592,15 +725,21 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
 
+        class TestClass {
+            void testMethod() {
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
         when(atomicTest.getAnnotation(Title.class)).thenReturn(null);
-        when(atomicTest.getName()).thenReturn("class name");
+        when(atomicTest.getName()).thenReturn(testMethod.getName());
 
         // act
         String titleWithoutInputParameters = Utils.extractTitle(atomicTest, null, true);
         String titleWithInputParameters = Utils.extractTitle(atomicTest, parameters, true);
 
         // assert
-        Assertions.assertEquals("class name", titleWithoutInputParameters);
-        Assertions.assertEquals("class name", titleWithInputParameters);
+        Assertions.assertNull(titleWithoutInputParameters);
+        Assertions.assertNull(titleWithInputParameters);
     }
 }
