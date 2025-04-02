@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UtilsTest {
+    private final static String TEXT_WITHOUT_PARAMETERS = "{Text without} {parameters}";
     private final static String[] LABELS_WITHOUT_PARAMETERS = new String[]{"{Labels", "without}", "{parameters}"};
 
     private Method atomicTest;
@@ -624,7 +625,7 @@ public class UtilsTest {
         Map<String, String> parameters = UtilsHelper.generateParameters();
 
         class TestClass {
-            @Description("{Text without} {parameters}")
+            @Description(TEXT_WITHOUT_PARAMETERS)
             void testMethod() {
             }
         }
@@ -636,7 +637,7 @@ public class UtilsTest {
         String description = Utils.extractDescription(atomicTest, parameters);
 
         // assert
-        Assertions.assertEquals("{Text without} {parameters}", description);
+        Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, description);
     }
 
     @Test
@@ -705,7 +706,7 @@ public class UtilsTest {
         Map<String, String> parameters = UtilsHelper.generateParameters();
 
         class TestClass {
-            @Title("{Text without} {parameters}")
+            @Title(TEXT_WITHOUT_PARAMETERS)
             void testMethod() {
             }
         }
@@ -717,7 +718,7 @@ public class UtilsTest {
         String title = Utils.extractTitle(atomicTest, parameters, true);
 
         // assert
-        Assertions.assertEquals("{Text without} {parameters}", title);
+        Assertions.assertEquals(TEXT_WITHOUT_PARAMETERS, title);
     }
 
     @Test
