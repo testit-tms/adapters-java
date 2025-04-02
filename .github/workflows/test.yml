@@ -8,7 +8,7 @@ on:
       # - "testit-adapter-cucumber6/**"
       # - "testit-adapter-cucumber7/**"
       # - "testit-adapter-jbehave/**"
-      # - "testit-adapter-junit4/**"
+      - "testit-adapter-junit4/**"
       - "testit-adapter-junit5/**"
       # - "testit-adapter-selenide/**"
       # - "testit-adapter-testng/**"
@@ -166,9 +166,9 @@ jobs:
           # - project_name: jbehave-maven-testng
           #   configuration_id: JBEHAVE_MAVEN_TESTNG_CONFIGURATION_ID
           #   project_id: JBEHAVE_MAVEN_TESTNG_PROJECT_ID
-          # - project_name: maven-junit4
-          #   configuration_id: MAVEN_JUNIT4_CONFIGURATION_ID
-          #   project_id: MAVEN_JUNIT4_PROJECT_ID
+          - project_name: maven-junit4
+            configuration_id: MAVEN_JUNIT4_CONFIGURATION_ID
+            project_id: MAVEN_JUNIT4_PROJECT_ID
           - project_name: maven-junit5
             configuration_id: MAVEN_JUNIT5_CONFIGURATION_ID
             project_id: MAVEN_JUNIT5_PROJECT_ID
