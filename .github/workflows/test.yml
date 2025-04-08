@@ -139,6 +139,7 @@ jobs:
           repository: testit-tms/api-validator-dotnet
           token: ${{ env.GITHUB_PAT }}
           path: api-validator-dotnet
+          ref: 'feat/java-runs'
       - name: Checkout java-examples
         uses: actions/checkout@v4
         with:
