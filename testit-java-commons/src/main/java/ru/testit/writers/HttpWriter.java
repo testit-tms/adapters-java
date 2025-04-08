@@ -74,11 +74,50 @@ public class HttpWriter implements Writer {
 
             List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
             results.add(autoTestResultsForTestRunModel);
-            List<UUID> ids = apiClient.sendTestResults(config.getTestRunId(), results);
+            
+            List<UUID> ids = executeWithRetry(() -> apiClient.sendTestResults(config.getTestRunId(), results));
+            
             testResults.put(testResult.getUuid(), ids.get(0));
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: " + (e.getMessage()));
         }
+    }
+    
+    private <T> T executeWithRetry(RetryableOperation<T> operation) throws ApiException {
+        int maxRetries = 3;
+        int retryCount = 0;
+        long retryDelay = 1000; // 1 second
+
+        while (retryCount < maxRetries) {
+            try {
+                return operation.execute();
+            }
+            catch (ApiException e) {
+                if (e.getCause() instanceof java.net.SocketTimeoutException) {
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        LOGGER.warn("Timeout occurred, retrying attempt {} of {}", retryCount, maxRetries);
+                        try {
+                            Thread.sleep(retryDelay);
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            throw e;
+                        }
+                    } else {
+                        LOGGER.error("Failed after {} retries: {}", maxRetries, e.getMessage());
+                        throw e;
+                    }
+                } else {
+                    throw e;
+                }
+            }
+        }
+        throw new ApiException("Max retries exceeded");
+    }
+
+    @FunctionalInterface
+    private interface RetryableOperation<T> {
+        T execute() throws ApiException;
     }
 
     private AutoTestPostModel prepareToCreateAutoTest(TestResult testResult) throws ApiException {

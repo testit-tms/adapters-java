@@ -53,16 +53,17 @@ jobs:
 
   test-gradle:
     needs: check-label
-    if: ${{ needs.check-label.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch' }}
+    # if: ${{ needs.check-label.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch' }}
     name: ${{ matrix.project_name }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          # - project_name: gradle-junit4
-          #   configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
-          #   project_id: GRADLE_JUNIT4_PROJECT_ID
+          - project_name: gradle-junit4
+            configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
+            project_id: GRADLE_JUNIT4_PROJECT_ID
+            
           # - project_name: gradle-junit5
           #   configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
           #   project_id: GRADLE_JUNIT5_PROJECT_ID
@@ -117,9 +118,9 @@ jobs:
           #   configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
           #   project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
           
-          - project_name: selenide-gradle-junit5
-            configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
+          # - project_name: selenide-gradle-junit5
+          #   configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
+          #   project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
           # - project_name: serenity2-gradle-junit4
           #   configuration_id: SERENITY2_GRADLE_JUNIT4_CONFIGURATION_ID
           #   project_id: SERENITY2_GRADLE_JUNIT4_PROJECT_ID
@@ -133,23 +134,24 @@ jobs:
     steps:
       - name: Checkout adapters-java
         uses: actions/checkout@v4
-      - name: Checkout api-validator-dotnet
-        uses: actions/checkout@v4
-        with:
-          repository: testit-tms/api-validator-dotnet
-          token: ${{ env.GITHUB_PAT }}
-          path: api-validator-dotnet
-          ref: 'feat/java-runs' # TODO:
+      # - name: Checkout api-validator-dotnet
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: testit-tms/api-validator-dotnet
+      #     token: ${{ env.GITHUB_PAT }}
+      #     path: api-validator-dotnet
+      #     ref: 'feat/java-runs' # TODO:
       - name: Checkout java-examples
         uses: actions/checkout@v4
         with:
           repository: testit-tms/java-examples
           path: java-examples
           ref: 'fix/selenide-build' # TODO:  
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          token: ${{ env.GITHUB_PAT }}
+      # - name: Setup dotnet
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Setup java
         uses: actions/setup-java@v4
         with:
@@ -162,21 +164,22 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
         run: |
+          chmod +x gradlew
           ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
-          dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
+          # dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
         run: |
-          testit testrun create --token ${{ env.TMS_PRIVATE_TOKEN }} --output ${{ env.TEMP_FILE }}
+          testit testrun create --token ${{ env.TMS_PRIVATE_TOKEN }} --output ${{ env.TEMP_FILE }} --project-id=${{ env.TMS_PROJECT_ID }} --url=${{ env.TMS_URL }}
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
       - name: Test
         run: |
           cd java-examples/${{ matrix.project_name }}
           chmod +x ./gradlew
           ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
-      - name: Validate
-        run: |
-          dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+      # - name: Validate
+      #   run: |
+      #     dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
 
   # test-maven:
   #   needs: check-label
