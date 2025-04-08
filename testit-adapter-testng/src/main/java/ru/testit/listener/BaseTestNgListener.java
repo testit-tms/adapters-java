@@ -104,6 +104,14 @@ public class BaseTestNgListener implements
         String testNode = testResult.getInstanceName() + "." + testResult.getName();
 
         Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
+        
+        String spaceNameValue = ((method.getDeclaringClass().getPackage() == null
+        || method.getDeclaringClass().getPackage().getName().equals(""))
+        ? null : method.getDeclaringClass().getPackage().getName());
+
+        String spaceName = Utils.extractNamespace(method, spaceNameValue, parameters);
+        String className = Utils.extractClassname(method, method.getDeclaringClass().getSimpleName(), parameters);
+
         final TestResult result = new TestResult()
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method, parameters))
@@ -111,12 +119,8 @@ public class BaseTestNgListener implements
                 .setWorkItemIds(Utils.extractWorkItemId(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters, true))
                 .setName(Utils.extractDisplayName(method, parameters))
-                .setClassName(Utils.extractClassname(method, method.getDeclaringClass().getSimpleName(), parameters))
-                .setSpaceName(Utils.extractNamespace(method,
-                        ((method.getDeclaringClass().getPackage() == null
-                                || method.getDeclaringClass().getPackage().getName().equals(""))
-                                ? null : method.getDeclaringClass().getPackage().getName()),
-                        parameters))
+                .setClassName(Utils.nullOnEmptyString(className))
+                .setSpaceName(Utils.nullOnEmptyString(spaceName))
                 .setLinkItems(Utils.extractLinks(method, parameters))
                 .setDescription(Utils.extractDescription(method, parameters))
                 .setParameters(parameters)

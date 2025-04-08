@@ -47,6 +47,13 @@ public class Utils {
         return workItemIds;
     }
 
+    public static String nullOnEmptyString(String value) {
+        if (value == "") {
+            return null;
+        }
+        return value;
+    }
+
     public static List<LinkItem> extractLinks(final Method atomicTest, Map<String, String> parameters) {
         final List<LinkItem> links = new LinkedList<>();
         final Links linksAnnotation = atomicTest.getAnnotation(Links.class);
