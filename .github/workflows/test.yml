@@ -134,24 +134,24 @@ jobs:
     steps:
       - name: Checkout adapters-java
         uses: actions/checkout@v4
-      # - name: Checkout api-validator-dotnet
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: testit-tms/api-validator-dotnet
-      #     token: ${{ env.GITHUB_PAT }}
-      #     path: api-validator-dotnet
-      #     ref: 'feat/java-runs' # TODO:
+      - name: Checkout api-validator-dotnet
+        uses: actions/checkout@v4
+        with:
+          repository: testit-tms/api-validator-dotnet
+          token: ${{ env.GITHUB_PAT }}
+          path: api-validator-dotnet
+          ref: 'feat/java-runs'
       - name: Checkout java-examples
         uses: actions/checkout@v4
         with:
           repository: testit-tms/java-examples
           path: java-examples
-          ref: 'fix/selenide-build' # TODO:  
+          ref: 'fix/selenide-build'
           token: ${{ env.GITHUB_PAT }}
-      # - name: Setup dotnet
-      #   uses: actions/setup-dotnet@v4
-      #   with:
-      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Setup java
         uses: actions/setup-java@v4
         with:
@@ -165,8 +165,8 @@ jobs:
       - name: Setup environment
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
-          # dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
+          ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal 
+          dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
         run: |
@@ -176,10 +176,12 @@ jobs:
         run: |
           cd java-examples/${{ matrix.project_name }}
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
-      # - name: Validate
-      #   run: |
-      #     dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+          IS_GITHUB_ACTION=true ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
+      - name: Validate
+        run: |
+          dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+
+
 
   # test-maven:
   #   needs: check-label
