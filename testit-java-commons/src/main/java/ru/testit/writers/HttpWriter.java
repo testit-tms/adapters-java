@@ -74,12 +74,15 @@ public class HttpWriter implements Writer {
 
             List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
             results.add(autoTestResultsForTestRunModel);
+            
             List<UUID> ids = apiClient.sendTestResults(config.getTestRunId(), results);
+            
             testResults.put(testResult.getUuid(), ids.get(0));
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: " + (e.getMessage()));
         }
     }
+    
 
     private AutoTestPostModel prepareToCreateAutoTest(TestResult testResult) throws ApiException {
         if (LOGGER.isDebugEnabled()) {
@@ -285,6 +288,7 @@ public class HttpWriter implements Writer {
                             UUID testResultId = testResults.get(test.getUuid());
 
                             TestResultResponse resultModel = apiClient.getTestResult(testResultId);
+
                             TestResultUpdateV2Request model = Converter.testResultToTestResultUpdateModel(resultModel);
                             model.setSetupResults(beforeResultFinish);
                             model.setTeardownResults(afterResultFinish);

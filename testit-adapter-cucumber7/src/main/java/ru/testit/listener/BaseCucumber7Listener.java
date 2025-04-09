@@ -110,6 +110,9 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
         final String uuid = getTestCaseUuid(currentTestCase.get());
         final String scenarioName = currentTestCase.get().getName();
 
+        String className = tagParser.getClassName();
+        String spaceName = tagParser.getNameSpace();
+        
         final TestResult result = new TestResult()
                 .setUuid(uuid)
                 .setExternalId(tagParser.getExternalId())
@@ -117,8 +120,8 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
                 .setTitle(tagParser.getTitle())
                 .setDescription(tagParser.getDescription())
                 .setWorkItemIds(tagParser.getWorkItemIds())
-                .setSpaceName(tagParser.getNameSpace())
-                .setClassName(tagParser.getClassName())
+                .setSpaceName(Utils.nullOnEmptyString(spaceName))
+                .setClassName(Utils.nullOnEmptyString(className))
                 .setLabels(tagParser.getScenarioLabels())
                 .setLinkItems(tagParser.getScenarioLinks())
                 .setParameters(parameters)

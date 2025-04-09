@@ -3,6 +3,7 @@ package ru.testit.listener;
 import org.jbehave.core.model.Scenario;
 import org.jbehave.core.model.Story;
 import ru.testit.models.TestResult;
+import ru.testit.services.Utils;
 
 import java.util.Map;
 
@@ -21,8 +22,8 @@ public class ScenarioParser {
                 .setTitle(tagParser.getTitle())
                 .setDescription(tagParser.getDescription())
                 .setWorkItemIds(tagParser.getWorkItemIds())
-                .setClassName(featureName)
-                .setSpaceName(nameSpace)
+                .setClassName(Utils.nullOnEmptyString(featureName))
+                .setSpaceName(Utils.nullOnEmptyString(nameSpace))
                 .setLabels(tagParser.getLabels())
                 .setLinkItems(tagParser.getLinks())
                 .setParameters(parameters);

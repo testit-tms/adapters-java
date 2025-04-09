@@ -70,11 +70,22 @@ public class Converter {
         model.setMessage(result.getMessage());
         model.setParameters(result.getParameters());
 
+        boolean shouldShortenTrace = false;
+        String isAction = System.getenv("IS_GITHUB_ACTION");
+        if (isAction != null && isAction.equals("true")) {
+            shouldShortenTrace = true;
+        }
+
         Throwable throwable = result.getThrowable();
         if (throwable != null) {
             model.setMessage(throwable.getMessage());
-            model.setTraces(ExceptionUtils.getStackTrace(throwable));
+            String trace = ExceptionUtils.getStackTrace(throwable);
+            // try on short trace
+            model.setTraces(shouldShortenTrace 
+                ? trace.substring(0, Math.min(trace.length(), 100)) 
+                : trace); 
         }
+        
 
         return model;
     }

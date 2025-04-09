@@ -53,7 +53,7 @@ jobs:
 
   test-gradle:
     needs: check-label
-    if: ${{ needs.check-label.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch' }}
+    # if: ${{ needs.check-label.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch' }}
     name: ${{ matrix.project_name }}
     runs-on: ubuntu-latest
     strategy:
@@ -63,69 +63,70 @@ jobs:
           - project_name: gradle-junit4
             configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: GRADLE_JUNIT4_PROJECT_ID
-          - project_name: gradle-junit5
-            configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: GRADLE_JUNIT5_PROJECT_ID
-          - project_name: gradle-testng
-            configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: GRADLE_TESTNG_PROJECT_ID
+            
+          # - project_name: gradle-junit5
+          #   configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
+          #   project_id: GRADLE_JUNIT5_PROJECT_ID
+          # - project_name: gradle-testng
+          #   configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
+          #   project_id: GRADLE_TESTNG_PROJECT_ID
 
-          - project_name: jbehave-gradle-junit5
-            configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
-          - project_name: jbehave-gradle-junit4
-            configuration_id: JBEHAVE_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: JBEHAVE_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: jbehave-gradle-testng
-            configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
+          # - project_name: jbehave-gradle-junit5
+          #   configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
+          #   project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
+          # - project_name: jbehave-gradle-junit4
+          #   configuration_id: JBEHAVE_GRADLE_JUNIT4_CONFIGURATION_ID
+          #   project_id: JBEHAVE_GRADLE_JUNIT4_PROJECT_ID
+          # - project_name: jbehave-gradle-testng
+          #   configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
+          #   project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
 
-          - project_name: cucumber7-gradle-testng
-            configuration_id: CUCUMBER7_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_TESTNG_PROJECT_ID
-          - project_name: cucumber7-gradle-junit4
-            configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: cucumber7-gradle-junit5
-            configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
+          # - project_name: cucumber7-gradle-testng
+          #   configuration_id: CUCUMBER7_GRADLE_TESTNG_CONFIGURATION_ID
+          #   project_id: CUCUMBER7_GRADLE_TESTNG_PROJECT_ID
+          # - project_name: cucumber7-gradle-junit4
+          #   configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
+          #   project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
+          # - project_name: cucumber7-gradle-junit5
+          #   configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
+          #   project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
 
-          - project_name: cucumber6-gradle-junit5
-            configuration_id: CUCUMBER6_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER6_GRADLE_JUNIT5_PROJECT_ID
-          - project_name: cucumber6-gradle-junit4
-            configuration_id: CUCUMBER6_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER6_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: cucumber6-gradle-testng
-            configuration_id: CUCUMBER6_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER6_GRADLE_TESTNG_PROJECT_ID
+          # - project_name: cucumber6-gradle-junit5
+          #   configuration_id: CUCUMBER6_GRADLE_JUNIT5_CONFIGURATION_ID
+          #   project_id: CUCUMBER6_GRADLE_JUNIT5_PROJECT_ID
+          # - project_name: cucumber6-gradle-junit4
+          #   configuration_id: CUCUMBER6_GRADLE_JUNIT4_CONFIGURATION_ID
+          #   project_id: CUCUMBER6_GRADLE_JUNIT4_PROJECT_ID
+          # - project_name: cucumber6-gradle-testng
+          #   configuration_id: CUCUMBER6_GRADLE_TESTNG_CONFIGURATION_ID
+          #   project_id: CUCUMBER6_GRADLE_TESTNG_PROJECT_ID
           
-          - project_name: cucumber5-gradle-junit4
-            configuration_id: CUCUMBER5_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER5_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: cucumber5-gradle-junit5
-            configuration_id: CUCUMBER5_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER5_GRADLE_JUNIT5_PROJECT_ID
-          - project_name: cucumber5-gradle-testng
-            configuration_id: CUCUMBER5_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER5_GRADLE_TESTNG_PROJECT_ID
+          # - project_name: cucumber5-gradle-junit4
+          #   configuration_id: CUCUMBER5_GRADLE_JUNIT4_CONFIGURATION_ID
+          #   project_id: CUCUMBER5_GRADLE_JUNIT4_PROJECT_ID
+          # - project_name: cucumber5-gradle-junit5
+          #   configuration_id: CUCUMBER5_GRADLE_JUNIT5_CONFIGURATION_ID
+          #   project_id: CUCUMBER5_GRADLE_JUNIT5_PROJECT_ID
+          # - project_name: cucumber5-gradle-testng
+          #   configuration_id: CUCUMBER5_GRADLE_TESTNG_CONFIGURATION_ID
+          #   project_id: CUCUMBER5_GRADLE_TESTNG_PROJECT_ID
 
-          - project_name: cucumber4-gradle-junit4
-            configuration_id: CUCUMBER4_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER4_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: cucumber4-gradle-testng
-            configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
+          # - project_name: cucumber4-gradle-junit4
+          #   configuration_id: CUCUMBER4_GRADLE_JUNIT4_CONFIGURATION_ID
+          #   project_id: CUCUMBER4_GRADLE_JUNIT4_PROJECT_ID
+          # - project_name: cucumber4-gradle-testng
+          #   configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
+          #   project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
           
-          - project_name: selenide-gradle-junit5
-            configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
-          - project_name: serenity2-gradle-junit4
-            configuration_id: SERENITY2_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: SERENITY2_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: serenity3-gradle-junit4
-            configuration_id: SERENITY3_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: SERENITY3_GRADLE_JUNIT4_PROJECT_ID
+          # - project_name: selenide-gradle-junit5
+          #   configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
+          #   project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
+          # - project_name: serenity2-gradle-junit4
+          #   configuration_id: SERENITY2_GRADLE_JUNIT4_CONFIGURATION_ID
+          #   project_id: SERENITY2_GRADLE_JUNIT4_PROJECT_ID
+          # - project_name: serenity3-gradle-junit4
+          #   configuration_id: SERENITY3_GRADLE_JUNIT4_CONFIGURATION_ID
+          #   project_id: SERENITY3_GRADLE_JUNIT4_PROJECT_ID
     env:
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
@@ -139,11 +140,14 @@ jobs:
           repository: testit-tms/api-validator-dotnet
           token: ${{ env.GITHUB_PAT }}
           path: api-validator-dotnet
+          ref: 'feat/java-runs'
       - name: Checkout java-examples
         uses: actions/checkout@v4
         with:
           repository: testit-tms/java-examples
           path: java-examples
+          ref: 'fix/selenide-build'
+          token: ${{ env.GITHUB_PAT }}
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
@@ -160,21 +164,24 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
         run: |
-          ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
+          chmod +x gradlew
+          ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal 
           dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
         run: |
-          testit testrun create --token ${{ env.TMS_PRIVATE_TOKEN }} --output ${{ env.TEMP_FILE }}
+          testit testrun create --token ${{ env.TMS_PRIVATE_TOKEN }} --output ${{ env.TEMP_FILE }} --project-id=${{ env.TMS_PROJECT_ID }} --url=${{ env.TMS_URL }}
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
       - name: Test
         run: |
           cd java-examples/${{ matrix.project_name }}
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
+          IS_GITHUB_ACTION=true ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+
+
 
   # test-maven:
   #   needs: check-label

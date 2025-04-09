@@ -109,6 +109,8 @@ public class BaseJunit4Listener extends RunListener {
         String fullName = method.getClassName();
         int index = fullName.lastIndexOf(".");
         String testNode = fullName + "." + method.getMethodName();
+        String spaceName = Utils.extractNamespace(method, (index != -1) ? fullName.substring(0, index) : null);
+        String className = Utils.extractClassname(method, (index != -1) ? fullName.substring(index + 1) : fullName);
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
@@ -117,8 +119,8 @@ public class BaseJunit4Listener extends RunListener {
                 .setWorkItemIds(Utils.extractWorkItemId(method))
                 .setTitle(Utils.extractTitle(method))
                 .setName(Utils.extractDisplayName(method))
-                .setClassName(Utils.extractClassname(method, (index != -1) ? fullName.substring(index + 1) : fullName))
-                .setSpaceName(Utils.extractNamespace(method, (index != -1) ? fullName.substring(0, index) : null))
+                .setClassName(ru.testit.services.Utils.nullOnEmptyString(className))
+                .setSpaceName(ru.testit.services.Utils.nullOnEmptyString(spaceName))
                 .setLinkItems(Utils.extractLinks(method))
                 .setDescription(Utils.extractDescription(method))
                 .setExternalKey(testNode);
