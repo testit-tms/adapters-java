@@ -12,7 +12,11 @@ The repository contains new versions of adaptors for JVM-based test frameworks.
 | 5.0     | 2.3             | 2.3             | 2.3             | 2.3             |
 | 5.2     | 2.4             | 2.4             | 2.4             | 2.4             |
 | 5.2.2   | 2.5             | 2.5             | 2.5             | 2.5             |
+| 5.3     | 2.6.2-TMS-5.3   | 2.6.2-TMS-5.3   | 2.6.2-TMS-5.3   | 2.6.2-TMS-5.3   |
 | Cloud   | 2.6.0-TMS-CLOUD | 2.6.0-TMS-CLOUD | 2.6.0-TMS-CLOUD | 2.6.0-TMS-CLOUD |
+
+
+
 
 Supported test frameworks :
  1. [TestNG](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-testng)
