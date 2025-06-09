@@ -12,6 +12,7 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 public class Converter {
     public static AutoTestPostModel testResultToAutoTestPostModel(TestResult result) {
         AutoTestPostModel model = new AutoTestPostModel();
@@ -359,5 +360,38 @@ public class Converter {
 
             return model;
         }).collect(Collectors.toList());
+    }
+
+    public static AutoTestStepResultUpdateRequest stepResultToRequest(AttachmentPutModelAutoTestStepResultsModel model) {
+        AutoTestStepResultUpdateRequest req = new AutoTestStepResultUpdateRequest();
+        req.setTitle(model.getTitle());
+        req.setDescription(model.getDescription());
+        req.setInfo(model.getInfo());
+        req.setStartedOn(model.getStartedOn());
+        req.setCompletedOn(model.getCompletedOn());
+        req.setDuration(model.getDuration());
+        req.setOutcome(model.getOutcome());
+        req.setStepResults(stepResultsToRequests(model.getStepResults()));
+        req.setAttachments(attachmentsToRequests(model.getAttachments()));
+        req.setParameters(model.getParameters());
+
+        return req;
+    }
+
+    public static List<AutoTestStepResultUpdateRequest> stepResultsToRequests(List<AttachmentPutModelAutoTestStepResultsModel> models) {
+        if (models == null) return null;
+        return models.stream().map(Converter::stepResultToRequest).collect(Collectors.toList());
+    }
+
+    public static AttachmentUpdateRequest attachmentToRequest(AttachmentPutModel model) {
+        AttachmentUpdateRequest req = new AttachmentUpdateRequest();
+        req.setId(model.getId());
+
+        return req;
+    }
+
+    public static List<AttachmentUpdateRequest> attachmentsToRequests(List<AttachmentPutModel> models) {
+        if (models == null) return null;
+        return models.stream().map(Converter::attachmentToRequest).collect(Collectors.toList());
     }
 }
