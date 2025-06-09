@@ -7,6 +7,11 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
 group = "ru.testit"
 
 tasks.withType(JavaCompile::class.java).configureEach {
@@ -16,6 +21,9 @@ tasks.withType(JavaCompile::class.java).configureEach {
     options.setIncremental(true)
     options.isFork = true
 }
+
+val sonaUsername = providers.gradleProperty("sonatypeAccessToken")
+val sonaPassword = providers.gradleProperty("sonatypeAccessPassword")
 
 nexusPublishing {
     connectTimeout.set(Duration.ofMinutes(7))
@@ -30,8 +38,8 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(System.getenv("MAVEN_USERNAME"))
-            password.set(System.getenv("MAVEN_PASSWORD"))
+            username.set(sonaUsername.get())
+            password.set(sonaPassword.get())
         }
     }
 }
@@ -45,6 +53,15 @@ configure(subprojects) {
     apply(plugin = "java")
 
     publishing {
+        repositories {
+            maven {
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = sonaUsername.get()
+                    password =  sonaPassword.get()
+                }
+            }
+        }
         publications {
             create<MavenPublication>("maven") {
                 from(components["java"])
@@ -86,10 +103,6 @@ configure(subprojects) {
     }
 
     signing {
-        val signingKeyId: String? by project
-        val signingKey: String? by project
-        val signingPassword: String? by project
-        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
 
         sign(publishing.publications["maven"])
     }
@@ -132,16 +145,11 @@ configure(subprojects) {
             url = if (version.toString().toLowerCase().contains("snapshot")) snapshotsUrl else releasesUrl
 
             credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
+                username = sonaUsername.get()
+                password =  sonaPassword.get()
             }
         }
         mavenLocal()
         mavenCentral()
     }
-}
-
-repositories {
-    mavenLocal()
-    mavenCentral()
 }
