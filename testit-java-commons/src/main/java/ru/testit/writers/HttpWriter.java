@@ -286,8 +286,8 @@ public class HttpWriter implements Writer {
 
                             TestResultResponse resultModel = apiClient.getTestResult(testResultId);
                             TestResultUpdateV2Request model = Converter.testResultToTestResultUpdateModel(resultModel);
-                            model.setSetupResults(beforeResultFinish);
-                            model.setTeardownResults(afterResultFinish);
+                            model.setSetupResults(Converter.stepResultsToRequests(beforeResultFinish));
+                            model.setTeardownResults(Converter.stepResultsToRequests(afterResultFinish));
 
                             apiClient.updateTestResult(testResultId, model);
 

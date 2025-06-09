@@ -4,3 +4,6 @@ build/
 .vs/
 bin
 .gradle.properties
+secring.gpg
+.secrets
+migrates.txt

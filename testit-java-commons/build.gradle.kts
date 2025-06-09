@@ -4,6 +4,7 @@ plugins {
     java
 }
 
+var apiClientVersion = "2.1.0-TMS-CLOUD"
 val slf4jVersion = "1.7.36"
 val jacksonVersion = "2.17.1"
 
@@ -14,7 +15,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
-    implementation("ru.testit:testit-api-client:2.0.1-TMS-5.3")
+    implementation("ru.testit:testit-api-client:$apiClientVersion")
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:3.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")

@@ -40,6 +40,10 @@ public final class Adapter {
     /**
      * @deprecated This method is no longer acceptable to compute time between versions.
      * <p> Use {@link Adapter#addLinks(String, String, String, LinkType)} instead.
+     * @param title - title
+     * @param description - description
+     * @param type - type
+     * @param url - url
      */
     @Deprecated
     public static void link(final String title, final String description, final LinkType type, final String url) {
@@ -50,6 +54,10 @@ public final class Adapter {
     /**
      * @deprecated This method is no longer acceptable to compute time between versions.
      * <p> Use {@link Adapter#addLinks(String, String, String, LinkType)} instead.
+     * @param url - url
+     * @param title - title
+     * @param description - description
+     * @param type - type
      */
     @Deprecated
     public static void addLink(final String url, final String title, final String description, final LinkType type) {
@@ -139,6 +147,7 @@ public final class Adapter {
     /**
      * @deprecated This method is no longer acceptable to compute time between versions.
      * <p> Use {@link Adapter#addAttachments(String attachment)} instead.
+     * @param attachment - attachment
      */
     @Deprecated
     public static void addAttachment(String attachment) {
