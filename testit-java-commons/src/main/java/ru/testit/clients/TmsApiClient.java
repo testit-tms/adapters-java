@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.testit.client.api.*;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
+import ru.testit.services.HtmlEscapeUtils;
 
 import java.io.File;
 import java.time.Duration;
@@ -50,7 +51,7 @@ public class TmsApiClient implements ApiClient {
         model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
 
         if (!Objects.equals(this.clientConfiguration.getTestRunName(), "null")) {
-            model.setName(this.clientConfiguration.getTestRunName());
+            model.setName(HtmlEscapeUtils.escapeHtmlTags(this.clientConfiguration.getTestRunName()));
         }
 
         if (LOGGER.isDebugEnabled()) {
@@ -79,21 +80,34 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public void updateAutoTest(AutoTestPutModel model) throws ApiException {
+        // Escape HTML tags in model before sending
+        HtmlEscapeUtils.escapeHtmlInObject(model);
+        
         autoTestsApi.updateAutoTest(model);
     }
 
     @Override
     public String createAutoTest(AutoTestPostModel model) throws ApiException {
+        // Escape HTML tags in model before sending
+        HtmlEscapeUtils.escapeHtmlInObject(model);
         return Objects.requireNonNull(autoTestsApi.createAutoTest(model).getId()).toString();
     }
 
     @Override
     public void updateAutoTests(List<AutoTestPutModel> models) throws ApiException {
+        // Escape HTML tags in models before sending
+        for (AutoTestPutModel model : models) {
+            HtmlEscapeUtils.escapeHtmlInObject(model);
+        }
         autoTestsApi.updateMultiple(models);
     }
 
     @Override
     public List<AutoTestModel> createAutoTests(List<AutoTestPostModel> models) throws ApiException {
+        // Escape HTML tags in models before sending
+        for (AutoTestPostModel model : models) {
+            HtmlEscapeUtils.escapeHtmlInObject(model);
+        }
         return autoTestsApi.createMultiple(models);
     }
 
@@ -206,6 +220,8 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException {
+        // Escape HTML tags in models before sending
+        HtmlEscapeUtils.escapeHtmlInObjectList(models);
         return testRunsApi.setAutoTestResultsForTestRun(UUID.fromString(testRunUuid), models);
     }
 
@@ -237,6 +253,8 @@ public class TmsApiClient implements ApiClient {
 
     @Override
     public void updateTestResult(UUID uuid, TestResultUpdateV2Request model) throws ApiException {
+        // Escape HTML tags in model before sending
+        HtmlEscapeUtils.escapeHtmlInObject(model);
         testResultsApi.apiV2TestResultsIdPut(uuid, model);
     }
 }
