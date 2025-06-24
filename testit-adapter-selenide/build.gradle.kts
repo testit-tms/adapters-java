@@ -9,6 +9,7 @@ plugins {
 val selenideVersion = "6.19.1"
 
 dependencies {
+    implementation(project(":testit-adapter-junit5"))
     implementation(project(":testit-java-commons"))
     compileOnly("com.codeborne:selenide:$selenideVersion")
     testImplementation("com.codeborne:selenide:$selenideVersion")
