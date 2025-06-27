@@ -1,0 +1,91 @@
+name: Publish to Maven Central
+
+on:
+  push:
+    tags:
+      - '*'  # Triggers on version tags like 2.7.1-TMS-CLOUD
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish'
+        required: true
+        default: '2.7.1-TMS-CLOUD'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for JReleaser
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    
+    - name: Install JReleaser CLI
+      run: |
+        curl https://jreleaser.org/setup.sh -sSfL | sh
+        echo "$HOME/.jreleaser/caches/jreleaser/distributions/latest" >> $GITHUB_PATH
+    
+    - name: Print JReleaser version
+      run: |
+        echo "JReleaser version:"
+        jreleaser --version
+
+    - name: Extract version from tag or input
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "push" ]; then
+          # Extract version from tag (remove 'v' prefix)
+          VERSION=${GITHUB_REF#refs/tags/v}
+        else
+          # Use manual input
+          VERSION="${{ github.event.inputs.version }}"
+        fi
+        echo "PROJECT_VERSION=$VERSION" >> $GITHUB_ENV
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Publishing version: $VERSION"
+    
+    - name: Make publish script executable
+      run: chmod +x scripts/publish-maven-central.sh
+    
+    - name: Publish to Maven Central
+      env:
+        DEPLOY: true
+        CI: true
+        PROJECT_VERSION: ${{ env.PROJECT_VERSION }}
+        JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
+        JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
+        JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+        JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+        JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+      run: |
+        echo "Publishing version $PROJECT_VERSION to Maven Central..."
+        ./scripts/publish-maven-central.sh
+    
+    - name: Upload JReleaser logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: jreleaser-logs
+        path: out/jreleaser/
+        retention-days: 5
+    
+ 

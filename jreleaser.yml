@@ -1,0 +1,44 @@
+project:
+  name: adapters-java
+  version: "XXX" # set automatically by publish-maven-central.sh
+  description: TestIT Framework Java Adapters
+  longDescription: |
+    Java adapters for TestIT Test Management System.
+    Includes adapters for JUnit 4/5, TestNG, Cucumber, JBehave, and Selenide.
+  authors:
+    - Integration team
+  license: Apache-2.0
+  links:
+    homepage: https://github.com/testit-tms/adapters-java
+    documentation: https://github.com/testit-tms/adapters-java
+  copyright: TestIT
+  java:
+    groupId: ru.testit
+
+# Environment variables setup
+environment:
+  properties:
+    artifactsDir: "out/jreleaser/assemble"
+
+# Disable GitHub release
+release:
+  github:
+    enabled: false
+
+# Signing configuration - will sign all artifacts
+signing:
+  active: ALWAYS
+  armored: true
+  verify: true
+
+# Deploy configuration for Maven Central Portal Publisher API
+deploy:
+  maven:
+    mavenCentral:
+      sonatype:
+        active: ALWAYS
+        url: https://central.sonatype.com/api/v1/publisher
+        stagingRepositories:
+          - "*/build/staging-deploy"
+        retryDelay: 20
+        maxRetries: 60 

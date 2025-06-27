@@ -7,3 +7,7 @@ bin
 secring.gpg
 .secrets
 migrates.txt
+keys/
+.env
+env.example
+out
