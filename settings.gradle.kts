@@ -13,9 +13,9 @@ include("testit-adapter-selenide")
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        mavenCentral()
     }
     plugins {
         kotlin("jvm") version "1.6.21"
     }
 }
-

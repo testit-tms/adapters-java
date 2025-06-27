@@ -18,7 +18,7 @@ public class HtmlEscapeUtils {
      * Escapes HTML tags to prevent XSS attacks.
      * First checks if the string contains HTML tags using regex pattern.
      * Only performs escaping if HTML tags are detected.
-     * Escapes all < as \< and > as \> only if they are not already escaped.
+     * Escapes all &lt; as \&lt; and &gt; as \&gt; only if they are not already escaped.
      * Uses regex with negative lookbehind to avoid double escaping.
      * @param text The text to escape
      * @return Escaped text or original text if no HTML tags found
