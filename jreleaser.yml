@@ -12,8 +12,9 @@ project:
     homepage: https://github.com/testit-tms/adapters-java
     documentation: https://github.com/testit-tms/adapters-java
   copyright: TestIT
-  java:
-    groupId: ru.testit
+  languages:
+    java:
+      groupId: ru.testit
 
 # Environment variables setup
 environment:

@@ -32,26 +32,55 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
     
-    - name: Install JReleaser CLI
+    - name: Install JReleaser CLI (manual setup)
       run: |
-        curl https://jreleaser.org/setup.sh -sSfL | sh
-        echo "$HOME/.jreleaser/caches/jreleaser/distributions/latest" >> $GITHUB_PATH
+        # Try to install a working version manually
+        JRELEASER_VERSION="1.18.0"
+        mkdir -p ~/.jreleaser/bin
+        
+        # Download the tar.gz version which usually contains all dependencies
+        curl -sL "https://github.com/jreleaser/jreleaser/releases/download/v${JRELEASER_VERSION}/jreleaser-tool-provider-${JRELEASER_VERSION}.jar" -o ~/.jreleaser/bin/jreleaser.jar
+        
+        # Create a wrapper script
+        cat > ~/.jreleaser/bin/jreleaser << 'EOF'
+        #!/bin/bash
+        java -jar ~/.jreleaser/bin/jreleaser.jar "$@"
+        EOF
+        chmod +x ~/.jreleaser/bin/jreleaser
+        
+        echo "$HOME/.jreleaser/bin" >> $GITHUB_PATH
     
-    - name: Print JReleaser version
+    - name: Print JReleaser version and check Java
       run: |
+        echo "Java version:"
+        java -version
         echo "JReleaser version:"
         jreleaser --version
+        echo "JReleaser path:"
+        which jreleaser
+        echo "JReleaser is running on JVM (not native binary)"
+
     
-    - name: Extract version from tag or input
+    - name: Extract version from gradle.properties  
       id: version
       run: |
-        VERSION="2.7.1-TMS-CLOUD"
+        # Read version from gradle.properties
+        VERSION=$(grep '^version=' gradle.properties | cut -d'=' -f2)
+        echo "Using version from gradle.properties: $VERSION"
+        
+        # Validate that version is not empty
+        if [ -z "$VERSION" ]; then
+          echo "❌ Error: Could not determine version from gradle.properties!"
+          exit 1
+        fi
+        
         echo "PROJECT_VERSION=$VERSION" >> $GITHUB_ENV
         echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "Publishing version: $VERSION"
+        echo "✅ Final version: $VERSION"
     
     - name: Make publish script executable
       run: chmod +x scripts/publish-maven-central.sh
+
     
     - name: Check publish script without deploy
       env:
