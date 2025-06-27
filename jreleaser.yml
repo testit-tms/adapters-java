@@ -39,6 +39,15 @@ deploy:
         active: ALWAYS
         url: https://central.sonatype.com/api/v1/publisher
         stagingRepositories:
-          - "*/build/staging-deploy"
+          - "testit-adapter-cucumber4/build/staging-deploy"
+          - "testit-adapter-cucumber5/build/staging-deploy"
+          - "testit-adapter-cucumber6/build/staging-deploy"
+          - "testit-adapter-cucumber7/build/staging-deploy"
+          - "testit-adapter-jbehave/build/staging-deploy"
+          - "testit-adapter-junit4/build/staging-deploy"
+          - "testit-adapter-junit5/build/staging-deploy"
+          - "testit-adapter-selenide/build/staging-deploy"
+          - "testit-adapter-testng/build/staging-deploy"
+          - "testit-java-commons/build/staging-deploy"
         retryDelay: 20
         maxRetries: 60 
