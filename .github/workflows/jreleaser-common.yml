@@ -1,0 +1,147 @@
+name: JReleaser Common Workflow
+
+on:
+  workflow_call:
+    inputs:
+      version_source:
+        description: 'Source of version: "tag", "input", or "gradle"'
+        required: true
+        type: string
+      manual_version:
+        description: 'Manual version for input source'
+        required: false
+        type: string
+        default: ''
+      deploy_enabled:
+        description: 'Whether to actually deploy (true/false)'
+        required: true
+        type: boolean
+    secrets:
+      JRELEASER_MAVENCENTRAL_USERNAME:
+        required: true
+      JRELEASER_MAVENCENTRAL_PASSWORD:
+        required: true
+      JRELEASER_GPG_PASSPHRASE:
+        required: true
+      JRELEASER_GPG_SECRET_KEY:
+        required: true
+      JRELEASER_GPG_PUBLIC_KEY:
+        required: true
+
+jobs:
+  jreleaser:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for JReleaser
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    
+    - name: Install JReleaser CLI (manual setup)
+      run: |
+        # Try to install a working version manually
+        JRELEASER_VERSION="1.18.0"
+        mkdir -p ~/.jreleaser/bin
+        
+        # Download the tar.gz version which usually contains all dependencies
+        curl -sL "https://github.com/jreleaser/jreleaser/releases/download/v${JRELEASER_VERSION}/jreleaser-tool-provider-${JRELEASER_VERSION}.jar" -o ~/.jreleaser/bin/jreleaser.jar
+        
+        # Create a wrapper script
+        cat > ~/.jreleaser/bin/jreleaser << 'EOF'
+        #!/bin/bash
+        java -jar ~/.jreleaser/bin/jreleaser.jar "$@"
+        EOF
+        chmod +x ~/.jreleaser/bin/jreleaser
+        
+        echo "$HOME/.jreleaser/bin" >> $GITHUB_PATH
+    
+    - name: Print JReleaser version and check Java
+      run: |
+        echo "Java version:"
+        java -version
+        echo "JReleaser version:"
+        jreleaser --version
+        echo "JReleaser path:"
+        which jreleaser
+        echo "JReleaser is running on JVM (not native binary)"
+
+    - name: Extract version
+      id: version
+      run: |
+        case "${{ inputs.version_source }}" in
+          "tag")
+            # Extract version from tag (remove refs/tags/ prefix)
+            VERSION=${GITHUB_REF#refs/tags/}
+            echo "Using version from git tag: $VERSION"
+            ;;
+          "input")
+            # Use manual input
+            VERSION="${{ inputs.manual_version }}"
+            echo "Using version from manual input: $VERSION"
+            ;;
+          "gradle")
+            # Read version from gradle.properties
+            VERSION=$(grep '^version=' gradle.properties | cut -d'=' -f2)
+            echo "Using version from gradle.properties: $VERSION"
+            ;;
+          *)
+            echo "❌ Error: Unknown version source '${{ inputs.version_source }}'"
+            exit 1
+            ;;
+        esac
+        
+        # Validate that version is not empty
+        if [ -z "$VERSION" ]; then
+          echo "❌ Error: Could not determine version!"
+          exit 1
+        fi
+        
+        echo "PROJECT_VERSION=$VERSION" >> $GITHUB_ENV
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "✅ Final version: $VERSION"
+    
+    - name: Make publish script executable
+      run: chmod +x scripts/publish-maven-central.sh
+        
+    - name: Run JReleaser
+      env:
+        DEPLOY: ${{ inputs.deploy_enabled }}
+        CI: true
+        PROJECT_VERSION: ${{ env.PROJECT_VERSION }}
+        JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
+        JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
+        JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+        JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+        JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+      run: |
+        if [ "${{ inputs.deploy_enabled }}" = "true" ]; then
+          echo "🚀 Publishing version $PROJECT_VERSION to Maven Central..."
+        else
+          echo "🔍 Checking JReleaser configuration for version $PROJECT_VERSION..."
+        fi
+        ./scripts/publish-maven-central.sh
+    
+    - name: Upload JReleaser logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: jreleaser-logs-${{ github.run_id }}
+        path: out/jreleaser/
+        retention-days: 5 
