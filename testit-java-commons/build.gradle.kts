@@ -4,7 +4,7 @@ plugins {
     java
 }
 
-var apiClientVersion = "2.2.1-TMS-5.4"
+var apiClientVersion = "2.2.0-TMS-CLOUD"
 val slf4jVersion = "1.7.36"
 val jacksonVersion = "2.17.1"
 
