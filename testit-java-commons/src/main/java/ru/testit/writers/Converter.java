@@ -228,7 +228,11 @@ public class Converter {
             model.setDescription(step.getDescription());
             model.setStartedOn(dateToOffsetDateTime(step.getStart()));
             model.setCompletedOn(dateToOffsetDateTime(step.getStop()));
-            model.setDuration(step.getStop() - step.getStart());
+            Long stop = step.getStop();
+            Long start = step.getStart();
+            if (stop != null && start != null) {
+                model.setDuration(stop - start);
+            }
             model.setOutcome(AvailableTestResultOutcome.fromValue(step.getItemStatus().value()));
             model.setStepResults(convertResultStep(step.getSteps()));
             model.attachments(convertAttachments(step.getAttachments()));
