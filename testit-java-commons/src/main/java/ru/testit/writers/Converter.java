@@ -259,6 +259,9 @@ public class Converter {
     }
 
     private static OffsetDateTime dateToOffsetDateTime(Long time) {
+        if (time == null) {
+            return null;
+        }
         Date date = new Date(time);
         return date.toInstant().atOffset(ZoneOffset.UTC);
     }
