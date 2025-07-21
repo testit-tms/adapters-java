@@ -233,7 +233,9 @@ public class Converter {
             if (stop != null && start != null) {
                 model.setDuration(stop - start);
             }
-            model.setOutcome(AvailableTestResultOutcome.fromValue(step.getItemStatus().value()));
+            if (step.getItemStatus() != null) {
+                model.setOutcome(AvailableTestResultOutcome.fromValue(step.getItemStatus().value()));
+            }
             model.setStepResults(convertResultStep(step.getSteps()));
             model.attachments(convertAttachments(step.getAttachments()));
             model.parameters(step.getParameters());
