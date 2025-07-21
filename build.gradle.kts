@@ -4,7 +4,11 @@ plugins {
     java
     `maven-publish`
     signing
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
 }
 
 group = "ru.testit"
@@ -17,25 +21,6 @@ tasks.withType(JavaCompile::class.java).configureEach {
     options.isFork = true
 }
 
-nexusPublishing {
-    connectTimeout.set(Duration.ofMinutes(7))
-    clientTimeout.set(Duration.ofMinutes(7))
-
-    transitionCheckOptions {
-        maxRetries.set(100)
-        delayBetween.set(Duration.ofSeconds(10))
-    }
-
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(System.getenv("MAVEN_USERNAME"))
-            password.set(System.getenv("MAVEN_PASSWORD"))
-        }
-    }
-}
-
 configure(subprojects) {
     group = "ru.testit"
     version = version
@@ -45,6 +30,13 @@ configure(subprojects) {
     apply(plugin = "java")
 
     publishing {
+        repositories {
+            // JReleaser staging repository
+            maven {
+                name = "staging"
+                url = uri(layout.buildDirectory.dir("staging-deploy"))
+            }
+        }
         publications {
             create<MavenPublication>("maven") {
                 from(components["java"])
@@ -85,15 +77,6 @@ configure(subprojects) {
         }
     }
 
-    signing {
-        val signingKeyId: String? by project
-        val signingKey: String? by project
-        val signingPassword: String? by project
-        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-
-        sign(publishing.publications["maven"])
-    }
-
     tasks.withType<Sign>().configureEach {
         if (System.getProperty("disableSign") == "true") {
             enabled = false;
@@ -126,22 +109,30 @@ configure(subprojects) {
     }
 
     repositories {
-        maven {
-            val releasesUrl = uri("https://s01.oss.sonatype.org/content/repositories/releases")
-            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
-            url = if (version.toString().toLowerCase().contains("snapshot")) snapshotsUrl else releasesUrl
-
-            credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
-            }
-        }
         mavenLocal()
         mavenCentral()
     }
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
+// JReleaser helper tasks
+tasks.register("jreleaserStage") {
+    group = "publishing"
+    description = "Stages all modules for JReleaser deployment"
+    
+    // Depend on publishing tasks from all subprojects
+    subprojects.forEach { project ->
+        dependsOn("${project.path}:publishMavenPublicationToStagingRepository")
+    }
+    
+    doLast {
+        println("✅ All modules staged for JReleaser deployment")
+        println("📁 Staging directories:")
+        subprojects.forEach { project ->
+            val stagingDir = project.layout.buildDirectory.dir("staging-deploy").get().asFile
+            if (stagingDir.exists()) {
+                println("   ${project.name}: ${stagingDir.absolutePath}")
+            }
+        }
+        println("🚀 Run 'jreleaser deploy' to publish to Maven Central")
+    }
 }
