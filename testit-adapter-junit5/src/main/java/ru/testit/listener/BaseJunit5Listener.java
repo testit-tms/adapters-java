@@ -57,6 +57,11 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
         adapterManager.stopClassContainer(Utils.getHash(context.getRequiredTestClass().getName()));
         adapterManager.stopMainContainer(launcherUUID.get());
+
+        if (BeforeAllThrowable != null)
+        {
+            BeforeAllThrowable = null;
+        }
     }
 
     @Override
@@ -383,7 +388,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
         if (BeforeEachThrowable != null)
         {
-            throw BeforeEachThrowable;
+            Throwable exception = BeforeEachThrowable;
+            BeforeEachThrowable = null;
+
+            throw exception;
         }
     }
 }
