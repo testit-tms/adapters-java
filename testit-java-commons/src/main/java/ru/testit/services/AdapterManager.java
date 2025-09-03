@@ -756,13 +756,14 @@ public class AdapterManager {
     public List<String> getTestFromTestRun() {
         if (adapterConfig.shouldEnableTmsIntegration()) {
             try {
-                List<String> testsForRun = client.getTestFromTestRun(clientConfiguration.getTestRunId(), clientConfiguration.getConfigurationId());
+                Set<Long> autotestGlobalIds = client.getAutotestGlobalIdsFromTestRun();
+                List<String> externalIds = client.getExternalIds(autotestGlobalIds);
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("List of tests from test run: {}", testsForRun);
+                    LOGGER.debug("List of tests from test run: {}", externalIds);
                 }
 
-                return testsForRun;
+                return externalIds;
             } catch (ApiException e) {
                 LOGGER.error("Could not get tests from test run", e);
             }

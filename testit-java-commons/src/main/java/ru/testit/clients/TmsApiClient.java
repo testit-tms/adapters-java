@@ -21,6 +21,7 @@ public class TmsApiClient implements ApiClient {
     private static final boolean INCLUDE_LINKS = true;
     private static final int MAX_TRIES = 10;
     private static final int WAITING_TIME = 100;
+    private static final int TESTS_LIMIT = 100;
 
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
@@ -244,6 +245,67 @@ public class TmsApiClient implements ApiClient {
         return model.getTestResults().stream()
                 .filter(result -> Objects.equals(result.getConfigurationId(), configUUID))
                 .map(result -> Objects.requireNonNull(result.getAutoTest()).getExternalId()).collect(Collectors.toList());
+    }
+
+    public Set<Long> getAutotestGlobalIdsFromTestRun() throws  ApiException {
+        List<TestResultShortResponse> allTestResults = new ArrayList<>();
+        TestResultsFilterApiModel model = Converter.buildTestResultsFilterApiModelWithInProgressOutcome(
+                UUID.fromString(clientConfiguration.getTestRunId()),
+                UUID.fromString(clientConfiguration.getConfigurationId())
+        );
+        int skip = 0;
+
+        do
+        {
+            List<TestResultShortResponse> testResults = testResultsApi.apiV2TestResultsSearchPost(
+                    skip,
+                    TESTS_LIMIT,
+                    null,
+                    null,
+                    null,
+                    model
+            );
+
+            allTestResults.addAll(testResults);
+            skip += TESTS_LIMIT;
+
+            if (testResults.isEmpty()) {
+                skip = -1;
+            }
+        } while(skip >= 0);
+
+        return allTestResults.stream()
+                .map(result -> Objects.requireNonNull(result).getAutotestGlobalId())
+                .collect(Collectors.toSet());
+    }
+
+    public List<String> getExternalIds(Set<Long> globalIds) throws  ApiException {
+        List<AutoTestApiResult> allAutotests = new ArrayList<>();
+        AutoTestSearchApiModel model = Converter.buildAutoTestSearchApiModel(globalIds);
+        int skip = 0;
+
+        do
+        {
+            List<AutoTestApiResult> autotests = autoTestsApi.apiV2AutoTestsSearchPost(
+                    skip,
+                    TESTS_LIMIT,
+                    null,
+                    null,
+                    null,
+                    model
+            );
+
+            allAutotests.addAll(autotests);
+            skip += TESTS_LIMIT;
+
+            if (autotests.isEmpty()) {
+                skip = -1;
+            }
+        } while(skip >= 0);
+
+        return allAutotests.stream()
+                .map(result -> Objects.requireNonNull(result).getExternalId())
+                .collect(Collectors.toList());
     }
 
     @Override

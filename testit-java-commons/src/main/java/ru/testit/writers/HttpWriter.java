@@ -6,11 +6,12 @@ import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 import ru.testit.clients.ApiClient;
 import ru.testit.clients.ClientConfiguration;
+import ru.testit.clients.Converter;
 import ru.testit.models.ClassContainer;
-import ru.testit.models.ItemStatus;
 import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;
 import ru.testit.services.ResultStorage;
+import ru.testit.writers.helpers.BulkAutotestHelper;
 
 import java.util.*;
 
@@ -20,7 +21,6 @@ public class HttpWriter implements Writer {
     private final ApiClient apiClient;
     private final ResultStorage storage;
     private final ClientConfiguration config;
-    private final int maxTestsForWrite = 100;
 
     public HttpWriter(ClientConfiguration config, ApiClient client, ResultStorage storage) {
         this.config = config;
@@ -55,12 +55,16 @@ public class HttpWriter implements Writer {
                     LOGGER.debug("The auto test {} is exist", testResult.getExternalId());
                 }
 
-                AutoTestPutModel autoTestPutModel = prepareToUpdateAutoTest(testResult, autotest);
+                AutoTestPutModel autoTestPutModel = Converter.prepareToUpdateAutoTest(
+                        testResult,
+                        autotest,
+                        config.getProjectId()
+                );
 
                 apiClient.updateAutoTest(autoTestPutModel);
                 autoTestId = autotest.getId().toString();
             } else {
-                AutoTestPostModel model = prepareToCreateAutoTest(testResult);
+                AutoTestPostModel model = Converter.prepareToCreateAutoTest(testResult, config.getProjectId());
                 autoTestId = apiClient.createAutoTest(model);
             }
 
@@ -70,7 +74,10 @@ public class HttpWriter implements Writer {
                 updateTestLinkToWorkItems(autoTestId, workItemIds);
             }
 
-            AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = prepareTestResultForTestRun(testResult);
+            AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
+                    testResult,
+                    config.getConfigurationId()
+            );
 
             List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
             results.add(autoTestResultsForTestRunModel);
@@ -79,49 +86,6 @@ public class HttpWriter implements Writer {
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: " + (e.getMessage()));
         }
-    }
-
-    private AutoTestPostModel prepareToCreateAutoTest(TestResult testResult) throws ApiException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Preparing to create the auto test {}", testResult.getExternalId());
-        }
-
-        AutoTestPostModel model = Converter.testResultToAutoTestPostModel(testResult);
-        model.setProjectId(UUID.fromString(config.getProjectId()));
-
-        //TODO: add WorkItemIds to AutoTestPutModel and AutoTestPostModel models after fixing the API
-        List<UUID> workItemUuids = apiClient.GetWorkItemUuidsByIds(testResult.getWorkItemIds());
-
-        model.setWorkItemIdsForLinkWithAutoTest(new HashSet<>(workItemUuids));
-
-        return model;
-    }
-
-    private AutoTestPutModel prepareToUpdateAutoTest(TestResult testResult, AutoTestModel autotest) throws ApiException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Preparing to update the auto test {}", testResult.getExternalId());
-        }
-
-        AutoTestPutModel model;
-
-        if (testResult.getItemStatus() == ItemStatus.FAILED) {
-            model = Converter.autoTestModelToAutoTestPutModel(autotest);
-            model.links(Converter.convertPutLinks(testResult.getLinkItems()));
-        } else {
-            model = Converter.testResultToAutoTestPutModel(testResult);
-            model.setProjectId(UUID.fromString(config.getProjectId()));
-        }
-
-        model.setIsFlaky(autotest.getIsFlaky());
-
-        //TODO: add WorkItemIds to AutoTestPutModel and AutoTestPostModel models after fixing the API
-        List<UUID> workItemUuids = apiClient.GetWorkItemUuidsByIds(testResult.getWorkItemIds());
-
-        workItemUuids = prepareWorkItemUuidsForUpdateAutoTest(workItemUuids, autotest.getId().toString());
-
-        model.setWorkItemIdsForLinkWithAutoTest(new HashSet<>(workItemUuids));
-
-        return model;
     }
 
     private List<UUID> prepareWorkItemUuidsForUpdateAutoTest(List<UUID> workItemUuids, String autoTestId) throws ApiException {
@@ -138,18 +102,6 @@ public class HttpWriter implements Writer {
         }
 
         return workItemUuids;
-    }
-
-    private AutoTestResultsForTestRunModel prepareTestResultForTestRun(TestResult testResult)
-    {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Preparing the test result for the auto test {}", testResult.getExternalId());
-        }
-
-        AutoTestResultsForTestRunModel model = Converter.testResultToAutoTestResultsForTestRunModel(testResult);
-        model.setConfigurationId(UUID.fromString(config.getConfigurationId()));
-
-        return model;
     }
 
     private void updateTestLinkToWorkItems(String autoTestId, List<String> workItemIds) throws ApiException {
@@ -231,8 +183,6 @@ public class HttpWriter implements Writer {
         List<AttachmentPutModelAutoTestStepResultsModel> beforeResultAll = Converter.convertResultFixture(container.getBeforeMethods(), null);
         List<AttachmentPutModelAutoTestStepResultsModel> afterResultAll = Converter.convertResultFixture(container.getAfterMethods(), null);
 
-//        List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
-
         for (final String classUuid : container.getChildren()) {
             storage.getClassContainer(classUuid).ifPresent(cl -> {
                 List<AutoTestStepModel> afterClass = Converter.convertFixture(cl.getAfterClassMethods(), null);
@@ -306,10 +256,7 @@ public class HttpWriter implements Writer {
         List<AttachmentPutModelAutoTestStepResultsModel> beforeResultAll = Converter.convertResultFixture(container.getBeforeMethods(), null);
         List<AttachmentPutModelAutoTestStepResultsModel> afterResultAll = Converter.convertResultFixture(container.getAfterMethods(), null);
 
-        List<AutoTestPostModel> autotestsForCreate = new ArrayList<>();
-        List<AutoTestPutModel> autotestsForUpdate = new ArrayList<>();
-        List<AutoTestResultsForTestRunModel> resultsForAutotestsBeingCreated = new ArrayList<>();
-        List<AutoTestResultsForTestRunModel> resultsForAutotestsBeingUpdated = new ArrayList<>();
+        BulkAutotestHelper bulkHelper = new BulkAutotestHelper(apiClient, config);
 
         for (final String classUuid : container.getChildren()) {
             storage.getClassContainer(classUuid).ifPresent(cl -> {
@@ -349,45 +296,45 @@ public class HttpWriter implements Writer {
 
                             AutoTestModel autoTestModel = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
 
-                            AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = prepareTestResultForTestRun(test);
+                            AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
+                                    test,
+                                    config.getConfigurationId()
+                            );
 
                             autoTestResultsForTestRunModel.setSetupResults(beforeResultFinish);
                             autoTestResultsForTestRunModel.setTeardownResults(afterResultFinish);
 
                             if (autoTestModel == null) {
-                                AutoTestPostModel model = prepareToCreateAutoTest(test);
+                                AutoTestPostModel model = Converter.prepareToCreateAutoTest(
+                                        test,
+                                        config.getProjectId()
+                                );
 
                                 model.setSetup(beforeFinish);
                                 model.setTeardown(afterFinish);
-
-                                autotestsForCreate.add(model);
-                                resultsForAutotestsBeingCreated.add(autoTestResultsForTestRunModel);
-
-                                if (autotestsForCreate.size() >= maxTestsForWrite)
-                                {
-                                    apiClient.createAutoTests(autotestsForCreate);
-                                    apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingCreated);
-
-                                    autotestsForCreate.clear();
-                                    resultsForAutotestsBeingCreated.clear();
-                                }
+                                bulkHelper.addForCreate(model, autoTestResultsForTestRunModel);
                             } else {
-                                AutoTestPutModel model = prepareToUpdateAutoTest(test, autoTestModel);
+                                AutoTestPutModel model = Converter.prepareToUpdateAutoTest(
+                                        test,
+                                        autoTestModel,
+                                        config.getProjectId()
+                                );
 
                                 model.setSetup(beforeFinish);
                                 model.setTeardown(afterFinish);
 
-                                autotestsForUpdate.add(model);
-                                resultsForAutotestsBeingUpdated.add(autoTestResultsForTestRunModel);
+                                String id = autoTestModel.getGlobalId().toString();
+                                List<String> wi = test.getWorkItemIds();
 
-                                if (autotestsForUpdate.size() >= maxTestsForWrite)
-                                {
-                                    apiClient.updateAutoTests(autotestsForUpdate);
-                                    apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingUpdated);
+                                Map<String, List<String>> autotestLinksToWIForUpdate = Map.of(
+                                        id, wi
+                                );
 
-                                    autotestsForUpdate.clear();
-                                    resultsForAutotestsBeingUpdated.clear();
-                                }
+                                bulkHelper.addForUpdate(
+                                        model,
+                                        autoTestResultsForTestRunModel,
+                                        autotestLinksToWIForUpdate
+                                );
                             }
                         } catch (ApiException e) {
                             LOGGER.error(e.getMessage());
@@ -398,21 +345,7 @@ public class HttpWriter implements Writer {
         }
 
         try {
-            if (!autotestsForCreate.isEmpty()) {
-                apiClient.createAutoTests(autotestsForCreate);
-                apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingCreated);
-
-                autotestsForCreate.clear();
-                resultsForAutotestsBeingCreated.clear();
-            }
-            if (!autotestsForUpdate.isEmpty())
-            {
-                apiClient.updateAutoTests(autotestsForUpdate);
-                apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingUpdated);
-
-                autotestsForUpdate.clear();
-                resultsForAutotestsBeingUpdated.clear();
-            }
+            bulkHelper.teardown();
         } catch (ApiException e) {
             LOGGER.error(e.getMessage());
         }

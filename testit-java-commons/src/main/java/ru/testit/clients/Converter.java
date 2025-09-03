@@ -1,6 +1,9 @@
-package ru.testit.writers;
+package ru.testit.clients;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.LinkType;
 import ru.testit.client.model.*;
 import ru.testit.models.*;
@@ -14,6 +17,8 @@ import java.util.stream.Collectors;
 
 
 public class Converter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Converter.class);
+
     public static AutoTestPostModel testResultToAutoTestPostModel(TestResult result) {
         AutoTestPostModel model = new AutoTestPostModel();
 
@@ -65,7 +70,7 @@ public class Converter {
         model.setStartedOn(dateToOffsetDateTime(result.getStart()));
         model.setCompletedOn(dateToOffsetDateTime(result.getStop()));
         model.setDuration(result.getStop() - result.getStart());
-        model.setOutcome(AvailableTestResultOutcome.fromValue(result.getItemStatus().value()));
+        model.setStatusCode(result.getItemStatus().value());
         model.setStepResults(convertResultStep(result.getSteps()));
         model.attachments(convertAttachments(result.getAttachments()));
         model.setMessage(result.getMessage());
@@ -105,7 +110,7 @@ public class Converter {
         TestResultUpdateV2Request model = new TestResultUpdateV2Request();
 
         model.setDuration(result.getDurationInMs());
-        model.setOutcome(result.getOutcome());
+        model.setStatusCode(result.getStatus().getCode());
         model.setLinks(result.getLinks());
         model.setStepResults(result.getStepResults());
         model.setFailureClassIds(result.getFailureClassIds());
@@ -300,6 +305,7 @@ public class Converter {
         AutoTestModel model = new AutoTestModel();
 
         model.setId(autoTestApiResult.getId());
+        model.setGlobalId(autoTestApiResult.getGlobalId());
         model.setExternalId(autoTestApiResult.getExternalId());
         model.setLinks(convertLinkApiResultsToPutLinks(autoTestApiResult.getLinks()));
         model.setProjectId(autoTestApiResult.getProjectId());
@@ -402,5 +408,95 @@ public class Converter {
     public static List<AttachmentUpdateRequest> attachmentsToRequests(List<AttachmentPutModel> models) {
         if (models == null) return null;
         return models.stream().map(Converter::attachmentToRequest).collect(Collectors.toList());
+    }
+
+    public static AutoTestPostModel prepareToCreateAutoTest(
+            TestResult testResult,
+            String projectId) throws ApiException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Preparing to create the auto test {}", testResult.getExternalId());
+        }
+
+        AutoTestPostModel model = Converter.testResultToAutoTestPostModel(testResult);
+        model.setProjectId(UUID.fromString(projectId));
+
+        //TODO: add WorkItemIds to AutoTestPutModel and AutoTestPostModel models after fixing the API
+//        List<UUID> workItemUuids = apiClient.GetWorkItemUuidsByIds(testResult.getWorkItemIds());
+//
+//        model.setWorkItemIdsForLinkWithAutoTest(new HashSet<>(workItemUuids));
+
+        return model;
+    }
+
+    public static AutoTestPutModel prepareToUpdateAutoTest(
+            TestResult testResult,
+            AutoTestModel autotest,
+            String projectId) throws ApiException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Preparing to update the auto test {}", testResult.getExternalId());
+        }
+
+        AutoTestPutModel model;
+
+        if (testResult.getItemStatus() == ItemStatus.FAILED) {
+            model = Converter.autoTestModelToAutoTestPutModel(autotest);
+            model.links(Converter.convertPutLinks(testResult.getLinkItems()));
+        } else {
+            model = Converter.testResultToAutoTestPutModel(testResult);
+            model.setProjectId(UUID.fromString(projectId));
+        }
+
+        model.setIsFlaky(autotest.getIsFlaky());
+
+        //TODO: add WorkItemIds to AutoTestPutModel and AutoTestPostModel models after fixing the API
+//        List<UUID> workItemUuids = apiClient.GetWorkItemUuidsByIds(testResult.getWorkItemIds());
+//
+//        workItemUuids = prepareWorkItemUuidsForUpdateAutoTest(workItemUuids, autotest.getId().toString());
+//
+//        model.setWorkItemIdsForLinkWithAutoTest(new HashSet<>(workItemUuids));
+
+        return model;
+    }
+
+    public static AutoTestResultsForTestRunModel prepareTestResultForTestRun(
+            TestResult testResult,
+            String configurationId
+    ) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Preparing the test result for the auto test {}", testResult.getExternalId());
+        }
+
+        AutoTestResultsForTestRunModel model = Converter.testResultToAutoTestResultsForTestRunModel(testResult);
+        model.setConfigurationId(UUID.fromString(configurationId));
+
+        return model;
+    }
+
+    public static TestResultsFilterApiModel buildTestResultsFilterApiModelWithInProgressOutcome(
+            UUID testRunId, UUID configurationId) {
+        TestResultsFilterApiModel model = new TestResultsFilterApiModel();
+
+        model.setTestRunIds(List.of(testRunId));
+        model.setConfigurationIds(List.of(configurationId));
+        model.setStatusCodes(List.of("InProgress"));
+
+        return model;
+    }
+
+    public static AutoTestSearchApiModel buildAutoTestSearchApiModel(Set<Long> globalIds) {
+        AutoTestFilterApiModel filter = new AutoTestFilterApiModel();
+
+        filter.setGlobalIds(globalIds);
+
+        AutoTestSearchIncludeApiModel includes = new AutoTestSearchIncludeApiModel();
+        includes.setIncludeLabels(false);
+        includes.setIncludeSteps(false);
+        includes.setIncludeLinks(false);
+
+        AutoTestSearchApiModel model = new AutoTestSearchApiModel();
+        model.setFilter(filter);
+        model.setIncludes(includes);
+
+        return model;
     }
 }
