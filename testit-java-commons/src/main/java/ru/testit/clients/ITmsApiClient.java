@@ -6,7 +6,7 @@ import ru.testit.client.model.*;
 import java.util.List;
 import java.util.UUID;
 
-public interface ApiClient {
+public interface ITmsApiClient {
     TestRunV2ApiResult createTestRun() throws ApiException;
     TestRunV2ApiResult getTestRun(String uuid) throws ApiException;
     void completeTestRun(String uuid) throws ApiException;
