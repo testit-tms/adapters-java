@@ -14,7 +14,7 @@ The repository contains new versions of adaptors for JVM-based test frameworks.
 | 5.2.2   | 2.5           | 2.5           | 2.5           | 2.5           |
 | 5.3     | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 |
 | 5.4     | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 |
-| Cloud   | 2.7.10        | 2.7.10        | 2.7.10        | 2.7.10        |
+| Cloud   | 2.7.11        | 2.7.11        | 2.7.11        | 2.7.11        |
 
 
 
