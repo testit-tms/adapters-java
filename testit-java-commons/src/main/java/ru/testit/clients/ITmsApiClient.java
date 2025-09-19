@@ -23,8 +23,7 @@ public interface ITmsApiClient {
     List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException;
     String addAttachment(String path) throws ApiException;
     List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException;
-    Set<Long> getAutotestGlobalIdsFromTestRun() throws ApiException;
-    List<String> getExternalIds(Set<Long> globalIds) throws ApiException;
+    List<String> getAutotestExternalIdsFromTestRun() throws ApiException;
     TestResultResponse getTestResult(UUID uuid) throws ApiException;
     void updateTestResult(UUID uuid, TestResultUpdateV2Request model) throws ApiException;
 }

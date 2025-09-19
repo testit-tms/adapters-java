@@ -2,7 +2,7 @@ package ru.testit.writers.helpers;
 
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
-import ru.testit.clients.ApiClient;
+import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BulkAutotestHelper {
-    private final ApiClient apiClient;
+    private final ITmsApiClient apiClient;
     private final ClientConfiguration config;
     private final int maxTestsForImport = 100;
     private final List<AutoTestPostModel> autotestsForCreate;
@@ -20,7 +20,7 @@ public class BulkAutotestHelper {
     private final List<AutoTestResultsForTestRunModel> resultsForAutotestsBeingCreated;
     private final List<AutoTestResultsForTestRunModel> resultsForAutotestsBeingUpdated;
 
-    public BulkAutotestHelper(ApiClient client, ClientConfiguration configuration) {
+    public BulkAutotestHelper(ITmsApiClient client, ClientConfiguration configuration) {
         config = configuration;
         apiClient = client;
         autotestsForCreate = new ArrayList<>();

@@ -756,8 +756,7 @@ public class AdapterManager {
     public List<String> getTestFromTestRun() {
         if (adapterConfig.shouldEnableTmsIntegration()) {
             try {
-                Set<Long> autotestGlobalIds = client.getAutotestGlobalIdsFromTestRun();
-                List<String> externalIds = client.getExternalIds(autotestGlobalIds);
+                List<String> externalIds = client.getAutotestExternalIdsFromTestRun();
 
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("List of tests from test run: {}", externalIds);

@@ -248,7 +248,7 @@ public class TmsApiClient implements ITmsApiClient {
                 .map(result -> Objects.requireNonNull(result.getAutoTest()).getExternalId()).collect(Collectors.toList());
     }
 
-    public Set<Long> getAutotestGlobalIdsFromTestRun() throws  ApiException {
+    public List<String> getAutotestExternalIdsFromTestRun() throws  ApiException {
         List<TestResultShortResponse> allTestResults = new ArrayList<>();
         TestResultsFilterApiModel model = Converter.buildTestResultsFilterApiModelWithInProgressOutcome(
                 UUID.fromString(clientConfiguration.getTestRunId()),
@@ -276,36 +276,7 @@ public class TmsApiClient implements ITmsApiClient {
         } while(skip >= 0);
 
         return allTestResults.stream()
-                .map(result -> Objects.requireNonNull(result).getAutotestGlobalId())
-                .collect(Collectors.toSet());
-    }
-
-    public List<String> getExternalIds(Set<Long> globalIds) throws  ApiException {
-        List<AutoTestApiResult> allAutotests = new ArrayList<>();
-        AutoTestSearchApiModel model = Converter.buildAutoTestSearchApiModel(globalIds);
-        int skip = 0;
-
-        do
-        {
-            List<AutoTestApiResult> autotests = autoTestsApi.apiV2AutoTestsSearchPost(
-                    skip,
-                    TESTS_LIMIT,
-                    null,
-                    null,
-                    null,
-                    model
-            );
-
-            allAutotests.addAll(autotests);
-            skip += TESTS_LIMIT;
-
-            if (autotests.isEmpty()) {
-                skip = -1;
-            }
-        } while(skip >= 0);
-
-        return allAutotests.stream()
-                .map(result -> Objects.requireNonNull(result).getExternalId())
+                .map(result -> Objects.requireNonNull(result).getAutotestExternalId())
                 .collect(Collectors.toList());
     }
 
