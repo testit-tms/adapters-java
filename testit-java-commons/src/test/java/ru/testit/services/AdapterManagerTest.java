@@ -8,7 +8,7 @@ import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.TestRunState;
 import ru.testit.client.model.TestRunV2ApiResult;
-import ru.testit.clients.ApiClient;
+import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.listener.ListenerManager;
 import ru.testit.models.*;
@@ -28,7 +28,7 @@ public class AdapterManagerTest {
     private ResultStorage storage;
     private HttpWriter writer;
     private Consumer update;
-    private ApiClient client;
+    private ITmsApiClient client;
     private AdapterConfig adapterConfig;
     private ClientConfiguration clientConfiguration;
 
@@ -42,7 +42,7 @@ public class AdapterManagerTest {
         this.threadContext = mock(ThreadContext.class);
         this.writer = mock(HttpWriter.class);
         this.update = mock(Consumer.class);
-        this.client = mock(ApiClient.class);
+        this.client = mock(ITmsApiClient.class);
         this.adapterConfig = spy(new AdapterConfig(new Properties()));
         this.clientConfiguration = mock(ClientConfiguration.class);
         this.listenerManager = mock(ListenerManager.class);

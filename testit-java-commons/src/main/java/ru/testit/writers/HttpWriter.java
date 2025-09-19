@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
-import ru.testit.clients.ApiClient;
+import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.Converter;
 import ru.testit.models.ClassContainer;
@@ -18,11 +18,11 @@ import java.util.*;
 public class HttpWriter implements Writer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpWriter.class);
     private final Map<String, UUID> testResults;
-    private final ApiClient apiClient;
+    private final ITmsApiClient apiClient;
     private final ResultStorage storage;
     private final ClientConfiguration config;
 
-    public HttpWriter(ClientConfiguration config, ApiClient client, ResultStorage storage) {
+    public HttpWriter(ClientConfiguration config, ITmsApiClient client, ResultStorage storage) {
         this.config = config;
         this.apiClient = client;
         this.storage = storage;

@@ -3,6 +3,7 @@ package ru.testit.clients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.client.api.*;
+import ru.testit.client.invoker.ApiClient;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 import ru.testit.services.HtmlEscapeUtils;
@@ -12,7 +13,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TmsApiClient implements ApiClient {
+public class TmsApiClient implements ITmsApiClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TmsApiClient.class);
     private static final String AUTH_PREFIX = "PrivateToken";
@@ -32,11 +33,11 @@ public class TmsApiClient implements ApiClient {
     private final ClientConfiguration clientConfiguration;
 
     public TmsApiClient(ClientConfiguration config) {
-        ru.testit.client.invoker.ApiClient apiClient = new ru.testit.client.invoker.ApiClient();
+        boolean disableCertificateValidation = !config.getCertValidation();
+        ApiClient apiClient = new ApiClient(disableCertificateValidation);
         apiClient.setBasePath(config.getUrl());
         apiClient.setApiKeyPrefix(AUTH_PREFIX);
         apiClient.setApiKey(config.getPrivateToken());
-        apiClient.setVerifyingSsl(config.getCertValidation());
 
         clientConfiguration = config;
         testRunsApi = new TestRunsApi(apiClient);

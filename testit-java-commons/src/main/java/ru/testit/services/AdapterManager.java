@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.TestRunState;
 import ru.testit.client.model.TestRunV2ApiResult;
-import ru.testit.clients.ApiClient;
+import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.TmsApiClient;
 import ru.testit.listener.AdapterListener;
@@ -28,7 +28,7 @@ public class AdapterManager {
     private final ThreadContext threadContext;
     private final ResultStorage storage;
     private final Writer writer;
-    private final ApiClient client;
+    private final ITmsApiClient client;
     private final ClientConfiguration clientConfiguration;
     private final AdapterConfig adapterConfig;
 
@@ -59,7 +59,7 @@ public class AdapterManager {
             ThreadContext threadContext,
             ResultStorage storage,
             Writer writer,
-            ApiClient client,
+            ITmsApiClient client,
             ListenerManager listenerManager
     ) {
         this.adapterConfig = adapterConfig;
