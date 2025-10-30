@@ -179,7 +179,7 @@ public class TmsApiClient implements ITmsApiClient {
 
             for (int attempts = 0; attempts < MAX_TRIES; attempts++) {
                 try {
-                    autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
+                    autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdApiModel().id(workItemId));
                     LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
 
                     attempts = MAX_TRIES;
