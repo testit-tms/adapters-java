@@ -76,6 +76,11 @@ public class TmsApiClient implements ITmsApiClient {
     }
 
     @Override
+    public void updateTestRun(UpdateEmptyTestRunApiModel testRun) throws ApiException {
+        testRunsApi.updateEmpty(testRun);
+    }
+
+    @Override
     public void completeTestRun(String uuid) throws ApiException {
         testRunsApi.completeTestRun(UUID.fromString(uuid));
     }
@@ -174,7 +179,7 @@ public class TmsApiClient implements ITmsApiClient {
 
             for (int attempts = 0; attempts < MAX_TRIES; attempts++) {
                 try {
-                    autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdApiModel().id(workItemId));
+                    autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdModel().id(workItemId));
                     LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
 
                     attempts = MAX_TRIES;
