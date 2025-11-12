@@ -355,6 +355,7 @@ public class Converter {
                     model.setTitle(link.getTitle());
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
+                    model.setHasInfo(false);
 
                     if (link.getType() != null) {
                         model.setType(LinkType.fromValue(link.getType().getValue()));
@@ -478,9 +479,9 @@ public class Converter {
             UUID testRunId, UUID configurationId) {
         TestResultsFilterApiModel model = new TestResultsFilterApiModel();
 
-        model.setTestRunIds(List.of(testRunId));
-        model.setConfigurationIds(List.of(configurationId));
-        model.setStatusCodes(List.of("InProgress"));
+        model.setTestRunIds(listOf(testRunId));
+        model.setConfigurationIds(listOf(configurationId));
+        model.setStatusCodes(listOf("InProgress"));
 
         return model;
     }
@@ -542,5 +543,13 @@ public class Converter {
                     return model;
                 }
         ).collect(Collectors.toList());
+    }
+
+    @SafeVarargs
+    private static <T> List<T> listOf(T... elements) {
+        if (elements == null || elements.length == 0) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(elements);
     }
 }
