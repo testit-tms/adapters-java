@@ -10,6 +10,7 @@ import java.util.UUID;
 public interface ITmsApiClient {
     TestRunV2ApiResult createTestRun() throws ApiException;
     TestRunV2ApiResult getTestRun(String uuid) throws ApiException;
+    void updateTestRun(UpdateEmptyTestRunApiModel testRun) throws ApiException;
     void completeTestRun(String uuid) throws ApiException;
     void updateAutoTest(AutoTestPutModel model) throws ApiException;
     String createAutoTest(AutoTestPostModel model) throws ApiException;

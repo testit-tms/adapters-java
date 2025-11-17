@@ -501,4 +501,54 @@ public class Converter {
 
         return model;
     }
+
+    public static UpdateEmptyTestRunApiModel buildUpdateEmptyTestRunApiModel(TestRunV2ApiResult testRun) {
+        UpdateEmptyTestRunApiModel model = new UpdateEmptyTestRunApiModel();
+
+        model.setId(testRun.getId());
+        model.setName(testRun.getName());
+        model.setDescription(testRun.getDescription());
+        model.setAttachments(Converter.buildAssignAttachmentApiModels(testRun.getAttachments()));
+        model.setLinks(Converter.buildUpdateLinkApiModels(testRun.getLinks()));
+        model.setLaunchSource(testRun.getLaunchSource());
+
+        return model;
+    }
+
+    public static List<AssignAttachmentApiModel> buildAssignAttachmentApiModels(List<AttachmentApiResult> attachments) {
+        return attachments.stream().map(
+                attachment -> {
+                    AssignAttachmentApiModel model = new AssignAttachmentApiModel();
+
+                    model.setId(attachment.getId());
+
+                    return model;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    public static List<UpdateLinkApiModel> buildUpdateLinkApiModels(List<LinkApiResult> links) {
+        return links.stream().map(
+                link -> {
+                    UpdateLinkApiModel model = new UpdateLinkApiModel();
+
+                    model.setId(link.getId());
+                    model.setTitle(link.getTitle());
+                    model.setDescription(link.getDescription());
+                    model.setUrl(link.getUrl());
+                    model.setType(LinkType.fromValue(link.getType().getValue()));
+                    model.setHasInfo(false);
+
+                    return model;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    @SafeVarargs
+    private static <T> List<T> listOf(T... elements) {
+        if (elements == null || elements.length == 0) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(elements);
+    }
 }

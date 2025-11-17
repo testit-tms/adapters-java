@@ -76,6 +76,11 @@ public class TmsApiClient implements ITmsApiClient {
     }
 
     @Override
+    public void updateTestRun(UpdateEmptyTestRunApiModel testRun) throws ApiException {
+        testRunsApi.updateEmpty(testRun);
+    }
+
+    @Override
     public void completeTestRun(String uuid) throws ApiException {
         testRunsApi.completeTestRun(UUID.fromString(uuid));
     }

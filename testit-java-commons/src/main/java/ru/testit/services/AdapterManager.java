@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.TestRunState;
 import ru.testit.client.model.TestRunV2ApiResult;
+import ru.testit.clients.Converter;
 import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.TmsApiClient;
@@ -83,6 +84,12 @@ public class AdapterManager {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Test run is exist.");
                 }
+
+                try {
+                    this.updateTestRunName();
+                } catch (ApiException e) {
+                    LOGGER.error("Can not update the launch: ".concat(e.getMessage()));
+                }
                 return;
             }
 
@@ -94,6 +101,24 @@ public class AdapterManager {
                 LOGGER.error("Can not start the launch: ".concat(e.getMessage()));
             }
         }
+    }
+
+    private void updateTestRunName() throws ApiException {
+        String testRunName = this.clientConfiguration.getTestRunName();
+
+        if (testRunName.isEmpty()) {
+            return;
+        }
+
+        TestRunV2ApiResult testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
+
+        if (testRun.getName().equals(testRunName)) {
+            return;
+        }
+
+        testRun.setName(testRunName);
+
+        this.client.updateTestRun(Converter.buildUpdateEmptyTestRunApiModel(testRun));
     }
 
     public void stopTests() {
