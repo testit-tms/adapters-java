@@ -1,5 +1,6 @@
 package ru.testit.models;
 
+import ru.testit.services.HtmlEscapeUtils;
 import ru.testit.services.Utils;
 
 import java.io.Serializable;
@@ -70,7 +71,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @return self for method chaining
      */
     public TestResult setExternalId(String externalId) {
-        this.externalId = externalId;
+        this.externalId = HtmlEscapeUtils.escapeHtmlTags(externalId);
         return this;
     }
 
@@ -110,7 +111,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @return self for method chaining
      */
     public TestResult setClassName(String className) {
-        this.className = className;
+        this.className = HtmlEscapeUtils.escapeHtmlTags(className);
         return this;
     }
 
@@ -130,7 +131,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @return self for method chaining
      */
     public TestResult setSpaceName(String spaceName) {
-        this.spaceName = spaceName;
+        this.spaceName = HtmlEscapeUtils.escapeHtmlTags(spaceName);
         return this;
     }
 
@@ -230,7 +231,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @return self for method chaining
      */
     public TestResult setMessage(String message) {
-        this.message = message;
+        this.message = HtmlEscapeUtils.escapeHtmlTags(message);
         return this;
     }
 
@@ -250,7 +251,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @return self for method chaining
      */
     public TestResult setTitle(String title) {
-        this.title = title;
+        this.title = HtmlEscapeUtils.escapeHtmlTags(title);
         return this;
     }
 
@@ -270,7 +271,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @return self for method chaining
      */
     public TestResult setName(String name) {
-        this.name = name;
+        this.name = HtmlEscapeUtils.escapeHtmlTags(name);
         return this;
     }
 
@@ -330,7 +331,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @return self for method chaining
      */
     public TestResult setDescription(String description) {
-        this.description = description;
+        this.description = HtmlEscapeUtils.escapeHtmlTags(description);
         return this;
     }
 
@@ -410,7 +411,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @return self for method chaining
      */
     public TestResult setThrowable(Throwable throwable) {
-        this.throwable = throwable;
+        this.throwable = HtmlEscapeUtils.escapeHtmlInObject(throwable);
         return this;
     }
 
@@ -430,7 +431,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
      * @return self for method chaining
      */
     public TestResult setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
+        this.parameters = HtmlEscapeUtils.escapeHtmlInObject(parameters);
         return this;
     }
 
