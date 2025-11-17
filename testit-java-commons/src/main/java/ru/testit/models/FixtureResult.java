@@ -1,5 +1,6 @@
 package ru.testit.models;
 
+import ru.testit.services.HtmlEscapeUtils;
 import ru.testit.services.Utils;
 
 import java.io.Serializable;
@@ -40,7 +41,7 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments, Se
      * @return self for method chaining
      */
     public FixtureResult setName(String name) {
-        this.name = name;
+        this.name = HtmlEscapeUtils.escapeHtmlTags(name);
         return this;
     }
 
@@ -100,7 +101,7 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments, Se
      * @return self for method chaining
      */
     public FixtureResult setDescription(String description) {
-        this.description = description;
+        this.description = HtmlEscapeUtils.escapeHtmlTags(description);
         return this;
     }
 
@@ -240,7 +241,7 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments, Se
      * @return self for method chaining
      */
     public FixtureResult setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
+        this.parameters = HtmlEscapeUtils.escapeHtmlInObject(parameters);
         return this;
     }
 
