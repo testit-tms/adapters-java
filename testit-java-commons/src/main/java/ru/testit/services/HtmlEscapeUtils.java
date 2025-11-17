@@ -11,8 +11,8 @@ public class HtmlEscapeUtils {
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<\\S.*?(?:>|/>)");
     
     // Regex patterns to escape only non-escaped characters
-    private static final Pattern LESS_THAN_PATTERN = Pattern.compile("(?<!\\\\)<");
-    private static final Pattern GREATER_THAN_PATTERN = Pattern.compile("(?<!\\\\)>");
+    private static final Pattern LESS_THAN_PATTERN = Pattern.compile("<");
+    private static final Pattern GREATER_THAN_PATTERN = Pattern.compile(">");
 
     /**
      * Escapes HTML tags to prevent XSS attacks.
@@ -34,8 +34,8 @@ public class HtmlEscapeUtils {
         }
         
         // Use regex with negative lookbehind to escape only non-escaped characters
-        String result = LESS_THAN_PATTERN.matcher(text).replaceAll("\\\\<");
-        result = GREATER_THAN_PATTERN.matcher(result).replaceAll("\\\\>");
+        String result = LESS_THAN_PATTERN.matcher(text).replaceAll("&lt;");
+        result = GREATER_THAN_PATTERN.matcher(result).replaceAll("&gt;");
         
         return result;
     }

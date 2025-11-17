@@ -88,33 +88,24 @@ public class TmsApiClient implements ITmsApiClient {
     @Override
     public void updateAutoTest(AutoTestPutModel model) throws ApiException {
         // Escape HTML tags in model before sending
-        HtmlEscapeUtils.escapeHtmlInObject(model);
-        
         autoTestsApi.updateAutoTest(model);
     }
 
     @Override
     public String createAutoTest(AutoTestPostModel model) throws ApiException {
         // Escape HTML tags in model before sending
-        HtmlEscapeUtils.escapeHtmlInObject(model);
         return Objects.requireNonNull(autoTestsApi.createAutoTest(model).getId()).toString();
     }
 
     @Override
     public void updateAutoTests(List<AutoTestPutModel> models) throws ApiException {
         // Escape HTML tags in models before sending
-        for (AutoTestPutModel model : models) {
-            HtmlEscapeUtils.escapeHtmlInObject(model);
-        }
         autoTestsApi.updateMultiple(models);
     }
 
     @Override
     public List<AutoTestModel> createAutoTests(List<AutoTestPostModel> models) throws ApiException {
         // Escape HTML tags in models before sending
-        for (AutoTestPostModel model : models) {
-            HtmlEscapeUtils.escapeHtmlInObject(model);
-        }
         return autoTestsApi.createMultiple(models);
     }
 
@@ -228,7 +219,6 @@ public class TmsApiClient implements ITmsApiClient {
     @Override
     public List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException {
         // Escape HTML tags in models before sending
-        HtmlEscapeUtils.escapeHtmlInObjectList(models);
         return testRunsApi.setAutoTestResultsForTestRun(UUID.fromString(testRunUuid), models);
     }
 
@@ -293,7 +283,6 @@ public class TmsApiClient implements ITmsApiClient {
     @Override
     public void updateTestResult(UUID uuid, TestResultUpdateV2Request model) throws ApiException {
         // Escape HTML tags in model before sending
-        HtmlEscapeUtils.escapeHtmlInObject(model);
         testResultsApi.apiV2TestResultsIdPut(uuid, model);
     }
 }
