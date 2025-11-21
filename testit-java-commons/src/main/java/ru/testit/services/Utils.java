@@ -148,7 +148,7 @@ public class Utils {
 
     public static String setParameters(String value, Map<String, String> parameters) {
         if (!isNull(parameters) && !isNull(value)) {
-            Pattern pattern = Pattern.compile("\\{\\s*(\\w+)}");
+            Pattern pattern = Pattern.compile("\\{\\s*([\\w\\s]+)}");
             Matcher matcher = pattern.matcher(value);
 
             while (matcher.find()) {
