@@ -1,5 +1,6 @@
 package ru.testit.models;
 
+import ru.testit.services.HtmlEscapeUtils;
 import ru.testit.services.Utils;
 
 import java.io.Serializable;
@@ -26,7 +27,7 @@ public class Label implements Serializable {
      * @return self for method chaining
      */
     public Label setName(final String name) {
-        this.name = name;
+        this.name = HtmlEscapeUtils.escapeHtmlTags(name);
         return this;
     }
 

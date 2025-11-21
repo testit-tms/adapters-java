@@ -1,5 +1,6 @@
 package ru.testit.models;
 
+import ru.testit.services.HtmlEscapeUtils;
 import ru.testit.services.Utils;
 
 /**
@@ -28,7 +29,7 @@ public class LinkItem
      * @return self for method chaining
      */
     public LinkItem setTitle(final String title) {
-        this.title = title;
+        this.title = HtmlEscapeUtils.escapeHtmlTags(title);
         return this;
     }
 
@@ -68,7 +69,7 @@ public class LinkItem
      * @return self for method chaining
      */
     public LinkItem setDescription(final String description) {
-        this.description = description;
+        this.description = HtmlEscapeUtils.escapeHtmlTags(description);
         return this;
     }
 
