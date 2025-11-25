@@ -431,6 +431,8 @@ Description of tags:
 - `NameSpace` - directory in the TMS system (default - file's name of test)
 - `ClassName` - subdirectory in the TMS system (default - class's name of test)
 
+If you want to insert a space in the tags, use the "\\_" character combination.
+
 Description of methods:
 - `Adapter.addLinks` - add links to the autotest result.
 - `Adapter.addAttachments` - add attachments to the autotest result.
