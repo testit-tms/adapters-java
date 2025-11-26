@@ -54,25 +54,25 @@ public class TagParser {
 
                 switch (tagKey) {
                     case EXTERNAL_ID:
-                        externalId = Utils.setParameters(tagValue, parameters);
+                        externalId = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case TITLE:
-                        title = Utils.setParameters(tagValue, parameters);
+                        title = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case DISPLAY_NAME:
-                        displayName = Utils.setParameters(tagValue, parameters);
+                        displayName = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case DESCRIPTION:
-                        description = Utils.setParameters(tagValue, parameters);
+                        description = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case NAMESPACE:
-                        nameSpace = Utils.setParameters(tagValue, parameters);
+                        nameSpace = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case CLASS_NAME:
-                        className = Utils.setParameters(tagValue, parameters);
+                        className = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case LABELS:
-                        Arrays.stream(Utils.setParameters(tagValue, parameters).split(TAG_VALUE_DELIMITER))
+                        Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(label -> getScenarioLabels().add(getTagLabel(label)));
                         break;
                     case LINKS:
@@ -83,7 +83,7 @@ public class TagParser {
                         }
                         break;
                     case WORK_ITEM_IDS:
-                        Arrays.stream(Utils.setParameters(tagValue, parameters).split(TAG_VALUE_DELIMITER))
+                        Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(id -> getWorkItemIds().add(id));
                         break;
                 }
@@ -166,8 +166,10 @@ public class TagParser {
 
         return new LinkItem()
                 .setUrl(link.getString("url"))
-                .setDescription(link.getString("description"))
-                .setTitle(link.getString("title"))
+                .setDescription(
+                        parseSpaceInTag(link.getString("description")))
+                .setTitle(
+                        parseSpaceInTag(link.getString("title")))
                 .setType(LinkType.fromString(link.getString("type")));
     }
 
@@ -178,8 +180,10 @@ public class TagParser {
             items.add(
                     new LinkItem()
                             .setUrl(links.getJSONObject(i).getString("url"))
-                            .setDescription(links.getJSONObject(i).getString("description"))
-                            .setTitle(links.getJSONObject(i).getString("title"))
+                            .setDescription(
+                                    parseSpaceInTag(links.getJSONObject(i).getString("description")))
+                            .setTitle(
+                                    parseSpaceInTag(links.getJSONObject(i).getString("title")))
                             .setType(LinkType.fromString(links.getJSONObject(i).getString("type")))
             );
         }
@@ -190,5 +194,9 @@ public class TagParser {
         String[] directories = scenario.getUri().toString().split("/");
 
         return directories[directories.length - 1];
+    }
+
+    private String parseSpaceInTag(String tag) {
+        return tag.replace("\\_", " ");
     }
 }
