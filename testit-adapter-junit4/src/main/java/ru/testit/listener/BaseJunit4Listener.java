@@ -127,6 +127,8 @@ public class BaseJunit4Listener extends RunListener {
                     beforeFixtureId.set(fixtureId);
 
                     FixtureResult fixture = getFixtureResult(method);
+                    // Set parent to associate with current test
+                    fixture.setParent(executableTest.get().getUuid());
                     adapterManager.startPrepareFixtureEachTest(
                         classUUID.get(),
                         fixtureId,
@@ -156,6 +158,8 @@ public class BaseJunit4Listener extends RunListener {
                     afterFixtureId.set(fixtureId);
 
                     FixtureResult fixture = getFixtureResult(method);
+                    // Set parent to associate with current test
+                    fixture.setParent(executableTest.get().getUuid());
                     adapterManager.startTearDownFixtureEachTest(
                         classUUID.get(),
                         fixtureId,
