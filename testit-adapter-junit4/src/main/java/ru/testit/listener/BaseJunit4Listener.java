@@ -40,7 +40,9 @@ public class BaseJunit4Listener extends RunListener {
     );
 
     // Fields to track fixture execution
+
     private final ThreadLocal<String> beforeFixtureId = new ThreadLocal<>();
+
     private final ThreadLocal<String> afterFixtureId = new ThreadLocal<>();
 
     public BaseJunit4Listener() {
@@ -64,15 +66,10 @@ public class BaseJunit4Listener extends RunListener {
         adapterManager.startClassContainer(launcherUUID.get(), classContainer);
 
         // Create and complete fixtures for @BeforeClass methods (execute once at start)
+
         createAndCompleteBeforeClassFixtures(description);
 
-        // Create fixtures for @Before methods (one per test)
-        createBeforeFixtures(description);
-
-        // Create fixtures for @After methods (one per test)
-        createAfterFixtures(description);
-
-        // @AfterClass fixtures will be created and completed at the end
+        // @Before and @After fixtures will be created per test in testStarted
     }
 
     private void createAndCompleteBeforeClassFixtures(
@@ -111,65 +108,11 @@ public class BaseJunit4Listener extends RunListener {
     }
 
     private void createBeforeFixtures(final Description description) {
-        // Get the test class
-        Class<?> testClass = description.getTestClass();
-        if (testClass == null) {
-            return;
-        }
-
-        // Look for @Before methods (create fixture for first one found)
-        Method[] methods = testClass.getDeclaredMethods();
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(Before.class)) {
-                // Found a @Before method, create fixture if not already created
-                if (beforeFixtureId.get() == null) {
-                    String fixtureId = UUID.randomUUID().toString();
-                    beforeFixtureId.set(fixtureId);
-
-                    FixtureResult fixture = getFixtureResult(method);
-                    // Set parent to associate with current test
-                    fixture.setParent(executableTest.get().getUuid());
-                    adapterManager.startPrepareFixtureEachTest(
-                        classUUID.get(),
-                        fixtureId,
-                        fixture
-                    );
-                    // Don't mark as passed yet - will be marked when each test finishes
-                }
-                break; // Only handle one for now, as in JUnit 5 implementation
-            }
-        }
+        // @Before fixtures will be created per test in testStarted
     }
 
     private void createAfterFixtures(final Description description) {
-        // Get the test class
-        Class<?> testClass = description.getTestClass();
-        if (testClass == null) {
-            return;
-        }
-
-        // Look for @After methods (create fixture for first one found)
-        Method[] methods = testClass.getDeclaredMethods();
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(After.class)) {
-                // Found a @After method, create fixture if not already created
-                if (afterFixtureId.get() == null) {
-                    String fixtureId = UUID.randomUUID().toString();
-                    afterFixtureId.set(fixtureId);
-
-                    FixtureResult fixture = getFixtureResult(method);
-                    // Set parent to associate with current test
-                    fixture.setParent(executableTest.get().getUuid());
-                    adapterManager.startTearDownFixtureEachTest(
-                        classUUID.get(),
-                        fixtureId,
-                        fixture
-                    );
-                    // Don't mark as passed yet - will be marked when each test finishes
-                }
-                break; // Only handle one for now, as in JUnit 5 implementation
-            }
-        }
+        // @After fixtures will be created per test in testStarted
     }
 
     private void createAndCompleteAfterClassFixtures(
@@ -241,13 +184,22 @@ public class BaseJunit4Listener extends RunListener {
 
     @Override
     public void testStarted(final Description description) {
-        ExecutableTest test = this.executableTest.get();
-        if (test.isStarted()) {
-            test = refreshContext();
-        }
-        test.setTestStatus();
+        ExecutableTest executableTest = this.executableTest.get();
 
-        final String uuid = test.getUuid();
+        if (executableTest.isStarted()) {
+            executableTest = refreshContext();
+        }
+
+        executableTest.setTestStatus();
+
+        // Create fixtures for @Before methods (one per test, like JUnit 5)
+        createBeforeFixtureForTest(description);
+
+        // Create fixtures for @After methods (one per test, like JUnit 5)
+        createAfterFixtureForTest(description);
+
+        final String uuid = executableTest.getUuid();
+
         startTestCase(description, uuid);
 
         adapterManager.updateClassContainer(classUUID.get(), container ->
@@ -265,9 +217,10 @@ public class BaseJunit4Listener extends RunListener {
             ItemStatus.FAILED
         );
 
-        // Fail any running fixtures
-        completeFixtureWithStatus(beforeFixtureId, ItemStatus.FAILED);
-        completeFixtureWithStatus(afterFixtureId, ItemStatus.FAILED);
+        // Complete @Before fixture with success status (it already executed)
+        completeFixtureWithStatus(beforeFixtureId, ItemStatus.PASSED);
+        // Complete @After fixture with success status (it should execute for cleanup)
+        completeFixtureWithStatus(afterFixtureId, ItemStatus.PASSED);
     }
 
     @Override
@@ -365,12 +318,75 @@ public class BaseJunit4Listener extends RunListener {
         final ItemStatus status
     ) {
         adapterManager.updateTestCase(uuid, setStatus(status, throwable));
+
         adapterManager.stopTestCase(uuid);
 
-        // If test failed, also fail any running fixtures
+        // If test failed, complete setup/teardown fixtures as passed
+
+        // (they executed successfully even if the test failed)
+
         if (status == ItemStatus.FAILED) {
-            completeFixtureWithStatus(beforeFixtureId, ItemStatus.FAILED);
-            completeFixtureWithStatus(afterFixtureId, ItemStatus.FAILED);
+            completeFixtureWithStatus(beforeFixtureId, ItemStatus.PASSED);
+
+            completeFixtureWithStatus(afterFixtureId, ItemStatus.PASSED);
+        }
+    }
+
+    private void createBeforeFixtureForTest(final Description description) {
+        // Get the test class
+        Class<?> testClass = description.getTestClass();
+        if (testClass == null) {
+            return;
+        }
+
+        // Look for @Before methods (create fixture for first one found)
+        Method[] methods = testClass.getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(Before.class)) {
+                // Found a @Before method, create a new fixture for this test
+                String fixtureId = UUID.randomUUID().toString();
+                beforeFixtureId.set(fixtureId);
+
+                FixtureResult fixture = getFixtureResult(method);
+                // Set parent to associate with current test
+                fixture.setParent(executableTest.get().getUuid());
+                adapterManager.startPrepareFixtureEachTest(
+                    classUUID.get(),
+                    fixtureId,
+                    fixture
+                );
+                // Don't mark as passed yet - will be marked when test finishes
+                break; // Only handle one for now, as in JUnit 5 implementation
+            }
+        }
+    }
+
+    private void createAfterFixtureForTest(final Description description) {
+        // Get the test class
+        Class<?> testClass = description.getTestClass();
+        if (testClass == null) {
+            return;
+        }
+
+        // Look for @After methods (create fixture for first one found)
+        Method[] methods = testClass.getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(After.class)) {
+                // Found a @After method, create a new fixture for this test
+                String fixtureId = UUID.randomUUID().toString();
+                afterFixtureId.set(fixtureId);
+
+                FixtureResult fixture = getFixtureResult(method);
+                // Set parent to associate with current test
+                fixture.setParent(executableTest.get().getUuid());
+                adapterManager.startTearDownFixtureEachTest(
+                    classUUID.get(),
+                    fixtureId,
+                    fixture
+                );
+                // Don't mark as passed yet - will be marked when test finishes
+                break; // Only handle one for now, as in JUnit 5 implementation
+            }
         }
     }
 
