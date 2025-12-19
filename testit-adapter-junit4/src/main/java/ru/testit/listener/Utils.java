@@ -10,10 +10,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Utils {
+
+    private Utils() {}
 
     public static String extractExternalID(final Description method) {
         final ExternalId annotation = method.getAnnotation(ExternalId.class);
@@ -25,20 +28,11 @@ public class Utils {
         return (annotation != null) ? annotation.value() : method.getMethodName();
     }
 
-    public static List<String> extractWorkItemId(final Description method) {
+    public static List<String> extractWorkItemIds(final Description method) {
         final List<String> workItemIds = new ArrayList<>();
-        final WorkItemId workItem = method.getAnnotation(WorkItemId.class);
-        if (workItem != null) {
-            workItemIds.add(workItem.value());
-
-            return workItemIds;
-        }
-
         final WorkItemIds workItems = method.getAnnotation(WorkItemIds.class);
         if (workItems != null) {
-            for (final String workItemId : workItems.value()) {
-                workItemIds.add(workItemId);
-            }
+            workItemIds.addAll(Arrays.asList(workItems.value()));
         }
 
         return workItemIds;

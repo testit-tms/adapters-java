@@ -10,13 +10,14 @@ val cucumberVersion = "5.1.2"
 val cucumberGherkinVersion = "5.1.0"
 val slf4jVersion = "1.7.36"
 val testngVersion = "7.5.1"
+val jsonVersion = "20231013"
 
 dependencies {
     implementation(project(":testit-java-commons"))
     implementation("io.cucumber:gherkin:$cucumberGherkinVersion")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
-    implementation("org.json:json:20231013")
+    implementation("org.json:json:$jsonVersion")
 
     compileOnly("io.cucumber:cucumber-plugin:$cucumberVersion")
 

@@ -110,7 +110,7 @@ public class TmsApiClient implements ITmsApiClient {
     }
 
     @Override
-    public List<UUID> GetWorkItemUuidsByIds(Iterable<String> workItemIds) {
+    public List<UUID> getWorkItemUuidsByIds(Iterable<String> workItemIds) {
         List<UUID> workItemUuids = new ArrayList<>();
 
         for (String workItemId : workItemIds) {
@@ -120,7 +120,7 @@ public class TmsApiClient implements ITmsApiClient {
 
                 workItemUuids.add(workItem.getId());
             } catch (ApiException e) {
-                LOGGER.error("Cannot get work item by id {}" + (e.getMessage()), workItemId);
+                LOGGER.error("Cannot get work item by id {} {}", workItemId, e.getMessage());
             }
         }
 
@@ -173,7 +173,7 @@ public class TmsApiClient implements ITmsApiClient {
                     autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdApiModel().id(workItemId));
                     LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
 
-                    attempts = MAX_TRIES;
+                    return;
                 } catch (ApiException e) {
                     LOGGER.error("Cannot link autotest {} to work item {}", id, workItemId);
 

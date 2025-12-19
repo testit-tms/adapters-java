@@ -8,7 +8,9 @@ import java.util.Map;
 
 public class ScenarioParser {
 
-    static public TestResult parseScenario(final Story story, final Scenario scenario, Map<String, String> parameters) {
+    private ScenarioParser() {}
+
+    public static TestResult parseScenario(final Story story, final Scenario scenario, Map<String, String> parameters) {
         final TagParser tagParser = new TagParser(story, scenario);
         final String featureName = story.getName();
 
@@ -16,15 +18,15 @@ public class ScenarioParser {
         nameSpace = nameSpace.substring(0, nameSpace.length() - 1);
 
         return new TestResult()
-                .setExternalId(tagParser.getExternalId())
-                .setName(tagParser.getDisplayName())
-                .setTitle(tagParser.getTitle())
-                .setDescription(tagParser.getDescription())
-                .setWorkItemIds(tagParser.getWorkItemIds())
+                .setExternalId(tagParser.getExternalIdValue())
+                .setName(tagParser.getDisplayNameValue())
+                .setTitle(tagParser.getTitleValue())
+                .setDescription(tagParser.getDescriptionValue())
+                .setWorkItemIds(tagParser.getWorkItemIdList())
                 .setClassName(featureName)
                 .setSpaceName(nameSpace)
-                .setLabels(tagParser.getLabels())
-                .setLinkItems(tagParser.getLinks())
+                .setLabels(tagParser.getLabelList())
+                .setLinkItems(tagParser.getLinkItemList())
                 .setParameters(parameters);
     }
 }

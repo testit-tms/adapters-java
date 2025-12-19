@@ -3,6 +3,8 @@ package ru.testit.listener;
 import io.cucumber.gherkin.GherkinParser;
 import io.cucumber.messages.types.*;
 import io.cucumber.plugin.event.TestSourceRead;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ScenarioStorage {
+    private static final Logger log = LoggerFactory.getLogger(ScenarioStorage.class);
     private final Map<URI, TestSourceRead> pathToScenarioMap = new HashMap<>();
     private final Map<URI, GherkinDocument> pathToDocumentMap = new HashMap<>();
     private final Map<URI, Map<Long, CucumberNode>> pathToNodeMap = new HashMap<>();
@@ -76,12 +79,24 @@ public class ScenarioStorage {
         pathToDocumentMap.put(path, gherkinDocument);
 
         final Map<Long, CucumberNode> nodeMap = new HashMap<>();
-        final Feature feature = gherkinDocument.getFeature().get();
+
+        if (gherkinDocument == null) {
+            log.error("gherkinDocument is null");
+            throw new AssertionError();
+        }
+
+        Optional<Feature> featureOptional = gherkinDocument.getFeature();
+        if (!featureOptional.isPresent()) {
+            log.error("Feature is not present");
+            throw new AssertionError();
+        }
+        final Feature feature = featureOptional.get();
         final CucumberNode currentParent = createCucumberNode(feature, null);
         for (FeatureChild child : feature.getChildren()) {
             processFeatureDefinition(nodeMap, child, currentParent);
         }
         pathToNodeMap.put(path, nodeMap);
+
     }
 
     private void processFeatureDefinition(
@@ -102,7 +117,7 @@ public class ScenarioStorage {
         for (Step step : child.getSteps()) {
             nodeMap.put(step.getLocation().getLine(), createCucumberNode(step, childNode));
         }
-        if (child.getExamples().size() > 0) {
+        if (!child.getExamples().isEmpty()) {
             processScenarioOutlineExamples(nodeMap, child, childNode);
         }
     }
@@ -128,7 +143,12 @@ public class ScenarioStorage {
                                                 final CucumberNode parent) {
         for (Examples examples : scenarioOutline.getExamples()) {
             final CucumberNode examplesNode = createCucumberNode(examples, parent);
-            final TableRow headerRow = examples.getTableHeader().get();
+            final Optional<TableRow> headerRowOptional = examples.getTableHeader();
+            if (!headerRowOptional.isPresent()) {
+                log.error("HeaderRow is null");
+                throw new AssertionError();
+            }
+            TableRow headerRow = headerRowOptional.get();
             final CucumberNode headerNode = createCucumberNode(headerRow, examplesNode);
             nodeMap.put(headerRow.getLocation().getLine(), headerNode);
             for (int i = 0; i < examples.getTableBody().size(); ++i) {

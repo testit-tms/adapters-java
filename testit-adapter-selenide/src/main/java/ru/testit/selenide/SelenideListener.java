@@ -16,10 +16,7 @@ import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
 
 import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -30,7 +27,7 @@ public class SelenideListener implements LogEventListener {
     private boolean saveScreenshots;
     private boolean savePageHtml;
     private boolean includeSelenideLocatorsSteps;
-    private final Map<LogType, Level> logTypesToSave = new HashMap<>();
+    private final Map<LogType, Level> logTypesToSave = new EnumMap<>(LogType.class);
 
     public SelenideListener() {
         this.adapterManager = Adapter.getAdapterManager();
@@ -112,12 +109,10 @@ public class SelenideListener implements LogEventListener {
                         adapterManager.updateStep(step -> step.setItemStatus(ItemStatus.PASSED));
                         break;
                     case FAIL:
-                        adapterManager.updateStep(stepResult -> {
-                            stepResult.setItemStatus(ItemStatus.FAILED);
-                        });
-                        adapterManager.updateTestCase(parentUuid, testResult -> {
-                            testResult.setThrowable(currentLog.getError());
-                        });
+                        adapterManager.updateStep(stepResult ->
+                            stepResult.setItemStatus(ItemStatus.FAILED));
+                        adapterManager.updateTestCase(parentUuid, testResult ->
+                            testResult.setThrowable(currentLog.getError()));
                         break;
                     default:
                         LOGGER.warn("Unsupported status of step: {}", currentLog.getStatus());

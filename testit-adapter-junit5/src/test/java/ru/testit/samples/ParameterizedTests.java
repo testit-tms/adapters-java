@@ -9,7 +9,7 @@ import ru.testit.models.LinkType;
 
 import java.util.stream.Stream;
 
-public class ParameterizedTests {
+class ParameterizedTests {
 
     @ParameterizedTest
     @ValueSource(shorts = {1, 2, 3})
@@ -20,7 +20,7 @@ public class ParameterizedTests {
     @Description("Test with BeforeEach, AfterEach and all annotations {number}")
     @Labels({"Tag{number}"})
     void testWithOneParameter(int number) {
-
+        // empty
     }
 
     @ParameterizedTest
@@ -36,6 +36,7 @@ public class ParameterizedTests {
             @Link(url = "https://{url}/module/issue/5", title = "{title} Issue-5", type = LinkType.ISSUE),
     })
     void testWithMultipleParameters(int number, String title, boolean expected, String url) {
+        // empty
     }
 
     static Stream<Arguments> arguments() {

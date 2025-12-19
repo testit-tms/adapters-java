@@ -13,7 +13,7 @@ import java.util.Map;
 public class BulkAutotestHelper {
     private final ITmsApiClient apiClient;
     private final ClientConfiguration config;
-    private final int maxTestsForImport = 100;
+    private static final int MAX_TESTS_FOR_IMPORT = 100;
     private final List<AutoTestPostModel> autotestsForCreate;
     private final List<AutoTestPutModel> autotestsForUpdate;
     private final Map<String, List<String>> autotestLinksToWIForUpdate;
@@ -37,7 +37,7 @@ public class BulkAutotestHelper {
         autotestsForCreate.add(createModel);
         resultsForAutotestsBeingCreated.add(resultModel);
 
-        if (autotestsForCreate.size() >= maxTestsForImport)
+        if (autotestsForCreate.size() >= MAX_TESTS_FOR_IMPORT)
         {
             bulkCreate();
         }
@@ -51,7 +51,7 @@ public class BulkAutotestHelper {
         resultsForAutotestsBeingUpdated.add(resultModel);
         autotestLinksToWIForUpdate.putAll(wiForUpdate);
 
-        if (autotestsForUpdate.size() >= maxTestsForImport)
+        if (autotestsForUpdate.size() >= MAX_TESTS_FOR_IMPORT)
         {
             bulkUpdate();
         }

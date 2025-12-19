@@ -24,6 +24,6 @@ public class XmlParameterizedTests {
             @Link(url = "https://dumps.example.com/module/issue/5", title = "{title} Issue-5", type = LinkType.ISSUE),
     })
     void testWithXmlParameters(String title, int number, String url) {
-
+        // empty
     }
 }

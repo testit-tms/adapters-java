@@ -4,6 +4,8 @@ import cucumber.api.*;
 import cucumber.api.event.*;
 import gherkin.ast.*;
 import gherkin.pickles.PickleTag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.testit.models.*;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
@@ -17,6 +19,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class BaseCucumber4Listener implements ConcurrentEventListener {
+    private static final Logger log = LoggerFactory.getLogger(BaseCucumber4Listener.class);
     private final AdapterManager adapterManager;
 
     private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
@@ -110,11 +113,11 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
-                .setExternalId(tagParser.getExternalId())
-                .setName(tagParser.getDisplayName())
-                .setTitle(tagParser.getTitle())
-                .setDescription(tagParser.getDescription())
-                .setWorkItemIds(tagParser.getWorkItemIds())
+                .setExternalId(tagParser.getExternalIdValue())
+                .setName(tagParser.getDisplayNameValue())
+                .setTitle(tagParser.getTitleValue())
+                .setDescription(tagParser.getDescriptionValue())
+                .setWorkItemIds(tagParser.getWorkItemIdList())
                 .setClassName(featureName)
                 .setLabels(tagParser.getScenarioLabels())
                 .setLinkItems(tagParser.getScenarioLinks())
@@ -146,9 +149,15 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
                         ).findFirst();
 
         if (examplesBlock.isPresent()) {
-            final TableRow row = examplesBlock.get().getTableBody().stream()
+
+            final Optional<TableRow> rowO = examplesBlock.get().getTableBody().stream()
                     .filter(example -> example.getLocation().getLine() == localCurrentTestCase.getLine())
-                    .findFirst().get();
+                    .findFirst();
+            if (!rowO.isPresent()) {
+                log.error("TableRow is not present");
+                throw new AssertionError();
+            }
+            TableRow row = rowO.get();
             final Map<String, String> parameters = new HashMap<>();
 
             IntStream.range(0, examplesBlock.get().getTableHeader().getCells().size()).forEach(index -> {
@@ -156,8 +165,8 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
                 final String value = row.getCells().get(index).getValue();
                 parameters.put(name, value);
             });
-
             return parameters;
+
         } else {
             return Collections.emptyMap();
         }
@@ -277,7 +286,7 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
     }
 
     private void updateTestCaseStatus(final ItemStatus status) {
-        if (!forbidTestCaseStatusChange.get()) {
+        if (!Boolean.TRUE.equals(forbidTestCaseStatusChange.get())) {
             adapterManager.updateTestCase(getTestCaseUuid(currentTestCase.get()),
                     result -> result.setItemStatus(status));
         }

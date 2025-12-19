@@ -3,6 +3,8 @@ package ru.testit.listener;
 import gherkin.ast.*;
 import io.cucumber.plugin.ConcurrentEventListener;
 import io.cucumber.plugin.event.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.testit.models.*;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
@@ -17,6 +19,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class BaseCucumber5Listener implements ConcurrentEventListener {
+    private static final Logger log = LoggerFactory.getLogger(BaseCucumber5Listener.class);
     private final AdapterManager adapterManager;
 
     private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
@@ -110,11 +113,11 @@ public class BaseCucumber5Listener implements ConcurrentEventListener {
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
-                .setExternalId(tagParser.getExternalId())
-                .setName(tagParser.getDisplayName())
-                .setTitle(tagParser.getTitle())
-                .setDescription(tagParser.getDescription())
-                .setWorkItemIds(tagParser.getWorkItemIds())
+                .setExternalId(tagParser.getExternalIdValue())
+                .setName(tagParser.getDisplayNameValue())
+                .setTitle(tagParser.getTitleValue())
+                .setDescription(tagParser.getDescriptionValue())
+                .setWorkItemIds(tagParser.getWorkItemIdList())
                 .setClassName(featureName)
                 .setLabels(tagParser.getScenarioLabels())
                 .setLinkItems(tagParser.getScenarioLinks())
@@ -146,18 +149,24 @@ public class BaseCucumber5Listener implements ConcurrentEventListener {
                         ).findFirst();
 
         if (examplesBlock.isPresent()) {
-            final TableRow row = examplesBlock.get().getTableBody().stream()
-                    .filter(example -> example.getLocation().getLine() == localCurrentTestCase.getLine())
-                    .findFirst().get();
-            final Map<String, String> parameters = new HashMap<>();
+            try {
+                final TableRow row = examplesBlock.get().getTableBody().stream()
+                        .filter(example -> example.getLocation().getLine() == localCurrentTestCase.getLine())
+                        .findFirst().get();
+                final Map<String, String> parameters = new HashMap<>();
 
-            IntStream.range(0, examplesBlock.get().getTableHeader().getCells().size()).forEach(index -> {
-                final String name = examplesBlock.get().getTableHeader().getCells().get(index).getValue();
-                final String value = row.getCells().get(index).getValue();
-                parameters.put(name, value);
-            });
+                IntStream.range(0, examplesBlock.get().getTableHeader().getCells().size()).forEach(index -> {
+                    final String name = examplesBlock.get().getTableHeader().getCells().get(index).getValue();
+                    final String value = row.getCells().get(index).getValue();
+                    parameters.put(name, value);
+                });
 
-            return parameters;
+                return parameters;
+            }
+            catch (NoSuchElementException e) {
+                log.error("e: ", e);
+                return Collections.emptyMap();
+            }
         } else {
             return Collections.emptyMap();
         }
@@ -277,7 +286,7 @@ public class BaseCucumber5Listener implements ConcurrentEventListener {
     }
 
     private void updateTestCaseStatus(final ItemStatus status) {
-        if (!forbidTestCaseStatusChange.get()) {
+        if (!Boolean.TRUE.equals(forbidTestCaseStatusChange.get())) {
             adapterManager.updateTestCase(getTestCaseUuid(currentTestCase.get()),
                     result -> result.setItemStatus(status));
         }

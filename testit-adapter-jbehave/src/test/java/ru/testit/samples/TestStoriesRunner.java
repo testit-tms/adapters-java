@@ -53,6 +53,7 @@ public class TestStoriesRunner extends ConfigurableEmbedder {
         embedder.runStoriesAsPaths(stories);
     }
 
+    @Override
     public Configuration configuration() {
         final BaseJbehaveListener listener = new BaseJbehaveListener();
 
@@ -64,6 +65,7 @@ public class TestStoriesRunner extends ConfigurableEmbedder {
                 .useDefaultStoryReporter(new NullStoryReporter());
     }
 
+    @Override
     public InjectableStepsFactory stepsFactory() {
         return new InstanceStepsFactory(embedder.configuration(), new SampleSteps());
     }

@@ -84,10 +84,11 @@ public class HttpWriter implements Writer {
             List<UUID> ids = apiClient.sendTestResults(config.getTestRunId(), results);
             testResults.put(testResult.getUuid(), ids.get(0));
         } catch (ApiException e) {
-            LOGGER.error("Can not write the autotest: " + (e.getMessage()));
+            LOGGER.error("Can not write the autotest: {}", e.getMessage());
         }
     }
 
+    // TODO: use after refactoring
     private List<UUID> prepareWorkItemUuidsForUpdateAutoTest(List<UUID> workItemUuids, String autoTestId) throws ApiException {
         List<WorkItemIdentifierModel> linkedWorkItems = apiClient.getWorkItemsLinkedToTest(autoTestId);
 
@@ -159,7 +160,7 @@ public class HttpWriter implements Writer {
 
                     apiClient.updateAutoTest(autoTestPutModel);
                 } catch (ApiException e) {
-                    LOGGER.error("Can not write the class: " + (e.getMessage()));
+                    LOGGER.error("Can not write the class: {}", (e.getMessage()));
                 }
             });
         }
@@ -242,7 +243,7 @@ public class HttpWriter implements Writer {
                             apiClient.updateTestResult(testResultId, model);
 
                         } catch (ApiException e) {
-                            LOGGER.error("Can not update the autotest: " + (e.getMessage()));
+                            LOGGER.error("Can not update the autotest: {}",(e.getMessage()));
                         }
                     });
                 }
@@ -356,7 +357,7 @@ public class HttpWriter implements Writer {
         try {
             return apiClient.addAttachment(path);
         } catch (ApiException e) {
-            LOGGER.error("Can not write attachment: " + (e.getMessage()));
+            LOGGER.error("Can not write attachment: {}", e.getMessage());
 
             return "";
         }

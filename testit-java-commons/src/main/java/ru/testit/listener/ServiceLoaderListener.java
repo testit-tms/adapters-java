@@ -30,7 +30,7 @@ public final class ServiceLoaderListener {
         return loaded;
     }
 
-    private static boolean nextSafely(final Iterator iterator) {
+    private static <T> boolean nextSafely(final Iterator<T> iterator) {
         try {
             return iterator.hasNext();
         } catch (Exception e) {

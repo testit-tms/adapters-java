@@ -9,6 +9,7 @@ plugins {
 val cucumberVersion = "4.8.1"
 val slf4jVersion = "1.7.36"
 val testngVersion = "7.5.1"
+val jsonVersion = "20231013"
 
 dependencies {
     implementation(project(":testit-java-commons"))
@@ -16,7 +17,7 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
     implementation("io.cucumber:cucumber-core:$cucumberVersion")
     implementation("io.cucumber:cucumber-java:$cucumberVersion")
-    implementation("org.json:json:20231013")
+    implementation("org.json:json:$jsonVersion")
 
     testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-java:$cucumberVersion")

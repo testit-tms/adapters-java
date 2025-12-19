@@ -20,6 +20,8 @@ import static java.util.Objects.isNull;
 
 public class Utils {
 
+    private Utils() {}
+
     public static String extractExternalID(final Method atomicTest, Map<String, String> parameters) {
         final ExternalId annotation = atomicTest.getAnnotation(ExternalId.class);
         return (annotation != null) ? setParameters(annotation.value(), parameters) : getHash(atomicTest.getDeclaringClass().getName() + atomicTest.getName());
@@ -30,14 +32,8 @@ public class Utils {
         return (annotation != null) ? setParameters(annotation.value(), parameters) : atomicTest.getName();
     }
 
-    public static List<String> extractWorkItemId(final Method atomicTest, Map<String, String> parameters) {
+    public static List<String> extractWorkItemIds(final Method atomicTest, Map<String, String> parameters) {
         final List<String> workItemIds = new ArrayList<>();
-        final WorkItemId workItem = atomicTest.getAnnotation(WorkItemId.class);
-        if (workItem != null) {
-            workItemIds.add(setParameters(workItem.value(), parameters));
-            return workItemIds;
-        }
-
         final WorkItemIds workItems = atomicTest.getAnnotation(WorkItemIds.class);
         if (workItems != null) {
             for (final String workItemId : workItems.value()) {

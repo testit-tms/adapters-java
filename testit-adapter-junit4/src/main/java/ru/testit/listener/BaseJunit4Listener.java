@@ -46,7 +46,7 @@ public class BaseJunit4Listener extends RunListener {
 
     @Override
     public void testRunFinished(final Result result) {
-        if (isFinished.get()) {
+        if (Boolean.TRUE.equals(isFinished.get())) {
             return;
         }
 
@@ -57,13 +57,13 @@ public class BaseJunit4Listener extends RunListener {
 
     @Override
     public void testStarted(final Description description) {
-        ExecutableTest executableTest = this.executableTest.get();
-        if (executableTest.isStarted()) {
-            executableTest = refreshContext();
+        ExecutableTest test = this.executableTest.get();
+        if (test.isStarted()) {
+            test = refreshContext();
         }
-        executableTest.setTestStatus();
+        test.setTestStatus();
 
-        final String uuid = executableTest.getUuid();
+        final String uuid = test.getUuid();
         startTestCase(description, uuid);
 
         adapterManager.updateClassContainer(classUUID.get(),
@@ -72,37 +72,35 @@ public class BaseJunit4Listener extends RunListener {
 
     @Override
     public void testFailure(final Failure failure) {
-        ExecutableTest executableTest = this.executableTest.get();
-        executableTest.setAfterStatus();
-        stopTestCase(executableTest.getUuid(), failure.getException(), ItemStatus.FAILED);
+        ExecutableTest test = this.executableTest.get();
+        test.setAfterStatus();
+        stopTestCase(test.getUuid(), failure.getException(), ItemStatus.FAILED);
     }
 
     @Override
     public void testAssumptionFailure(final Failure failure) {
-        ExecutableTest executableTest = this.executableTest.get();
-        executableTest.setAfterStatus();
-        stopTestCase(executableTest.getUuid(), failure.getException(), ItemStatus.FAILED);
+        testFailure(failure);
     }
 
     @Override
     public void testIgnored(final Description description) {
-        final ExecutableTest executableTest = this.executableTest.get();
-        if (executableTest.isAfter() || executableTest.isBefore()) {
+        final ExecutableTest test = this.executableTest.get();
+        if (test.isAfter() || test.isBefore()) {
             return;
         }
-        executableTest.setAfterStatus();
-        stopTestCase(executableTest.getUuid(), null, ItemStatus.SKIPPED);
+        test.setAfterStatus();
+        stopTestCase(test.getUuid(), null, ItemStatus.SKIPPED);
     }
 
     @Override
     public void testFinished(final Description description) {
-        final ExecutableTest executableTest = this.executableTest.get();
-        if (executableTest.isAfter()) {
+        final ExecutableTest test = this.executableTest.get();
+        if (test.isAfter()) {
             return;
         }
-        executableTest.setAfterStatus();
-        adapterManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
-        adapterManager.stopTestCase(executableTest.getUuid());
+        test.setAfterStatus();
+        adapterManager.updateTestCase(test.getUuid(), setStatus(ItemStatus.PASSED, null));
+        adapterManager.stopTestCase(test.getUuid());
     }
 
     protected void startTestCase(Description method, final String uuid) {
@@ -114,7 +112,7 @@ public class BaseJunit4Listener extends RunListener {
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method))
                 .setExternalId(Utils.extractExternalID(method))
-                .setWorkItemIds(Utils.extractWorkItemId(method))
+                .setWorkItemIds(Utils.extractWorkItemIds(method))
                 .setTitle(Utils.extractTitle(method))
                 .setName(Utils.extractDisplayName(method))
                 .setClassName(Utils.extractClassname(method, (index != -1) ? fullName.substring(index + 1) : fullName))

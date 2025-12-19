@@ -12,39 +12,39 @@ import java.util.List;
 import java.util.UUID;
 
 public class Helper {
-    private final static String EXTERNAL_ID = "5819479d";
-    private final static String TITLE = "Test title";
-    private final static String DESCRIPTION = "Test description";
-    private final static String NAME = "Test name";
-    private final static String CLASS_NAME = "ClassName";
-    private final static String SPACE_NAME = "SpaceName";
-    private final static String WORK_ITEM_ID = "6523";
-    private final static ItemStatus ITEM_STATUS = ItemStatus.PASSED;
-    private final static String TEST_UUID = "99d77db9-8d68-4835-9e17-3a6333f01251";
+    private static final String EXTERNAL_ID = "5819479d";
+    private static final String TITLE = "Test title";
+    private static final String DESCRIPTION = "Test description";
+    private static final String NAME = "Test name";
+    private static final String CLASS_NAME = "ClassName";
+    private static final String SPACE_NAME = "SpaceName";
+    private static final String WORK_ITEM_ID = "6523";
+    private static final ItemStatus ITEM_STATUS = ItemStatus.PASSED;
+    private static final String TEST_UUID = "99d77db9-8d68-4835-9e17-3a6333f01251";
 
-    private final static String LINK_TITLE = "Link title";
-    private final static String LINK_DESCRIPTION = "Link description";
-    private final static LinkType LINK_TYPE = LinkType.ISSUE;
-    private final static String LINK_URL = "https://example.test/";
+    private static final String LINK_TITLE = "Link title";
+    private static final String LINK_DESCRIPTION = "Link description";
+    private static final LinkType LINK_TYPE = LinkType.ISSUE;
+    private static final String LINK_URL = "https://example.test/";
 
-    private final static String STEP_TITLE = "Step title";
-    private final static String STEP_DESCRIPTION = "Step description";
+    private static final String STEP_TITLE = "Step title";
+    private static final String STEP_DESCRIPTION = "Step description";
 
-    private final static String LABEL_NAME = "Label name";
+    private static final String LABEL_NAME = "Label name";
 
-    private final static String CLASS_UUID = "179f193b-2519-4ae9-a364-173c3d8fa6cd";
+    private static final String CLASS_UUID = "179f193b-2519-4ae9-a364-173c3d8fa6cd";
 
-    private final static String BEFORE_EACH_NAME = "Before Each name";
-    private final static String BEFORE_EACH_DESCRIPTION = "Before Each description";
+    private static final String BEFORE_EACH_NAME = "Before Each name";
+    private static final String BEFORE_EACH_DESCRIPTION = "Before Each description";
 
-    private final static String AFTER_EACH_NAME = "After Each name";
-    private final static String AFTER_EACH_DESCRIPTION = "After Each description";
+    private static final String AFTER_EACH_NAME = "After Each name";
+    private static final String AFTER_EACH_DESCRIPTION = "After Each description";
 
-    private final static String BEFORE_ALL_NAME = "Before All name";
-    private final static String BEFORE_ALL_DESCRIPTION = "Before All description";
+    private static final String BEFORE_ALL_NAME = "Before All name";
+    private static final String BEFORE_ALL_DESCRIPTION = "Before All description";
 
-    private final static String AFTER_ALL_NAME = "After All name";
-    private final static String AFTER_ALL_DESCRIPTION = "After All description";
+    private static final String AFTER_ALL_NAME = "After All name";
+    private static final String AFTER_ALL_DESCRIPTION = "After All description";
 
     public static List<UUID> generateListUuid(){
         List<UUID> uuids = new ArrayList<>();

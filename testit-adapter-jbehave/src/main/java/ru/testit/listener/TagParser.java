@@ -25,53 +25,53 @@ public class TagParser {
     private static final String LINKS = "Links";
     private static final String WORK_ITEM_IDS = "WorkItemIds";
 
-    private final List<Label> labels = new ArrayList<>();
-    private final List<LinkItem> links = new ArrayList<>();
-    private final List<String> workItemIds = new ArrayList<>();
-    private String externalId;
-    private String displayName;
-    private final String title;
-    private final String description;
+    private final List<Label> labelList = new ArrayList<>();
+    private final List<LinkItem> linkItemList = new ArrayList<>();
+    private final List<String> workItemIdList = new ArrayList<>();
+    private String externalIdValue;
+    private String displayNameValue;
+    private final String titleValue;
+    private final String descriptionValue;
 
     TagParser(final Story story, final Scenario scenario) {
         Meta storyMeta = story.getMeta();
         Meta scenarioMeta = scenario.getMeta();
 
-        externalId = getMetaValue(storyMeta, scenarioMeta, EXTERNAL_ID);
-        title = getMetaValue(storyMeta, scenarioMeta, TITLE);
-        displayName = getMetaValue(storyMeta, scenarioMeta, DISPLAY_NAME);
-        description = getMetaValue(storyMeta, scenarioMeta, DESCRIPTION);
+        externalIdValue = getMetaValue(storyMeta, scenarioMeta, EXTERNAL_ID);
+        titleValue = getMetaValue(storyMeta, scenarioMeta, TITLE);
+        displayNameValue = getMetaValue(storyMeta, scenarioMeta, DISPLAY_NAME);
+        descriptionValue = getMetaValue(storyMeta, scenarioMeta, DESCRIPTION);
 
         String labelsValue = getMetaValue(storyMeta, scenarioMeta, LABELS);
 
         if (!labelsValue.isEmpty()) {
             Arrays.stream(labelsValue.split(TAG_VALUE_DELIMITER))
-                    .forEach(label -> getLabels().add(getTagLabel(label)));
+                    .forEach(label -> getLabelList().add(getTagLabel(label)));
         }
 
         String linksValue = getMetaValue(storyMeta, scenarioMeta, LINKS);
 
         if (isJson(linksValue)) {
-            getLinks().add(getLinkItem(linksValue));
+            getLinkItemList().add(getLinkItem(linksValue));
         } else if (isJsonArray(linksValue)) {
-            getLinks().addAll(getLinkItems(linksValue));
+            getLinkItemList().addAll(getLinkItems(linksValue));
         }
 
         String workItemIdsValue = getMetaValue(storyMeta, scenarioMeta, WORK_ITEM_IDS);
 
         if (!workItemIdsValue.isEmpty()) {
             Arrays.stream(workItemIdsValue.split(TAG_VALUE_DELIMITER))
-                    .forEach(id -> getWorkItemIds().add(id));
+                    .forEach(id -> getWorkItemIdList().add(id));
         }
 
         final String name = scenario.getTitle();
 
-        if (externalId.isEmpty()) {
-            externalId = Utils.getHash(story.getPath() + name);
+        if (externalIdValue.isEmpty()) {
+            externalIdValue = Utils.getHash(story.getPath() + name);
         }
 
-        if (displayName.isEmpty()) {
-            displayName = name;
+        if (displayNameValue.isEmpty()) {
+            displayNameValue = name;
         }
     }
 
@@ -87,39 +87,39 @@ public class TagParser {
         return "";
     }
 
-    public List<Label> getLabels() {
-        return labels;
+    public List<Label> getLabelList() {
+        return labelList;
     }
 
-    public List<LinkItem> getLinks() {
-        return links;
+    public List<LinkItem> getLinkItemList() {
+        return linkItemList;
     }
 
-    public List<String> getWorkItemIds() {
-        return workItemIds;
+    public List<String> getWorkItemIdList() {
+        return workItemIdList;
     }
 
-    public String getExternalId() {
-        return externalId;
+    public String getExternalIdValue() {
+        return externalIdValue;
     }
 
-    public String getTitle() {
-        return title;
+    public String getTitleValue() {
+        return titleValue;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getDisplayNameValue() {
+        return displayNameValue;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescriptionValue() {
+        return descriptionValue;
     }
 
     private Label getTagLabel(final String tag) {
         return new Label().setName(tag);
     }
 
-    private Boolean isJson(String json) {
+    private boolean isJson(String json) {
         try {
             new JSONObject(json);
         } catch (JSONException ex) {
@@ -128,7 +128,7 @@ public class TagParser {
         return true;
     }
 
-    private Boolean isJsonArray(String json) {
+    private boolean isJsonArray(String json) {
         try {
             new JSONArray(json);
         } catch (JSONException ex1) {
@@ -150,14 +150,14 @@ public class TagParser {
 
     private List<LinkItem> getLinkItems(String json) {
         List<LinkItem> items = new ArrayList<>();
-        JSONArray links = new JSONArray(json);
-        for (int i = 0; i < links.length(); i++) {
+        JSONArray linksArr = new JSONArray(json);
+        for (int i = 0; i < linksArr.length(); i++) {
             items.add(
                     new LinkItem()
-                            .setUrl(links.getJSONObject(i).getString("url"))
-                            .setDescription(links.getJSONObject(i).getString("description"))
-                            .setTitle(links.getJSONObject(i).getString("title"))
-                            .setType(LinkType.fromString(links.getJSONObject(i).getString("type")))
+                            .setUrl(linksArr.getJSONObject(i).getString("url"))
+                            .setDescription(linksArr.getJSONObject(i).getString("description"))
+                            .setTitle(linksArr.getJSONObject(i).getString("title"))
+                            .setType(LinkType.fromString(linksArr.getJSONObject(i).getString("type")))
             );
         }
         return items;

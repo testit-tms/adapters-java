@@ -11,7 +11,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ResultStorageTest {
+class ResultStorageTest {
 
     @Test
     void getTestResult_WithCorrectUuid() {

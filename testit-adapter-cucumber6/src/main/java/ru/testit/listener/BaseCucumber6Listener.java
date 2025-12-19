@@ -99,8 +99,9 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         final String featureName = feature.getName();
         final String uuid = getTestCaseUuid(currentTestCase.get());
 
+        int line = currentTestCase.get().getLocation().getLine();
         final Scenario scenarioDefinition =
-                scenarioParser.getScenarioDefinition(currentFeatureFile.get(), currentTestCase.get().getLine());
+                scenarioParser.getScenarioDefinition(currentFeatureFile.get(), line);
 
         Map<String, String> parameters = new HashMap<>();
 
@@ -115,11 +116,11 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
-                .setExternalId(tagParser.getExternalId())
-                .setName(tagParser.getDisplayName())
-                .setTitle(tagParser.getTitle())
-                .setDescription(tagParser.getDescription())
-                .setWorkItemIds(tagParser.getWorkItemIds())
+                .setExternalId(tagParser.getExternalIdValue())
+                .setName(tagParser.getDisplayNameValue())
+                .setTitle(tagParser.getTitleValue())
+                .setDescription(tagParser.getDescriptionValue())
+                .setWorkItemIds(tagParser.getWorkItemIdList())
                 .setClassName(featureName)
                 .setLabels(tagParser.getScenarioLabels())
                 .setLinkItems(tagParser.getScenarioLinks())
@@ -293,7 +294,7 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
     }
 
     private void updateTestCaseStatus(final ItemStatus status) {
-        if (!forbidTestCaseStatusChange.get()) {
+        if (!Boolean.TRUE.equals(forbidTestCaseStatusChange.get())) {
             adapterManager.updateTestCase(getTestCaseUuid(currentTestCase.get()),
                     result -> result.setItemStatus(status));
         }
@@ -312,7 +313,8 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
     }
 
     private String getId(final TestCase testCase) {
-        final String testCaseLocation = getTestCaseUri(testCase) + ":" + testCase.getLine();
+        int line = testCase.getLocation().getLine();
+        final String testCaseLocation = getTestCaseUri(testCase) + ":" + line;
         return Utils.getHash(testCaseLocation);
     }
 

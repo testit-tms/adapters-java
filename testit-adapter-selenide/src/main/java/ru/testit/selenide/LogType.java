@@ -31,14 +31,14 @@ public enum LogType {
      */
     SERVER(org.openqa.selenium.logging.LogType.SERVER);
 
-    private final String logType;
+    private final String logTypeValue;
 
-    LogType(final String logType) {
-        this.logType = logType;
+    LogType(final String logTypeValue) {
+        this.logTypeValue = logTypeValue;
     }
 
     @Override
     public String toString() {
-        return logType;
+        return logTypeValue;
     }
 }

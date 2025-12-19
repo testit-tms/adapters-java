@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -58,8 +57,7 @@ public class AppProperties {
         }});
     }};
 
-    public AppProperties() {
-    }
+    private AppProperties() {}
 
     public static Properties loadProperties() {
         String configFile = getConfigFileName();
@@ -115,10 +113,11 @@ public class AppProperties {
 
         try {
             String url = properties.getProperty(varNames.get(URL), null);
-            URI ignored = new java.net.URL(url).toURI();
+            new java.net.URL(url).toURI();
             result.put(URL, url);
         } catch (MalformedURLException | URISyntaxException | SecurityException | NullPointerException |
                  IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
@@ -127,33 +126,37 @@ public class AppProperties {
                 result.put(PRIVATE_TOKEN, token);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
             String projectId = properties.getProperty(varNames.get(PROJECT_ID), null);
             if (projectId != null && !projectId.isEmpty()) {
-                java.util.UUID ignored = java.util.UUID.fromString(projectId);
+                java.util.UUID.fromString(projectId);
                 result.put(PROJECT_ID, projectId);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
             String configurationId = properties.getProperty(varNames.get(CONFIGURATION_ID), null);
             if (configurationId != null && !configurationId.isEmpty()) {
-                java.util.UUID ignored = java.util.UUID.fromString(configurationId);
+                java.util.UUID.fromString(configurationId);
                 result.put(CONFIGURATION_ID, configurationId);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
             String testRunId = properties.getProperty(varNames.get(TEST_RUN_ID), null);
             if (testRunId != null && !testRunId.isEmpty()) {
-                java.util.UUID ignored = java.util.UUID.fromString(testRunId);
+                java.util.UUID.fromString(testRunId);
                 result.put(TEST_RUN_ID, testRunId);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
@@ -162,6 +165,7 @@ public class AppProperties {
                 result.put(TEST_RUN_NAME, testRunName);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
@@ -172,6 +176,7 @@ public class AppProperties {
                 result.put(ADAPTER_MODE, adapterMode);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
@@ -180,6 +185,7 @@ public class AppProperties {
                 result.put(AUTOMATIC_CREATION_TEST_CASES, createTestCases);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
@@ -188,6 +194,7 @@ public class AppProperties {
                 result.put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, updateLinksToTestCases);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
@@ -196,6 +203,7 @@ public class AppProperties {
                 result.put(CERT_VALIDATION, certValidation);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
@@ -204,6 +212,7 @@ public class AppProperties {
                 result.put(TMS_INTEGRATION, tmsIntegration);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         try {
@@ -212,6 +221,7 @@ public class AppProperties {
                 result.put(TMS_IMPORT_REALTIME, tmsImportRealtime);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         return result;
@@ -222,7 +232,7 @@ public class AppProperties {
 
         try {
             String url = properties.getProperty(URL);
-            URI ignored = new java.net.URL(url).toURI();
+            new java.net.URL(url).toURI();
         } catch (Exception e) {
             String message = "Invalid url: " + e.getMessage();
             log.error(message);
@@ -238,7 +248,7 @@ public class AppProperties {
 
         try {
             String projectId = properties.getProperty(PROJECT_ID);
-            java.util.UUID ignored = java.util.UUID.fromString(projectId);
+            java.util.UUID.fromString(projectId);
         } catch (Exception e) {
             String message = "Invalid projectId: " + e.getMessage();
             log.error(message);
@@ -247,7 +257,7 @@ public class AppProperties {
 
         try {
             String configurationId = properties.getProperty(CONFIGURATION_ID);
-            java.util.UUID ignored = java.util.UUID.fromString(configurationId);
+            java.util.UUID.fromString(configurationId);
         } catch (Exception e) {
             String message = "Invalid configurationId: " + e.getMessage();
             log.error(message);
@@ -271,11 +281,13 @@ public class AppProperties {
 
         try {
             adapterMode = Integer.parseInt(properties.getProperty(ADAPTER_MODE));
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+            // empty
+        }
 
         try {
             String testRunId = properties.getProperty(TEST_RUN_ID);
-            java.util.UUID ignored = java.util.UUID.fromString(testRunId);
+            java.util.UUID.fromString(testRunId);
 
             if (adapterMode == 2) {
                 String message = "Adapter works in mode 2. Config should not contains test run id.";
@@ -334,6 +346,7 @@ public class AppProperties {
                 return fileName;
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
         }
 
         return PROPERTIES_FILE;

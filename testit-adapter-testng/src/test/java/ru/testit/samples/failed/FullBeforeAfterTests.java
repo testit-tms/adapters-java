@@ -6,17 +6,17 @@ import ru.testit.annotations.*;
 import ru.testit.models.LinkType;
 import ru.testit.services.Adapter;
 
-public class FullBeforeAfterTests {
+class FullBeforeAfterTests {
     @BeforeClass
     @Title("Open browser")
-    public static void openBrowser() {
+    static void openBrowser() {
         Assert.assertTrue(true);
     }
 
     @BeforeMethod
     @Title("Log in the system")
     @Description("System authentication")
-    public void authorization() {
+    void authorization() {
         Assert.assertTrue(setLogin("User_1"));
         Assert.assertTrue(setPassword("Pass123"));
     }
@@ -24,55 +24,55 @@ public class FullBeforeAfterTests {
     @Step
     @Title("Set login: {login}")
     @Description("Login \"{login}\" has been set")
-    public boolean setLogin(String login) {
+    boolean setLogin(String login) {
         return login.equals("User_1");
     }
 
     @Step
     @Title("Set password: {password}")
     @Description("Password \"{password}\" has been set")
-    public boolean setPassword(String password) {
+    boolean setPassword(String password) {
         return password.equals("Pass123");
     }
 
     @Step
     @Title("Create a project")
     @Description("Project was created")
-    public void createProject() {
+    void createProject() {
         Assert.assertTrue(true);
     }
 
     @Step
     @Title("Enter the project")
     @Description("The contents of the project are displayed")
-    public void enterProject() {
+    void enterProject() {
         Assert.assertTrue(true);
     }
 
     @Step
     @Title("Create a section")
     @Description("Section was created")
-    public void createSection() {
+    void createSection() {
         Assert.fail();
     }
 
     @Step
     @Title("Create a test case")
     @Description("Test case was created")
-    public void createTestCase() {
+    void createTestCase() {
         Assert.assertTrue(true);
     }
 
     @BeforeMethod
     @Title("Maximum nesting in setup step")
-    public void beforeStepWithMaximumNesting() {
+    void beforeStepWithMaximumNesting() {
         maximumNestingStep(13);
     }
 
     @Step
     @Title("Maximum nesting step")
     @Description("15 nesting levels of step")
-    public void maximumNestingStep(int level) {
+    void maximumNestingStep(int level) {
         if (level > 1) {
             maximumNestingStep(level - 1);
         }
@@ -93,7 +93,7 @@ public class FullBeforeAfterTests {
             @Link(url = "https://dumps.example.com/module/JCP-777", title = "JCP-777", type = LinkType.DEFECT),
             @Link(url = "https://dumps.example.com/module/issue/5", title = "Issue-5", type = LinkType.ISSUE),
     })
-    public void allAnnotationsTest() {
+    void allAnnotationsTest() {
        Adapter.addLinks("https://testit.ru/", "Test 1","Desc 1", LinkType.ISSUE);
         createProject();
         enterProject();
@@ -105,25 +105,25 @@ public class FullBeforeAfterTests {
     @Test
     @ExternalId("failed_full_before_after_with_required_annotations")
     @DisplayName("Failed test with required annotations")
-    public void requiredAnnotationsTest() {
+    void requiredAnnotationsTest() {
         Assert.assertTrue(true);
     }
 
     @AfterMethod
     @Title("Log out the system")
-    public void logOut() {
+    void logOut() {
         Assert.assertTrue(true);
     }
 
     @AfterMethod
     @Title("Maximum nesting in teardown step")
-    public void afterStepWithMaximumNesting() {
+    void afterStepWithMaximumNesting() {
         maximumNestingStep(13);
     }
 
     @AfterClass
     @Title("Close browser")
-    public static void CloseBrowser() {
+    static void CloseBrowser() {
         Assert.assertTrue(true);
     }
 }
