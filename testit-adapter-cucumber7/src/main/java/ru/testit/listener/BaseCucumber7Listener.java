@@ -1,11 +1,16 @@
 package ru.testit.listener;
 
-import io.cucumber.messages.types.Examples;
-import io.cucumber.messages.types.Feature;
-import io.cucumber.messages.types.Scenario;
-import io.cucumber.messages.types.TableRow;
+import io.cucumber.messages.types.*;
 import io.cucumber.plugin.ConcurrentEventListener;
 import io.cucumber.plugin.event.*;
+import io.cucumber.plugin.event.TestCase;
+import io.cucumber.plugin.event.TestCaseFinished;
+import io.cucumber.plugin.event.TestCaseStarted;
+import io.cucumber.plugin.event.TestRunStarted;
+import io.cucumber.plugin.event.TestStepFinished;
+import io.cucumber.plugin.event.TestStepStarted;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.testit.models.*;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
@@ -20,6 +25,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class BaseCucumber7Listener implements ConcurrentEventListener {
+    private static final Logger log = LoggerFactory.getLogger(BaseCucumber7Listener.class);
     private final AdapterManager adapterManager;
 
     private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
@@ -92,8 +98,9 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
         currentTestCase.set(event.getTestCase());
         forbidTestCaseStatusChange.set(false);
 
+        int line = currentTestCase.get().getLocation().getLine();
         final Scenario scenarioDefinition =
-                scenarioParser.getScenarioDefinition(currentFeatureFile.get(), currentTestCase.get().getLine());
+                scenarioParser.getScenarioDefinition(currentFeatureFile.get(), line);
 
         Map<String, String> parameters = new HashMap<>();
 
@@ -112,13 +119,13 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
-                .setExternalId(tagParser.getExternalId())
-                .setName(tagParser.getDisplayName())
-                .setTitle(tagParser.getTitle())
-                .setDescription(tagParser.getDescription())
-                .setWorkItemIds(tagParser.getWorkItemIds())
-                .setSpaceName(tagParser.getNameSpace())
-                .setClassName(tagParser.getClassName())
+                .setExternalId(tagParser.getExternalIdValue())
+                .setName(tagParser.getDisplayNameValue())
+                .setTitle(tagParser.getTitleValue())
+                .setDescription(tagParser.getDescriptionValue())
+                .setWorkItemIds(tagParser.getWorkItemIdList())
+                .setSpaceName(tagParser.getNameSpaceValue())
+                .setClassName(tagParser.getClassNameValue())
                 .setLabels(tagParser.getScenarioLabels())
                 .setLinkItems(tagParser.getScenarioLinks())
                 .setParameters(parameters)
@@ -167,14 +174,22 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
         final TableRow row = maybeRow.get();
         final Map<String, String> parameters = new HashMap<>();
 
-        IntStream.range(0, examples.getTableHeader().get().getCells().size()).forEach
+        Optional<TableRow> headerOptional = examples.getTableHeader();
+        if (!headerOptional.isPresent()) {
+            log.error("Header is null");
+            throw new AssertionError();
+        }
+        TableRow header = headerOptional.get();
+        List<TableCell> headerCells = header.getCells();
+        IntStream.range(0, headerCells.size()).forEach
                 (index -> {
-                    final String name = examples.getTableHeader().get().getCells().get(index).getValue();
+                    final String name = headerCells.get(index).getValue();
                     final String value = row.getCells().get(index).getValue();
                     parameters.put(name, value);
                 });
 
         return parameters;
+
     }
 
     private void testFinished(final TestCaseFinished event) {
@@ -304,7 +319,7 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
     }
 
     private void updateTestCaseStatus(final ItemStatus status) {
-        if (!forbidTestCaseStatusChange.get()) {
+        if (!Boolean.TRUE.equals(forbidTestCaseStatusChange.get())) {
             adapterManager.updateTestCase(getTestCaseUuid(currentTestCase.get()),
                     result -> result.setItemStatus(status));
         }
@@ -323,7 +338,8 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
     }
 
     private String getId(final TestCase testCase) {
-        final String testCaseLocation = getTestCaseUri(testCase) + ":" + testCase.getLine();
+        int line = testCase.getLocation().getLine();
+        final String testCaseLocation = getTestCaseUri(testCase) + ":" + line;
         return Utils.getHash(testCaseLocation);
     }
 

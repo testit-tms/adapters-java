@@ -3,8 +3,9 @@ package ru.testit.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.TestRunState;
 import ru.testit.client.model.TestRunV2ApiResult;
+import ru.testit.client.model.TestStatusApiResult;
+import ru.testit.client.model.TestStatusApiType;
 import ru.testit.clients.Converter;
 import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
@@ -131,9 +132,15 @@ public class AdapterManager {
         try {
             TestRunV2ApiResult testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
 
-            if (testRun.getStateName() != TestRunState.COMPLETED) {
+            TestStatusApiResult status = testRun.getStatus();
+            TestStatusApiType type = status.getType();
+            if (type != TestStatusApiType.SUCCEEDED) {
                 this.client.completeTestRun(this.clientConfiguration.getTestRunId());
             }
+            // disabled deprecated and testing
+            // if (testRun.getStateName() != TestRunState.COMPLETED) {
+            //     this.client.completeTestRun(this.clientConfiguration.getTestRunId());
+            // }
         } catch (ApiException e) {
             if (e.getResponseBody().contains("the StateName is already Completed")) {
                 return;

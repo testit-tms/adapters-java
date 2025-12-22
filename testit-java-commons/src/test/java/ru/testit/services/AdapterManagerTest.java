@@ -6,8 +6,9 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.testit.Helper;
 import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.TestRunState;
 import ru.testit.client.model.TestRunV2ApiResult;
+import ru.testit.client.model.TestStatusApiResult;
+import ru.testit.client.model.TestStatusApiType;
 import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.listener.ListenerManager;
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
 import static org.mockito.Mockito.*;
 
 @Disabled("Mockito compatibility issues with Java 19+ and sealed classes")
-public class AdapterManagerTest {
+class AdapterManagerTest {
 
     private ThreadContext threadContext;
     private ResultStorage storage;
@@ -34,7 +35,7 @@ public class AdapterManagerTest {
 
     private ListenerManager listenerManager;
 
-    private final static String TEST_RUN_ID = "5819479d-e38b-40d0-9e35-c5b2dab50158";
+    private static final String TEST_RUN_ID = "5819479d-e38b-40d0-9e35-c5b2dab50158";
 
     @BeforeEach
     void init() {
@@ -113,7 +114,11 @@ public class AdapterManagerTest {
     void stopTests_WithCompletedTestRun_NoInvokeCompleteHandler() throws ApiException {
         // arrange
         TestRunV2ApiResult response = new TestRunV2ApiResult();
-        response.setStateName(TestRunState.COMPLETED);
+        // response.setStateName(TestRunState.COMPLETED);
+
+        TestStatusApiResult status = new TestStatusApiResult();
+        status.setType(TestStatusApiType.SUCCEEDED);
+        response.setStatus(status);
 
         when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
 
@@ -130,7 +135,11 @@ public class AdapterManagerTest {
     void stopTests_WithInProgressTestRun_InvokeCompleteHandler() throws ApiException {
         // arrange
         TestRunV2ApiResult response = new TestRunV2ApiResult();
-        response.setStateName(TestRunState.IN_PROGRESS);
+        // response.setStateName(TestRunState.IN_PROGRESS);
+
+        TestStatusApiResult status = new TestStatusApiResult();
+        status.setType(TestStatusApiType.IN_PROGRESS);
+        response.setStatus(status);
 
         when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
 
@@ -937,7 +946,7 @@ public class AdapterManagerTest {
         AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
-        Boolean result = manager.isFilteredMode();
+        boolean result = manager.isFilteredMode();
 
         // assert
         Assertions.assertTrue(result);
@@ -951,7 +960,7 @@ public class AdapterManagerTest {
         AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
         // act
-        Boolean result = manager.isFilteredMode();
+        boolean result = manager.isFilteredMode();
 
         // assert
         Assertions.assertFalse(result);

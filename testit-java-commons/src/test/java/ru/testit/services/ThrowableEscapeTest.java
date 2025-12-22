@@ -3,10 +3,10 @@ package ru.testit.services;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
-public class ThrowableEscapeTest {
+class ThrowableEscapeTest {
 
     @Test
-    public void testEscapeHtmlInObjectWithThrowable() {
+    void testEscapeHtmlInObjectWithThrowable() {
         // Create a Throwable with a message containing HTML
         Throwable throwable = new AssertionError("Assertion failed: expected <1> but was <0>");
 
@@ -21,7 +21,7 @@ public class ThrowableEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlInObjectWithThrowableContainingHtml() {
+    void testEscapeHtmlInObjectWithThrowableContainingHtml() {
         // Create a Throwable with a message containing actual HTML tags
         Throwable throwable = new RuntimeException("Error in <div> element with <script> tag");
 
@@ -37,7 +37,7 @@ public class ThrowableEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlInObjectWithCausedByThrowable() {
+    void testEscapeHtmlInObjectWithCausedByThrowable() {
         // Create nested Throwables
         Throwable cause = new IllegalArgumentException("Cause message with <html>");
         Throwable throwable = new RuntimeException("Main error", cause);

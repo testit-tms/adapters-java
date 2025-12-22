@@ -3,10 +3,12 @@ package ru.testit.models;
 import ru.testit.services.HtmlEscapeUtils;
 import ru.testit.services.Utils;
 
+import java.io.Serializable;
+
 /**
  * Model object to pass links to external resources.
  */
-public class LinkItem
+public class LinkItem implements Serializable
 {
     private String title;
     private String url;

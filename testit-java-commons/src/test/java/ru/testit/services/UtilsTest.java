@@ -18,9 +18,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Disabled("Mockito compatibility issues with Java 19+ and sealed classes")
-public class UtilsTest {
-    private final static String TEXT_WITHOUT_PARAMETERS = "{Text without} {parameters}";
-    private final static String[] LABELS_WITHOUT_PARAMETERS = new String[]{"{Labels", "without}", "{parameters}"};
+class UtilsTest {
+    private static final String TEXT_WITHOUT_PARAMETERS = "{Text without} {parameters}";
+    private static final String[] LABELS_WITHOUT_PARAMETERS = new String[]{"{Labels", "without}", "{parameters}"};
 
     private Method atomicTest;
 
@@ -38,6 +38,7 @@ public class UtilsTest {
         class TestClass {
             @ExternalId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
@@ -60,6 +61,7 @@ public class UtilsTest {
         class TestClass {
             @ExternalId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
@@ -81,6 +83,7 @@ public class UtilsTest {
         class TestClass {
             @ExternalId("Text without parameters")
             void testMethod() {
+                // empty
             }
         }
 
@@ -97,7 +100,9 @@ public class UtilsTest {
     @Test
     void extractExternalID_WithoutExternalID() throws NoSuchMethodException {
         class MockTests {
-            public void allAnnotationsTest() {}
+            void allAnnotationsTest() {
+                // empty
+            }
         }
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
@@ -122,6 +127,7 @@ public class UtilsTest {
         class TestClass {
             @DisplayName("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
@@ -144,6 +150,7 @@ public class UtilsTest {
         class TestClass {
             @DisplayName("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
@@ -165,6 +172,7 @@ public class UtilsTest {
         class TestClass {
             @DisplayName("Text without parameters")
             void testMethod() {
+                // empty
             }
         }
 
@@ -202,16 +210,17 @@ public class UtilsTest {
         String textAfterSetParameters = UtilsHelper.generateTextAfterSetParameters(parameters);
 
         class TestClass {
-            @WorkItemId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            @WorkItemIds("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
         Method testMethod = TestClass.class.getDeclaredMethods()[0];
-        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(testMethod.getAnnotation(WorkItemId.class));
+        when(atomicTest.getAnnotation(WorkItemIds.class)).thenReturn(testMethod.getAnnotation(WorkItemIds.class));
 
         // act
-        List<String> workItemIds = Utils.extractWorkItemId(atomicTest, parameters);
+        List<String> workItemIds = Utils.extractWorkItemIds(atomicTest, parameters);
 
         // assert
         Assertions.assertEquals(textAfterSetParameters, workItemIds.get(0));
@@ -224,16 +233,17 @@ public class UtilsTest {
         String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
 
         class TestClass {
-            @WorkItemId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            @WorkItemIds("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
         Method testMethod = TestClass.class.getDeclaredMethods()[0];
-        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(testMethod.getAnnotation(WorkItemId.class));
+        when(atomicTest.getAnnotation(WorkItemIds.class)).thenReturn(testMethod.getAnnotation(WorkItemIds.class));
 
         // act
-        List<String> workItemIds = Utils.extractWorkItemId(atomicTest, null);
+        List<String> workItemIds = Utils.extractWorkItemIds(atomicTest, null);
 
         // assert
         Assertions.assertEquals(textBeforeSetParameters, workItemIds.get(0));
@@ -245,16 +255,17 @@ public class UtilsTest {
         Map<String, String> parameters = UtilsHelper.generateParameters();
 
         class TestClass {
-            @WorkItemId("Text without parameters")
+            @WorkItemIds("Text without parameters")
             void testMethod() {
+                // empty
             }
         }
 
         Method testMethod = TestClass.class.getDeclaredMethods()[0];
-        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(testMethod.getAnnotation(WorkItemId.class));
+        when(atomicTest.getAnnotation(WorkItemIds.class)).thenReturn(testMethod.getAnnotation(WorkItemIds.class));
 
         // act
-        List<String> workItemIds = Utils.extractWorkItemId(atomicTest, parameters);
+        List<String> workItemIds = Utils.extractWorkItemIds(atomicTest, parameters);
 
         // assert
         Assertions.assertEquals("Text without parameters", workItemIds.get(0));
@@ -265,11 +276,11 @@ public class UtilsTest {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
 
-        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(null);
+        when(atomicTest.getAnnotation(WorkItemIds.class)).thenReturn(null);
 
         // act
-        List<String> workItemIdWithoutInputParameters = Utils.extractWorkItemId(atomicTest, null);
-        List<String> workItemIdWithInputParameters = Utils.extractWorkItemId(atomicTest, parameters);
+        List<String> workItemIdWithoutInputParameters = Utils.extractWorkItemIds(atomicTest, null);
+        List<String> workItemIdWithInputParameters = Utils.extractWorkItemIds(atomicTest, parameters);
 
         // assert
         Assertions.assertTrue(workItemIdWithoutInputParameters.isEmpty());
@@ -304,6 +315,7 @@ public class UtilsTest {
                     )
             })
             void testMethod() {
+                // empty
             }
         }
 
@@ -351,6 +363,7 @@ public class UtilsTest {
                     ),
             })
             void testMethod() {
+                // empty
             }
         }
 
@@ -384,6 +397,7 @@ public class UtilsTest {
                     type = LinkType.ISSUE
             )
             void testMethod() {
+                // empty
             }
         }
 
@@ -406,7 +420,6 @@ public class UtilsTest {
     void extractLinks_WithoutLinks_WithFullLinkWithoutParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        LinkItem link = Helper.generateLinkItem();
 
         class TestClass {
             @Link(
@@ -416,6 +429,7 @@ public class UtilsTest {
                     type = ru.testit.models.LinkType.ISSUE
             )
             void testMethod() {
+                // empty
             }
         }
 
@@ -488,6 +502,7 @@ public class UtilsTest {
                     "{Param name} = {name}; "
             })
             void testMethod() {
+                // empty
             }
         }
 
@@ -517,6 +532,7 @@ public class UtilsTest {
                     "{Param name} = {name}; "
             })
             void testMethod() {
+                // empty
             }
         }
 
@@ -545,6 +561,7 @@ public class UtilsTest {
                     "{parameters}"
             })
             void testMethod() {
+                // empty
             }
         }
 
@@ -586,6 +603,7 @@ public class UtilsTest {
         class TestClass {
             @Description("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
@@ -608,6 +626,7 @@ public class UtilsTest {
         class TestClass {
             @Description("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
@@ -629,6 +648,7 @@ public class UtilsTest {
         class TestClass {
             @Description(TEXT_WITHOUT_PARAMETERS)
             void testMethod() {
+                // empty
             }
         }
 
@@ -667,6 +687,7 @@ public class UtilsTest {
         class TestClass {
             @Title("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
@@ -689,6 +710,7 @@ public class UtilsTest {
         class TestClass {
             @Title("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
+                // empty
             }
         }
 
@@ -710,6 +732,7 @@ public class UtilsTest {
         class TestClass {
             @Title(TEXT_WITHOUT_PARAMETERS)
             void testMethod() {
+                // empty
             }
         }
 
@@ -730,6 +753,7 @@ public class UtilsTest {
 
         class TestClass {
             void testMethod() {
+                // empty
             }
         }
 

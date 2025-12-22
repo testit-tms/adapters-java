@@ -3,10 +3,10 @@ package ru.testit.services;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
-public class CircularReferenceTest {
+class CircularReferenceTest {
 
     @Test
-    public void testEscapeHtmlInObjectWithCircularReference() {
+    void testEscapeHtmlInObjectWithCircularReference() {
         // Create objects with circular reference
         ParentObject parent = new ParentObject();
         parent.name = "Parent <div>";
@@ -26,7 +26,7 @@ public class CircularReferenceTest {
     }
 
     @Test
-    public void testEscapeHtmlInObjectWithSelfReference() {
+    void testEscapeHtmlInObjectWithSelfReference() {
         // Create object with self-reference
         SelfReferencingObject obj = new SelfReferencingObject();
         obj.name = "Self <object>";
@@ -41,17 +41,17 @@ public class CircularReferenceTest {
 
     // Test classes for circular reference testing
     private static class ParentObject {
-        public String name;
-        public ChildObject child;
+        String name;
+        ChildObject child;
     }
 
     private static class ChildObject {
-        public String name;
-        public ParentObject parent;
+        String name;
+        ParentObject parent;
     }
 
     private static class SelfReferencingObject {
-        public String name;
-        public SelfReferencingObject self;
+        String name;
+        SelfReferencingObject self;
     }
 }

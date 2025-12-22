@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
     private List<String> testsForRun;
     private final boolean isFilteredMode;
-    private static final String paramRegex = "\\{.*}";
+    private static final String PARAM_REGEX = "\\{.*}";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Junit5PostDiscoveryFilter.class);
 
@@ -48,7 +48,7 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
             final MethodSource methodSource = (MethodSource) testSource.get();
 
             String externalId = Utils.extractExternalID(methodSource.getJavaMethod(), null);
-            final Pattern pattern = Pattern.compile(paramRegex, Pattern.MULTILINE);
+            final Pattern pattern = Pattern.compile(PARAM_REGEX, Pattern.MULTILINE);
             final Matcher matcher = pattern.matcher(externalId);
 
             if (matcher.find()) {
@@ -78,7 +78,7 @@ public class Junit5PostDiscoveryFilter implements PostDiscoveryFilter {
     }
 
     private FilterResult filterTestWithParameters(String externalId) {
-        Pattern pattern = Pattern.compile(externalId.replaceAll(paramRegex, ".*"));
+        Pattern pattern = Pattern.compile(externalId.replaceAll(PARAM_REGEX, ".*"));
 
         for (String test : testsForRun) {
             Matcher matcher = pattern.matcher(test);

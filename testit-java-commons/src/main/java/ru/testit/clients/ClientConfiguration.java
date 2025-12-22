@@ -40,8 +40,8 @@ public class ClientConfiguration implements Serializable {
         }
 
         try {
-            String tmsImportRealtime = String.valueOf(properties.get(AppProperties.TMS_IMPORT_REALTIME));
-            this.tmsImportRealtime = Objects.equals(tmsImportRealtime, "true");
+            String importRealtime = String.valueOf(properties.get(AppProperties.TMS_IMPORT_REALTIME));
+            this.tmsImportRealtime = Objects.equals(importRealtime, "true");
         } catch (NullPointerException ignored) {
             this.tmsImportRealtime = true;
         }

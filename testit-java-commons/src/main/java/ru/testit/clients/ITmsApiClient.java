@@ -4,7 +4,6 @@ import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public interface ITmsApiClient {
@@ -16,7 +15,7 @@ public interface ITmsApiClient {
     String createAutoTest(AutoTestPostModel model) throws ApiException;
     void updateAutoTests(List<AutoTestPutModel> models) throws ApiException;
     List<AutoTestModel> createAutoTests(List<AutoTestPostModel> models) throws ApiException;
-    List<UUID> GetWorkItemUuidsByIds(Iterable<String> workItemIds);
+    List<UUID> getWorkItemUuidsByIds(Iterable<String> workItemIds);
     AutoTestApiResult getAutoTestByExternalId(String externalId) throws ApiException;
     void linkAutoTestToWorkItems(String id, Iterable<String> workItemIds);
     void unlinkAutoTestToWorkItem(String id, String workItemId);

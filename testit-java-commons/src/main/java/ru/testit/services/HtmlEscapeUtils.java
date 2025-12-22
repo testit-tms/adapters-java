@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 public class HtmlEscapeUtils {
 
+    private HtmlEscapeUtils() {}
+
     private static final String NO_ESCAPE_HTML = System.getenv(
             "NO_ESCAPE_HTML"
     );

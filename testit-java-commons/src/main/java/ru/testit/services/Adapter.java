@@ -21,6 +21,8 @@ public final class Adapter {
     private static AdapterManager adapterManager;
     private static ResultStorage storage;
 
+    private Adapter() {}
+
     public static AdapterManager getAdapterManager() {
         if (Objects.isNull(adapterManager)) {
             Properties appProperties = AppProperties.loadProperties();
@@ -35,41 +37,6 @@ public final class Adapter {
             storage = new ResultStorage();
         }
         return storage;
-    }
-
-    /**
-     * @deprecated This method is no longer acceptable to compute time between versions.
-     * <p> Use {@link Adapter#addLinks(String, String, String, LinkType)} instead.
-     * @param title - title
-     * @param description - description
-     * @param type - type
-     * @param url - url
-     */
-    @Deprecated
-    public static void link(final String title, final String description, final LinkType type, final String url) {
-        final LinkItem link = new LinkItem().setTitle(title).setDescription(description).setType(type).setUrl(url);
-        getAdapterManager().updateTestCase(testResult -> testResult.getResultLinks().add(link));
-    }
-
-    /**
-     * @deprecated This method is no longer acceptable to compute time between versions.
-     * <p> Use {@link Adapter#addLinks(String, String, String, LinkType)} instead.
-     * @param url - url
-     * @param title - title
-     * @param description - description
-     * @param type - type
-     */
-    @Deprecated
-    public static void addLink(final String url, final String title, final String description, final LinkType type) {
-        LinkItem link = new LinkItem().setTitle(title)
-                .setDescription(description)
-                .setType(type)
-                .setUrl(url);
-
-        List<LinkItem> links = new ArrayList<>();
-        links.add(link);
-
-        addLinks(links);
     }
 
     public static void addLinks(final String url, final String title, final String description, final LinkType type) {
@@ -105,10 +72,8 @@ public final class Adapter {
         }
 
         Path path = Paths.get(fileName);
-        try {
-            BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset());
+        try (BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset())) {
             writer.write(content);
-            writer.close();
         } catch (IOException e) {
             LOGGER.error(String.format("Can not write file '%s':", fileName), e);
         }
@@ -142,19 +107,6 @@ public final class Adapter {
         } catch (IOException e) {
             LOGGER.error(String.format("Can not delete file '%s':", fileName), e);
         }
-    }
-
-    /**
-     * @deprecated This method is no longer acceptable to compute time between versions.
-     * <p> Use {@link Adapter#addAttachments(String attachment)} instead.
-     * @param attachment - attachment
-     */
-    @Deprecated
-    public static void addAttachment(String attachment) {
-        List<String> attachments = new ArrayList<>();
-        attachments.add(attachment);
-
-        getAdapterManager().addAttachments(attachments);
     }
 
     public static void addMessage(String message) {

@@ -18,7 +18,7 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments, Se
     private ItemStage itemStage;
     private String description;
     private List<StepResult> steps = new ArrayList<>();
-    private List<LinkItem> linkItems = new ArrayList<>();
+    private  List<LinkItem> linkItems = new ArrayList<>();
     private List<String> attachments = new ArrayList<>();
     private String parent;
     private Long start;

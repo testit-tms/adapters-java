@@ -56,7 +56,7 @@ public class BaseTestNgListener implements
 
     private final AdapterManager adapterManager;
 
-    private static final String paramRegex = "\\{.*}";
+    private static final String PARAM_REGEX = "\\{.*}";
 
     public BaseTestNgListener() {
         adapterManager = Adapter.getAdapterManager();
@@ -82,13 +82,13 @@ public class BaseTestNgListener implements
 
     @Override
     public void onTestStart(final ITestResult testResult) {
-        ExecutableTest executableTest = this.executableTest.get();
-        if (executableTest.isStarted()) {
-            executableTest = refreshContext();
+        ExecutableTest test = this.executableTest.get();
+        if (test.isStarted()) {
+            test = refreshContext();
         }
-        executableTest.setTestStatus();
+        test.setTestStatus();
 
-        final String uuid = executableTest.getUuid();
+        final String uuid = test.getUuid();
 
         startTestCase(testResult, uuid);
 
@@ -108,7 +108,7 @@ public class BaseTestNgListener implements
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
-                .setWorkItemIds(Utils.extractWorkItemId(method, parameters))
+                .setWorkItemIds(Utils.extractWorkItemIds(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters, true))
                 .setName(Utils.extractDisplayName(method, parameters))
                 .setClassName(Utils.extractClassname(method, method.getDeclaringClass().getSimpleName(), parameters))
@@ -179,44 +179,44 @@ public class BaseTestNgListener implements
 
     @Override
     public void onTestSuccess(final ITestResult testResult) {
-        final ExecutableTest executableTest = this.executableTest.get();
-        executableTest.setAfterStatus();
-        adapterManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
-        adapterManager.stopTestCase(executableTest.getUuid());
+        final ExecutableTest test = this.executableTest.get();
+        test.setAfterStatus();
+        adapterManager.updateTestCase(test.getUuid(), setStatus(ItemStatus.PASSED, null));
+        adapterManager.stopTestCase(test.getUuid());
     }
 
     @Override
     public void onTestFailure(final ITestResult result) {
-        ExecutableTest executableTest = this.executableTest.get();
+        ExecutableTest test = this.executableTest.get();
 
-        if (executableTest.isAfter()) {
-            executableTest = refreshContext();
+        if (test.isAfter()) {
+            test = refreshContext();
         }
 
-        if (!executableTest.isStarted()) {
+        if (!test.isStarted()) {
             createTestResultForTestWithoutSetup(result);
         }
 
-        executableTest.setAfterStatus();
+        test.setAfterStatus();
 
-        stopTestCase(executableTest.getUuid(), result.getThrowable(), ItemStatus.FAILED);
+        stopTestCase(test.getUuid(), result.getThrowable(), ItemStatus.FAILED);
     }
 
     @Override
     public void onTestSkipped(final ITestResult result) {
-        ExecutableTest executableTest = this.executableTest.get();
+        ExecutableTest test = this.executableTest.get();
 
-        if (executableTest.isAfter()) {
-            executableTest = refreshContext();
+        if (test.isAfter()) {
+            test = refreshContext();
         }
 
-        if (!executableTest.isStarted()) {
+        if (!test.isStarted()) {
             createTestResultForTestWithoutSetup(result);
         }
 
-        executableTest.setAfterStatus();
+        test.setAfterStatus();
 
-        stopTestCase(executableTest.getUuid(), result.getThrowable(), ItemStatus.SKIPPED);
+        stopTestCase(test.getUuid(), result.getThrowable(), ItemStatus.SKIPPED);
     }
 
     @Override
@@ -407,7 +407,7 @@ public class BaseTestNgListener implements
         return methods.stream().filter(method -> {
             String externalId = Utils.extractExternalID(method.getMethod().getConstructorOrMethod().getMethod(), null);
 
-            final Pattern pattern = Pattern.compile(paramRegex, Pattern.MULTILINE);
+            final Pattern pattern = Pattern.compile(PARAM_REGEX, Pattern.MULTILINE);
             final Matcher matcher = pattern.matcher(externalId);
 
             if (matcher.find()) {
@@ -439,7 +439,7 @@ public class BaseTestNgListener implements
     }
 
     private boolean filterTestWithParameters(List<String> testsForRun, String externalId) {
-        Pattern pattern = Pattern.compile(externalId.replaceAll(paramRegex, ".*"));
+        Pattern pattern = Pattern.compile(externalId.replaceAll(PARAM_REGEX, ".*"));
 
         for (String test : testsForRun) {
             Matcher matcher = pattern.matcher(test);

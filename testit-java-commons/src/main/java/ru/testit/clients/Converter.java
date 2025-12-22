@@ -17,6 +17,9 @@ import java.util.stream.Collectors;
 
 
 public class Converter {
+
+    private Converter() {}
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Converter.class);
 
     public static AutoTestPostModel testResultToAutoTestPostModel(TestResult result) {

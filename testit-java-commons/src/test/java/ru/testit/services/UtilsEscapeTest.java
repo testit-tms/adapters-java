@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Assertions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UtilsEscapeTest {
+class UtilsEscapeTest {
 
     @Test
-    public void testEscapeHtmlTags() {
+    void testEscapeHtmlTags() {
         // Test escaping < anywhere
         String input1 = "Test <div> here";
         String result1 = HtmlEscapeUtils.escapeHtmlTags(input1);
@@ -61,7 +61,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlTagsAvoidDoubleEscaping() {
+    void testEscapeHtmlTagsAvoidDoubleEscaping() {
         // Test that already escaped characters are not escaped again (no HTML tags, so no changes)
         String input1 = "Already escaped \\< and \\>";
         String result1 = HtmlEscapeUtils.escapeHtmlTags(input1);
@@ -89,7 +89,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testHtmlTagDetection() {
+    void testHtmlTagDetection() {
         // Test HTML tag detection - these should be escaped
         String input1 = "Text with <div> tag";
         String result1 = HtmlEscapeUtils.escapeHtmlTags(input1);
@@ -117,7 +117,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlTagsWithEnvironmentVariable() {
+    void testEscapeHtmlTagsWithEnvironmentVariable() {
         // Save original environment (not possible to modify in runtime for this test)
         // This test demonstrates the behavior when NO_ESCAPE_HTML would be set
         
@@ -134,7 +134,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlInObject() {
+    void testEscapeHtmlInObject() {
         // Test object with String fields
         TestObject obj = new TestObject();
         obj.name = "Test <script>";
@@ -149,7 +149,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlInObjectWithStringList() {
+    void testEscapeHtmlInObjectWithStringList() {
         // Test object with List<String> field
         TestObjectWithStringList obj = new TestObjectWithStringList();
         obj.name = "Test <object>";
@@ -170,7 +170,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlInObjectWithObjectList() {
+    void testEscapeHtmlInObjectWithObjectList() {
         // Test object with List<Object> field
         TestObjectWithObjectList parent = new TestObjectWithObjectList();
         parent.name = "Parent <object>";
@@ -200,7 +200,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlInObjectWithEmptyList() {
+    void testEscapeHtmlInObjectWithEmptyList() {
         // Test object with empty list
         TestObjectWithStringList obj = new TestObjectWithStringList();
         obj.name = "Test <object>";
@@ -213,7 +213,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlInObjectWithNullList() {
+    void testEscapeHtmlInObjectWithNullList() {
         // Test object with null list
         TestObjectWithStringList obj = new TestObjectWithStringList();
         obj.name = "Test <object>";
@@ -226,7 +226,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlInNestedObjects() {
+    void testEscapeHtmlInNestedObjects() {
         // Test recursive processing of nested objects
         NestedTestObject parent = new NestedTestObject();
         parent.name = "Parent <div>";
@@ -247,7 +247,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlInDeeplyNestedObjects() {
+    void testEscapeHtmlInDeeplyNestedObjects() {
         // Test deeply nested objects
         DeeplyNestedTestObject root = new DeeplyNestedTestObject();
         root.title = "Root <html>";
@@ -267,7 +267,7 @@ public class UtilsEscapeTest {
     }
 
     @Test
-    public void testEscapeHtmlWithSimpleTypes() {
+    void testEscapeHtmlWithSimpleTypes() {
         // Test that simple types are not processed recursively
         ObjectWithSimpleTypes obj = new ObjectWithSimpleTypes();
         obj.name = "Test <object>";
@@ -292,39 +292,39 @@ public class UtilsEscapeTest {
 
     // Test classes for reflection testing
     private static class TestObject {
-        public String name;
-        public String description;
-        public int number;
+        String name;
+        String description;
+        int number;
     }
 
     private static class TestObjectWithStringList {
-        public String name;
-        public List<String> tags;
+        String name;
+        List<String> tags;
     }
 
     private static class TestObjectWithObjectList {
-        public String name;
-        public List<TestObject> children;
+        String name;
+        List<TestObject> children;
     }
 
     private static class NestedTestObject {
-        public String name;
-        public TestObject child;
+        String name;
+        TestObject child;
     }
 
     private static class DeeplyNestedTestObject {
-        public String title;
-        public NestedTestObject level1;
+        String title;
+        NestedTestObject level1;
     }
 
     private static class ObjectWithSimpleTypes {
-        public String name;
-        public int number;
-        public boolean isActive;
-        public java.util.Date date;
-        public java.util.UUID uuid;
-        public java.math.BigDecimal bigDecimal;
-        public TestEnum enumValue;
+        String name;
+        int number;
+        boolean isActive;
+        java.util.Date date;
+        java.util.UUID uuid;
+        java.math.BigDecimal bigDecimal;
+        TestEnum enumValue;
     }
 
     private enum TestEnum {

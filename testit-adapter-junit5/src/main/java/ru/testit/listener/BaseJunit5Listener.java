@@ -23,8 +23,8 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
     private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
     private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
-    private Throwable BeforeAllThrowable;
-    private Throwable BeforeEachThrowable;
+    private Throwable beforeAllThrowable;
+    private Throwable beforeEachThrowable;
 
     public BaseJunit5Listener() {
         adapterManager = Adapter.getAdapterManager();
@@ -58,9 +58,9 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         adapterManager.stopClassContainer(Utils.getHash(context.getRequiredTestClass().getName()));
         adapterManager.stopMainContainer(launcherUUID.get());
 
-        if (BeforeAllThrowable != null)
+        if (beforeAllThrowable != null)
         {
-            BeforeAllThrowable = null;
+            beforeAllThrowable = null;
         }
     }
 
@@ -70,7 +70,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        if (BeforeAllThrowable != null)
+        if (beforeAllThrowable != null)
         {
             invocation.skip();
 
@@ -89,7 +89,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             invocation.proceed();
             adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
         } catch (Throwable throwable) {
-            BeforeAllThrowable = throwable;
+            beforeAllThrowable = throwable;
 
             adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
         }
@@ -111,7 +111,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        if (BeforeAllThrowable != null || BeforeEachThrowable != null)
+        if (beforeAllThrowable != null || beforeEachThrowable != null)
         {
             invocation.skip();
 
@@ -137,7 +137,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             invocation.proceed();
             adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.PASSED));
         } catch (Throwable throwable) {
-            BeforeEachThrowable = throwable;
+            beforeEachThrowable = throwable;
 
             adapterManager.updateFixture(uuid, result -> result.setItemStatus(ItemStatus.FAILED));
         }
@@ -157,13 +157,13 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
         Map<String, String> parameters = getParameters(invocationContext);
 
-        ExecutableTest executableTest = this.executableTest.get();
-        if (executableTest.isStarted()) {
-            executableTest = refreshContext();
+        ExecutableTest test = this.executableTest.get();
+        if (test.isStarted()) {
+            test = refreshContext();
         }
-        executableTest.setTestStatus();
+        test.setTestStatus();
 
-        final String uuid = executableTest.getUuid();
+        final String uuid = test.getUuid();
         startTestCase(extensionContext.getRequiredTestMethod(), uuid, parameters);
 
         adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
@@ -206,13 +206,13 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             LOGGER.debug("Intercept test: {}", invocationContext.getExecutable().getName());
         }
 
-        ExecutableTest executableTest = this.executableTest.get();
-        if (executableTest.isStarted()) {
-            executableTest = refreshContext();
+        ExecutableTest test = this.executableTest.get();
+        if (test.isStarted()) {
+            test = refreshContext();
         }
-        executableTest.setTestStatus();
+        test.setTestStatus();
 
-        final String uuid = executableTest.getUuid();
+        final String uuid = test.getUuid();
         startTestCase(extensionContext.getRequiredTestMethod(), uuid, null);
 
         adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
@@ -229,7 +229,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
                 .setUuid(uuid)
                 .setLabels(Utils.extractLabels(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
-                .setWorkItemIds(Utils.extractWorkItemId(method, parameters))
+                .setWorkItemIds(Utils.extractWorkItemIds(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters, true))
                 .setName(Utils.extractDisplayName(method, parameters))
                 .setClassName(Utils.extractClassname(method, method.getDeclaringClass().getSimpleName(), parameters))
@@ -253,10 +253,10 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             LOGGER.debug("Test successful: {}", context.getDisplayName());
         }
 
-        final ExecutableTest executableTest = this.executableTest.get();
-        executableTest.setAfterStatus();
-        adapterManager.updateTestCase(executableTest.getUuid(), setStatus(ItemStatus.PASSED, null));
-        adapterManager.stopTestCase(executableTest.getUuid());
+        final ExecutableTest test = this.executableTest.get();
+        test.setAfterStatus();
+        adapterManager.updateTestCase(test.getUuid(), setStatus(ItemStatus.PASSED, null));
+        adapterManager.stopTestCase(test.getUuid());
     }
 
     private Consumer<TestResult> setStatus(final ItemStatus status, final Throwable throwable) {
@@ -274,15 +274,15 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             LOGGER.debug("Test aborted: {}", context.getDisplayName());
         }
 
-        ExecutableTest executableTest = this.executableTest.get();
+        ExecutableTest test = this.executableTest.get();
 
-        if (executableTest.isAfter()) {
-            executableTest = refreshContext();
+        if (test.isAfter()) {
+            test = refreshContext();
         }
 
-        executableTest.setAfterStatus();
+        test.setAfterStatus();
 
-        stopTestCase(executableTest.getUuid(), cause, ItemStatus.SKIPPED);
+        stopTestCase(test.getUuid(), cause, ItemStatus.SKIPPED);
     }
 
     @Override
@@ -291,15 +291,15 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             LOGGER.debug("Test failed: {}", context.getDisplayName());
         }
 
-        ExecutableTest executableTest = this.executableTest.get();
+        ExecutableTest test = this.executableTest.get();
 
-        if (executableTest.isAfter()) {
-            executableTest = refreshContext();
+        if (test.isAfter()) {
+            test = refreshContext();
         }
 
-        executableTest.setAfterStatus();
+        test.setAfterStatus();
 
-        stopTestCase(executableTest.getUuid(), cause, ItemStatus.FAILED);
+        stopTestCase(test.getUuid(), cause, ItemStatus.FAILED);
     }
 
     private void stopTestCase(final String uuid, final Throwable throwable, final ItemStatus status) {
@@ -313,12 +313,12 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        if (BeforeEachThrowable != null)
+        if (beforeEachThrowable != null)
         {
-            BeforeEachThrowable = null;
+            beforeEachThrowable = null;
         }
 
-        if (BeforeAllThrowable != null)
+        if (beforeAllThrowable != null)
         {
             invocation.skip();
 
@@ -351,9 +351,9 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) {
-        if (BeforeAllThrowable != null)
+        if (beforeAllThrowable != null)
         {
-            BeforeAllThrowable = null;
+            beforeAllThrowable = null;
         }
 
         if (LOGGER.isDebugEnabled()) {
@@ -379,17 +379,16 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         return executableTest.get();
     }
 
-    private void callFixtureThrowable() throws Throwable
-    {
-        if (BeforeAllThrowable != null)
+    private void callFixtureThrowable() throws Throwable {
+        if (beforeAllThrowable != null)
         {
-            throw BeforeAllThrowable;
+            throw beforeAllThrowable;
         }
 
-        if (BeforeEachThrowable != null)
+        if (beforeEachThrowable != null)
         {
-            Throwable exception = BeforeEachThrowable;
-            BeforeEachThrowable = null;
+            Throwable exception = beforeEachThrowable;
+            beforeEachThrowable = null;
 
             throw exception;
         }

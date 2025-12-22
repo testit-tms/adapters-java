@@ -31,6 +31,6 @@ public class DataProviderParameterizedTests {
             @Link(url = "https://{url}/module/issue/5", title = "{title} Issue-5", type = LinkType.ISSUE),
     })
     void testWithDataProviderParameters(String title, int number, String url) {
-
+        // empty
     }
 }

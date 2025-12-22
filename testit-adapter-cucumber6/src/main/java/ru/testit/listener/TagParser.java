@@ -23,13 +23,13 @@ public class TagParser {
     private static final String LINKS = "@LINKS";
     private static final String WORK_ITEM_IDS = "@WORKITEMIDS";
 
-    private final List<Label> labels = new ArrayList<>();
-    private final List<LinkItem> links = new ArrayList<>();
-    private final List<String> workItemIds = new ArrayList<>();
-    private String externalId = "";
-    private String title = "";
-    private String displayName = "";
-    private String description = "";
+    private final List<Label> labelList = new ArrayList<>();
+    private final List<LinkItem> linkItemList = new ArrayList<>();
+    private final List<String> workItemIdList = new ArrayList<>();
+    private String externalIdValue = "";
+    private String titleValue = "";
+    private String displayNameValue = "";
+    private String descriptionValue = "";
 
     TagParser(final Feature feature, final TestCase scenario, final Deque<String> tags, Map<String, String> parameters) {
         while (tags.peek() != null) {
@@ -47,16 +47,16 @@ public class TagParser {
 
                 switch (tagKey) {
                     case EXTERNAL_ID:
-                        externalId = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
+                        externalIdValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case TITLE:
-                        title = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
+                        titleValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case DISPLAY_NAME:
-                        displayName = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
+                        displayNameValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case DESCRIPTION:
-                        description = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
+                        descriptionValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case LABELS:
                         Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
@@ -71,7 +71,9 @@ public class TagParser {
                         break;
                     case WORK_ITEM_IDS:
                         Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
-                                .forEach(id -> getWorkItemIds().add(id));
+                                .forEach(id -> getWorkItemIdList().add(id));
+                        break;
+                    default:
                         break;
                 }
             }
@@ -80,48 +82,48 @@ public class TagParser {
         final String featureName = feature.getName();
         final String name = scenario.getName();
 
-        if (externalId.isEmpty()) {
-            externalId = Utils.getHash(featureName + name);
+        if (externalIdValue.isEmpty()) {
+            externalIdValue = Utils.getHash(featureName + name);
         }
 
-        if (displayName.isEmpty()) {
-            displayName = name;
+        if (displayNameValue.isEmpty()) {
+            displayNameValue = name;
         }
     }
 
     public List<Label> getScenarioLabels() {
-        return labels;
+        return labelList;
     }
 
     public List<LinkItem> getScenarioLinks() {
-        return links;
+        return linkItemList;
     }
 
-    public List<String> getWorkItemIds() {
-        return workItemIds;
+    public List<String> getWorkItemIdList() {
+        return workItemIdList;
     }
 
-    public String getExternalId() {
-        return externalId;
+    public String getExternalIdValue() {
+        return externalIdValue;
     }
 
-    public String getTitle() {
-        return title;
+    public String getTitleValue() {
+        return titleValue;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getDisplayNameValue() {
+        return displayNameValue;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescriptionValue() {
+        return descriptionValue;
     }
 
     private Label getTagLabel(final String tag) {
         return new Label().setName(tag);
     }
 
-    private Boolean isJson(String json) {
+    private boolean isJson(String json) {
         try {
             new JSONObject(json);
         } catch (JSONException ex) {
@@ -130,7 +132,7 @@ public class TagParser {
         return true;
     }
 
-    private Boolean isJsonArray(String json) {
+    private boolean isJsonArray(String json) {
         try {
             new JSONArray(json);
         } catch (JSONException ex1) {
@@ -154,16 +156,16 @@ public class TagParser {
 
     private List<LinkItem> getLinkItems(String json) {
         List<LinkItem> items = new ArrayList<>();
-        JSONArray links = new JSONArray(json);
-        for (int i = 0; i < links.length(); i++) {
+        JSONArray linksArr = new JSONArray(json);
+        for (int i = 0; i < linksArr.length(); i++) {
             items.add(
                     new LinkItem()
-                            .setUrl(links.getJSONObject(i).getString("url"))
+                            .setUrl(linksArr.getJSONObject(i).getString("url"))
                             .setDescription(
-                                    parseSpaceInTag(links.getJSONObject(i).getString("description")))
+                                    parseSpaceInTag(linksArr.getJSONObject(i).getString("description")))
                             .setTitle(
-                                    parseSpaceInTag(links.getJSONObject(i).getString("title")))
-                            .setType(LinkType.fromString(links.getJSONObject(i).getString("type")))
+                                    parseSpaceInTag(linksArr.getJSONObject(i).getString("title")))
+                            .setType(LinkType.fromString(linksArr.getJSONObject(i).getString("type")))
             );
         }
         return items;
