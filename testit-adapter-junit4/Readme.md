@@ -4,6 +4,10 @@
 
 ## Getting Started
 
+#### IMPORTANT NOTE
+
+>We added support for handling Before/BeforeClass and After/AfterClass annotations, but exceptions or errors inside them will not be displayed. Otherwise, they will be shown.
+
 ### Installation
 
 #### Maven users
