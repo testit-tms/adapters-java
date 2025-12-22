@@ -144,6 +144,7 @@ jobs:
         with:
           repository: testit-tms/java-examples
           path: java-examples
+          ref: junit-test-fixtures
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
