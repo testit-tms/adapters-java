@@ -39,10 +39,8 @@ public class BaseJunit4Listener extends RunListener {
         () -> false
     );
 
-    // Fields to track fixture execution
-
+    // Track fixture IDs for proper management
     private final ThreadLocal<String> beforeFixtureId = new ThreadLocal<>();
-
     private final ThreadLocal<String> afterFixtureId = new ThreadLocal<>();
 
     public BaseJunit4Listener() {
@@ -65,27 +63,22 @@ public class BaseJunit4Listener extends RunListener {
 
         adapterManager.startClassContainer(launcherUUID.get(), classContainer);
 
-        // Create and complete fixtures for @BeforeClass methods (execute once at start)
-
-        createAndCompleteBeforeClassFixtures(description);
-
-        // @Before and @After fixtures will be created per test in testStarted
+        // Create fixtures for @BeforeClass methods (created once at start)
+        createBeforeClassFixtures(description);
     }
 
-    private void createAndCompleteBeforeClassFixtures(
-        final Description description
-    ) {
+    private void createBeforeClassFixtures(final Description description) {
         // Get the test class
         Class<?> testClass = description.getTestClass();
         if (testClass == null) {
             return;
         }
 
-        // Look for @BeforeClass methods and create+complete fixtures for them
+        // Look for @BeforeClass methods (create fixtures for all found)
         Method[] methods = testClass.getDeclaredMethods();
         for (Method method : methods) {
             if (method.isAnnotationPresent(BeforeClass.class)) {
-                // Found a @BeforeClass method, create and complete fixture
+                // Found a @BeforeClass method, create fixture
                 String fixtureId = UUID.randomUUID().toString();
 
                 FixtureResult fixture = getFixtureResult(method);
@@ -95,62 +88,7 @@ public class BaseJunit4Listener extends RunListener {
                     fixture
                 );
 
-                // Mark as passed immediately and complete (assume successful since tests are running)
-                adapterManager.updateFixture(fixtureId, f ->
-                    f.setItemStatus(ItemStatus.PASSED)
-                );
-                adapterManager.stopFixture(fixtureId);
-
-                // Note: Not storing fixtureId since it's immediately completed
-                break; // Only handle one for now, as in JUnit 5 implementation
-            }
-        }
-    }
-
-    private void createBeforeFixtures(final Description description) {
-        // @Before fixtures will be created per test in testStarted
-    }
-
-    private void createAfterFixtures(final Description description) {
-        // @After fixtures will be created per test in testStarted
-    }
-
-    private void createAndCompleteAfterClassFixtures(
-        final Description description
-    ) {
-        // Get the test class
-        Class<?> testClass = description.getTestClass();
-        if (testClass == null) {
-            // Fallback to a basic description if needed
-            Description fallbackDesc = Description.createSuiteDescription(
-                "TestSuite"
-            );
-            testClass = fallbackDesc.getTestClass();
-            if (testClass == null) {
-                return;
-            }
-        }
-
-        // Look for @AfterClass methods and create+complete fixtures for them
-        Method[] methods = testClass.getDeclaredMethods();
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(AfterClass.class)) {
-                // Found a @AfterClass method, create and complete fixture
-                String fixtureId = UUID.randomUUID().toString();
-
-                FixtureResult fixture = getFixtureResult(method);
-                adapterManager.startTearDownFixtureAll(
-                    launcherUUID.get(),
-                    fixtureId,
-                    fixture
-                );
-
-                // Mark as passed immediately and complete (assume successful at end)
-                adapterManager.updateFixture(fixtureId, f ->
-                    f.setItemStatus(ItemStatus.PASSED)
-                );
-                adapterManager.stopFixture(fixtureId);
-
+                // Don't mark status yet - will be determined based on test execution
                 break; // Only handle one for now, as in JUnit 5 implementation
             }
         }
@@ -162,20 +100,8 @@ public class BaseJunit4Listener extends RunListener {
             return;
         }
 
-        // Complete any remaining @Before fixtures with passed status
-        completeFixtureWithStatus(beforeFixtureId, ItemStatus.PASSED);
-
-        // Complete any remaining @After fixtures with passed status
-        completeFixtureWithStatus(afterFixtureId, ItemStatus.PASSED);
-
-        // Create and complete @AfterClass fixtures (execute once at end)
-        createAndCompleteAfterClassFixtures(
-            Description.createSuiteDescription("TestSuite")
-        );
-
-        // Clean up fixture IDs
-        beforeFixtureId.remove();
-        afterFixtureId.remove();
+        // Create and complete fixtures for @AfterClass methods
+        createAndCompleteAfterClassFixtures(getFallbackDescription());
 
         adapterManager.stopClassContainer(classUUID.get());
         adapterManager.stopMainContainer(launcherUUID.get());
@@ -184,22 +110,19 @@ public class BaseJunit4Listener extends RunListener {
 
     @Override
     public void testStarted(final Description description) {
-        ExecutableTest test = this.executableTest.get();
-
-        if (test.isStarted()) {
-            test = refreshContext();
+        ExecutableTest executableTest = this.executableTest.get();
+        if (executableTest.isStarted()) {
+            executableTest = refreshContext();
         }
+        executableTest.setTestStatus();
 
-        test.setTestStatus();
-
-        // Create fixtures for @Before methods (one per test, like JUnit 5)
+        // Create fixtures for @Before methods (one per test)
         createBeforeFixtureForTest(description);
 
-        // Create fixtures for @After methods (one per test, like JUnit 5)
+        // Create fixtures for @After methods (one per test)
         createAfterFixtureForTest(description);
 
-        final String uuid = test.getUuid();
-
+        final String uuid = executableTest.getUuid();
         startTestCase(description, uuid);
 
         adapterManager.updateClassContainer(classUUID.get(), container ->
@@ -209,49 +132,59 @@ public class BaseJunit4Listener extends RunListener {
 
     @Override
     public void testFailure(final Failure failure) {
-        ExecutableTest test = this.executableTest.get();
-        test.setAfterStatus();
+        ExecutableTest executableTest = this.executableTest.get();
+        executableTest.setAfterStatus();
         stopTestCase(
-            test.getUuid(),
+            executableTest.getUuid(),
             failure.getException(),
             ItemStatus.FAILED
         );
 
-        // Complete @Before fixture with success status (it already executed)
-        completeFixtureWithStatus(beforeFixtureId, ItemStatus.PASSED);
-        // Complete @After fixture with success status (it should execute for cleanup)
-        completeFixtureWithStatus(afterFixtureId, ItemStatus.PASSED);
+        // When any test fails, mark ALL active fixtures as FAILED
+        // This is a conservative approach to ensure failures are reported
+        completeFixtureWithStatus(beforeFixtureId, ItemStatus.FAILED);
+        completeFixtureWithStatus(afterFixtureId, ItemStatus.FAILED);
     }
 
     @Override
     public void testAssumptionFailure(final Failure failure) {
-        testFailure(failure);
+        ExecutableTest executableTest = this.executableTest.get();
+        executableTest.setAfterStatus();
+        stopTestCase(
+            executableTest.getUuid(),
+            failure.getException(),
+            ItemStatus.FAILED
+        );
+
+        // When any test fails, mark ALL active fixtures as FAILED
+        completeFixtureWithStatus(beforeFixtureId, ItemStatus.FAILED);
+        completeFixtureWithStatus(afterFixtureId, ItemStatus.FAILED);
     }
 
     @Override
     public void testIgnored(final Description description) {
-        final ExecutableTest test = this.executableTest.get();
-        if (test.isAfter() || test.isBefore()) {
+        final ExecutableTest executableTest = this.executableTest.get();
+        if (executableTest.isAfter() || executableTest.isBefore()) {
             return;
         }
-        test.setAfterStatus();
-        stopTestCase(test.getUuid(), null, ItemStatus.SKIPPED);
+        executableTest.setAfterStatus();
+        stopTestCase(executableTest.getUuid(), null, ItemStatus.SKIPPED);
     }
 
     @Override
     public void testFinished(final Description description) {
-        final ExecutableTest test = this.executableTest.get();
-        if (test.isAfter()) {
+        final ExecutableTest executableTest = this.executableTest.get();
+        if (executableTest.isAfter()) {
             return;
         }
-        test.setAfterStatus();
+        executableTest.setAfterStatus();
         adapterManager.updateTestCase(
-            test.getUuid(),
+            executableTest.getUuid(),
             setStatus(ItemStatus.PASSED, null)
         );
-        adapterManager.stopTestCase(test.getUuid());
+        adapterManager.stopTestCase(executableTest.getUuid());
 
-        // Complete @Before and @After fixtures with success status
+        // When test completes successfully, mark ALL active fixtures as PASSED
         completeFixtureWithStatus(beforeFixtureId, ItemStatus.PASSED);
         completeFixtureWithStatus(afterFixtureId, ItemStatus.PASSED);
     }
@@ -296,6 +229,33 @@ public class BaseJunit4Listener extends RunListener {
             .setItemStage(ItemStage.RUNNING);
     }
 
+    private void stopTestCase(
+        final String uuid,
+        final Throwable throwable,
+        final ItemStatus status
+    ) {
+        adapterManager.updateTestCase(uuid, setStatus(status, throwable));
+        adapterManager.stopTestCase(uuid);
+
+        // If test failed, mark ALL active fixtures as FAILED
+        if (status == ItemStatus.FAILED) {
+            completeFixtureWithStatus(beforeFixtureId, ItemStatus.FAILED);
+            completeFixtureWithStatus(afterFixtureId, ItemStatus.FAILED);
+        }
+    }
+
+    private Consumer<TestResult> setStatus(
+        final ItemStatus status,
+        final Throwable throwable
+    ) {
+        return result -> {
+            result.setItemStatus(status);
+            if (nonNull(throwable)) {
+                result.setThrowable(throwable);
+            }
+        };
+    }
+
     private void completeFixtureWithStatus(
         ThreadLocal<String> fixtureIdHolder,
         ItemStatus status
@@ -312,24 +272,9 @@ public class BaseJunit4Listener extends RunListener {
         }
     }
 
-    private void stopTestCase(
-        final String uuid,
-        final Throwable throwable,
-        final ItemStatus status
-    ) {
-        adapterManager.updateTestCase(uuid, setStatus(status, throwable));
-
-        adapterManager.stopTestCase(uuid);
-
-        // If test failed, complete setup/teardown fixtures as passed
-
-        // (they executed successfully even if the test failed)
-
-        if (status == ItemStatus.FAILED) {
-            completeFixtureWithStatus(beforeFixtureId, ItemStatus.PASSED);
-
-            completeFixtureWithStatus(afterFixtureId, ItemStatus.PASSED);
-        }
+    private ExecutableTest refreshContext() {
+        executableTest.remove();
+        return executableTest.get();
     }
 
     private void createBeforeFixtureForTest(final Description description) {
@@ -355,7 +300,7 @@ public class BaseJunit4Listener extends RunListener {
                     fixtureId,
                     fixture
                 );
-                // Don't mark as passed yet - will be marked when test finishes
+                // Don't mark status yet - will be determined when test completes
                 break; // Only handle one for now, as in JUnit 5 implementation
             }
         }
@@ -384,26 +329,46 @@ public class BaseJunit4Listener extends RunListener {
                     fixtureId,
                     fixture
                 );
-                // Don't mark as passed yet - will be marked when test finishes
+                // Don't mark status yet - will be determined when test completes
                 break; // Only handle one for now, as in JUnit 5 implementation
             }
         }
     }
 
-    private Consumer<TestResult> setStatus(
-        final ItemStatus status,
-        final Throwable throwable
+    private void createAndCompleteAfterClassFixtures(
+        final Description description
     ) {
-        return result -> {
-            result.setItemStatus(status);
-            if (nonNull(throwable)) {
-                result.setThrowable(throwable);
+        // Get the test class
+        Class<?> testClass = description.getTestClass();
+        if (testClass == null) {
+            return;
+        }
+
+        // Look for @AfterClass methods (create and complete fixtures for all found)
+        Method[] methods = testClass.getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(AfterClass.class)) {
+                // Found a @AfterClass method, create and complete fixture
+                String fixtureId = UUID.randomUUID().toString();
+
+                FixtureResult fixture = getFixtureResult(method);
+                adapterManager.startTearDownFixtureAll(
+                    launcherUUID.get(),
+                    fixtureId,
+                    fixture
+                );
+
+                // Mark as passed immediately and complete (assume successful at end)
+                adapterManager.updateFixture(fixtureId, f ->
+                    f.setItemStatus(ItemStatus.PASSED)
+                );
+                adapterManager.stopFixture(fixtureId);
             }
-        };
+        }
     }
 
-    private ExecutableTest refreshContext() {
-        executableTest.remove();
-        return executableTest.get();
+    // Helper method to get fallback description
+    private Description getFallbackDescription() {
+        return Description.createSuiteDescription("TestSuite");
     }
 }
