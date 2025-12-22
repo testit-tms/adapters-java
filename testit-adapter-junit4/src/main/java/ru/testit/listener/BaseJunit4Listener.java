@@ -184,13 +184,13 @@ public class BaseJunit4Listener extends RunListener {
 
     @Override
     public void testStarted(final Description description) {
-        ExecutableTest executableTest = this.executableTest.get();
+        ExecutableTest test = this.executableTest.get();
 
-        if (executableTest.isStarted()) {
-            executableTest = refreshContext();
+        if (test.isStarted()) {
+            test = refreshContext();
         }
 
-        executableTest.setTestStatus();
+        test.setTestStatus();
 
         // Create fixtures for @Before methods (one per test, like JUnit 5)
         createBeforeFixtureForTest(description);
@@ -198,7 +198,7 @@ public class BaseJunit4Listener extends RunListener {
         // Create fixtures for @After methods (one per test, like JUnit 5)
         createAfterFixtureForTest(description);
 
-        final String uuid = executableTest.getUuid();
+        final String uuid = test.getUuid();
 
         startTestCase(description, uuid);
 
