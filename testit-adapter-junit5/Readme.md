@@ -302,6 +302,8 @@ Description of methods:
 #### Simple test
 
 ```java
+package ru.testit.samples;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import ru.testit.annotations.*;
