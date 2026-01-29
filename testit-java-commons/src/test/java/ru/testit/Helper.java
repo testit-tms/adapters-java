@@ -102,8 +102,9 @@ public class Helper {
 
         return model;
     }
-    public static AutoTestModel generateAutoTestModel(String projectId) {
-        AutoTestModel model = new AutoTestModel();
+
+    public static AutoTestApiResult generateAutoTestApiResult(String projectId) {
+        AutoTestApiResult model = new AutoTestApiResult();
 
         model.setName(NAME);
         model.setTitle(TITLE);
@@ -112,9 +113,9 @@ public class Helper {
         model.setExternalId(EXTERNAL_ID);
         model.setNamespace(SPACE_NAME);
         model.setProjectId(UUID.fromString(projectId));
-        model.setSteps(generateSteps());
+        model.setSteps(generateStepsApiResults());
         model.setLinks(generatePutLinks());
-        model.setLabels(generateShortLabels());
+        model.setLabels(generateLabelsApiResults());
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
         model.setId(UUID.fromString(TEST_UUID));
@@ -122,8 +123,8 @@ public class Helper {
         return model;
     }
 
-    public static AutoTestPutModel generateAutoTestPutModel(String projectId) {
-        AutoTestPutModel model = new AutoTestPutModel();
+    public static AutoTestUpdateApiModel generateAutoTestUpdateApiModel(String projectId) {
+        AutoTestUpdateApiModel model = new AutoTestUpdateApiModel();
 
         model.setTitle(TITLE);
         model.setExternalId(EXTERNAL_ID);
@@ -132,7 +133,7 @@ public class Helper {
         model.setClassname(CLASS_NAME);
         model.setNamespace(SPACE_NAME);
         model.setSteps(generateSteps());
-        model.setLinks(generatePutLinks());
+        model.setLinks(generateUpdateApiLinks());
         model.setLabels(generatePostLabels());
         model.setProjectId(UUID.fromString(projectId));
         model.setSetup(new ArrayList<>());
@@ -143,8 +144,8 @@ public class Helper {
         return model;
     }
 
-    public static AutoTestPostModel generateAutoTestPostModel(String projectId) {
-        AutoTestPostModel model = new AutoTestPostModel();
+    public static AutoTestCreateApiModel generateAutoTestCreateApiModel(String projectId) {
+        AutoTestCreateApiModel model = new AutoTestCreateApiModel();
 
         model.setTitle(TITLE);
         model.setExternalId(EXTERNAL_ID);
@@ -314,10 +315,10 @@ public class Helper {
         return labels;
     }
 
-    private static List<LabelPostModel> generatePostLabels() {
-        List<LabelPostModel> labels = new ArrayList<>();
+    private static List<LabelApiResult> generateLabelsApiResults() {
+        List<LabelApiResult> labels = new ArrayList<>();
 
-        LabelPostModel label = new LabelPostModel();
+        LabelApiResult label = new LabelApiResult();
         label.setName(LABEL_NAME);
 
         labels.add(label);
@@ -325,10 +326,23 @@ public class Helper {
         return labels;
     }
 
-    private static List<LinkPutModel> generatePutLinks() {
-        List<LinkPutModel> links = new ArrayList<>();
 
-        LinkPutModel link = new LinkPutModel();
+
+    private static List<LabelApiModel> generatePostLabels() {
+        List<LabelApiModel> labels = new ArrayList<>();
+
+        LabelApiModel label = new LabelApiModel();
+        label.setName(LABEL_NAME);
+
+        labels.add(label);
+
+        return labels;
+    }
+
+    private static List<LinkApiResult> generatePutLinks() {
+        List<LinkApiResult> links = new ArrayList<>();
+
+        LinkApiResult link = new LinkApiResult();
         link.setTitle(LINK_TITLE);
         link.setDescription(LINK_DESCRIPTION);
         link.setUrl(LINK_URL);
@@ -339,10 +353,10 @@ public class Helper {
         return links;
     }
 
-    private static List<LinkPostModel> generatePostLinks() {
-        List<LinkPostModel> links = new ArrayList<>();
+    private static List<LinkUpdateApiModel> generateUpdateApiLinks() {
+        List<LinkUpdateApiModel> links = new ArrayList<>();
 
-        LinkPostModel link = new LinkPostModel();
+        LinkUpdateApiModel link = new LinkUpdateApiModel();
         link.setTitle(LINK_TITLE);
         link.setDescription(LINK_DESCRIPTION);
         link.setUrl(LINK_URL);
@@ -353,9 +367,33 @@ public class Helper {
         return links;
     }
 
-    private static List<AutoTestStepModel> generateSteps() {
-        List<AutoTestStepModel> steps = new ArrayList<>();
-        AutoTestStepModel step = new AutoTestStepModel();
+    private static List<LinkCreateApiModel> generatePostLinks() {
+        List<LinkCreateApiModel> links = new ArrayList<>();
+
+        LinkCreateApiModel link = new LinkCreateApiModel();
+        link.setTitle(LINK_TITLE);
+        link.setDescription(LINK_DESCRIPTION);
+        link.setUrl(LINK_URL);
+        link.setType(ru.testit.client.model.LinkType.fromValue(LINK_TYPE.getValue()));
+
+        links.add(link);
+
+        return links;
+    }
+
+    private static List<AutoTestStepApiModel> generateSteps() {
+        List<AutoTestStepApiModel> steps = new ArrayList<>();
+        AutoTestStepApiModel step = new AutoTestStepApiModel();
+        step.setTitle(STEP_TITLE);
+        step.setDescription(STEP_DESCRIPTION);
+        step.setSteps(new ArrayList<>());
+        steps.add(step);
+        return steps;
+    }
+
+    private static List<AutoTestStepApiResult> generateStepsApiResults() {
+        List<AutoTestStepApiResult> steps = new ArrayList<>();
+        AutoTestStepApiResult step = new AutoTestStepApiResult();
         step.setTitle(STEP_TITLE);
         step.setDescription(STEP_DESCRIPTION);
         step.setSteps(new ArrayList<>());

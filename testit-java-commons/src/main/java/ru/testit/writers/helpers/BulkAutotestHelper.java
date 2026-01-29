@@ -14,8 +14,8 @@ public class BulkAutotestHelper {
     private final ITmsApiClient apiClient;
     private final ClientConfiguration config;
     private static final int MAX_TESTS_FOR_IMPORT = 100;
-    private final List<AutoTestPostModel> autotestsForCreate;
-    private final List<AutoTestPutModel> autotestsForUpdate;
+    private final List<AutoTestCreateApiModel> autotestsForCreate;
+    private final List<AutoTestUpdateApiModel> autotestsForUpdate;
     private final Map<String, List<String>> autotestLinksToWIForUpdate;
     private final List<AutoTestResultsForTestRunModel> resultsForAutotestsBeingCreated;
     private final List<AutoTestResultsForTestRunModel> resultsForAutotestsBeingUpdated;
@@ -31,7 +31,7 @@ public class BulkAutotestHelper {
     }
 
     public void addForCreate(
-            AutoTestPostModel createModel,
+            AutoTestCreateApiModel createModel,
             AutoTestResultsForTestRunModel resultModel
     ) throws ApiException {
         autotestsForCreate.add(createModel);
@@ -44,7 +44,7 @@ public class BulkAutotestHelper {
     }
 
     public void addForUpdate(
-            AutoTestPutModel updateModel,
+            AutoTestUpdateApiModel updateModel,
             AutoTestResultsForTestRunModel resultModel,
             Map<String, List<String>> wiForUpdate) throws ApiException {
         autotestsForUpdate.add(updateModel);
@@ -97,9 +97,9 @@ public class BulkAutotestHelper {
 
     //TODO: delete after fix PUT/api/v2/autoTests
     private void updateTestLinkToWorkItems(String autoTestId, List<String> workItemIds) throws ApiException {
-        List<WorkItemIdentifierModel> linkedWorkItems = apiClient.getWorkItemsLinkedToTest(autoTestId);
+        List<AutoTestWorkItemIdentifierApiResult> linkedWorkItems = apiClient.getWorkItemsLinkedToTest(autoTestId);
 
-        for (WorkItemIdentifierModel linkedWorkItem : linkedWorkItems) {
+        for (AutoTestWorkItemIdentifierApiResult linkedWorkItem : linkedWorkItems) {
             String linkedWorkItemId = linkedWorkItem.getGlobalId().toString();
 
             if (workItemIds.contains(linkedWorkItemId)) {

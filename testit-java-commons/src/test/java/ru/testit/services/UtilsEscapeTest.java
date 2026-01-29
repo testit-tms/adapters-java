@@ -13,25 +13,25 @@ class UtilsEscapeTest {
         String input1 = "Test <div> here";
         String result1 = HtmlEscapeUtils.escapeHtmlTags(input1);
 
-        Assertions.assertEquals("Test \\<div\\> here", result1);
+        Assertions.assertEquals("Test &lt;div&gt; here", result1);
 
         // Test escaping self-closing tag
         String input2 = "Test <br/> here";
         String result2 = HtmlEscapeUtils.escapeHtmlTags(input2);
 
-        Assertions.assertEquals("Test \\<br/\\> here", result2);
+        Assertions.assertEquals("Test &lt;br/&gt; here", result2);
 
         // Test escaping at start of string
         String input3 = "<div>";
         String result3 = HtmlEscapeUtils.escapeHtmlTags(input3);
 
-        Assertions.assertEquals("\\<div\\>", result3);
+        Assertions.assertEquals("&lt;div&gt;", result3);
 
         // Test complex case with multiple tags
         String input4 = "<div>content</div>";
         String result4 = HtmlEscapeUtils.escapeHtmlTags(input4);
 
-        Assertions.assertEquals("\\<div\\>content\\</div\\>", result4);
+        Assertions.assertEquals("&lt;div&gt;content&lt;/div&gt;", result4);
 
         // Test just < symbol (should NOT be escaped - no HTML tags)
         String input5 = "value < 10";
@@ -73,9 +73,9 @@ class UtilsEscapeTest {
         Assertions.assertEquals("Mixed \\< escaped < not escaped >", result2);
 
         // Test complex case with tags and already escaped content
-        String input3 = "\\<already\\> and <new> tags";
+        String input3 = "\\<already\\> and \\<new\\> tags";
         String result3 = HtmlEscapeUtils.escapeHtmlTags(input3);
-        Assertions.assertEquals("\\<already\\> and \\<new\\> tags", result3);
+        Assertions.assertEquals("\\&lt;already\\&gt; and \\&lt;new\\&gt; tags", result3);
 
         // Test multiple backslashes before < or > (no HTML tags, so no changes)
         String input4 = "\\\\< and \\\\>";
@@ -83,9 +83,9 @@ class UtilsEscapeTest {
         Assertions.assertEquals("\\\\< and \\\\>", result4);
         
         // Test avoid double escaping WITH HTML tags
-        String input5 = "Already escaped \\<tag> and new <div> tags";
+        String input5 = "Already escaped \\<tag\\> and new \\<div\\> tags";
         String result5 = HtmlEscapeUtils.escapeHtmlTags(input5);
-        Assertions.assertEquals("Already escaped \\<tag\\> and new \\<div\\> tags", result5);
+        Assertions.assertEquals("Already escaped \\&lt;tag\\&gt; and new \\&lt;div\\&gt; tags", result5);
     }
 
     @Test
@@ -93,17 +93,17 @@ class UtilsEscapeTest {
         // Test HTML tag detection - these should be escaped
         String input1 = "Text with <div> tag";
         String result1 = HtmlEscapeUtils.escapeHtmlTags(input1);
-        Assertions.assertEquals("Text with \\<div\\> tag", result1);
+        Assertions.assertEquals("Text with &lt;div&gt; tag", result1);
         
         // Test self-closing tag detection
         String input2 = "Text with <br/> tag";
         String result2 = HtmlEscapeUtils.escapeHtmlTags(input2);
-        Assertions.assertEquals("Text with \\<br/\\> tag", result2);
+        Assertions.assertEquals("Text with &lt;br/&gt; tag", result2);
         
         // Test tag with attributes
         String input3 = "Text with <a href='link'> tag";
         String result3 = HtmlEscapeUtils.escapeHtmlTags(input3);
-        Assertions.assertEquals("Text with \\<a href='link'\\> tag", result3);
+        Assertions.assertEquals("Text with &lt;a href='link'&gt; tag", result3);
         
         // Test non-HTML < and > - these should NOT be escaped
         String input4 = "Math: 5 < 10 and 20 > 15";
@@ -113,7 +113,7 @@ class UtilsEscapeTest {
         // Test mixed content - only HTML parts should be escaped
         String input5 = "Expression: a < b, but also <span>text</span>";
         String result5 = HtmlEscapeUtils.escapeHtmlTags(input5);
-        Assertions.assertEquals("Expression: a \\< b, but also \\<span\\>text\\</span\\>", result5);
+        Assertions.assertEquals("Expression: a &lt; b, but also &lt;span&gt;text&lt;/span&gt;", result5);
     }
 
     @Test
@@ -127,7 +127,7 @@ class UtilsEscapeTest {
         String result = HtmlEscapeUtils.escapeHtmlTags(input);
         
         // Should be escaped normally when env var is not set or not "true"
-        Assertions.assertEquals("\\<script\\>alert('test')\\</script\\>", result);
+        Assertions.assertEquals("&lt;script&gt;alert('test')&lt;/script&gt;", result);
         
         // Note: Cannot easily test environment variable modification in unit tests
         // without additional test setup or mocking framework
@@ -143,8 +143,8 @@ class UtilsEscapeTest {
         
         HtmlEscapeUtils.escapeHtmlInObject(obj);
         
-        Assertions.assertEquals("Test \\<script\\>", obj.name);
-        Assertions.assertEquals("\\<b\\>Bold\\</b\\> text", obj.description);
+        Assertions.assertEquals("Test &lt;script&gt;", obj.name);
+        Assertions.assertEquals("&lt;b&gt;Bold&lt;/b&gt; text", obj.description);
         Assertions.assertEquals(123, obj.number);
     }
 
@@ -161,11 +161,11 @@ class UtilsEscapeTest {
         HtmlEscapeUtils.escapeHtmlInObject(obj);
         
         // Check that String field is escaped
-        Assertions.assertEquals("Test \\<object\\>", obj.name);
+        Assertions.assertEquals("Test &lt;object&gt;", obj.name);
         
         // Check that all strings in list are escaped
-        Assertions.assertEquals("tag1 \\<html\\>", obj.tags.get(0));
-        Assertions.assertEquals("\\<script\\>alert('xss')\\</script\\>", obj.tags.get(1));
+        Assertions.assertEquals("tag1 &lt;html&gt;", obj.tags.get(0));
+        Assertions.assertEquals("&lt;script&gt;alert('xss')&lt;/script&gt;", obj.tags.get(1));
         Assertions.assertEquals("normal tag", obj.tags.get(2));
     }
 
@@ -189,14 +189,14 @@ class UtilsEscapeTest {
         HtmlEscapeUtils.escapeHtmlInObject(parent);
         
         // Check that parent String field is escaped
-        Assertions.assertEquals("Parent \\<object\\>", parent.name);
+        Assertions.assertEquals("Parent &lt;object&gt;", parent.name);
         
         // Check that all objects in list are escaped
-        Assertions.assertEquals("Child1 \\<div\\>", parent.children.get(0).name);
-        Assertions.assertEquals("\\<span\\>description\\</span\\>", parent.children.get(0).description);
+        Assertions.assertEquals("Child1 &lt;div&gt;", parent.children.get(0).name);
+        Assertions.assertEquals("&lt;span&gt;description&lt;/span&gt;", parent.children.get(0).description);
         
-        Assertions.assertEquals("Child2 \\<p\\>", parent.children.get(1).name);
-        Assertions.assertEquals("\\<b\\>another\\</b\\> description", parent.children.get(1).description);
+        Assertions.assertEquals("Child2 &lt;p&gt;", parent.children.get(1).name);
+        Assertions.assertEquals("&lt;b&gt;another&lt;/b&gt; description", parent.children.get(1).description);
     }
 
     @Test
@@ -208,7 +208,7 @@ class UtilsEscapeTest {
         
         HtmlEscapeUtils.escapeHtmlInObject(obj);
         
-        Assertions.assertEquals("Test \\<object\\>", obj.name);
+        Assertions.assertEquals("Test &lt;object&gt;", obj.name);
         Assertions.assertTrue(obj.tags.isEmpty());
     }
 
@@ -221,7 +221,7 @@ class UtilsEscapeTest {
         
         HtmlEscapeUtils.escapeHtmlInObject(obj);
         
-        Assertions.assertEquals("Test \\<object\\>", obj.name);
+        Assertions.assertEquals("Test &lt;object&gt;", obj.name);
         Assertions.assertNull(obj.tags);
     }
 
@@ -238,11 +238,11 @@ class UtilsEscapeTest {
         HtmlEscapeUtils.escapeHtmlInObject(parent);
         
         // Check parent fields are escaped
-        Assertions.assertEquals("Parent \\<div\\>", parent.name);
+        Assertions.assertEquals("Parent &lt;div&gt;", parent.name);
         
         // Check nested object fields are escaped
-        Assertions.assertEquals("Child \\<script\\>", parent.child.name);
-        Assertions.assertEquals("\\<b\\>nested\\</b\\> content", parent.child.description);
+        Assertions.assertEquals("Child &lt;script&gt;", parent.child.name);
+        Assertions.assertEquals("&lt;b&gt;nested&lt;/b&gt; content", parent.child.description);
         Assertions.assertEquals(42, parent.child.number);
     }
 
@@ -260,10 +260,10 @@ class UtilsEscapeTest {
         HtmlEscapeUtils.escapeHtmlInObject(root);
         
         // Check all levels are escaped
-        Assertions.assertEquals("Root \\<html\\>", root.title);
-        Assertions.assertEquals("Level1 \\<div\\>", root.level1.name);
-        Assertions.assertEquals("Level2 \\<span\\>", root.level1.child.name);
-        Assertions.assertEquals("\\<p\\>deep content\\</p\\>", root.level1.child.description);
+        Assertions.assertEquals("Root &lt;html&gt;", root.title);
+        Assertions.assertEquals("Level1 &lt;div&gt;", root.level1.name);
+        Assertions.assertEquals("Level2 &lt;span&gt;", root.level1.child.name);
+        Assertions.assertEquals("&lt;p&gt;deep content&lt;/p&gt;", root.level1.child.description);
     }
 
     @Test
@@ -281,7 +281,7 @@ class UtilsEscapeTest {
         HtmlEscapeUtils.escapeHtmlInObject(obj);
         
         // Only String field should be escaped, others should remain unchanged
-        Assertions.assertEquals("Test \\<object\\>", obj.name);
+        Assertions.assertEquals("Test &lt;object&gt;", obj.name);
         Assertions.assertEquals(123, obj.number);
         Assertions.assertTrue(obj.isActive);
         Assertions.assertNotNull(obj.date);

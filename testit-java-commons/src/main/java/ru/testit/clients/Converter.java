@@ -18,12 +18,13 @@ import java.util.stream.Collectors;
 
 public class Converter {
 
-    private Converter() {}
+    private Converter() {
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Converter.class);
 
-    public static AutoTestPostModel testResultToAutoTestPostModel(TestResult result) {
-        AutoTestPostModel model = new AutoTestPostModel();
+    public static AutoTestCreateApiModel testResultToAutoTestCreateApiModel(TestResult result) {
+        AutoTestCreateApiModel model = new AutoTestCreateApiModel();
 
         model.setExternalId(result.getExternalId());
         model.setDescription(result.getDescription());
@@ -31,8 +32,8 @@ public class Converter {
         model.setClassname(result.getClassName());
         model.setNamespace(result.getSpaceName());
         model.setTitle(result.getTitle());
-        model.setLinks(convertPostLinks(result.getLinkItems()));
-        model.setSteps(convertSteps(result.getSteps()));
+        model.setLinks(convertCreateLinks(result.getLinkItems()));
+        model.setSteps(convertStepsToApiModels(result.getSteps()));
         model.setLabels(labelsPostConvert(result.getLabels()));
         model.shouldCreateWorkItem(result.getAutomaticCreationTestCases());
         model.externalKey(result.getExternalKey());
@@ -49,6 +50,21 @@ public class Converter {
                             model.setTitle(fixture.getName());
                             model.setDescription(fixture.getDescription());
                             model.setSteps(convertSteps(fixture.getSteps()));
+
+                            return model;
+                        }
+                ).collect(Collectors.toList());
+    }
+
+    public static List<AutoTestStepApiModel> convertFixtureToApi(List<FixtureResult> fixtures, String parentUuid) {
+        return fixtures.stream()
+                .filter(fixture -> filterSteps(parentUuid, fixture))
+                .map(fixture -> {
+                            AutoTestStepApiModel model = new AutoTestStepApiModel();
+
+                            model.setTitle(fixture.getName());
+                            model.setDescription(fixture.getDescription());
+                            model.setSteps(convertStepsToApiModels(fixture.getSteps()));
 
                             return model;
                         }
@@ -124,8 +140,8 @@ public class Converter {
         return model;
     }
 
-    public static AutoTestPutModel testResultToAutoTestPutModel(TestResult result) {
-        AutoTestPutModel model = new AutoTestPutModel();
+    public static AutoTestUpdateApiModel testResultToAutoTestUpdateApiModel(TestResult result) {
+        AutoTestUpdateApiModel model = new AutoTestUpdateApiModel();
 
         model.setExternalId(result.getExternalId());
         model.setDescription(result.getDescription());
@@ -134,7 +150,7 @@ public class Converter {
         model.setNamespace(result.getSpaceName());
         model.setTitle(result.getTitle());
         model.setLinks(convertPutLinks(result.getLinkItems()));
-        model.setSteps(convertSteps(result.getSteps()));
+        model.setSteps(convertStepsToApiModels(result.getSteps()));
         model.setLabels(labelsPostConvert(result.getLabels()));
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
@@ -143,49 +159,27 @@ public class Converter {
         return model;
     }
 
-    public static AutoTestPutModel autoTestModelToAutoTestPutModel(AutoTestModel autoTestModel) {
-        AutoTestPutModel model = new AutoTestPutModel();
+    public static AutoTestUpdateApiModel AutoTestApiResultToAutoTestUpdateApiModel(AutoTestApiResult autoTestApiResult) {
+        AutoTestUpdateApiModel model = new AutoTestUpdateApiModel();
 
-        model.setId(autoTestModel.getId());
-        model.setExternalId(autoTestModel.getExternalId());
-        model.setLinks(autoTestModel.getLinks());
-        model.setProjectId(autoTestModel.getProjectId());
-        model.setName(autoTestModel.getName());
-        model.setNamespace(autoTestModel.getNamespace());
-        model.setClassname(autoTestModel.getClassname());
-        model.setSteps(autoTestModel.getSteps());
-        model.setSetup(autoTestModel.getSetup());
-        model.setTeardown(autoTestModel.getTeardown());
-        model.setTitle(autoTestModel.getTitle());
-        model.setDescription(autoTestModel.getDescription());
-        model.setLabels(labelsConvert(autoTestModel.getLabels()));
-        model.externalKey(autoTestModel.getExternalKey());
+        model.setId(autoTestApiResult.getId());
+        model.setExternalId(autoTestApiResult.getExternalId());
+        model.setLinks(Converter.buildLinkUpdateApiModel(autoTestApiResult.getLinks()));
+        model.setProjectId(autoTestApiResult.getProjectId());
+        model.setName(autoTestApiResult.getName());
+        model.setNamespace(autoTestApiResult.getNamespace());
+        model.setClassname(autoTestApiResult.getClassname());
+        model.setSteps(convertAutoTestStepApiResultsToModels(autoTestApiResult.getSteps()));
+        model.setSetup(convertAutoTestStepApiResultsToModels(autoTestApiResult.getSetup()));
+        model.setTeardown(convertAutoTestStepApiResultsToModels(autoTestApiResult.getTeardown()));
+        model.setTitle(autoTestApiResult.getTitle());
+        model.setDescription(autoTestApiResult.getDescription());
+        model.setLabels(labelsConvertFromApi(autoTestApiResult.getLabels()));
+        model.externalKey(autoTestApiResult.getExternalKey());
 
         return model;
     }
 
-    public static Map<String, List<String>> getRelationWorkItemIdsToAutotestIdsByExternalIds(
-            Map<String, List<String>> relationWorkItemIdsToAutotestExternalIdsBeingCreated,
-            List<AutoTestModel> autoTestModels) {
-        Map<String, List<String>> relationWorkItemIdsToAutotestIds = new HashMap<>();
-        Set<String> externalIds = relationWorkItemIdsToAutotestExternalIdsBeingCreated.keySet();
-
-        for (String externalId : externalIds) {
-            AutoTestModel autotest = autoTestModels.stream()
-                    .filter(m -> m.getExternalId().equals(externalId))
-                    .findFirst()
-                    .orElse(null);
-
-            if (autotest != null)
-            {
-                relationWorkItemIdsToAutotestIds.put(
-                        autotest.getId().toString(),
-                        relationWorkItemIdsToAutotestExternalIdsBeingCreated.get(externalId));
-            }
-        }
-
-        return relationWorkItemIdsToAutotestIds;
-    }
 
     private static List<LinkPostModel> convertPostLinks(List<LinkItem> links) {
         return links.stream().map(
@@ -196,23 +190,39 @@ public class Converter {
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
                     model.setType(LinkType.fromValue(link.getType().getValue()));
-                    model.setHasInfo(false);
+                    // model.setHasInfo(false);
 
                     return model;
                 }
         ).collect(Collectors.toList());
     }
 
-    public static List<LinkPutModel> convertPutLinks(List<LinkItem> links) {
+    private static List<LinkCreateApiModel> convertCreateLinks(List<LinkItem> links) {
         return links.stream().map(
                 link -> {
-                    LinkPutModel model = new LinkPutModel();
+                    LinkCreateApiModel model = new LinkCreateApiModel();
 
                     model.setTitle(link.getTitle());
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
                     model.setType(LinkType.fromValue(link.getType().getValue()));
-                    model.setHasInfo(false);
+                    // model.setHasInfo(false);
+
+                    return model;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    public static List<LinkUpdateApiModel> convertPutLinks(List<LinkItem> links) {
+        return links.stream().map(
+                link -> {
+                    LinkUpdateApiModel model = new LinkUpdateApiModel();
+
+                    model.setTitle(link.getTitle());
+                    model.setDescription(link.getDescription());
+                    model.setUrl(link.getUrl());
+                    model.setType(LinkType.fromValue(link.getType().getValue()));
+                    // model.setHasInfo(false);
 
                     return model;
                 }
@@ -225,6 +235,17 @@ public class Converter {
             model.setTitle(step.getName());
             model.setDescription(step.getDescription());
             model.setSteps(convertSteps(step.getSteps()));
+
+            return model;
+        }).collect(Collectors.toList());
+    }
+
+    private static List<AutoTestStepApiModel> convertStepsToApiModels(List<StepResult> steps) {
+        return steps.stream().map(step -> {
+            AutoTestStepApiModel model = new AutoTestStepApiModel();
+            model.setTitle(step.getName());
+            model.setDescription(step.getDescription());
+            model.setSteps(convertStepsToApiModels(step.getSteps()));
 
             return model;
         }).collect(Collectors.toList());
@@ -254,9 +275,9 @@ public class Converter {
         }).collect(Collectors.toList());
     }
 
-    private static List<LabelPostModel> labelsConvert(List<LabelShortModel> labels) {
+    private static List<LabelApiModel> labelsConvert(List<LabelShortModel> labels) {
         return labels.stream().map(label -> {
-            LabelPostModel model = new LabelPostModel();
+            LabelApiModel model = new LabelApiModel();
 
             model.setName(label.getName());
 
@@ -264,9 +285,19 @@ public class Converter {
         }).collect(Collectors.toList());
     }
 
-    private static List<LabelPostModel> labelsPostConvert(List<Label> labels) {
+    private static List<LabelApiModel> labelsConvertFromApi(List<LabelApiResult> labels) {
         return labels.stream().map(label -> {
-            LabelPostModel model = new LabelPostModel();
+            LabelApiModel model = new LabelApiModel();
+
+            model.setName(label.getName());
+
+            return model;
+        }).collect(Collectors.toList());
+    }
+
+    private static List<LabelApiModel> labelsPostConvert(List<Label> labels) {
+        return labels.stream().map(label -> {
+            LabelApiModel model = new LabelApiModel();
 
             model.setName(label.getName());
 
@@ -302,86 +333,50 @@ public class Converter {
         }).collect(Collectors.toList());
     }
 
-    public static AutoTestModel convertAutoTestApiResultToAutoTestModel(AutoTestApiResult autoTestApiResult) {
+    public static AutoTestApiResult convertAutoTestApiResultToAutoTestApiResult(AutoTestApiResult autoTestApiResult) {
         if (autoTestApiResult == null || autoTestApiResult.getExternalId() == null) {
             return null;
         }
 
-        AutoTestModel model = new AutoTestModel();
+        AutoTestApiResult model = new AutoTestApiResult();
 
         model.setId(autoTestApiResult.getId());
         model.setGlobalId(autoTestApiResult.getGlobalId());
         model.setExternalId(autoTestApiResult.getExternalId());
-        model.setLinks(convertLinkApiResultsToPutLinks(autoTestApiResult.getLinks()));
+        model.setLinks(autoTestApiResult.getLinks());
         model.setProjectId(autoTestApiResult.getProjectId());
         model.setName(autoTestApiResult.getName());
         model.setNamespace(autoTestApiResult.getNamespace());
         model.setClassname(autoTestApiResult.getClassname());
-        model.setSteps(convertAutoTestStepApiResultsToSteps(autoTestApiResult.getSteps()));
-        model.setSetup(convertAutoTestStepApiResultsToSteps(autoTestApiResult.getSetup()));
-        model.setTeardown(convertAutoTestStepApiResultsToSteps(autoTestApiResult.getTeardown()));
+        model.setSteps(autoTestApiResult.getSteps());
+        model.setSetup(autoTestApiResult.getSetup());
+        model.setTeardown(autoTestApiResult.getTeardown());
         model.setTitle(autoTestApiResult.getTitle());
         model.setDescription(autoTestApiResult.getDescription());
-        model.setLabels(convertLabelApiResultsToLabelShortModels(autoTestApiResult.getLabels()));
+        model.setLabels(autoTestApiResult.getLabels());
         model.externalKey(autoTestApiResult.getExternalKey());
 
         return model;
     }
 
-    private static List<AutoTestStepModel> convertAutoTestStepApiResultsToSteps(List<AutoTestStepApiResult> steps) {
+    private static List<AutoTestStepApiModel> convertAutoTestStepApiResultsToModels(List<AutoTestStepApiResult> steps) {
         if (steps == null) {
             return new ArrayList<>();
         }
 
         return steps.stream().map(step -> {
-            AutoTestStepModel model = new AutoTestStepModel();
+            AutoTestStepApiModel model = new AutoTestStepApiModel();
             model.setTitle(step.getTitle());
             model.setDescription(step.getDescription());
 
             if (step.getSteps() != null) {
-                model.setSteps(convertAutoTestStepApiResultsToSteps(step.getSteps()));
+                model.setSteps(convertAutoTestStepApiResultsToModels(step.getSteps()));
             }
 
             return model;
         }).collect(Collectors.toList());
     }
 
-    public static List<LinkPutModel> convertLinkApiResultsToPutLinks(List<LinkApiResult> links) {
-        if (links == null) {
-            return new ArrayList<>();
-        }
-
-        return links.stream().map(
-                link -> {
-                    LinkPutModel model = new LinkPutModel();
-
-                    model.setTitle(link.getTitle());
-                    model.setDescription(link.getDescription());
-                    model.setUrl(link.getUrl());
-                    model.setHasInfo(false);
-
-                    if (link.getType() != null) {
-                        model.setType(LinkType.fromValue(link.getType().getValue()));
-                    }
-
-                    return model;
-                }
-        ).collect(Collectors.toList());
-    }
-
-    private static List<LabelShortModel> convertLabelApiResultsToLabelShortModels(List<LabelApiResult> labels) {
-        if (labels == null) {
-            return new ArrayList<>();
-        }
-
-        return labels.stream().map(label -> {
-            LabelShortModel model = new LabelShortModel();
-
-            model.setName(label.getName());
-
-            return model;
-        }).collect(Collectors.toList());
-    }
 
     public static AutoTestStepResultUpdateRequest stepResultToRequest(AttachmentPutModelAutoTestStepResultsModel model) {
         AutoTestStepResultUpdateRequest req = new AutoTestStepResultUpdateRequest();
@@ -416,50 +411,50 @@ public class Converter {
         return models.stream().map(Converter::attachmentToRequest).collect(Collectors.toList());
     }
 
-    public static AutoTestPostModel prepareToCreateAutoTest(
+    public static AutoTestCreateApiModel prepareToCreateAutoTest(
             TestResult testResult,
             String projectId) throws ApiException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Preparing to create the auto test {}", testResult.getExternalId());
         }
 
-        AutoTestPostModel model = Converter.testResultToAutoTestPostModel(testResult);
+        AutoTestCreateApiModel model = Converter.testResultToAutoTestCreateApiModel(testResult);
         model.setProjectId(UUID.fromString(projectId));
 
-        //TODO: add WorkItemIds to AutoTestPutModel and AutoTestPostModel models after fixing the API
-//        List<UUID> workItemUuids = apiClient.GetWorkItemUuidsByIds(testResult.getWorkItemIds());
-//
-//        model.setWorkItemIdsForLinkWithAutoTest(new HashSet<>(workItemUuids));
+        // TODO: add WorkItemIds to AutoTestUpdateApiModel and AutoTestCreateApiModel models after fixing the API
+        // List<UUID> workItemUuids = apiClient.GetWorkItemUuidsByIds(testResult.getWorkItemIds());
+
+        // model.setWorkItemIdsForLinkWithAutoTest(new HashSet<>(workItemUuids));
 
         return model;
     }
 
-    public static AutoTestPutModel prepareToUpdateAutoTest(
+    public static AutoTestUpdateApiModel prepareToUpdateAutoTest(
             TestResult testResult,
-            AutoTestModel autotest,
+            AutoTestApiResult autotest,
             String projectId) throws ApiException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Preparing to update the auto test {}", testResult.getExternalId());
         }
 
-        AutoTestPutModel model;
+        AutoTestUpdateApiModel model;
 
         if (testResult.getItemStatus() == ItemStatus.FAILED) {
-            model = Converter.autoTestModelToAutoTestPutModel(autotest);
+            model = Converter.AutoTestApiResultToAutoTestUpdateApiModel(autotest);
             model.links(Converter.convertPutLinks(testResult.getLinkItems()));
         } else {
-            model = Converter.testResultToAutoTestPutModel(testResult);
+            model = Converter.testResultToAutoTestUpdateApiModel(testResult);
             model.setProjectId(UUID.fromString(projectId));
         }
 
         model.setIsFlaky(autotest.getIsFlaky());
 
-        //TODO: add WorkItemIds to AutoTestPutModel and AutoTestPostModel models after fixing the API
-//        List<UUID> workItemUuids = apiClient.GetWorkItemUuidsByIds(testResult.getWorkItemIds());
-//
-//        workItemUuids = prepareWorkItemUuidsForUpdateAutoTest(workItemUuids, autotest.getId().toString());
-//
-//        model.setWorkItemIdsForLinkWithAutoTest(new HashSet<>(workItemUuids));
+        // TODO: add WorkItemIds to AutoTestUpdateApiModel and AutoTestCreateApiModel models after fixing the API
+        // List<UUID> workItemUuids = apiClient.GetWorkItemUuidsByIds(testResult.getWorkItemIds());
+
+        // workItemUuids = prepareWorkItemUuidsForUpdateAutoTest(workItemUuids, autotest.getId().toString());
+
+        // model.setWorkItemIdsForLinkWithAutoTest(new HashSet<>(workItemUuids));
 
         return model;
     }
@@ -548,6 +543,23 @@ public class Converter {
         ).collect(Collectors.toList());
     }
 
+    public static List<LinkUpdateApiModel> buildLinkUpdateApiModel(List<LinkApiResult> links) {
+        return links.stream().map(
+                link -> {
+                    LinkUpdateApiModel model = new LinkUpdateApiModel();
+
+                    model.setId(link.getId());
+                    model.setTitle(link.getTitle());
+                    model.setDescription(link.getDescription());
+                    model.setUrl(link.getUrl());
+                    model.setType(LinkType.fromValue(link.getType().getValue()));
+                    model.setHasInfo(false);
+
+                    return model;
+                }
+        ).collect(Collectors.toList());
+    }
+
     @SafeVarargs
     private static <T> List<T> listOf(T... elements) {
         if (elements == null || elements.length == 0) {
@@ -555,4 +567,78 @@ public class Converter {
         }
         return Arrays.asList(elements);
     }
+
+    public static Map<String, List<String>> getRelationWorkItemIdsToAutotestIdsByExternalIds(
+            Map<String, List<String>> relationWorkItemIdsToAutotestExternalIdsBeingCreated,
+            List<AutoTestApiResult> AutoTestApiResults) {
+        Map<String, List<String>> relationWorkItemIdsToAutotestIds = new HashMap<>();
+        Set<String> externalIds = relationWorkItemIdsToAutotestExternalIdsBeingCreated.keySet();
+
+        for (String externalId : externalIds) {
+            AutoTestApiResults.stream()
+                    .filter(m -> Objects.equals(m.getExternalId(), externalId))
+                    .findFirst().ifPresent(autotest -> relationWorkItemIdsToAutotestIds.put(
+                            autotest.getId().toString(),
+                            relationWorkItemIdsToAutotestExternalIdsBeingCreated.get(externalId)));
+
+        }
+
+        return relationWorkItemIdsToAutotestIds;
+    }
+
+    private static List<AutoTestStepModel> convertAutoTestStepApiResultsToSteps(List<AutoTestStepApiResult> steps) {
+        if (steps == null) {
+            return new ArrayList<>();
+        }
+
+        return steps.stream().map(step -> {
+            AutoTestStepModel model = new AutoTestStepModel();
+            model.setTitle(step.getTitle());
+            model.setDescription(step.getDescription());
+
+            if (step.getSteps() != null) {
+                model.setSteps(convertAutoTestStepApiResultsToSteps(step.getSteps()));
+            }
+
+            return model;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<LinkPutModel> convertLinkApiResultsToPutLinks(List<LinkApiResult> links) {
+        if (links == null) {
+            return new ArrayList<>();
+        }
+
+        return links.stream().map(
+                link -> {
+                    LinkPutModel model = new LinkPutModel();
+
+                    model.setTitle(link.getTitle());
+                    model.setDescription(link.getDescription());
+                    model.setUrl(link.getUrl());
+                    model.setHasInfo(false);
+
+                    if (link.getType() != null) {
+                        model.setType(LinkType.fromValue(link.getType().getValue()));
+                    }
+
+                    return model;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    private static List<LabelShortModel> convertLabelApiResultsToLabelShortModels(List<LabelApiResult> labels) {
+        if (labels == null) {
+            return new ArrayList<>();
+        }
+
+        return labels.stream().map(label -> {
+            LabelShortModel model = new LabelShortModel();
+
+            model.setName(label.getName());
+
+            return model;
+        }).collect(Collectors.toList());
+    }
+
 }

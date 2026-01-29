@@ -48,23 +48,23 @@ public class HttpWriter implements Writer {
             AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(testResult.getExternalId());
             String autoTestId;
 
-            AutoTestModel autotest = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
+            AutoTestApiResult autotest = Converter.convertAutoTestApiResultToAutoTestApiResult(autoTestApiResult);
 
             if (autotest != null) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("The auto test {} is exist", testResult.getExternalId());
                 }
 
-                AutoTestPutModel autoTestPutModel = Converter.prepareToUpdateAutoTest(
+                AutoTestUpdateApiModel AutoTestUpdateApiModel = Converter.prepareToUpdateAutoTest(
                         testResult,
                         autotest,
                         config.getProjectId()
                 );
 
-                apiClient.updateAutoTest(autoTestPutModel);
+                apiClient.updateAutoTest(AutoTestUpdateApiModel);
                 autoTestId = autotest.getId().toString();
             } else {
-                AutoTestPostModel model = Converter.prepareToCreateAutoTest(testResult, config.getProjectId());
+                AutoTestCreateApiModel model = Converter.prepareToCreateAutoTest(testResult, config.getProjectId());
                 autoTestId = apiClient.createAutoTest(model);
             }
 
@@ -90,9 +90,9 @@ public class HttpWriter implements Writer {
 
     // TODO: use after refactoring
     private List<UUID> prepareWorkItemUuidsForUpdateAutoTest(List<UUID> workItemUuids, String autoTestId) throws ApiException {
-        List<WorkItemIdentifierModel> linkedWorkItems = apiClient.getWorkItemsLinkedToTest(autoTestId);
+        List<AutoTestWorkItemIdentifierApiResult> linkedWorkItems = apiClient.getWorkItemsLinkedToTest(autoTestId);
 
-        for (WorkItemIdentifierModel linkedWorkItem : linkedWorkItems) {
+        for (AutoTestWorkItemIdentifierApiResult linkedWorkItem : linkedWorkItems) {
             UUID linkedWorkItemUuid = linkedWorkItem.getId();
 
             if (workItemUuids.contains(linkedWorkItemUuid) || config.shouldAutomaticUpdationLinksToTestCases()) {
@@ -106,9 +106,9 @@ public class HttpWriter implements Writer {
     }
 
     private void updateTestLinkToWorkItems(String autoTestId, List<String> workItemIds) throws ApiException {
-        List<WorkItemIdentifierModel> linkedWorkItems = apiClient.getWorkItemsLinkedToTest(autoTestId);
+        List<AutoTestWorkItemIdentifierApiResult> linkedWorkItems = apiClient.getWorkItemsLinkedToTest(autoTestId);
 
-        for (WorkItemIdentifierModel linkedWorkItem : linkedWorkItems) {
+        for (AutoTestWorkItemIdentifierApiResult linkedWorkItem : linkedWorkItems) {
             String linkedWorkItemId = linkedWorkItem.getGlobalId().toString();
 
             if (workItemIds.contains(linkedWorkItemId)) {
@@ -137,28 +137,28 @@ public class HttpWriter implements Writer {
                 try {
                     AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
 
-                    AutoTestModel autoTestModel = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
+                    AutoTestApiResult AutoTestApiResult = Converter.convertAutoTestApiResultToAutoTestApiResult(autoTestApiResult);
 
-                    if (autoTestModel == null) {
+                    if (AutoTestApiResult == null) {
                         return;
                     }
 
-                    AutoTestPutModel autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
+                    AutoTestUpdateApiModel autoTestUpdateApiModel = Converter.AutoTestApiResultToAutoTestUpdateApiModel(AutoTestApiResult);
 
-                    List<AutoTestStepModel> beforeClass = Converter.convertFixture(container.getBeforeClassMethods(), null);
-                    List<AutoTestStepModel> beforeEach = Converter.convertFixture(container.getBeforeEachTest(), testUuid);
+                    List<AutoTestStepApiModel> beforeClass = Converter.convertFixtureToApi(container.getBeforeClassMethods(), null);
+                    List<AutoTestStepApiModel> beforeEach = Converter.convertFixtureToApi(container.getBeforeEachTest(), testUuid);
                     beforeClass.addAll(beforeEach);
 
-                    List<AutoTestStepModel> afterClass = Converter.convertFixture(container.getAfterClassMethods(), null);
-                    List<AutoTestStepModel> afterEach = Converter.convertFixture(container.getAfterEachTest(), testUuid);
+                    List<AutoTestStepApiModel> afterClass = Converter.convertFixtureToApi(container.getAfterClassMethods(), null);
+                    List<AutoTestStepApiModel> afterEach = Converter.convertFixtureToApi(container.getAfterEachTest(), testUuid);
                     afterClass.addAll(afterEach);
 
-                    autoTestPutModel.setSetup(beforeClass);
-                    autoTestPutModel.setTeardown(afterClass);
+                    autoTestUpdateApiModel.setSetup(beforeClass);
+                    autoTestUpdateApiModel.setTeardown(afterClass);
 
-                    autoTestPutModel.setIsFlaky(autoTestModel.getIsFlaky());
+                    autoTestUpdateApiModel.setIsFlaky(AutoTestApiResult.getIsFlaky());
 
-                    apiClient.updateAutoTest(autoTestPutModel);
+                    apiClient.updateAutoTest(autoTestUpdateApiModel);
                 } catch (ApiException e) {
                     LOGGER.error("Can not write the class: {}", (e.getMessage()));
                 }
@@ -179,14 +179,14 @@ public class HttpWriter implements Writer {
     }
 
     private void updateTestResults(MainContainer container) {
-        List<AutoTestStepModel> beforeAll = Converter.convertFixture(container.getBeforeMethods(), null);
-        List<AutoTestStepModel> afterAll = Converter.convertFixture(container.getAfterMethods(), null);
+        List<AutoTestStepApiModel> beforeAll = Converter.convertFixtureToApi(container.getBeforeMethods(), null);
+        List<AutoTestStepApiModel> afterAll = Converter.convertFixtureToApi(container.getAfterMethods(), null);
         List<AttachmentPutModelAutoTestStepResultsModel> beforeResultAll = Converter.convertResultFixture(container.getBeforeMethods(), null);
         List<AttachmentPutModelAutoTestStepResultsModel> afterResultAll = Converter.convertResultFixture(container.getAfterMethods(), null);
 
         for (final String classUuid : container.getChildren()) {
             storage.getClassContainer(classUuid).ifPresent(cl -> {
-                List<AutoTestStepModel> afterClass = Converter.convertFixture(cl.getAfterClassMethods(), null);
+                List<AutoTestStepApiModel> afterClass = Converter.convertFixtureToApi(cl.getAfterClassMethods(), null);
                 List<AttachmentPutModelAutoTestStepResultsModel> beforeResultClass = Converter.convertResultFixture(cl.getBeforeClassMethods(), null);
                 List<AttachmentPutModelAutoTestStepResultsModel> afterResultClass = Converter.convertResultFixture(cl.getAfterClassMethods(), null);
 
@@ -195,26 +195,26 @@ public class HttpWriter implements Writer {
                         try {
                             AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
 
-                            AutoTestModel autoTestModel = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
+                            AutoTestApiResult AutoTestApiResult = Converter.convertAutoTestApiResultToAutoTestApiResult(autoTestApiResult);
 
-                            if (autoTestModel == null) {
+                            if (AutoTestApiResult == null) {
                                 return;
                             }
 
-                            AutoTestPutModel autoTestPutModel = Converter.autoTestModelToAutoTestPutModel(autoTestModel);
+                            AutoTestUpdateApiModel autoTestUpdateApiModel = Converter.AutoTestApiResultToAutoTestUpdateApiModel(AutoTestApiResult);
 
-                            List<AutoTestStepModel> beforeFinish = new ArrayList<>(beforeAll);
-                            beforeFinish.addAll(autoTestPutModel.getSetup());
-                            autoTestPutModel.setSetup(beforeFinish);
+                            List<AutoTestStepApiModel> beforeFinish = new ArrayList<>(beforeAll);
+                            beforeFinish.addAll(autoTestUpdateApiModel.getSetup());
+                            autoTestUpdateApiModel.setSetup(beforeFinish);
 
-                            List<AutoTestStepModel> afterFinish = autoTestPutModel.getTeardown();
+                            List<AutoTestStepApiModel> afterFinish = autoTestUpdateApiModel.getTeardown();
                             afterFinish.addAll(afterClass);
                             afterFinish.addAll(afterAll);
-                            autoTestPutModel.setTeardown(afterFinish);
+                            autoTestUpdateApiModel.setTeardown(afterFinish);
 
-                            autoTestPutModel.setIsFlaky(autoTestModel.getIsFlaky());
+                            autoTestUpdateApiModel.setIsFlaky(AutoTestApiResult.getIsFlaky());
 
-                            apiClient.updateAutoTest(autoTestPutModel);
+                            apiClient.updateAutoTest(autoTestUpdateApiModel);
 
                             AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.testResultToAutoTestResultsForTestRunModel(test);
 
@@ -252,8 +252,8 @@ public class HttpWriter implements Writer {
     }
 
     private void writeTestsAfterAll(MainContainer container) {
-        List<AutoTestStepModel> beforeAll = Converter.convertFixture(container.getBeforeMethods(), null);
-        List<AutoTestStepModel> afterAll = Converter.convertFixture(container.getAfterMethods(), null);
+        List<AutoTestStepApiModel> beforeAll = Converter.convertFixtureToApi(container.getBeforeMethods(), null);
+        List<AutoTestStepApiModel> afterAll = Converter.convertFixtureToApi(container.getAfterMethods(), null);
         List<AttachmentPutModelAutoTestStepResultsModel> beforeResultAll = Converter.convertResultFixture(container.getBeforeMethods(), null);
         List<AttachmentPutModelAutoTestStepResultsModel> afterResultAll = Converter.convertResultFixture(container.getAfterMethods(), null);
 
@@ -261,41 +261,41 @@ public class HttpWriter implements Writer {
 
         for (final String classUuid : container.getChildren()) {
             storage.getClassContainer(classUuid).ifPresent(cl -> {
-                List<AutoTestStepModel> beforeClass = Converter.convertFixture(cl.getBeforeClassMethods(), null);
+                List<AutoTestStepApiModel> beforeClass = Converter.convertFixtureToApi(cl.getBeforeClassMethods(), null);
                 List<AttachmentPutModelAutoTestStepResultsModel> beforeResultClass = Converter.convertResultFixture(cl.getBeforeClassMethods(), null);
-                List<AutoTestStepModel> afterClass = Converter.convertFixture(cl.getAfterClassMethods(), null);
+                List<AutoTestStepApiModel> afterClass = Converter.convertFixtureToApi(cl.getAfterClassMethods(), null);
                 List<AttachmentPutModelAutoTestStepResultsModel> afterResultClass = Converter.convertResultFixture(cl.getAfterClassMethods(), null);
 
                 for (final String testUuid : cl.getChildren()) {
                     storage.getTestResult(testUuid).ifPresent(test -> {
                         try {
-                            List<AutoTestStepModel> beforeEach = Converter.convertFixture(cl.getBeforeEachTest(), testUuid);
+                            List<AutoTestStepApiModel> beforeEach = Converter.convertFixtureToApi(cl.getBeforeEachTest(), testUuid);
                             List<AttachmentPutModelAutoTestStepResultsModel> beforeResultEach = Converter.convertResultFixture(cl.getBeforeEachTest(), testUuid);
                             List<AttachmentPutModelAutoTestStepResultsModel> beforeResultFinish = new ArrayList<>();
                             beforeResultFinish.addAll(beforeResultAll);
                             beforeResultFinish.addAll(beforeResultClass);
                             beforeResultFinish.addAll(beforeResultEach);
 
-                            List<AutoTestStepModel> afterEach = Converter.convertFixture(cl.getAfterEachTest(), testUuid);
+                            List<AutoTestStepApiModel> afterEach = Converter.convertFixtureToApi(cl.getAfterEachTest(), testUuid);
                             List<AttachmentPutModelAutoTestStepResultsModel> afterResultEach = Converter.convertResultFixture(cl.getAfterEachTest(), testUuid);
                             List<AttachmentPutModelAutoTestStepResultsModel> afterResultFinish = new ArrayList<>();
                             afterResultFinish.addAll(afterResultEach);
                             afterResultFinish.addAll(afterResultClass);
                             afterResultFinish.addAll(afterResultAll);
 
-                            List<AutoTestStepModel> beforeFinish = new ArrayList<>();
+                            List<AutoTestStepApiModel> beforeFinish = new ArrayList<>();
                             beforeFinish.addAll(beforeAll);
                             beforeFinish.addAll(beforeClass);
                             beforeFinish.addAll(beforeEach);
 
-                            List<AutoTestStepModel> afterFinish = new ArrayList<>();
+                            List<AutoTestStepApiModel> afterFinish = new ArrayList<>();
                             afterFinish.addAll(afterEach);
                             afterFinish.addAll(afterClass);
                             afterFinish.addAll(afterAll);
 
                             AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
 
-                            AutoTestModel autoTestModel = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
+                            AutoTestApiResult AutoTestApiResult = Converter.convertAutoTestApiResultToAutoTestApiResult(autoTestApiResult);
 
                             AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
                                     test,
@@ -305,8 +305,8 @@ public class HttpWriter implements Writer {
                             autoTestResultsForTestRunModel.setSetupResults(beforeResultFinish);
                             autoTestResultsForTestRunModel.setTeardownResults(afterResultFinish);
 
-                            if (autoTestModel == null) {
-                                AutoTestPostModel model = Converter.prepareToCreateAutoTest(
+                            if (AutoTestApiResult == null) {
+                                AutoTestCreateApiModel model = Converter.prepareToCreateAutoTest(
                                         test,
                                         config.getProjectId()
                                 );
@@ -315,21 +315,20 @@ public class HttpWriter implements Writer {
                                 model.setTeardown(afterFinish);
                                 bulkHelper.addForCreate(model, autoTestResultsForTestRunModel);
                             } else {
-                                AutoTestPutModel model = Converter.prepareToUpdateAutoTest(
+                                AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
                                         test,
-                                        autoTestModel,
+                                        AutoTestApiResult,
                                         config.getProjectId()
                                 );
 
                                 model.setSetup(beforeFinish);
                                 model.setTeardown(afterFinish);
 
-                                String id = autoTestModel.getGlobalId().toString();
+                                String id = AutoTestApiResult.getGlobalId().toString();
                                 List<String> wi = test.getWorkItemIds();
 
-                                Map<String, List<String>> autotestLinksToWIForUpdate = Map.of(
-                                        id, wi
-                                );
+                                Map<String, List<String>> autotestLinksToWIForUpdate = new HashMap<>();
+                                autotestLinksToWIForUpdate.put(id, wi);
 
                                 bulkHelper.addForUpdate(
                                         model,

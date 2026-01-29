@@ -58,10 +58,10 @@ public interface ApiClient {
     AutoTestApiResult getAutoTestByExternalId(String externalId) throws ApiException;
 
     // Создать новый автотест
-    String createAutoTest(AutoTestPostModel model) throws ApiException;
+    String createAutoTest(AutoTestCreateApiModel model) throws ApiException;
 
     // Обновить существующий автотест
-    void updateAutoTest(AutoTestPutModel model) throws ApiException;
+    void updateAutoTest(AutoTestUpdateApiModel model) throws ApiException;
 
     // Отправить результаты для тест-рана
     List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException;
@@ -117,11 +117,11 @@ public interface Writer {
 
 **Класс:** `ru.testit.writers.Converter`
 
-Мы столкнулись с небольшой деталью: формат данных, в котором адаптер хранит результаты ([Модели Результатов Тестирования](03_модели_результатов_тестирования_.md), например `TestResult`, `StepResult`), не полностью совпадает с форматом, который ожидает API Test IT (модели из `ru.testit.client.model`, например `AutoTestPostModel`, `AutoTestResultsForTestRunModel`).
+Мы столкнулись с небольшой деталью: формат данных, в котором адаптер хранит результаты ([Модели Результатов Тестирования](03_модели_результатов_тестирования_.md), например `TestResult`, `StepResult`), не полностью совпадает с форматом, который ожидает API Test IT (модели из `ru.testit.client.model`, например `AutoTestCreateApiModel`, `AutoTestResultsForTestRunModel`).
 
 Класс `Converter` — это статический вспомогательный класс, который выполняет преобразование между нашими внутренними моделями и моделями, понятными для `ApiClient`.
 
-Представьте, что `TestResult` — это ваш черновик отчета, а `AutoTestPostModel` — это официальный бланк, который принимает API. `Converter` заполняет этот бланк на основе вашего черновика.
+Представьте, что `TestResult` — это ваш черновик отчета, а `AutoTestCreateApiModel` — это официальный бланк, который принимает API. `Converter` заполняет этот бланк на основе вашего черновика.
 
 ```java
 // Пример метода из Converter.java (упрощенно)
@@ -134,8 +134,8 @@ import ru.testit.models.TestResult; // Наша модель
 public class Converter {
 
     // Преобразует наш TestResult в модель для создания нового автотеста
-    public static AutoTestPostModel testResultToAutoTestPostModel(TestResult result) {
-        AutoTestPostModel model = new AutoTestPostModel(); // Создаем "официальный бланк"
+    public static AutoTestCreateApiModel testResultToAutoTestCreateApiModel(TestResult result) {
+        AutoTestCreateApiModel model = new AutoTestCreateApiModel(); // Создаем "официальный бланк"
 
         // Переносим данные из нашего "черновика" (result) в "бланк" (model)
         model.setExternalId(result.getExternalId());
@@ -194,16 +194,16 @@ sequenceDiagram
     ApiClient-->>Writer: autoTestApiResult (информация о тесте или null)
 
     alt Тест уже существует
-        Writer->>Converter: testResultToAutoTestPutModel(testResult) // "Преобразуй для обновления"
-        Converter-->>Writer: AutoTestPutModel (данные для обновления)
-        Writer->>ApiClient: updateAutoTest(AutoTestPutModel) // "Обнови автотест"
+        Writer->>Converter: testResultToAutoTestUpdateApiModel(testResult) // "Преобразуй для обновления"
+        Converter-->>Writer: AutoTestUpdateApiModel (данные для обновления)
+        Writer->>ApiClient: updateAutoTest(AutoTestUpdateApiModel) // "Обнови автотест"
         ApiClient->>TestIT: Запрос PUT /api/v2/autoTests
         TestIT-->>ApiClient: Ответ (успех/ошибка)
         ApiClient-->>Writer: Результат обновления
     else Тест новый
-        Writer->>Converter: testResultToAutoTestPostModel(testResult) // "Преобразуй для создания"
-        Converter-->>Writer: AutoTestPostModel (данные для создания)
-        Writer->>ApiClient: createAutoTest(AutoTestPostModel) // "Создай автотест"
+        Writer->>Converter: testResultToAutoTestCreateApiModel(testResult) // "Преобразуй для создания"
+        Converter-->>Writer: AutoTestCreateApiModel (данные для создания)
+        Writer->>ApiClient: createAutoTest(AutoTestCreateApiModel) // "Создай автотест"
         ApiClient->>TestIT: Запрос POST /api/v2/autoTests
         TestIT-->>ApiClient: Ответ (ID нового теста)
         ApiClient-->>Writer: ID созданного теста
@@ -305,17 +305,17 @@ public class HttpWriter implements Writer {
             String autoTestId; // ID автотеста в Test Tt
 
             // 2. Конвертируем найденный результат API в нашу модель (если он есть)
-            AutoTestModel existingAutotest = Converter.convertAutoTestApiResultToAutoTestModel(autoTestApiResult);
+            AutoTestApiResult existingAutotest = Converter.convertAutoTestApiResultToAutoTestApiResult(autoTestApiResult);
 
             if (existingAutotest != null) {
                 // 3а. Если автотест есть - готовим модель для ОБНОВЛЕНИЯ
-                AutoTestPutModel autoTestPutModel = prepareToUpdateAutoTest(testResult, existingAutotest);
+                AutoTestUpdateApiModel AutoTestUpdateApiModel = prepareToUpdateAutoTest(testResult, existingAutotest);
                 // Обновляем автотест через API клиент
-                apiClient.updateAutoTest(autoTestPutModel);
+                apiClient.updateAutoTest(AutoTestUpdateApiModel);
                 autoTestId = existingAutotest.getId().toString();
             } else {
                 // 3б. Если автотеста нет - готовим модель для СОЗДАНИЯ
-                AutoTestPostModel model = prepareToCreateAutoTest(testResult);
+                AutoTestCreateApiModel model = prepareToCreateAutoTest(testResult);
                 // Создаем автотест через API клиент
                 autoTestId = apiClient.createAutoTest(model);
             }
@@ -338,17 +338,17 @@ public class HttpWriter implements Writer {
         }
     }
 
-    // Вспомогательный метод: использует Converter для создания модели AutoTestPostModel
-    private AutoTestPostModel prepareToCreateAutoTest(TestResult testResult) throws ApiException {
-        AutoTestPostModel model = Converter.testResultToAutoTestPostModel(testResult);
+    // Вспомогательный метод: использует Converter для создания модели AutoTestCreateApiModel
+    private AutoTestCreateApiModel prepareToCreateAutoTest(TestResult testResult) throws ApiException {
+        AutoTestCreateApiModel model = Converter.testResultToAutoTestCreateApiModel(testResult);
         model.setProjectId(UUID.fromString(config.getProjectId()));
         // ... (возможно, получаем UUID для Work Items через apiClient) ...
         return model;
     }
 
-    // Вспомогательный метод: использует Converter для создания модели AutoTestPutModel
-    private AutoTestPutModel prepareToUpdateAutoTest(TestResult testResult, AutoTestModel autotest) throws ApiException {
-        AutoTestPutModel model = Converter.testResultToAutoTestPutModel(testResult);
+    // Вспомогательный метод: использует Converter для создания модели AutoTestUpdateApiModel
+    private AutoTestUpdateApiModel prepareToUpdateAutoTest(TestResult testResult, AutoTestApiResult autotest) throws ApiException {
+        AutoTestUpdateApiModel model = Converter.testResultToAutoTestUpdateApiModel(testResult);
         model.setProjectId(UUID.fromString(config.getProjectId()));
         // ... (логика объединения ссылок, установка флага isFlaky и т.д.) ...
         // ... (возможно, получаем UUID для Work Items) ...

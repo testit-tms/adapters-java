@@ -4,10 +4,10 @@
 //import org.junit.jupiter.api.Test;
 //import ru.testit.Helper;
 //import ru.testit.client.invoker.ApiException;
-//import ru.testit.client.model.AutoTestModel;
-//import ru.testit.client.model.AutoTestPostModel;
-//import ru.testit.client.model.LinkPutModel;
-//import ru.testit.client.model.AutoTestPutModel;
+//import ru.testit.client.model.AutoTestApiResult;
+//import ru.testit.client.model.AutoTestCreateApiModel;
+//import ru.testit.client.model.LinkApiResult;
+//import ru.testit.client.model.AutoTestUpdateApiModel;
 //import ru.testit.clients.ApiClient;
 //import ru.testit.clients.ClientConfiguration;
 //import ru.testit.models.*;
@@ -42,8 +42,8 @@
 //    void writeTest_WithExistingAutoTest_InvokeUpdateHandler() throws ApiException {
 //        // arrange
 //        TestResult testResult = Helper.generateTestResult();
-//        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-//        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+//        AutoTestApiResult response = Helper.generateAutoTestApiResult(config.getProjectId());
+//        AutoTestUpdateApiModel request = Helper.generateAutoTestUpdateApiModel(config.getProjectId());
 //        List<UUID> uuids = Helper.generateListUuid();
 //        request.setId(null);
 //
@@ -63,7 +63,7 @@
 //    void writeTest_WithCreatingAutoTest_InvokeCreateHandler() throws ApiException {
 //        // arrange
 //        TestResult testResult = Helper.generateTestResult();
-//        AutoTestPostModel request = Helper.generateAutoTestPostModel(config.getProjectId());
+//        AutoTestCreateApiModel request = Helper.generateAutoTestCreateApiModel(config.getProjectId());
 //        List<UUID> uuids = Helper.generateListUuid();
 //
 //        when(client.getAutoTestByExternalId(testResult.getExternalId())).thenReturn(null);
@@ -82,7 +82,7 @@
 //    void writeTest_WithWorkItemId_InvokeLinkHandler() throws ApiException {
 //        // arrange
 //        TestResult testResult = Helper.generateTestResult();
-//        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+//        AutoTestApiResult response = Helper.generateAutoTestApiResult(config.getProjectId());
 //        String autotestId = response.getId().toString();
 //        List<String> workItemGlobalId = testResult.getWorkItemIds();
 //        List<UUID> uuids = Helper.generateListUuid();
@@ -120,7 +120,7 @@
 //    void writeTest_FiledExistingAutoTest_NoInvokeLinkHandler() throws ApiException {
 //        // arrange
 //        TestResult testResult = Helper.generateTestResult().setItemStatus(ItemStatus.FAILED);
-//        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+//        AutoTestApiResult response = Helper.generateAutoTestApiResult(config.getProjectId());
 //        List<UUID> uuids = Helper.generateListUuid();
 //
 //        when(client.getAutoTestByExternalId(testResult.getExternalId())).thenReturn(response);
@@ -145,17 +145,17 @@
 //        List<UUID> uuids = Helper.generateListUuid();
 //
 //        TestResult testResult = Helper.generateTestResult().setItemStatus(ItemStatus.FAILED).setLinkItems(links);
-//        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+//        AutoTestApiResult response = Helper.generateAutoTestApiResult(config.getProjectId());
 //
-//        List<LinkPutModel> putLinks = new ArrayList<>();
-//        LinkPutModel putLink = new LinkPutModel();
+//        List<LinkApiResult> putLinks = new ArrayList<>();
+//        LinkApiResult putLink = new LinkApiResult();
 //        putLink.setTitle("Title");
 //        putLink.setDescription("Description");
 //        putLink.setUrl("http://test.example/bug123");
 //        putLink.setType(ru.testit.client.model.LinkType.DEFECT);
 //        putLinks.add(putLink);
 //
-//        AutoTestPutModel putModel = Helper.generateAutoTestPutModel(config.getProjectId());
+//        AutoTestUpdateApiModel putModel = Helper.generateAutoTestUpdateApiModel(config.getProjectId());
 //        putModel.links(putLinks);
 //
 //        when(client.getAutoTestByExternalId(testResult.getExternalId())).thenReturn(response);
@@ -174,8 +174,8 @@
 //    void writeTest_Failed_InvokeSendTestResult() throws ApiException {
 //        // arrange
 //        TestResult testResult = Helper.generateTestResult();
-//        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-//        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+//        AutoTestApiResult response = Helper.generateAutoTestApiResult(config.getProjectId());
+//        AutoTestUpdateApiModel request = Helper.generateAutoTestUpdateApiModel(config.getProjectId());
 //        request.setId(null);
 //
 //        when(client.getAutoTestByExternalId(testResult.getExternalId())).thenReturn(response);
@@ -205,7 +205,7 @@
 //        writer.writeClass(container);
 //
 //        // assert
-//        verify(client, never()).updateAutoTest(any(AutoTestPutModel.class));
+//        verify(client, never()).updateAutoTest(any(AutoTestUpdateApiModel.class));
 //    }
 //
 //    @Test
@@ -213,8 +213,8 @@
 //        // arrange
 //        ClassContainer container = Helper.generateClassContainer();
 //        TestResult testResult = Helper.generateTestResult();
-//        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
-//        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+//        AutoTestApiResult response = Helper.generateAutoTestApiResult(config.getProjectId());
+//        AutoTestUpdateApiModel request = Helper.generateAutoTestUpdateApiModel(config.getProjectId());
 //        request.getSetup().add(Helper.generateBeforeEachSetup());
 //        request.getTeardown().add(Helper.generateAfterEachSetup());
 //
@@ -247,7 +247,7 @@
 //        writer.writeTests(container);
 //
 //        // assert
-//        verify(client, never()).updateAutoTest(any(AutoTestPutModel.class));
+//        verify(client, never()).updateAutoTest(any(AutoTestUpdateApiModel.class));
 //        verify(client, never()).updateTestResult(any(), any());
 //    }
 //
@@ -259,11 +259,11 @@
 //        MainContainer container = Helper.generateMainContainer();
 //        ClassContainer classContainer = Helper.generateClassContainer();
 //        TestResult testResult = Helper.generateTestResult();
-//        AutoTestModel response = Helper.generateAutoTestModel(config.getProjectId());
+//        AutoTestApiResult response = Helper.generateAutoTestApiResult(config.getProjectId());
 //        response.getSetup().add(Helper.generateBeforeEachSetup());
 //        response.getTeardown().add(Helper.generateAfterEachSetup());
 //
-//        AutoTestPutModel request = Helper.generateAutoTestPutModel(config.getProjectId());
+//        AutoTestUpdateApiModel request = Helper.generateAutoTestUpdateApiModel(config.getProjectId());
 //        request.getSetup().add(Helper.generateBeforeAllSetup());
 //        request.getSetup().add(Helper.generateBeforeEachSetup());
 //        request.getTeardown().add(Helper.generateAfterEachSetup());

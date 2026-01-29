@@ -86,25 +86,25 @@ public class TmsApiClient implements ITmsApiClient {
     }
 
     @Override
-    public void updateAutoTest(AutoTestPutModel model) throws ApiException {
+    public void updateAutoTest(AutoTestUpdateApiModel model) throws ApiException {
         // Escape HTML tags in model before sending
         autoTestsApi.updateAutoTest(model);
     }
 
     @Override
-    public String createAutoTest(AutoTestPostModel model) throws ApiException {
+    public String createAutoTest(AutoTestCreateApiModel model) throws ApiException {
         // Escape HTML tags in model before sending
         return Objects.requireNonNull(autoTestsApi.createAutoTest(model).getId()).toString();
     }
 
     @Override
-    public void updateAutoTests(List<AutoTestPutModel> models) throws ApiException {
+    public void updateAutoTests(List<AutoTestUpdateApiModel> models) throws ApiException {
         // Escape HTML tags in models before sending
         autoTestsApi.updateMultiple(models);
     }
 
     @Override
-    public List<AutoTestModel> createAutoTests(List<AutoTestPostModel> models) throws ApiException {
+    public List<AutoTestApiResult> createAutoTests(List<AutoTestCreateApiModel> models) throws ApiException {
         // Escape HTML tags in models before sending
         return autoTestsApi.createMultiple(models);
     }
@@ -212,7 +212,7 @@ public class TmsApiClient implements ITmsApiClient {
     }
 
     @Override
-    public List<WorkItemIdentifierModel> getWorkItemsLinkedToTest(String id) throws ApiException {
+    public List<AutoTestWorkItemIdentifierApiResult> getWorkItemsLinkedToTest(String id) throws ApiException {
         return autoTestsApi.getWorkItemsLinkedToAutoTest(id, false, false);
     }
 
