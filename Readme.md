@@ -15,8 +15,11 @@ The repository contains new versions of adaptors for JVM-based test frameworks.
 | 5.3     | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 |
 | 5.4     | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 |
 | 5.5     | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 |
-| Cloud   | 2.8.4         | 2.8.4         | 2.8.4         | 2.8.4         |
+| Cloud   | 2.8.4 +       | 2.8.4 +       | 2.8.4 +       | 2.8.4 +       |
 
+1. For current versions, see the releases tab. 
+2. Starting with 5.2, we have added a TMS postscript, which means that the utility is compatible with a specific enterprise version. 
+3. If you are in doubt about which version to use, check with the support staff. support@yoonion.ru
 
 
 Supported test frameworks :
