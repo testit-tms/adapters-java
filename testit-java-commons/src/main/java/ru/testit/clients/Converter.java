@@ -190,7 +190,7 @@ public class Converter {
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
                     model.setType(LinkType.fromValue(link.getType().getValue()));
-                    // model.setHasInfo(false);
+                    model.setHasInfo(false);
 
                     return model;
                 }
@@ -206,7 +206,7 @@ public class Converter {
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
                     model.setType(LinkType.fromValue(link.getType().getValue()));
-                    // model.setHasInfo(false);
+                    model.setHasInfo(false);
 
                     return model;
                 }
@@ -222,7 +222,7 @@ public class Converter {
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
                     model.setType(LinkType.fromValue(link.getType().getValue()));
-                    // model.setHasInfo(false);
+                    model.setHasInfo(false);
 
                     return model;
                 }
