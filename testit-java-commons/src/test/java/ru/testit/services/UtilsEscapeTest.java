@@ -213,6 +213,19 @@ class UtilsEscapeTest {
     }
 
     @Test
+    void testEscapeHtmlInObjectWithSomeParameter() {
+        // Test object with empty list
+        TestObjectWithStringList obj = new TestObjectWithStringList();
+        obj.name = "Test <object href=\"\">";
+        obj.tags = new ArrayList<>(); // empty list
+        
+        HtmlEscapeUtils.escapeHtmlInObject(obj);
+        
+        Assertions.assertEquals("Test &lt;object href=\"\"&gt;", obj.name);
+        Assertions.assertTrue(obj.tags.isEmpty());
+    }
+
+    @Test
     void testEscapeHtmlInObjectWithNullList() {
         // Test object with null list
         TestObjectWithStringList obj = new TestObjectWithStringList();
