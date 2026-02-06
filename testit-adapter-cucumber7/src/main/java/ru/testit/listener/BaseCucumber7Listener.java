@@ -226,7 +226,7 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
             );
 
             final StepResult stepResult = new StepResult()
-                    .setName(String.format("%s %s", stepKeyword, pickleStep.getStep().getText()))
+                    .setTitle(String.format("%s %s", stepKeyword, pickleStep.getStep().getText()))
                     .setStart(System.currentTimeMillis())
                     .setParameters(parameters);
 
@@ -304,7 +304,7 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
 
     private void initHook(final HookTestStep hook) {
         final FixtureResult hookResult = new FixtureResult()
-                .setName(hook.getCodeLocation())
+                .setTitle(hook.getCodeLocation())
                 .setStart(System.currentTimeMillis());
 
         if (hook.getHookType() == HookType.BEFORE) {

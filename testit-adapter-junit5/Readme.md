@@ -296,6 +296,16 @@ Description of methods:
 - `Adapter.addLinks` - add links to the autotest result.
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
+- `Adapter.addWorkItemIds` - a dynamic method that links autotests with manual tests. Receives the array of manual tests' IDs
+- `Adapter.addDisplayName` - a dynamic method for adding internal autotest name (used in Test IT)
+- `Adapter.addExternalId` - a dynamic method for adding unique internal autotest ID (used in Test IT)
+- `Adapter.addTitle` - a dynamic method for adding autotest name specified in the autotest card or the step. If not specified, the name from the displayName method is used
+- `Adapter.addDescription` - a dynamic method for adding autotest description specified in the autotest card or the step
+- `Adapter.addLabels` - a dynamic method for adding tags listed in the autotest card
+- `Adapter.addNameSpace` - a dynamic method for adding directory in the TMS system
+- `Adapter.addClassName` - a dynamic method for adding subdirectory in the TMS system
+- `Adapter.addParameter` - a dynamic method for adding parameter in the autotest result or the step
+- `Adapter.addParameters` - a dynamic method for adding parameters in the autotest result or the step
 
 ### Examples
 

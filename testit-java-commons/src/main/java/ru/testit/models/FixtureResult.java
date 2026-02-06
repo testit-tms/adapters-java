@@ -12,8 +12,8 @@ import java.util.Map;
  * Model describes fixture.
  */
 
-public class FixtureResult implements ResultWithSteps, ResultWithAttachments, Serializable {
-    private String name;
+public class FixtureResult implements ResultWithSteps, ResultWithAttachments, ResultWithParameters, ResultWithTitle, ResultWithDescription, Serializable {
+    private String title;
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
@@ -26,22 +26,22 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments, Se
     private Map<String, String> parameters;
 
     /**
-     * Gets name.
+     * Gets title.
      *
-     * @return the name
+     * @return the title
      */
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
     /**
-     * Sets name.
+     * Sets title.
      *
-     * @param name the value
+     * @param title the value
      * @return self for method chaining
      */
-    public FixtureResult setName(String name) {
-        this.name = HtmlEscapeUtils.escapeHtmlTags(name);
+    public FixtureResult setTitle(String title) {
+        this.title = HtmlEscapeUtils.escapeHtmlTags(title);
         return this;
     }
 
@@ -246,10 +246,9 @@ public class FixtureResult implements ResultWithSteps, ResultWithAttachments, Se
     }
 
     public String toString() {
-
         StringBuilder sb = new StringBuilder();
         sb.append("class FixtureResult {\n");
-        sb.append("    name: ").append(Utils.toIndentedString(this.name)).append("\n");
+        sb.append("    title: ").append(Utils.toIndentedString(this.title)).append("\n");
         sb.append("    itemStatus: ").append(Utils.toIndentedString(this.itemStatus)).append("\n");
         sb.append("    itemStage: ").append(Utils.toIndentedString(this.itemStage)).append("\n");
         sb.append("    description: ").append(Utils.toIndentedString(this.description)).append("\n");

@@ -128,7 +128,7 @@ public class SelenideListener implements LogEventListener {
         if (stepsShouldBeLogged(currentLog)) {
             adapterManager.getCurrentTestCaseOrStep().ifPresent(parentUuid -> {
                 final String uuid = UUID.randomUUID().toString();
-                adapterManager.startStep(parentUuid, uuid, new StepResult().setName(currentLog.toString()));
+                adapterManager.startStep(parentUuid, uuid, new StepResult().setTitle(currentLog.toString()));
             });
         }
     }
