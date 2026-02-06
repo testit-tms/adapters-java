@@ -2,6 +2,7 @@ package ru.testit.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.properties.AppProperties;
@@ -111,5 +112,55 @@ public final class Adapter {
 
     public static void addMessage(String message) {
         getAdapterManager().updateTestCase(testResult -> testResult.setMessage(message));
+    }
+
+    public static void addParameters(Map<String, String> parameters) {
+        getAdapterManager().addParameters(parameters);
+    }
+
+    public static void addParameter(String key, String value) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put(key, value);
+
+        addParameters(parameters);
+    }
+
+    public static void addTitle(String title) {
+        getAdapterManager().addTitle(title);
+    }
+
+    public static void addDisplayName(String displayName) {
+        getAdapterManager().updateTestCase(testResult -> testResult.setName(displayName));
+    }
+
+    public static void addDescription(String description) {
+        getAdapterManager().addDescription(description);
+    }
+
+    public static void addNameSpace(String nameSpace) {
+        getAdapterManager().updateTestCase(testResult -> testResult.setSpaceName(nameSpace));
+    }
+
+    public static void addClassName(String className) {
+        getAdapterManager().updateTestCase(testResult -> testResult.setClassName(className));
+    }
+
+    public static void addExternalId(String externalId) {
+        getAdapterManager().updateTestCase(testResult -> testResult.setExternalId(externalId));
+    }
+
+    public static void addWorkItemIds(String[] workItemIds) {
+        getAdapterManager().updateTestCase(testResult -> testResult.setWorkItemIds(Arrays.asList(workItemIds)));
+    }
+
+    public static void addLabels(String[] labels) {
+        final List<Label> modifyLabels = new LinkedList<>();
+
+        for (final String label : labels) {
+            final Label modifyLabel = new Label().setName(label);
+            modifyLabels.add(modifyLabel);
+        }
+
+        getAdapterManager().updateTestCase(testResult -> testResult.setLabels(modifyLabels));
     }
 }

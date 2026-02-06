@@ -781,6 +781,66 @@ public class AdapterManager {
         );
     }
 
+    public void addParameters(Map<String, String> parameters) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
+        final Optional<String> current = threadContext.getCurrent();
+        if (!current.isPresent()) {
+            LOGGER.error("Could not add parameter: no test is running");
+            return;
+        }
+
+        storage.get(current.get(), ResultWithParameters.class).ifPresent(
+                result -> {
+                    synchronized (storage) {
+                        result.getParameters().putAll(parameters);
+                    }
+                }
+        );
+    }
+
+    public void addTitle(String title) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
+        final Optional<String> current = threadContext.getCurrent();
+        if (!current.isPresent()) {
+            LOGGER.error("Could not set title: no test is running");
+            return;
+        }
+
+        storage.get(current.get(), ResultWithTitle.class).ifPresent(
+                result -> {
+                    synchronized (storage) {
+                        result.setTitle(title);
+                    }
+                }
+        );
+    }
+
+    public void addDescription(String description) {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return;
+        }
+
+        final Optional<String> current = threadContext.getCurrent();
+        if (!current.isPresent()) {
+            LOGGER.error("Could not set description: no test is running");
+            return;
+        }
+
+        storage.get(current.get(), ResultWithDescription.class).ifPresent(
+                result -> {
+                    synchronized (storage) {
+                        result.setDescription(description);
+                    }
+                }
+        );
+    }
+
     public boolean isFilteredMode() {
         return adapterConfig.getMode() == AdapterMode.USE_FILTER;
     }
