@@ -204,9 +204,7 @@ public class AdapterManager {
         }
 
         storage.getTestsContainer(parentUuid).ifPresent(parent -> {
-            synchronized (storage) {
-                parent.getChildren().add(container.getUuid());
-            }
+            storage.updateIfPresent(parentUuid, MainContainer.class, p -> p.getChildren().add(container.getUuid()));
         });
         container.setStart(System.currentTimeMillis());
         storage.put(container.getUuid(), container);
@@ -405,9 +403,7 @@ public class AdapterManager {
         }
 
         storage.getTestsContainer(parentUuid).ifPresent(container -> {
-            synchronized (storage) {
-                container.getBeforeMethods().add(result);
-            }
+            storage.updateIfPresent(parentUuid, MainContainer.class, c -> c.getBeforeMethods().add(result));
         });
         startFixture(uuid, result);
     }
@@ -429,9 +425,7 @@ public class AdapterManager {
         }
 
         storage.getTestsContainer(parentUuid).ifPresent(container -> {
-            synchronized (storage) {
-                container.getAfterMethods().add(result);
-            }
+            storage.updateIfPresent(parentUuid, MainContainer.class, c -> c.getAfterMethods().add(result));
         });
 
         startFixture(uuid, result);
@@ -454,9 +448,7 @@ public class AdapterManager {
         }
 
         storage.getClassContainer(parentUuid).ifPresent(container -> {
-            synchronized (storage) {
-                container.getBeforeClassMethods().add(result);
-            }
+            storage.updateIfPresent(parentUuid, ClassContainer.class, c -> c.getBeforeClassMethods().add(result));
         });
 
         startFixture(uuid, result);
@@ -479,9 +471,7 @@ public class AdapterManager {
         }
 
         storage.getClassContainer(parentUuid).ifPresent(container -> {
-            synchronized (storage) {
-                container.getAfterClassMethods().add(result);
-            }
+            storage.updateIfPresent(parentUuid, ClassContainer.class, c -> c.getAfterClassMethods().add(result));
         });
 
         startFixture(uuid, result);
@@ -504,9 +494,7 @@ public class AdapterManager {
         }
 
         storage.getClassContainer(parentUuid).ifPresent(container -> {
-            synchronized (storage) {
-                container.getBeforeEachTest().add(result);
-            }
+            storage.updateIfPresent(parentUuid, ClassContainer.class, c -> c.getBeforeEachTest().add(result));
         });
 
         startFixture(uuid, result);
@@ -529,9 +517,7 @@ public class AdapterManager {
         }
 
         storage.getClassContainer(parentUuid).ifPresent(container -> {
-            synchronized (storage) {
-                container.getAfterEachTest().add(result);
-            }
+            storage.updateIfPresent(parentUuid, ClassContainer.class, c -> c.getAfterEachTest().add(result));
         });
 
         startFixture(uuid, result);
@@ -649,9 +635,7 @@ public class AdapterManager {
 
         storage.put(uuid, result);
         storage.get(parentUuid, ResultWithSteps.class).ifPresent(parentStep -> {
-            synchronized (storage) {
-                parentStep.getSteps().add(result);
-            }
+            storage.updateIfPresent(parentUuid, ResultWithSteps.class, p -> p.getSteps().add(result));
         });
 
         if (LOGGER.isDebugEnabled()) {
@@ -774,9 +758,7 @@ public class AdapterManager {
 
         storage.get(current.get(), ResultWithAttachments.class).ifPresent(
                 result -> {
-                    synchronized (storage) {
-                        result.getAttachments().addAll(uuids);
-                    }
+                    storage.updateIfPresent(current.get(), ResultWithAttachments.class, r -> r.getAttachments().addAll(uuids));
                 }
         );
     }
@@ -794,9 +776,8 @@ public class AdapterManager {
 
         storage.get(current.get(), ResultWithParameters.class).ifPresent(
                 result -> {
-                    synchronized (storage) {
-                        result.getParameters().putAll(parameters);
-                    }
+                    storage.updateIfPresent(
+                            current.get(), ResultWithParameters.class, r -> r.getParameters().putAll(parameters));
                 }
         );
     }
@@ -814,9 +795,7 @@ public class AdapterManager {
 
         storage.get(current.get(), ResultWithTitle.class).ifPresent(
                 result -> {
-                    synchronized (storage) {
-                        result.setTitle(title);
-                    }
+                    storage.updateIfPresent(current.get(), ResultWithTitle.class, r -> r.setTitle(title));
                 }
         );
     }
@@ -834,9 +813,8 @@ public class AdapterManager {
 
         storage.get(current.get(), ResultWithDescription.class).ifPresent(
                 result -> {
-                    synchronized (storage) {
-                        result.setDescription(description);
-                    }
+                    storage.updateIfPresent(
+                            current.get(), ResultWithDescription.class, r -> r.setDescription(description));
                 }
         );
     }
