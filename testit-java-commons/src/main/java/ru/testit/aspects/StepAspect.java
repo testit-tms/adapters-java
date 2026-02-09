@@ -52,7 +52,7 @@ public class StepAspect {
         }
 
         final StepResult result = new StepResult()
-                .setName(Utils.extractTitle(method, stepParameters, false))
+                .setTitle(Utils.extractTitle(method, stepParameters, false))
                 .setDescription(Utils.extractDescription(method, stepParameters))
                 .setParameters(stepParameters);
 

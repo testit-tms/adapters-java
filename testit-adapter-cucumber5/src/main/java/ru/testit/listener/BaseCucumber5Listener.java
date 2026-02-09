@@ -194,7 +194,7 @@ public class BaseCucumber5Listener implements ConcurrentEventListener {
             ).orElse("UNDEFINED");
 
             final StepResult stepResult = new StepResult()
-                    .setName(String.format("%s %s", stepKeyword, pickleStep.getStep().getText()))
+                    .setTitle(String.format("%s %s", stepKeyword, pickleStep.getStep().getText()))
                     .setStart(System.currentTimeMillis());
 
             adapterManager.startStep(getTestCaseUuid(currentTestCase.get()), getStepUuid(pickleStep), stepResult);
@@ -271,7 +271,7 @@ public class BaseCucumber5Listener implements ConcurrentEventListener {
 
     private void initHook(final HookTestStep hook) {
         final FixtureResult hookResult = new FixtureResult()
-                .setName(hook.getCodeLocation())
+                .setTitle(hook.getCodeLocation())
                 .setStart(System.currentTimeMillis());
 
         if (hook.getHookType() == HookType.BEFORE) {

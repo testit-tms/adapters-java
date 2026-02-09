@@ -145,7 +145,7 @@ public class BaseJbehaveListener extends NullStoryReporter {
     @Override
     public void beforeStep(final String step) {
         final StepResult stepResult = new StepResult()
-                .setName(step)
+                .setTitle(step)
                 .setStart(System.currentTimeMillis());
 
         adapterManager.startStep(

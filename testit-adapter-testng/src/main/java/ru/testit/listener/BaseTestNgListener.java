@@ -308,7 +308,7 @@ public class BaseTestNgListener implements
         final Method method = testMethod.getConstructorOrMethod().getMethod();
 
         return new FixtureResult()
-                .setName(Utils.extractTitle(method, null, false))
+                .setTitle(Utils.extractTitle(method, null, false))
                 .setDescription(Utils.extractDescription(method, null))
                 .setStart(System.currentTimeMillis())
                 .setItemStage(ItemStage.RUNNING);

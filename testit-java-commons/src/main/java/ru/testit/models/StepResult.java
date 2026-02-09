@@ -12,8 +12,8 @@ import java.util.Map;
  * Model describes step.
  */
 
-public class StepResult implements ResultWithSteps, ResultWithAttachments, Serializable {
-    private String name;
+public class StepResult implements ResultWithSteps, ResultWithAttachments, ResultWithParameters, ResultWithTitle, ResultWithDescription, Serializable {
+    private String title;
     private ItemStatus itemStatus;
     private ItemStage itemStage;
     private String description;
@@ -26,22 +26,22 @@ public class StepResult implements ResultWithSteps, ResultWithAttachments, Seria
     private Map<String, String> parameters;
 
     /**
-     * Gets name.
+     * Gets title.
      *
-     * @return the name
+     * @return the title
      */
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
     /**
-     * Sets name.
+     * Sets title.
      *
-     * @param name the value
+     * @param title the value
      * @return self for method chaining
      */
-    public StepResult setName(String name) {
-        this.name = HtmlEscapeUtils.escapeHtmlTags(name);
+    public StepResult setTitle(String title) {
+        this.title = HtmlEscapeUtils.escapeHtmlTags(title);
         return this;
     }
 
@@ -248,7 +248,7 @@ public class StepResult implements ResultWithSteps, ResultWithAttachments, Seria
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class StepResult {\n");
-        sb.append("    name: ").append(Utils.toIndentedString(this.name)).append("\n");
+        sb.append("    title: ").append(Utils.toIndentedString(this.title)).append("\n");
         sb.append("    itemStatus: ").append(Utils.toIndentedString(this.itemStatus)).append("\n");
         sb.append("    itemStage: ").append(Utils.toIndentedString(this.itemStage)).append("\n");
         sb.append("    description: ").append(Utils.toIndentedString(this.description)).append("\n");

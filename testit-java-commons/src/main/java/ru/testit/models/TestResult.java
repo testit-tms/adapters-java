@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * The model object that stores information about test that was run.
  */
-public class TestResult implements ResultWithSteps, ResultWithAttachments, Serializable {
+public class TestResult implements ResultWithSteps, ResultWithAttachments, ResultWithParameters, ResultWithTitle, ResultWithDescription, Serializable {
     private String uuid;
     private String externalId;
     private List<String> workItemIds = new ArrayList<>();
@@ -476,7 +476,6 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Seria
     }
 
     public String toString() {
-
         StringBuilder sb = new StringBuilder();
         sb.append("class TestResult {\n");
         sb.append("    uuid: ").append(Utils.toIndentedString(this.uuid)).append("\n");

@@ -290,7 +290,7 @@ public class BaseJunit4Listener extends RunListener {
 
     private FixtureResult getFixtureResult(final Method method) {
         return new FixtureResult()
-            .setName(method.getName())
+            .setTitle(method.getName())
             .setDescription("") // JUnit 4 doesn't have built-in description for setup methods
             .setStart(System.currentTimeMillis())
             .setItemStage(ItemStage.RUNNING);

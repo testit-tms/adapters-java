@@ -189,7 +189,7 @@ public class Helper {
 
         StepResult result = new StepResult();
 
-        result.setName(STEP_TITLE);
+        result.setTitle(STEP_TITLE);
         result.setDescription(STEP_DESCRIPTION);
         result.setStart(startDate.getTime());
         result.setStop(stopDate.getTime());
@@ -205,7 +205,7 @@ public class Helper {
 
         FixtureResult fixtureResult = new FixtureResult();
 
-        fixtureResult.setName(BEFORE_EACH_NAME)
+        fixtureResult.setTitle(BEFORE_EACH_NAME)
                 .setParent(TEST_UUID)
                 .setItemStatus(ItemStatus.PASSED)
                 .setDescription(BEFORE_EACH_DESCRIPTION)
@@ -221,7 +221,7 @@ public class Helper {
 
         FixtureResult fixtureResult = new FixtureResult();
 
-        fixtureResult.setName(AFTER_EACH_NAME)
+        fixtureResult.setTitle(AFTER_EACH_NAME)
                 .setParent(TEST_UUID)
                 .setItemStatus(ItemStatus.PASSED)
                 .setDescription(AFTER_EACH_DESCRIPTION)
@@ -257,7 +257,7 @@ public class Helper {
 
         FixtureResult fixtureResult = new FixtureResult();
 
-        fixtureResult.setName(BEFORE_ALL_NAME)
+        fixtureResult.setTitle(BEFORE_ALL_NAME)
                 .setParent(TEST_UUID)
                 .setItemStatus(ItemStatus.PASSED)
                 .setDescription(BEFORE_ALL_DESCRIPTION)
@@ -273,7 +273,7 @@ public class Helper {
 
         FixtureResult fixtureResult = new FixtureResult();
 
-        fixtureResult.setName(AFTER_ALL_NAME)
+        fixtureResult.setTitle(AFTER_ALL_NAME)
                 .setParent(TEST_UUID)
                 .setItemStatus(ItemStatus.PASSED)
                 .setDescription(AFTER_ALL_DESCRIPTION)

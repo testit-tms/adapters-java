@@ -47,7 +47,7 @@ public class Converter {
                 .map(fixture -> {
                             AutoTestStepModel model = new AutoTestStepModel();
 
-                            model.setTitle(fixture.getName());
+                            model.setTitle(fixture.getTitle());
                             model.setDescription(fixture.getDescription());
                             model.setSteps(convertSteps(fixture.getSteps()));
 
@@ -62,7 +62,7 @@ public class Converter {
                 .map(fixture -> {
                             AutoTestStepApiModel model = new AutoTestStepApiModel();
 
-                            model.setTitle(fixture.getName());
+                            model.setTitle(fixture.getTitle());
                             model.setDescription(fixture.getDescription());
                             model.setSteps(convertStepsToApiModels(fixture.getSteps()));
 
@@ -110,7 +110,7 @@ public class Converter {
                             AttachmentPutModelAutoTestStepResultsModel model =
                                     new AttachmentPutModelAutoTestStepResultsModel();
 
-                            model.setTitle(fixture.getName());
+                            model.setTitle(fixture.getTitle());
                             model.setDescription(fixture.getDescription());
                             model.setStartedOn(dateToOffsetDateTime(fixture.getStart()));
                             model.setCompletedOn(dateToOffsetDateTime(fixture.getStop()));
@@ -232,7 +232,7 @@ public class Converter {
     private static List<AutoTestStepModel> convertSteps(List<StepResult> steps) {
         return steps.stream().map(step -> {
             AutoTestStepModel model = new AutoTestStepModel();
-            model.setTitle(step.getName());
+            model.setTitle(step.getTitle());
             model.setDescription(step.getDescription());
             model.setSteps(convertSteps(step.getSteps()));
 
@@ -243,7 +243,7 @@ public class Converter {
     private static List<AutoTestStepApiModel> convertStepsToApiModels(List<StepResult> steps) {
         return steps.stream().map(step -> {
             AutoTestStepApiModel model = new AutoTestStepApiModel();
-            model.setTitle(step.getName());
+            model.setTitle(step.getTitle());
             model.setDescription(step.getDescription());
             model.setSteps(convertStepsToApiModels(step.getSteps()));
 
@@ -255,7 +255,7 @@ public class Converter {
         return steps.stream().map(step -> {
             AttachmentPutModelAutoTestStepResultsModel model = new AttachmentPutModelAutoTestStepResultsModel();
 
-            model.setTitle(step.getName());
+            model.setTitle(step.getTitle());
             model.setDescription(step.getDescription());
             model.setStartedOn(dateToOffsetDateTime(step.getStart()));
             model.setCompletedOn(dateToOffsetDateTime(step.getStop()));
