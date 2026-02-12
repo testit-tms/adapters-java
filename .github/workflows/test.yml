@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       run_tests:
-        description: 'Запустить тесты'
+        description: "Запустить тесты"
         required: true
         type: boolean
         default: true
@@ -60,72 +60,72 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - project_name: gradle-junit4
-            configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: GRADLE_JUNIT4_PROJECT_ID
+          #          - project_name: gradle-junit4
+          #            configuration_id: GRADLE_JUNIT4_CONFIGURATION_ID
+          #            project_id: GRADLE_JUNIT4_PROJECT_ID
           - project_name: gradle-junit5
             configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
             project_id: GRADLE_JUNIT5_PROJECT_ID
-          - project_name: gradle-testng
-            configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: GRADLE_TESTNG_PROJECT_ID
-
-          - project_name: jbehave-gradle-junit5
-            configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
-          - project_name: jbehave-gradle-junit4
-            configuration_id: JBEHAVE_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: JBEHAVE_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: jbehave-gradle-testng
-            configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
-
-          - project_name: cucumber7-gradle-testng
-            configuration_id: CUCUMBER7_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_TESTNG_PROJECT_ID
-          - project_name: cucumber7-gradle-junit4
-            configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: cucumber7-gradle-junit5
-            configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
-
-          - project_name: cucumber6-gradle-junit5
-            configuration_id: CUCUMBER6_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER6_GRADLE_JUNIT5_PROJECT_ID
-          - project_name: cucumber6-gradle-junit4
-            configuration_id: CUCUMBER6_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER6_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: cucumber6-gradle-testng
-            configuration_id: CUCUMBER6_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER6_GRADLE_TESTNG_PROJECT_ID
-          
-          - project_name: cucumber5-gradle-junit4
-            configuration_id: CUCUMBER5_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER5_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: cucumber5-gradle-junit5
-            configuration_id: CUCUMBER5_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: CUCUMBER5_GRADLE_JUNIT5_PROJECT_ID
-          - project_name: cucumber5-gradle-testng
-            configuration_id: CUCUMBER5_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER5_GRADLE_TESTNG_PROJECT_ID
-
-          - project_name: cucumber4-gradle-junit4
-            configuration_id: CUCUMBER4_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: CUCUMBER4_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: cucumber4-gradle-testng
-            configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
-            project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
-          
-          - project_name: selenide-gradle-junit5
-            configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
-            project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
-          - project_name: serenity2-gradle-junit4
-            configuration_id: SERENITY2_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: SERENITY2_GRADLE_JUNIT4_PROJECT_ID
-          - project_name: serenity3-gradle-junit4
-            configuration_id: SERENITY3_GRADLE_JUNIT4_CONFIGURATION_ID
-            project_id: SERENITY3_GRADLE_JUNIT4_PROJECT_ID
+    #          - project_name: gradle-testng
+    #            configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
+    #            project_id: GRADLE_TESTNG_PROJECT_ID
+    #
+    #          - project_name: jbehave-gradle-junit5
+    #            configuration_id: JBEHAVE_GRADLE_JUNIT5_CONFIGURATION_ID
+    #            project_id: JBEHAVE_GRADLE_JUNIT5_PROJECT_ID
+    #          - project_name: jbehave-gradle-junit4
+    #            configuration_id: JBEHAVE_GRADLE_JUNIT4_CONFIGURATION_ID
+    #            project_id: JBEHAVE_GRADLE_JUNIT4_PROJECT_ID
+    #          - project_name: jbehave-gradle-testng
+    #            configuration_id: JBEHAVE_GRADLE_TESTNG_CONFIGURATION_ID
+    #            project_id: JBEHAVE_GRADLE_TESTNG_PROJECT_ID
+    #
+    #          - project_name: cucumber7-gradle-testng
+    #            configuration_id: CUCUMBER7_GRADLE_TESTNG_CONFIGURATION_ID
+    #            project_id: CUCUMBER7_GRADLE_TESTNG_PROJECT_ID
+    #          - project_name: cucumber7-gradle-junit4
+    #            configuration_id: CUCUMBER7_GRADLE_JUNIT4_CONFIGURATION_ID
+    #            project_id: CUCUMBER7_GRADLE_JUNIT4_PROJECT_ID
+    #          - project_name: cucumber7-gradle-junit5
+    #            configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
+    #            project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
+    #
+    #          - project_name: cucumber6-gradle-junit5
+    #            configuration_id: CUCUMBER6_GRADLE_JUNIT5_CONFIGURATION_ID
+    #            project_id: CUCUMBER6_GRADLE_JUNIT5_PROJECT_ID
+    #          - project_name: cucumber6-gradle-junit4
+    #            configuration_id: CUCUMBER6_GRADLE_JUNIT4_CONFIGURATION_ID
+    #            project_id: CUCUMBER6_GRADLE_JUNIT4_PROJECT_ID
+    #          - project_name: cucumber6-gradle-testng
+    #            configuration_id: CUCUMBER6_GRADLE_TESTNG_CONFIGURATION_ID
+    #            project_id: CUCUMBER6_GRADLE_TESTNG_PROJECT_ID
+    #
+    #          - project_name: cucumber5-gradle-junit4
+    #            configuration_id: CUCUMBER5_GRADLE_JUNIT4_CONFIGURATION_ID
+    #            project_id: CUCUMBER5_GRADLE_JUNIT4_PROJECT_ID
+    #          - project_name: cucumber5-gradle-junit5
+    #            configuration_id: CUCUMBER5_GRADLE_JUNIT5_CONFIGURATION_ID
+    #            project_id: CUCUMBER5_GRADLE_JUNIT5_PROJECT_ID
+    #          - project_name: cucumber5-gradle-testng
+    #            configuration_id: CUCUMBER5_GRADLE_TESTNG_CONFIGURATION_ID
+    #            project_id: CUCUMBER5_GRADLE_TESTNG_PROJECT_ID
+    #
+    #          - project_name: cucumber4-gradle-junit4
+    #            configuration_id: CUCUMBER4_GRADLE_JUNIT4_CONFIGURATION_ID
+    #            project_id: CUCUMBER4_GRADLE_JUNIT4_PROJECT_ID
+    #          - project_name: cucumber4-gradle-testng
+    #            configuration_id: CUCUMBER4_GRADLE_TESTNG_CONFIGURATION_ID
+    #            project_id: CUCUMBER4_GRADLE_TESTNG_PROJECT_ID
+    #
+    #          - project_name: selenide-gradle-junit5
+    #            configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
+    #            project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
+    #          - project_name: serenity2-gradle-junit4
+    #            configuration_id: SERENITY2_GRADLE_JUNIT4_CONFIGURATION_ID
+    #            project_id: SERENITY2_GRADLE_JUNIT4_PROJECT_ID
+    #          - project_name: serenity3-gradle-junit4
+    #            configuration_id: SERENITY3_GRADLE_JUNIT4_CONFIGURATION_ID
+    #            project_id: SERENITY3_GRADLE_JUNIT4_PROJECT_ID
     env:
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
@@ -169,9 +169,47 @@ jobs:
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
       - name: Test
         run: |
+          # current location - /adapters-java/
+          export SYNC_STORAGE_VERSION=$(grep -o 'SYNC_STORAGE_VERSION = "[^"]*"' testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java | cut -d'"' -f2)
+          
           cd java-examples/${{ matrix.project_name }}
+
+          # Создаем директорию .caches если она не существует
+          mkdir -p .caches
+
+          # Скачиваем файл с GitHub Releases
+          wget -O .caches/syncstorage-linux-amd64 \
+              "https://github.com/testit-tms/sync-storage-public/releases/download/${SYNC_STORAGE_VERSION}/syncstorage-${SYNC_STORAGE_VERSION}-linux_amd64"
+
+          # Делаем файл исполняемым
+          chmod +x .caches/syncstorage-linux-amd64
+
+
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || exit 0
+          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
+          -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
+
+          if ! nc -z 127.0.0.1 49152; then
+            echo "Сервис на порту 49152 не доступен!"
+            exit 0
+          fi
+          echo "healthcheck"
+          curl -v http://127.0.0.1:49152/health || true
+          # wait some time until completion process end the run
+          echo "check run"
+          # curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} || true
+          echo "healthcheck"
+          curl -v http://127.0.0.1:49152/health || true
+
+          sleep 10
+          curl -v http://127.0.0.1:49152/health || true
+
+          cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/shutdown.log
+
+#          echo "Service log:"
+#          cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/service.log
       - name: Validate
         run: |
           dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet

@@ -95,6 +95,7 @@ public class Converter {
         model.attachments(convertAttachments(result.getAttachments()));
         model.setMessage(result.getMessage());
         model.setParameters(result.getParameters());
+        model.setOutcome(AvailableTestResultOutcome.fromValue(result.getItemStatus().value()));
 
         Throwable throwable = result.getThrowable();
         if (throwable != null) {
@@ -278,16 +279,6 @@ public class Converter {
         }).collect(Collectors.toList());
     }
 
-    private static List<LabelApiModel> labelsConvert(List<LabelShortModel> labels) {
-        return labels.stream().map(label -> {
-            LabelApiModel model = new LabelApiModel();
-
-            model.setName(label.getName());
-
-            return model;
-        }).collect(Collectors.toList());
-    }
-
     private static List<LabelApiModel> labelsConvertFromApi(List<LabelApiResult> labels) {
         return labels.stream().map(label -> {
             LabelApiModel model = new LabelApiModel();
@@ -334,32 +325,6 @@ public class Converter {
 
             return model;
         }).collect(Collectors.toList());
-    }
-
-    public static AutoTestApiResult convertAutoTestApiResultToAutoTestApiResult(AutoTestApiResult autoTestApiResult) {
-        if (autoTestApiResult == null || autoTestApiResult.getExternalId() == null) {
-            return null;
-        }
-
-        AutoTestApiResult model = new AutoTestApiResult();
-
-        model.setId(autoTestApiResult.getId());
-        model.setGlobalId(autoTestApiResult.getGlobalId());
-        model.setExternalId(autoTestApiResult.getExternalId());
-        model.setLinks(autoTestApiResult.getLinks());
-        model.setProjectId(autoTestApiResult.getProjectId());
-        model.setName(autoTestApiResult.getName());
-        model.setNamespace(autoTestApiResult.getNamespace());
-        model.setClassname(autoTestApiResult.getClassname());
-        model.setSteps(autoTestApiResult.getSteps());
-        model.setSetup(autoTestApiResult.getSetup());
-        model.setTeardown(autoTestApiResult.getTeardown());
-        model.setTitle(autoTestApiResult.getTitle());
-        model.setDescription(autoTestApiResult.getDescription());
-        model.setLabels(autoTestApiResult.getLabels());
-        model.externalKey(autoTestApiResult.getExternalKey());
-
-        return model;
     }
 
     private static List<AutoTestStepApiModel> convertAutoTestStepApiResultsToModels(List<AutoTestStepApiResult> steps) {
@@ -487,23 +452,6 @@ public class Converter {
         return model;
     }
 
-    public static AutoTestSearchApiModel buildAutoTestSearchApiModel(Set<Long> globalIds) {
-        AutoTestFilterApiModel filter = new AutoTestFilterApiModel();
-
-        filter.setGlobalIds(globalIds);
-
-        AutoTestSearchIncludeApiModel includes = new AutoTestSearchIncludeApiModel();
-        includes.setIncludeLabels(false);
-        includes.setIncludeSteps(false);
-        includes.setIncludeLinks(false);
-
-        AutoTestSearchApiModel model = new AutoTestSearchApiModel();
-        model.setFilter(filter);
-        model.setIncludes(includes);
-
-        return model;
-    }
-
     public static UpdateEmptyTestRunApiModel buildUpdateEmptyTestRunApiModel(TestRunV2ApiResult testRun) {
         UpdateEmptyTestRunApiModel model = new UpdateEmptyTestRunApiModel();
 
@@ -569,79 +517,6 @@ public class Converter {
             return Collections.emptyList();
         }
         return Arrays.asList(elements);
-    }
-
-    public static Map<String, List<String>> getRelationWorkItemIdsToAutotestIdsByExternalIds(
-            Map<String, List<String>> relationWorkItemIdsToAutotestExternalIdsBeingCreated,
-            List<AutoTestApiResult> AutoTestApiResults) {
-        Map<String, List<String>> relationWorkItemIdsToAutotestIds = new HashMap<>();
-        Set<String> externalIds = relationWorkItemIdsToAutotestExternalIdsBeingCreated.keySet();
-
-        for (String externalId : externalIds) {
-            AutoTestApiResults.stream()
-                    .filter(m -> Objects.equals(m.getExternalId(), externalId))
-                    .findFirst().ifPresent(autotest -> relationWorkItemIdsToAutotestIds.put(
-                            autotest.getId().toString(),
-                            relationWorkItemIdsToAutotestExternalIdsBeingCreated.get(externalId)));
-
-        }
-
-        return relationWorkItemIdsToAutotestIds;
-    }
-
-    private static List<AutoTestStepModel> convertAutoTestStepApiResultsToSteps(List<AutoTestStepApiResult> steps) {
-        if (steps == null) {
-            return new ArrayList<>();
-        }
-
-        return steps.stream().map(step -> {
-            AutoTestStepModel model = new AutoTestStepModel();
-            model.setTitle(step.getTitle());
-            model.setDescription(step.getDescription());
-
-            if (step.getSteps() != null) {
-                model.setSteps(convertAutoTestStepApiResultsToSteps(step.getSteps()));
-            }
-
-            return model;
-        }).collect(Collectors.toList());
-    }
-
-    public static List<LinkPutModel> convertLinkApiResultsToPutLinks(List<LinkApiResult> links) {
-        if (links == null) {
-            return new ArrayList<>();
-        }
-
-        return links.stream().map(
-                link -> {
-                    LinkPutModel model = new LinkPutModel();
-
-                    model.setTitle(link.getTitle());
-                    model.setDescription(link.getDescription());
-                    model.setUrl(link.getUrl());
-                    model.setHasInfo(false);
-
-                    if (link.getType() != null) {
-                        model.setType(LinkType.fromValue(link.getType().getValue()));
-                    }
-
-                    return model;
-                }
-        ).collect(Collectors.toList());
-    }
-
-    private static List<LabelShortModel> convertLabelApiResultsToLabelShortModels(List<LabelApiResult> labels) {
-        if (labels == null) {
-            return new ArrayList<>();
-        }
-
-        return labels.stream().map(label -> {
-            LabelShortModel model = new LabelShortModel();
-
-            model.setName(label.getName());
-
-            return model;
-        }).collect(Collectors.toList());
     }
 
 }

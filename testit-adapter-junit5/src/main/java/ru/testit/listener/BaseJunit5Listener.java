@@ -180,17 +180,22 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         Map<String, String> testParameters = new HashMap<>();
 
         for (int i = 0; i < parameters.length; i++) {
-            final Parameter parameter = parameters[i];
-            final Class<?> parameterType = parameter.getType();
+            try {
+                final Parameter parameter = parameters[i];
+                final Class<?> parameterType = parameter.getType();
 
-            if (parameterType.getCanonicalName().startsWith("org.junit.jupiter.api")) {
-                continue;
+                if (parameterType.getCanonicalName().startsWith("org.junit.jupiter.api")) {
+                    continue;
+                }
+
+                String name = parameter.getName();
+                String value = invocationContext.getArguments().get(i).toString();
+
+                testParameters.put(name, value);
             }
-
-            String name = parameter.getName();
-            String value = invocationContext.getArguments().get(i).toString();
-
-            testParameters.put(name, value);
+            catch (NullPointerException e) {
+                LOGGER.warn("Exception on parsing junit test parameter: {}", e.getMessage());
+            }
         }
 
         return testParameters;

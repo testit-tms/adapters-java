@@ -10,6 +10,8 @@ public class AdapterConfig implements Serializable {
     private AdapterMode mode;
     private boolean automaticCreationTestCases;
     private boolean tmsIntegration;
+    private String syncStoragePath;
+    private String syncStoragePort;
 
 
     public AdapterConfig(Properties properties) {
@@ -33,6 +35,24 @@ public class AdapterConfig implements Serializable {
         } catch (NullPointerException ignored) {
             this.tmsIntegration = true;
         }
+
+        try {
+            this.syncStoragePath = String.valueOf(properties.get(AppProperties.SYNC_STORAGE_PATH));
+            if ("null".equals(this.syncStoragePath)) {
+                this.syncStoragePath = null;
+            }
+        } catch (NullPointerException ignored) {
+            this.syncStoragePath = null;
+        }
+
+        try {
+            this.syncStoragePort = String.valueOf(properties.get(AppProperties.SYNC_STORAGE_PORT));
+            if ("null".equals(this.syncStoragePort)) {
+                this.syncStoragePort = "8080"; // Порт по умолчанию
+            }
+        } catch (NullPointerException ignored) {
+            this.syncStoragePort = "8080"; // Порт по умолчанию
+        }
     }
 
     public AdapterMode getMode() {
@@ -54,9 +74,18 @@ public class AdapterConfig implements Serializable {
         sb.append("    mode: ").append(Utils.toIndentedString(this.mode)).append("\n");
         sb.append("    automaticCreationTestCases: ").append(Utils.toIndentedString(this.automaticCreationTestCases)).append("\n");
         sb.append("    tmsIntegration: ").append(Utils.toIndentedString(this.tmsIntegration)).append("\n");
+        sb.append("    syncStoragePath: ").append(Utils.toIndentedString(this.syncStoragePath)).append("\n");
+        sb.append("    syncStoragePort: ").append(Utils.toIndentedString(this.syncStoragePort)).append("\n");
         sb.append("}");
 
         return sb.toString();
     }
-}
 
+    public String getSyncStoragePath() {
+        return syncStoragePath;
+    }
+
+    public String getSyncStoragePort() {
+        return syncStoragePort;
+    }
+}

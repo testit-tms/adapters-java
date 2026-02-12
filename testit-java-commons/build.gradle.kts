@@ -12,6 +12,8 @@ val commonsLang3Version = "3.18.0"
 val jakartaWsRsVersion = "3.0.0"
 val junitJupiterVersion = "5.8.2"
 val mockitoInlineVersion = "4.4.0"
+val jacksonDatabindNullable = "0.2.9"
+val jacksonDatatypeJsr310 = "2.15.0"
 
 dependencies {
     implementation("org.aspectj:aspectjrt:$aspectjrtVersion")
@@ -22,10 +24,14 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
     implementation("ru.testit:testit-api-client:$apiClientVersion")
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:$jakartaWsRsVersion")
+    // Source: https://mvnrepository.com/artifact/org.openapitools/jackson-databind-nullable
+    implementation("org.openapitools:jackson-databind-nullable:$jacksonDatabindNullable")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonDatatypeJsr310")
 
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("org.mockito:mockito-inline:$mockitoInlineVersion")
+
 }
 
 tasks.test {

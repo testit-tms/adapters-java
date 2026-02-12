@@ -97,6 +97,7 @@ configure(subprojects) {
         options.encoding = "utf-8"
         options.setIncremental(true)
         options.isFork = true
+        //options.compilerArgs.add("-Xlint:-comment") // not supported in java 8
     }
 
     tasks.jar {

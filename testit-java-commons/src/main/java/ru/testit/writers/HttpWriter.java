@@ -31,24 +31,23 @@ public class HttpWriter implements Writer {
 
     @Override
     public void writeTest(TestResult testResult) {
-        if (!config.shouldImportRealtime())
-        {
+        if (!config.shouldImportRealtime()) {
             return;
         }
 
         writeTestRealtime(testResult);
     }
 
-    private void writeTestRealtime(TestResult testResult) {
+    @Override
+    public void writeTestRealtime(TestResult testResult) {
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Write the auto test {}", testResult.getExternalId());
             }
 
-            AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(testResult.getExternalId());
+            AutoTestApiResult autotest = apiClient.getAutoTestByExternalId(testResult.getExternalId());
             String autoTestId;
 
-            AutoTestApiResult autotest = Converter.convertAutoTestApiResultToAutoTestApiResult(autoTestApiResult);
 
             if (autotest != null) {
                 if (LOGGER.isDebugEnabled()) {
@@ -127,8 +126,7 @@ public class HttpWriter implements Writer {
 
     @Override
     public void writeClass(ClassContainer container) {
-        if (!config.shouldImportRealtime())
-        {
+        if (!config.shouldImportRealtime()) {
             return;
         }
 
@@ -137,13 +135,11 @@ public class HttpWriter implements Writer {
                 try {
                     AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
 
-                    AutoTestApiResult AutoTestApiResult = Converter.convertAutoTestApiResultToAutoTestApiResult(autoTestApiResult);
-
-                    if (AutoTestApiResult == null) {
+                    if (autoTestApiResult == null) {
                         return;
                     }
 
-                    AutoTestUpdateApiModel autoTestUpdateApiModel = Converter.AutoTestApiResultToAutoTestUpdateApiModel(AutoTestApiResult);
+                    AutoTestUpdateApiModel autoTestUpdateApiModel = Converter.AutoTestApiResultToAutoTestUpdateApiModel(autoTestApiResult);
 
                     List<AutoTestStepApiModel> beforeClass = Converter.convertFixtureToApi(container.getBeforeClassMethods(), null);
                     List<AutoTestStepApiModel> beforeEach = Converter.convertFixtureToApi(container.getBeforeEachTest(), testUuid);
@@ -156,9 +152,15 @@ public class HttpWriter implements Writer {
                     autoTestUpdateApiModel.setSetup(beforeClass);
                     autoTestUpdateApiModel.setTeardown(afterClass);
 
-                    autoTestUpdateApiModel.setIsFlaky(AutoTestApiResult.getIsFlaky());
+                    autoTestUpdateApiModel.setIsFlaky(autoTestApiResult.getIsFlaky());
 
-                    apiClient.updateAutoTest(autoTestUpdateApiModel);
+                    // Оптимизация: сравниваем модель с сервера с той, которую хотим отправить
+                    if (hasAutoTestChanged(autoTestApiResult, autoTestUpdateApiModel)) {
+                        apiClient.updateAutoTest(autoTestUpdateApiModel);
+                        LOGGER.debug("AutoTest {} updated", test.getExternalId());
+                    } else {
+                        LOGGER.debug("AutoTest {} has not changed, skipping update", test.getExternalId());
+                    }
                 } catch (ApiException e) {
                     LOGGER.error("Can not write the class: {}", (e.getMessage()));
                 }
@@ -168,13 +170,13 @@ public class HttpWriter implements Writer {
 
     @Override
     public void writeTests(MainContainer container) {
-        if (config.shouldImportRealtime())
-        {
+        if (config.shouldImportRealtime()) {
             updateTestResults(container);
 
             return;
         }
 
+        // realtime false: all in one
         writeTestsAfterAll(container);
     }
 
@@ -195,13 +197,11 @@ public class HttpWriter implements Writer {
                         try {
                             AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
 
-                            AutoTestApiResult AutoTestApiResult = Converter.convertAutoTestApiResultToAutoTestApiResult(autoTestApiResult);
-
-                            if (AutoTestApiResult == null) {
+                            if (autoTestApiResult == null) {
                                 return;
                             }
 
-                            AutoTestUpdateApiModel autoTestUpdateApiModel = Converter.AutoTestApiResultToAutoTestUpdateApiModel(AutoTestApiResult);
+                            AutoTestUpdateApiModel autoTestUpdateApiModel = Converter.AutoTestApiResultToAutoTestUpdateApiModel(autoTestApiResult);
 
                             List<AutoTestStepApiModel> beforeFinish = new ArrayList<>(beforeAll);
                             beforeFinish.addAll(autoTestUpdateApiModel.getSetup());
@@ -212,9 +212,14 @@ public class HttpWriter implements Writer {
                             afterFinish.addAll(afterAll);
                             autoTestUpdateApiModel.setTeardown(afterFinish);
 
-                            autoTestUpdateApiModel.setIsFlaky(AutoTestApiResult.getIsFlaky());
+                            autoTestUpdateApiModel.setIsFlaky(autoTestApiResult.getIsFlaky());
 
-                            apiClient.updateAutoTest(autoTestUpdateApiModel);
+                            // Оптимизация: сравниваем модель с сервера с той, которую хотим отправить
+                            if (hasAutoTestChanged(autoTestApiResult, autoTestUpdateApiModel)) {
+                                apiClient.updateAutoTest(autoTestUpdateApiModel);
+                            } else {
+                                LOGGER.debug("AutoTest {} has not changed, skipping update", test.getExternalId());
+                            }
 
                             AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.testResultToAutoTestResultsForTestRunModel(test);
 
@@ -243,7 +248,7 @@ public class HttpWriter implements Writer {
                             apiClient.updateTestResult(testResultId, model);
 
                         } catch (ApiException e) {
-                            LOGGER.error("Can not update the autotest: {}",(e.getMessage()));
+                            LOGGER.error("Can not update the autotest: {}", (e.getMessage()));
                         }
                     });
                 }
@@ -295,8 +300,6 @@ public class HttpWriter implements Writer {
 
                             AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
 
-                            AutoTestApiResult AutoTestApiResult = Converter.convertAutoTestApiResultToAutoTestApiResult(autoTestApiResult);
-
                             AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
                                     test,
                                     config.getConfigurationId()
@@ -305,7 +308,7 @@ public class HttpWriter implements Writer {
                             autoTestResultsForTestRunModel.setSetupResults(beforeResultFinish);
                             autoTestResultsForTestRunModel.setTeardownResults(afterResultFinish);
 
-                            if (AutoTestApiResult == null) {
+                            if (autoTestApiResult == null) {
                                 AutoTestCreateApiModel model = Converter.prepareToCreateAutoTest(
                                         test,
                                         config.getProjectId()
@@ -317,14 +320,14 @@ public class HttpWriter implements Writer {
                             } else {
                                 AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
                                         test,
-                                        AutoTestApiResult,
+                                        autoTestApiResult,
                                         config.getProjectId()
                                 );
 
                                 model.setSetup(beforeFinish);
                                 model.setTeardown(afterFinish);
 
-                                String id = AutoTestApiResult.getGlobalId().toString();
+                                String id = autoTestApiResult.getGlobalId().toString();
                                 List<String> wi = test.getWorkItemIds();
 
                                 Map<String, List<String>> autotestLinksToWIForUpdate = new HashMap<>();
@@ -343,6 +346,7 @@ public class HttpWriter implements Writer {
                 }
             });
         }
+
 
         try {
             bulkHelper.teardown();
@@ -365,4 +369,85 @@ public class HttpWriter implements Writer {
     void addUuid(String key, UUID uuid) {
         this.testResults.put(key, uuid);
     }
+
+
+    /**
+     * Сравнивает авто-тест с сервера с моделью для обновления
+     *
+     * @param serverModel модель с сервера
+     * @param updateModel модель для обновления
+     * @return true, если модели отличаются и нужно выполнить обновление
+     */
+    private boolean hasAutoTestChanged(AutoTestApiResult serverModel, AutoTestUpdateApiModel updateModel) {
+        if (serverModel == null || updateModel == null) {
+            return true;
+        }
+        // Сравниваем основные поля
+        if (!Objects.equals(serverModel.getExternalId(), updateModel.getExternalId())) {
+            return true;
+        }
+        if (!Objects.equals(serverModel.getName(), updateModel.getName())) {
+            return true;
+        }
+        if (!Objects.equals(serverModel.getNamespace(), updateModel.getNamespace())) {
+            return true;
+        }
+        if (!Objects.equals(serverModel.getClassname(), updateModel.getClassname())) {
+            return true;
+        }
+        if (!Objects.equals(serverModel.getTitle(), updateModel.getTitle())) {
+            return true;
+        }
+        if (!Objects.equals(serverModel.getDescription(), updateModel.getDescription())) {
+            return true;
+        }
+        // Сравниваем setup методы
+        if (!areStepListsEqual(serverModel.getSetup(), updateModel.getSetup())) {
+            return true;
+        }
+        // Сравниваем teardown методы
+        if (!areStepListsEqual(serverModel.getTeardown(), updateModel.getTeardown())) {
+            return true;
+        }
+        // Если дошли до этого места, модели идентичны
+        return false;
+    }
+
+    /**
+     * Сравнивает два списка шагов авто-теста
+     *
+     * @param serverSteps шаги с сервера
+     * @param updateSteps шаги для обновления
+     * @return true, если списки отличаются
+     */
+    private boolean areStepListsEqual(List<AutoTestStepApiResult> serverSteps, List<AutoTestStepApiModel> updateSteps) {
+
+        if (serverSteps == null && updateSteps == null) {
+            return false; // Если оба null, то они равны
+        }
+        if (serverSteps == null || updateSteps == null) {
+            return true; // Если один null, а другой нет, то они разные
+        }
+
+        if (serverSteps.size() != updateSteps.size()) {
+            return true;
+        }
+
+        for (int i = 0; i < serverSteps.size(); i++) {
+            AutoTestStepApiResult serverStep = serverSteps.get(i);
+            AutoTestStepApiModel updateStep = updateSteps.get(i);
+
+            if (!Objects.equals(serverStep.getTitle(), updateStep.getTitle())) {
+                return true;
+            }
+
+            if (!Objects.equals(serverStep.getDescription(), updateStep.getDescription())) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
 }
