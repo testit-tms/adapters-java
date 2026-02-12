@@ -6,7 +6,6 @@ import org.jbehave.core.model.Story;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Utils;
@@ -22,10 +21,11 @@ public class TagParser {
     private static final String DISPLAY_NAME = "DisplayName";
     private static final String DESCRIPTION = "Description";
     private static final String LABELS = "Labels";
+    private static final String TAGS = "Tags";
     private static final String LINKS = "Links";
     private static final String WORK_ITEM_IDS = "WorkItemIds";
 
-    private final List<Label> labelList = new ArrayList<>();
+    private final List<String> tagList = new ArrayList<>();
     private final List<LinkItem> linkItemList = new ArrayList<>();
     private final List<String> workItemIdList = new ArrayList<>();
     private String externalIdValue;
@@ -46,7 +46,14 @@ public class TagParser {
 
         if (!labelsValue.isEmpty()) {
             Arrays.stream(labelsValue.split(TAG_VALUE_DELIMITER))
-                    .forEach(label -> getLabelList().add(getTagLabel(label)));
+                    .forEach(label -> getTagList().add(label));
+        }
+
+        String tagsValue = getMetaValue(storyMeta, scenarioMeta, TAGS);
+
+        if (!tagsValue.isEmpty()) {
+            Arrays.stream(tagsValue.split(TAG_VALUE_DELIMITER))
+                    .forEach(tag -> getTagList().add(tag));
         }
 
         String linksValue = getMetaValue(storyMeta, scenarioMeta, LINKS);
@@ -87,8 +94,8 @@ public class TagParser {
         return "";
     }
 
-    public List<Label> getLabelList() {
-        return labelList;
+    public List<String> getTagList() {
+        return tagList;
     }
 
     public List<LinkItem> getLinkItemList() {
@@ -113,10 +120,6 @@ public class TagParser {
 
     public String getDescriptionValue() {
         return descriptionValue;
-    }
-
-    private Label getTagLabel(final String tag) {
-        return new Label().setName(tag);
     }
 
     private boolean isJson(String json) {

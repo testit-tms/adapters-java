@@ -106,7 +106,8 @@ public class BaseTestNgListener implements
         Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
         final TestResult result = new TestResult()
                 .setUuid(uuid)
-                .setLabels(Utils.extractLabels(method, parameters))
+                .setTags(Utils.extractLabels(method, parameters))
+                .setTags(Utils.extractTags(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
                 .setWorkItemIds(Utils.extractWorkItemIds(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters, true))

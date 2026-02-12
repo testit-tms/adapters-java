@@ -1,7 +1,6 @@
 package ru.testit;
 
 import ru.testit.client.model.*;
-import ru.testit.models.Label;
 import ru.testit.models.LinkType;
 import ru.testit.models.*;
 import ru.testit.models.StepResult;
@@ -62,9 +61,8 @@ public class Helper {
         List<StepResult> steps = new ArrayList<>();
         steps.add(generateStepResult());
 
-        List<Label> labels = new ArrayList<>();
-        Label label = new Label().setName(LABEL_NAME);
-        labels.add(label);
+        List<String> labels = new ArrayList<>();
+        labels.add(LABEL_NAME);
 
         TestResult testResult = new TestResult();
         List<String> workItems = new ArrayList<>();
@@ -82,7 +80,7 @@ public class Helper {
                 .setItemStatus(ITEM_STATUS)
                 .setLinkItems(links)
                 .setSteps(steps)
-                .setLabels(labels);
+                .setTags(labels);
 
         return testResult;
     }

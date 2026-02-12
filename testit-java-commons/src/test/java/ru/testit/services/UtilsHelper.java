@@ -1,6 +1,5 @@
 package ru.testit.services;
 
-import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 
@@ -89,12 +88,11 @@ public class UtilsHelper {
         return labels.toArray(new String[labels.size()]);
     }
 
-    public static List<Label> generateLabelsAfterSetParameters(Map<String, String> parameters) {
-        List<Label> labels = new ArrayList<>();
+    public static List<String> generateLabelsAfterSetParameters(Map<String, String> parameters) {
+        List<String> labels = new ArrayList<>();
 
         for(String key : parameters.keySet()) {
-            labels.add(new Label()
-                    .setName("{Param " + key + "} = " + parameters.get(key) + "; "));
+            labels.add("{Param " + key + "} = " + parameters.get(key) + "; ");
         }
 
         return labels;

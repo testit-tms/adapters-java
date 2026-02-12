@@ -5,7 +5,6 @@ import io.cucumber.plugin.event.TestCase;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Utils;
@@ -20,12 +19,13 @@ public class TagParser {
     private static final String DISPLAY_NAME = "@DISPLAYNAME";
     private static final String DESCRIPTION = "@DESCRIPTION";
     private static final String LABELS = "@LABELS";
+    private static final String TAGS = "@TAGS";
     private static final String LINKS = "@LINKS";
     private static final String WORK_ITEM_IDS = "@WORKITEMIDS";
     private static final String NAMESPACE = "@NAMESPACE";
     private static final String CLASS_NAME = "@CLASSNAME";
 
-    private final List<Label> labelList = new ArrayList<>();
+    private final List<String> tagList = new ArrayList<>();
     private final List<LinkItem> linkItemList = new ArrayList<>();
     private final List<String> workItemIdList = new ArrayList<>();
     private String externalIdValue = "";
@@ -72,8 +72,9 @@ public class TagParser {
                         classNameValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case LABELS:
+                    case TAGS:
                         Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
-                                .forEach(label -> getScenarioLabels().add(getTagLabel(label)));
+                                .forEach(t -> getScenarioTags().add(t));
                         break;
                     case LINKS:
                         if (isJson(tagValue)) {
@@ -104,8 +105,8 @@ public class TagParser {
         }
     }
 
-    public List<Label> getScenarioLabels() {
-        return labelList;
+    public List<String> getScenarioTags() {
+        return tagList;
     }
 
     public List<LinkItem> getScenarioLinks() {
@@ -138,10 +139,6 @@ public class TagParser {
 
     public String getClassNameValue() {
         return classNameValue;
-    }
-
-    private Label getTagLabel(final String tag) {
-        return new Label().setName(tag);
     }
 
     private boolean isJson(String json) {

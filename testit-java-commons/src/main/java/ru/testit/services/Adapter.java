@@ -2,7 +2,6 @@ package ru.testit.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.properties.AppProperties;
@@ -154,13 +153,10 @@ public final class Adapter {
     }
 
     public static void addLabels(String[] labels) {
-        final List<Label> modifyLabels = new LinkedList<>();
+        getAdapterManager().updateTestCase(testResult -> testResult.setTags(Arrays.asList(labels)));
+    }
 
-        for (final String label : labels) {
-            final Label modifyLabel = new Label().setName(label);
-            modifyLabels.add(modifyLabel);
-        }
-
-        getAdapterManager().updateTestCase(testResult -> testResult.setLabels(modifyLabels));
+    public static void addTags(String[] tags) {
+        getAdapterManager().updateTestCase(testResult -> testResult.setTags(Arrays.asList(tags)));
     }
 }

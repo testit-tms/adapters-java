@@ -1,7 +1,6 @@
 package ru.testit.services;
 
 import ru.testit.annotations.*;
-import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 
 import java.lang.reflect.Method;
@@ -60,17 +59,26 @@ public class Utils {
         return links;
     }
 
-    public static List<Label> extractLabels(final Method atomicTest, Map<String, String> parameters) {
-        final List<Label> labels = new LinkedList<>();
+    public static List<String> extractLabels(final Method atomicTest, Map<String, String> parameters) {
+        final List<String> labels = new LinkedList<>();
         final Labels annotation = atomicTest.getAnnotation(Labels.class);
         if (annotation != null) {
             for (final String s : annotation.value()) {
-                final Label label = new Label()
-                        .setName(setParameters(s, parameters));
-                labels.add(label);
+                labels.add(setParameters(s, parameters));
             }
         }
         return labels;
+    }
+
+    public static List<String> extractTags(final Method atomicTest, Map<String, String> parameters) {
+        final List<String> tags = new LinkedList<>();
+        final Tags annotation = atomicTest.getAnnotation(Tags.class);
+        if (annotation != null) {
+            for (final String s : annotation.value()) {
+                tags.add(setParameters(s, parameters));
+            }
+        }
+        return tags;
     }
 
     public static String extractClassname(final Method atomicTest, String className, Map<String, String> parameters) {

@@ -126,7 +126,7 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
                 .setWorkItemIds(tagParser.getWorkItemIdList())
                 .setSpaceName(tagParser.getNameSpaceValue())
                 .setClassName(tagParser.getClassNameValue())
-                .setLabels(tagParser.getScenarioLabels())
+                .setTags(tagParser.getScenarioTags())
                 .setLinkItems(tagParser.getScenarioLinks())
                 .setParameters(parameters)
                 .setExternalKey(scenarioName);
