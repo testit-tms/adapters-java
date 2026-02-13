@@ -2,6 +2,7 @@ package ru.testit.listener;
 
 import org.junit.runner.Description;
 import ru.testit.annotations.*;
+import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 
 import javax.xml.bind.DatatypeConverter;
@@ -73,11 +74,14 @@ public class Utils {
         return (annotation != null) ? annotation.value() : nameSpace;
     }
 
-    public static List<String> extractLabels(final Description method) {
-        final List<String> labels = new LinkedList<>();
+    public static List<Label> extractLabels(final Description method) {
+        final List<Label> labels = new LinkedList<>();
         final Labels annotation = method.getAnnotation(Labels.class);
         if (annotation != null) {
-            labels.addAll(Arrays.asList(annotation.value()));
+            for (final String s : annotation.value()) {
+                final Label label = new Label().setName(s);
+                labels.add(label);
+            }
         }
         return labels;
     }

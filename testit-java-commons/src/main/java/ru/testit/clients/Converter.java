@@ -8,6 +8,7 @@ import ru.testit.client.model.LinkType;
 import ru.testit.client.model.*;
 import ru.testit.models.*;
 import ru.testit.models.StepResult;
+import ru.testit.models.Label;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -33,6 +34,7 @@ public class Converter {
         model.setTitle(result.getTitle());
         model.setLinks(convertCreateLinks(result.getLinkItems()));
         model.setSteps(convertStepsToApiModels(result.getSteps()));
+        model.setLabels(labelsPostConvert(result.getLabels()));
         model.setTags(result.getTags());
         model.shouldCreateWorkItem(result.getAutomaticCreationTestCases());
         model.externalKey(result.getExternalKey());
@@ -150,6 +152,7 @@ public class Converter {
         model.setTitle(result.getTitle());
         model.setLinks(convertPutLinks(result.getLinkItems()));
         model.setSteps(convertStepsToApiModels(result.getSteps()));
+        model.setLabels(labelsPostConvert(result.getLabels()));
         model.setTags(result.getTags());
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
@@ -174,6 +177,7 @@ public class Converter {
         model.setTitle(autoTestApiResult.getTitle());
         model.setDescription(autoTestApiResult.getDescription());
         model.setLabels(labelsConvertFromApi(autoTestApiResult.getLabels()));
+        model.setTags(autoTestApiResult.getTags());
         model.externalKey(autoTestApiResult.getExternalKey());
 
         return model;

@@ -17,6 +17,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Resul
     private List<String> workItemIds = new ArrayList<>();
     private String className;
     private String spaceName;
+    private List<Label> labels = new ArrayList<>();
     private List<String> tags = new ArrayList<>();
     private List<LinkItem> linkItems = new ArrayList<>();
     private List<LinkItem> resultLinks = new ArrayList<>();
@@ -152,6 +153,26 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Resul
      */
     public TestResult setAttachments(List<String> attachments) {
         this.attachments = attachments;
+        return this;
+    }
+
+    /**
+     * Gets labels.
+     *
+     * @return the labels
+     */
+    public List<Label> getLabels() {
+        return labels;
+    }
+
+    /**
+     * Sets labels.
+     *
+     * @param labels the labels
+     * @return self for method chaining
+     */
+    public TestResult setLabels(List<Label> labels) {
+        this.labels = labels;
         return this;
     }
 
@@ -483,6 +504,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Resul
         sb.append("    workItemIds: ").append(Utils.toIndentedString(this.workItemIds)).append("\n");
         sb.append("    className: ").append(Utils.toIndentedString(this.className)).append("\n");
         sb.append("    spaceName: ").append(Utils.toIndentedString(this.spaceName)).append("\n");
+        sb.append("    labels: ").append(Utils.toIndentedString(this.labels)).append("\n");
         sb.append("    tags: ").append(Utils.toIndentedString(this.tags)).append("\n");
         sb.append("    linkItems: ").append(Utils.toIndentedString(this.linkItems)).append("\n");
         sb.append("    resultLinks: ").append(Utils.toIndentedString(this.resultLinks)).append("\n");

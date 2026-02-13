@@ -426,10 +426,9 @@ Description of tags:
 - `ExternalId` - unique internal autotest ID (used in Test IT)
 - `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
 - `Description` - autotest description specified in the autotest card
+- `Labels` - labels listed in the autotest card
 - `Tags` - tags listed in the autotest card
 - `Links` - links listed in the autotest card
-- `NameSpace` - directory in the TMS system (default - file's name of test)
-- `ClassName` - subdirectory in the TMS system (default - class's name of test)
 
 If you want to insert a space in the tags, use the "\\_" character combination.
 
@@ -443,6 +442,7 @@ Description of methods:
 - `Adapter.addExternalId` - a dynamic method for adding unique internal autotest ID (used in Test IT)
 - `Adapter.addTitle` - a dynamic method for adding autotest name specified in the autotest card or the step. If not specified, the name from the displayName method is used
 - `Adapter.addDescription` - a dynamic method for adding autotest description specified in the autotest card or the step
+- `Adapter.addLabels` - a dynamic method for adding labels listed in the autotest card
 - `Adapter.addTags` - a dynamic method for adding tags listed in the autotest card
 - `Adapter.addNameSpace` - a dynamic method for adding directory in the TMS system
 - `Adapter.addClassName` - a dynamic method for adding subdirectory in the TMS system

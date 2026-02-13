@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.testit.annotations.*;
+import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 
@@ -491,7 +492,7 @@ class UtilsTest {
     void extractLabels_WithLabelsWithParameters_WithInputParameters() {
         // arrange
         Map<String, String> parameters = UtilsHelper.generateParameters();
-        List<String> expectedLabels = UtilsHelper.generateLabelsAfterSetParameters(parameters);
+        List<Label> expectedLabels = UtilsHelper.generateLabelsAfterSetParameters(parameters);
 
         class TestClass {
             @Labels(value = {
@@ -508,12 +509,12 @@ class UtilsTest {
         when(atomicTest.getAnnotation(Labels.class)).thenReturn(testMethod.getAnnotation(Labels.class));
 
         // act
-        List<String> getLabels = Utils.extractLabels(atomicTest, parameters);
+        List<Label> getLabels = Utils.extractLabels(atomicTest, parameters);
 
         // assert
         Assertions.assertEquals(expectedLabels.size(), getLabels.size());
         for (int i = 0; i < expectedLabels.size(); i++) {
-            Assertions.assertEquals(expectedLabels.get(i), getLabels.get(i));
+            Assertions.assertEquals(expectedLabels.get(i).getName(), getLabels.get(i).getName());
         }
     }
 
@@ -538,12 +539,12 @@ class UtilsTest {
         when(atomicTest.getAnnotation(Labels.class)).thenReturn(testMethod.getAnnotation(Labels.class));
 
         // act
-        List<String> getLabels = Utils.extractLabels(atomicTest, null);
+        List<Label> getLabels = Utils.extractLabels(atomicTest, null);
 
         // assert
         Assertions.assertEquals(putLabels.length, getLabels.size());
         for (int i = 0; i < putLabels.length; i++) {
-            Assertions.assertEquals(putLabels[i], getLabels.get(i));
+            Assertions.assertEquals(putLabels[i], getLabels.get(i).getName());
         }
     }
 
@@ -567,12 +568,12 @@ class UtilsTest {
         when(atomicTest.getAnnotation(Labels.class)).thenReturn(testMethod.getAnnotation(Labels.class));
 
         // act
-        List<String> getLabels = Utils.extractLabels(atomicTest, parameters);
+        List<Label> getLabels = Utils.extractLabels(atomicTest, parameters);
 
         // assert
         Assertions.assertEquals(LABELS_WITHOUT_PARAMETERS.length, getLabels.size());
         for (int i = 0; i < LABELS_WITHOUT_PARAMETERS.length; i++) {
-            Assertions.assertEquals(LABELS_WITHOUT_PARAMETERS[i], getLabels.get(i));
+            Assertions.assertEquals(LABELS_WITHOUT_PARAMETERS[i], getLabels.get(i).getName());
         }
     }
 
@@ -584,8 +585,8 @@ class UtilsTest {
         when(atomicTest.getAnnotation(Labels.class)).thenReturn(null);
 
         // act
-        List<String> labelsWithoutInputParameters = Utils.extractLabels(atomicTest, null);
-        List<String> labelsWithInputParameters = Utils.extractLabels(atomicTest, parameters);
+        List<Label> labelsWithoutInputParameters = Utils.extractLabels(atomicTest, null);
+        List<Label> labelsWithInputParameters = Utils.extractLabels(atomicTest, parameters);
 
         // assert
         Assertions.assertEquals(0, labelsWithoutInputParameters.size());

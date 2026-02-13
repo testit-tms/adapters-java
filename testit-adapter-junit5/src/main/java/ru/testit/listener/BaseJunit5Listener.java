@@ -227,7 +227,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
-                .setTags(Utils.extractLabels(method, parameters))
+                .setLabels(Utils.extractLabels(method, parameters))
                 .setTags(Utils.extractTags(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
                 .setWorkItemIds(Utils.extractWorkItemIds(method, parameters))

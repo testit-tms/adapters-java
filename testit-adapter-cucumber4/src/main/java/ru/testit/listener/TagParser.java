@@ -6,6 +6,7 @@ import gherkin.pickles.PickleTag;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
 import ru.testit.models.LinkType;
 import ru.testit.services.Utils;
@@ -24,6 +25,7 @@ public class TagParser {
     private static final String LINKS = "@LINKS";
     private static final String WORK_ITEM_IDS = "@WORKITEMIDS";
 
+    private final List<Label> labelList = new ArrayList<>();
     private final List<String> tagList = new ArrayList<>();
     private final List<LinkItem> linkItemList = new ArrayList<>();
     private final List<String> workItemIdList = new ArrayList<>();
@@ -62,6 +64,9 @@ public class TagParser {
                         descriptionValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case LABELS:
+                        Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
+                                .forEach(label -> getScenarioLabels().add(getTagLabel(label)));
+                        break;
                     case TAGS:
                         Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(t -> getScenarioTags().add(t));
@@ -95,6 +100,10 @@ public class TagParser {
         }
     }
 
+    public List<Label> getScenarioLabels() {
+        return labelList;
+    }
+
     public List<String> getScenarioTags() {
         return tagList;
     }
@@ -121,6 +130,10 @@ public class TagParser {
 
     public String getDescriptionValue() {
         return descriptionValue;
+    }
+
+    private Label getTagLabel(final String tag) {
+        return new Label().setName(tag);
     }
 
     private boolean isJson(String json) {

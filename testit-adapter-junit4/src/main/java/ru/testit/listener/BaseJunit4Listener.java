@@ -263,7 +263,7 @@ public class BaseJunit4Listener extends RunListener {
 
         final TestResult result = new TestResult()
             .setUuid(uuid)
-            .setTags(Utils.extractLabels(method))
+            .setLabels(Utils.extractLabels(method))
             .setTags(Utils.extractTags(method))
             .setExternalId(Utils.extractExternalID(method))
             .setWorkItemIds(Utils.extractWorkItemIds(method))
