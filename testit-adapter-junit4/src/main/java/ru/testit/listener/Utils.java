@@ -86,6 +86,15 @@ public class Utils {
         return labels;
     }
 
+    public static List<String> extractTags(final Description method) {
+        final List<String> tags = new LinkedList<>();
+        final Tags annotation = method.getAnnotation(Tags.class);
+        if (annotation != null) {
+            tags.addAll(Arrays.asList(annotation.value()));
+        }
+        return tags;
+    }
+
     public static String extractTitle(final Description method) {
         final Title annotation = method.getAnnotation(Title.class);
 

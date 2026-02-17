@@ -73,6 +73,17 @@ public class Utils {
         return labels;
     }
 
+    public static List<String> extractTags(final Method atomicTest, Map<String, String> parameters) {
+        final List<String> tags = new LinkedList<>();
+        final Tags annotation = atomicTest.getAnnotation(Tags.class);
+        if (annotation != null) {
+            for (final String s : annotation.value()) {
+                tags.add(setParameters(s, parameters));
+            }
+        }
+        return tags;
+    }
+
     public static String extractClassname(final Method atomicTest, String className, Map<String, String> parameters) {
         Classname annotation = atomicTest.getAnnotation(Classname.class);
 

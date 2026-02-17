@@ -20,10 +20,12 @@ public class TagParser {
     private static final String DISPLAY_NAME = "@DISPLAYNAME";
     private static final String DESCRIPTION = "@DESCRIPTION";
     private static final String LABELS = "@LABELS";
+    private static final String TAGS = "@TAGS";
     private static final String LINKS = "@LINKS";
     private static final String WORK_ITEM_IDS = "@WORKITEMIDS";
 
     private final List<Label> labelList = new ArrayList<>();
+    private final List<String> tagList = new ArrayList<>();
     private final List<LinkItem> linkItemList = new ArrayList<>();
     private final List<String> workItemIdList = new ArrayList<>();
     private String externalIdValue = "";
@@ -62,6 +64,10 @@ public class TagParser {
                         Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(label -> getScenarioLabels().add(getTagLabel(label)));
                         break;
+                    case TAGS:
+                        Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
+                                .forEach(t -> getScenarioTags().add(t));
+                        break;
                     case LINKS:
                         if (isJson(tagValue)) {
                             getScenarioLinks().add(getLinkItem(tagValue));
@@ -93,6 +99,10 @@ public class TagParser {
 
     public List<Label> getScenarioLabels() {
         return labelList;
+    }
+
+    public List<String> getScenarioTags() {
+        return tagList;
     }
 
     public List<LinkItem> getScenarioLinks() {

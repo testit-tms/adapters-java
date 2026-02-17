@@ -160,7 +160,10 @@ public final class Adapter {
             final Label modifyLabel = new Label().setName(label);
             modifyLabels.add(modifyLabel);
         }
-
         getAdapterManager().updateTestCase(testResult -> testResult.setLabels(modifyLabels));
+    }
+
+    public static void addTags(String[] tags) {
+        getAdapterManager().updateTestCase(testResult -> testResult.setTags(Arrays.asList(tags)));
     }
 }

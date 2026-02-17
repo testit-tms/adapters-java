@@ -26,6 +26,7 @@ public class ScenarioParser {
                 .setClassName(featureName)
                 .setSpaceName(nameSpace)
                 .setLabels(tagParser.getLabelList())
+                .setTags(tagParser.getTagList())
                 .setLinkItems(tagParser.getLinkItemList())
                 .setParameters(parameters);
     }
