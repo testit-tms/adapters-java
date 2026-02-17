@@ -365,6 +365,13 @@ public class SimpleTest {
 
 #### Parameterized test
 
+> [!WARNING]
+> When linking a parameterized autotest to a parameterized test case, please consider the problematic points:
+> - In TMS test cases have a table with parameters, but autotests do not. They are not equal entities, so there may be incompatibility in terms of parameters
+> - Running a parameterized test case, TMS expects the results of all related autotests with all the parameters specified in the test case table
+> - In TMS, the parameters are limited to the string type, so the adapter transmits absolutely all the autotest parameters as a string. This implies the following problematic point for the test case table
+> - TMS expects a complete **textual** match of the name and value of the parameters of the test case table with the autotest parameters
+
 ```java
 package ru.testit.samples;
 
