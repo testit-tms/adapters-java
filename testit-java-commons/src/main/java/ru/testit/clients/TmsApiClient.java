@@ -166,23 +166,27 @@ public class TmsApiClient implements ITmsApiClient {
     @Override
     public void linkAutoTestToWorkItems(String id, Iterable<String> workItemIds) {
         for (String workItemId : workItemIds) {
-            LOGGER.debug("Link autotest {} to workitem {}", id, workItemId);
+            linkAutoTestToWorkItem(id, workItemId);
+        }
+    }
 
-            for (int attempts = 0; attempts < MAX_TRIES; attempts++) {
+    public void linkAutoTestToWorkItem(String id, String workItemId) {
+        LOGGER.debug("Link autotest {} to workitem {}", id, workItemId);
+
+        for (int attempts = 0; attempts < MAX_TRIES; attempts++) {
+            try {
+                autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdApiModel().id(workItemId));
+                LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
+
+                return;
+            } catch (ApiException e) {
+                LOGGER.error("Cannot link autotest {} to work item {}", id, workItemId);
+
                 try {
-                    autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdApiModel().id(workItemId));
-                    LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
-
-                    return;
-                } catch (ApiException e) {
-                    LOGGER.error("Cannot link autotest {} to work item {}", id, workItemId);
-
-                    try {
-                        Thread.sleep(Duration.ofMillis(100).toMillis());
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        break;
-                    }
+                    Thread.sleep(Duration.ofMillis(100).toMillis());
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
                 }
             }
         }
