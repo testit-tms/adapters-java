@@ -107,7 +107,7 @@ public class AdapterManager {
     private void updateTestRunName() throws ApiException {
         String testRunName = this.clientConfiguration.getTestRunName();
 
-        if (testRunName.isEmpty()) {
+        if (testRunName.isEmpty() || Objects.equals(this.clientConfiguration.getTestRunName(), "null")) {
             return;
         }
 
@@ -117,7 +117,7 @@ public class AdapterManager {
             return;
         }
 
-        testRun.setName(testRunName);
+        testRun.setName(HtmlEscapeUtils.escapeHtmlTags(testRunName));
 
         this.client.updateTestRun(Converter.buildUpdateEmptyTestRunApiModel(testRun));
     }
