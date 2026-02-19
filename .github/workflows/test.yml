@@ -184,6 +184,8 @@ jobs:
           # Делаем файл исполняемым
           chmod +x .caches/syncstorage-linux-amd64
 
+          nohup .caches/syncstorage-linux-amd64 --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
+            --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1
 
           chmod +x ./gradlew
           ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
@@ -206,7 +208,10 @@ jobs:
           sleep 10
           curl -v http://127.0.0.1:49152/health || true
 
-          cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/shutdown.log
+#          cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/shutdown.log
+
+#          cat shutdown.log
+          cat service.log
 
 #          echo "Service log:"
 #          cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/service.log
