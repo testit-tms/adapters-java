@@ -172,6 +172,7 @@ jobs:
           # current location - /adapters-java/
           export SYNC_STORAGE_VERSION=$(grep -o 'SYNC_STORAGE_VERSION = "[^"]*"' testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java | cut -d'"' -f2)
           
+          
           cd java-examples/${{ matrix.project_name }}
 
           # Создаем директорию .caches если она не существует
@@ -185,7 +186,7 @@ jobs:
           chmod +x .caches/syncstorage-linux-amd64
 
           nohup .caches/syncstorage-linux-amd64 --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
-            --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1
+            --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 &
 
           chmod +x ./gradlew
           ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
