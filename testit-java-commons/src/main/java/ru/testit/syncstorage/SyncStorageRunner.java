@@ -34,9 +34,14 @@ public class SyncStorageRunner {
 
     private boolean isMaster = false;
     private boolean isAlreadyInProgress = false;
+    // running in process
     private boolean isRunning = false;
+    // running outside of this process
+    private boolean isExternal = false;
 
-    private static final String SYNC_STORAGE_VERSION = "v0.1.5";
+
+    private static final String SYNC_STORAGE_VERSION = "v0.1.9";
+
     private static final String SYNC_STORAGE_REPO_URL ="https://github.com/testit-tms/sync-storage-public/releases/download/";
     private static final String AMD64 = "amd64";
     private static final String ARM64 = "arm64";
@@ -233,8 +238,15 @@ public class SyncStorageRunner {
                             ". Connecting to existing one..."
             );
             isRunning = true;
-            // Register current process as worker
-            registerWorker();
+            isExternal = true;
+
+            try {
+                registerWorkerWithRetry();
+            }
+            catch (Exception e) {
+                LOGGER.error(e.getMessage());
+            }
+
             return;
         }
 
@@ -316,7 +328,7 @@ public class SyncStorageRunner {
             System.out.println("SyncStorage started successfully on port " + port);
             Thread.sleep(2000);
             try {
-                registerWorker();
+                registerWorkerWithRetry();
             }
             catch (Exception e) {
                 LOGGER.error(e.getMessage());
@@ -325,6 +337,15 @@ public class SyncStorageRunner {
             throw new RuntimeException(
                     "Cannot start the SyncStorage until timeout"
             );
+        }
+    }
+
+    private void registerWorkerWithRetry() {
+        // Register current process as worker
+        // try 5 times in a row
+        for (int i = 0; i < 5; i++) {
+            boolean isRegistered = registerWorker();
+            if (isRegistered) break;
         }
     }
 
@@ -398,7 +419,7 @@ public class SyncStorageRunner {
      * Register current process as worker SyncStorage
      * API CALL
      */
-    private void registerWorker() throws IOException {
+    private boolean registerWorker() {
         try {
             workerPid =
                     "worker-" +
@@ -406,7 +427,8 @@ public class SyncStorageRunner {
                             "-" +
                             System.currentTimeMillis();
 
-            URL url = new URL("http://localhost:" + port + "/register");
+            URL url = new URL(this.getUrl() + "/register");
+            LOGGER.info("register on " + url.toString());
             HttpURLConnection connection =
                     (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -458,6 +480,7 @@ public class SyncStorageRunner {
                             "Worker registered successfully, PID: " + workerPid
                     );
                 }
+                return true;
             } else {
                 LOGGER.warn(
                         "Error worker register. Response code: " + responseCode
@@ -468,6 +491,7 @@ public class SyncStorageRunner {
                     "Error on worker registering: " + e.getMessage()
             );
         }
+        return false;
     }
 
     /**
@@ -500,6 +524,18 @@ public class SyncStorageRunner {
      * Check is SyncStorage running
      */
     public boolean isRunning() {
+//        LOGGER.info("isRunning" + isRunning);
+//        LOGGER.info("not null" + (syncStorageProcess != null));
+
+        return (
+                isRunning
+        );
+    }
+
+    public boolean isRunningAsProcess() {
+        LOGGER.info("isRunning" + isRunning);
+        LOGGER.info("not null" + (syncStorageProcess != null));
+
         return (
                 isRunning &&
                         syncStorageProcess != null &&

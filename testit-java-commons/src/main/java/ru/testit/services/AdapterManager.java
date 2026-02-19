@@ -1134,6 +1134,7 @@ public class AdapterManager {
      */
     public void setWorkerStatus(String pid, String status) {
         if (syncStorageRunner == null || !syncStorageRunner.isRunning()) {
+            LOGGER.info("not running???");
             return;
         }
 
@@ -1153,6 +1154,7 @@ public class AdapterManager {
             // Send POST to /set_worker_status
             LOGGER.info(jsonPayload);
             String url = syncStorageRunner.getUrl() + "/set_worker_status";
+            LOGGER.info("url: " + url.toString());
             int responseCode = postRequest(url, 15000, jsonPayload);
             if (responseCode == 200) {
                 LOGGER.info(
