@@ -9,6 +9,7 @@ import ru.testit.client.model.*;
 import ru.testit.models.*;
 import ru.testit.models.StepResult;
 import ru.testit.models.Label;
+import ru.testit.services.HtmlEscapeUtils;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -98,8 +99,8 @@ public class Converter {
 
         Throwable throwable = result.getThrowable();
         if (throwable != null) {
-            model.setMessage(throwable.getMessage());
-            model.setTraces(ExceptionUtils.getStackTrace(throwable));
+            model.setMessage(HtmlEscapeUtils.escapeHtmlTags(throwable.getMessage()));
+            model.setTraces(HtmlEscapeUtils.escapeHtmlTags(ExceptionUtils.getStackTrace(throwable)));
         }
 
         return model;
