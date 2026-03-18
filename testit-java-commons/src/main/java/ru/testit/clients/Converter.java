@@ -83,6 +83,28 @@ public class Converter {
         } else return parentUuid == null || Objects.equals(f.getParent(), parentUuid);
     }
 
+    /**
+     PASSED("Passed"),
+     FAILED("Failed"),
+     SKIPPED("Skipped"),
+     INPROGRESS("InProgress"),
+     BLOCKED("Blocked")
+     */
+    private static TestStatusType mapStatusType(String status) {
+        status = status.toLowerCase();
+        switch (status) {
+            case "passed": return TestStatusType.SUCCEEDED;
+            case "failed": return TestStatusType.FAILED;
+            case "inprogress": return TestStatusType.IN_PROGRESS;
+            case "skipped":
+            case "blocked":
+                return TestStatusType.INCOMPLETE;
+            default:
+                System.out.println("Warning! Undefined type: " + status);
+                return TestStatusType.INCOMPLETE;
+        }
+    }
+
     public static AutoTestResultsForTestRunModel testResultToAutoTestResultsForTestRunModel(TestResult result) {
         AutoTestResultsForTestRunModel model = new AutoTestResultsForTestRunModel();
 
@@ -91,7 +113,7 @@ public class Converter {
         model.setStartedOn(dateToOffsetDateTime(result.getStart()));
         model.setCompletedOn(dateToOffsetDateTime(result.getStop()));
         model.setDuration(result.getStop() - result.getStart());
-        model.setStatusCode(result.getItemStatus().value());
+        model.setStatusType(mapStatusType(result.getItemStatus().value()));
         model.setStepResults(convertResultStep(result.getSteps()));
         model.attachments(convertAttachments(result.getAttachments()));
         model.setMessage(result.getMessage());
@@ -131,6 +153,7 @@ public class Converter {
         TestResultUpdateV2Request model = new TestResultUpdateV2Request();
 
         model.setDuration(result.getDurationInMs());
+        // здесь корректное использование code из ответа с сервера
         model.setStatusCode(result.getStatus().getCode());
         model.setLinks(result.getLinks());
         model.setStepResults(result.getStepResults());
@@ -483,8 +506,8 @@ public class Converter {
 
         model.setTestRunIds(listOf(testRunId));
         model.setConfigurationIds(listOf(configurationId));
+        // TODO: решить, что с этим делать, хардкод статуса по фильтру, для чего?
         model.setStatusCodes(listOf("InProgress"));
-
         return model;
     }
 
