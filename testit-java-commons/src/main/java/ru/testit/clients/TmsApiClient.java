@@ -116,7 +116,7 @@ public class TmsApiClient implements ITmsApiClient {
         for (String workItemId : workItemIds) {
             try
             {
-                WorkItemModel workItem = workItemsApi.getWorkItemById(workItemId, null, null);
+                WorkItemApiResult workItem = workItemsApi.getWorkItemById(workItemId, null, null);
 
                 workItemUuids.add(workItem.getId());
             } catch (ApiException e) {
