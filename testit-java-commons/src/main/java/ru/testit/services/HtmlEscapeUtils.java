@@ -15,7 +15,7 @@ public class HtmlEscapeUtils {
 
     // Regex pattern to detect HTML tags
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile(
-            "<\\S.*[^>]*>"
+            "<[a-zA-Z!/][^<>\"']*(?:\"[^\"]*\"[^<>\"']*|'[^']*'[^<>\"']*)*>"
     );
 
     // Regex patterns to escape only non-escaped characters
