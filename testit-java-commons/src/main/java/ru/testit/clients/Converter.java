@@ -506,8 +506,7 @@ public class Converter {
 
         model.setTestRunIds(listOf(testRunId));
         model.setConfigurationIds(listOf(configurationId));
-        // TODO: решить, что с этим делать, хардкод статуса по фильтру, для чего?
-        model.setStatusCodes(listOf("InProgress"));
+        model.setStatusTypes(listOf("InProgress"));
         return model;
     }
 
