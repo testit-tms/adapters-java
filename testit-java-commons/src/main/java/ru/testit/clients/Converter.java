@@ -506,7 +506,7 @@ public class Converter {
 
         model.setTestRunIds(listOf(testRunId));
         model.setConfigurationIds(listOf(configurationId));
-        model.setStatusTypes(listOf("InProgress"));
+        model.setStatusTypes(Collections.singletonList(TestStatusApiType.IN_PROGRESS));
         return model;
     }
 
