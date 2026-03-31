@@ -5,7 +5,6 @@ plugins {
     `maven-publish`
     signing
 }
-// id("org.sonarqube") version "7.2.0.6526"
 
 repositories {
     mavenLocal()
