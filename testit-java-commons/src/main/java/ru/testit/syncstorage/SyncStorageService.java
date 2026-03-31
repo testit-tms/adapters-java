@@ -40,7 +40,7 @@ public class SyncStorageService {
     }
 
     public void sendTestResultToSyncStorage(TestResult testResult) {
-        if (syncStorageRunner == null || !syncStorageRunner.isRunning()) {
+        if (syncStorageRunner == null || syncStorageRunner.isNotRunning()) {
             return;
         }
 
@@ -69,7 +69,7 @@ public class SyncStorageService {
     }
 
     public void setWorkerStatus(String pid, String status) {
-        if (syncStorageRunner == null || !syncStorageRunner.isRunning()) {
+        if (syncStorageRunner == null || syncStorageRunner.isNotRunning()) {
             LOGGER.info("not running???");
             return;
         }

@@ -1,5 +1,6 @@
 package ru.testit.syncstorage;
 
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.services.AdapterManager;
@@ -17,8 +18,9 @@ import java.util.List;
 public class SyncStorageRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(
-            AdapterManager.class
+            SyncStorageRunner.class
     );
+    public static final int CONNECT_TIMEOUT = 30000;
 
     private Process syncStorageProcess;
 
@@ -120,8 +122,8 @@ public class SyncStorageRunner {
         URL url = new URL(downloadUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        connection.setConnectTimeout(30000); // 30 sec
-        connection.setReadTimeout(30000); // 30 sec
+        connection.setConnectTimeout(CONNECT_TIMEOUT);
+        connection.setReadTimeout(CONNECT_TIMEOUT);
 
         try {
             int responseCode = connection.getResponseCode();
@@ -253,32 +255,7 @@ public class SyncStorageRunner {
 
         String executablePath = getFileNameByArchAndOS();
 
-        List<String> command = new ArrayList<>();
-        command.add(executablePath);
-
-        if (testRunId != null && !testRunId.isEmpty()) {
-            command.add("--testRunId");
-            command.add(testRunId);
-        }
-
-        if (port != null && !port.isEmpty()) {
-            command.add("--port");
-            command.add(port);
-        }
-
-        // Add baseURL if defined
-        if (baseURL != null && !baseURL.isEmpty()) {
-            command.add("--baseURL");
-
-            command.add(baseURL);
-        }
-
-        // Add privateToken if defined
-        if (privateToken != null && !privateToken.isEmpty()) {
-            command.add("--privateToken");
-            command.add(privateToken);
-        }
-
+        List<String> command = getCommand(executablePath);
 
 
         // prepare executable file
@@ -287,26 +264,7 @@ public class SyncStorageRunner {
         // Update command with selected file
         command.set(0, preparedExecutablePath);
 
-        String osName = System.getProperty("os.name").toLowerCase();
-//        if (isMacOs(osName)) {
-//            String command1 = String.join(" ", command);
-//            command1 += "& disown -h %1";
-//
-//            command = new ArrayList<>();
-//            command.add("zsh");
-//            command.add("-c");
-//            command.add(command1);
-//        }
-//        if (isLinux(osName)) {
-//            String command1 = String.join(" ", command);
-//            command1 = "nohup " + command1 + " > service.log 2>&1";
-//            command1 += " & disown -h %1";
-//
-//            command = new ArrayList<>();
-//            command.add("bash");
-//            command.add("-c");
-//            command.add(command1);
-//        }
+        // String osName = System.getProperty("os.name").toLowerCase();
 
         System.out.println(
                 "Starting SyncStorage with command: " + String.join(" ", command)
@@ -339,6 +297,36 @@ public class SyncStorageRunner {
                     "Cannot start the SyncStorage until timeout"
             );
         }
+    }
+
+    @Nonnull
+    private List<String> getCommand(String executablePath) {
+        List<String> command = new ArrayList<>();
+        command.add(executablePath);
+
+        if (testRunId != null && !testRunId.isEmpty()) {
+            command.add("--testRunId");
+            command.add(testRunId);
+        }
+
+        if (port != null && !port.isEmpty()) {
+            command.add("--port");
+            command.add(port);
+        }
+
+        // Add baseURL if defined
+        if (baseURL != null && !baseURL.isEmpty()) {
+            command.add("--baseURL");
+
+            command.add(baseURL);
+        }
+
+        // Add privateToken if defined
+        if (privateToken != null && !privateToken.isEmpty()) {
+            command.add("--privateToken");
+            command.add(privateToken);
+        }
+        return command;
     }
 
     private void registerWorkerWithRetry() {
@@ -469,13 +457,8 @@ public class SyncStorageRunner {
     /**
      * Check is SyncStorage running
      */
-    public boolean isRunning() {
-//        LOGGER.info("isRunning" + isRunning);
-//        LOGGER.info("not null" + (syncStorageProcess != null));
-
-        return (
-                isRunning
-        );
+    public boolean isNotRunning() {
+        return (!isRunning);
     }
 
     public boolean isRunningAsProcess() {
