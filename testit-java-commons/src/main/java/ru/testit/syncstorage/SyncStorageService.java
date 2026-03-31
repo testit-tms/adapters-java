@@ -1,0 +1,119 @@
+package ru.testit.syncstorage;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.testit.client.model.TestRunV2ApiResult;
+import ru.testit.clients.ClientConfiguration;
+import ru.testit.clients.ITmsApiClient;
+import ru.testit.models.TestResult;
+
+public class SyncStorageService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SyncStorageService.class);
+
+    private final ClientConfiguration clientConfiguration;
+    private final ITmsApiClient client;
+    private final ClientWrapper clientWrapper;
+    private final SyncStorageRunner syncStorageRunner;
+
+    public SyncStorageService(
+            ClientConfiguration clientConfiguration,
+            ITmsApiClient client,
+            ClientWrapper clientWrapper
+    ) {
+        this.clientConfiguration = clientConfiguration;
+        this.client = client;
+        this.clientWrapper = clientWrapper;
+        this.syncStorageRunner = initializeSyncStorage();
+    }
+
+    public boolean shouldSendInProgressResult() {
+        return syncStorageRunner != null &&
+                syncStorageRunner.isMaster() &&
+                !syncStorageRunner.isAlreadyInProgress();
+    }
+
+    public void markInProgressResultSent() {
+        if (syncStorageRunner != null) {
+            syncStorageRunner.setIsAlreadyInProgress(true);
+        }
+    }
+
+    public void sendTestResultToSyncStorage(TestResult testResult) {
+        if (syncStorageRunner == null || !syncStorageRunner.isRunning()) {
+            return;
+        }
+
+        LOGGER.info("trying to send testResult to sync storage");
+        boolean isSent = clientWrapper.sendTestResultToSyncStorage(
+                syncStorageRunner.getUrl(),
+                syncStorageRunner.getTestRunId(),
+                testResult
+        );
+        if (isSent) {
+            LOGGER.info(
+                    "Successfully sent test result to SyncStorage for test: {}",
+                    testResult.getExternalId()
+            );
+        }
+    }
+
+    public void setWorkerStatus(String status) {
+        LOGGER.info("Set worker status to {}", status);
+        if (syncStorageRunner == null) {
+            LOGGER.warn("No runner");
+            return;
+        }
+        setWorkerStatus(syncStorageRunner.getWorkerPid(), status);
+    }
+
+    public void setWorkerStatus(String pid, String status) {
+        if (syncStorageRunner == null || !syncStorageRunner.isRunning()) {
+            LOGGER.info("not running???");
+            return;
+        }
+
+        LOGGER.info("{}:{}", pid, status);
+        boolean isUpdated = clientWrapper.setWorkerStatus(
+                syncStorageRunner.getUrl(),
+                pid,
+                status,
+                syncStorageRunner.getTestRunId()
+        );
+        if (isUpdated) {
+            LOGGER.info(
+                    "Successfully set status {} for worker with PID: {}",
+                    status,
+                    pid
+            );
+        }
+    }
+
+    private SyncStorageRunner initializeSyncStorage() {
+        try {
+            String port = "49152";
+            String testRunId = clientConfiguration.getTestRunId();
+            if (testRunId == null || "null".equals(testRunId)) {
+                TestRunV2ApiResult response = this.client.createTestRun();
+                this.clientConfiguration.setTestRunId(response.getId().toString());
+                testRunId = response.getId().toString();
+            }
+
+            SyncStorageRunner runner = new SyncStorageRunner(
+                    testRunId,
+                    port,
+                    clientConfiguration.getUrl(),
+                    clientConfiguration.getPrivateToken()
+            );
+            runner.start();
+            return runner;
+        } catch (Exception e) {
+            LOGGER.warn(
+                    "Failed to initialize SyncStorage: {}",
+                    e.getMessage(),
+                    e
+            );
+            return null;
+        }
+    }
+}

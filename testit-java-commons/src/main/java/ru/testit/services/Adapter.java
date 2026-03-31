@@ -114,6 +114,10 @@ public final class Adapter {
         getAdapterManager().updateTestCase(testResult -> testResult.setMessage(message));
     }
 
+    // public static void addTraces(String traces) {
+    //     getAdapterManager().updateTestCase(testResult -> testResult.setThrowable(new Exception(traces)));
+    // }
+
     public static void addParameters(Map<String, String> parameters) {
         getAdapterManager().addParameters(parameters);
     }

@@ -1,23 +1,13 @@
 package ru.testit.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
-import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.AutoTestResultsForTestRunModel;
 import ru.testit.client.model.TestRunV2ApiResult;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.Converter;
@@ -29,7 +19,8 @@ import ru.testit.listener.ServiceLoaderListener;
 import ru.testit.models.*;
 import ru.testit.properties.AdapterConfig;
 import ru.testit.properties.AdapterMode;
-import ru.testit.syncstorage.SyncStorageRunner;
+import ru.testit.syncstorage.ClientWrapper;
+import ru.testit.syncstorage.SyncStorageService;
 import ru.testit.writers.HttpWriter;
 import ru.testit.writers.Writer;
 
@@ -49,7 +40,7 @@ public class AdapterManager {
     private final AdapterConfig adapterConfig;
 
     private final ListenerManager listenerManager;
-    private final SyncStorageRunner syncStorageRunner;
+    private final SyncStorageService syncStorageService;
 
     public AdapterManager(
             ClientConfiguration clientConfiguration,
@@ -79,7 +70,11 @@ public class AdapterManager {
                 this.storage
         );
         this.listenerManager = listenerManager;
-        this.syncStorageRunner = initializeSyncStorage();
+        this.syncStorageService = new SyncStorageService(
+                this.clientConfiguration,
+                this.client,
+                new ClientWrapper()
+        );
     }
 
     public AdapterManager(
@@ -98,7 +93,11 @@ public class AdapterManager {
         this.writer = writer;
         this.client = client;
         this.listenerManager = listenerManager;
-        this.syncStorageRunner = initializeSyncStorage();
+        this.syncStorageService = new SyncStorageService(
+                this.clientConfiguration,
+                this.client,
+                new ClientWrapper()
+        );
     }
 
     public void startTests() {
@@ -147,42 +146,6 @@ public class AdapterManager {
         testRun.setName(HtmlEscapeUtils.escapeHtmlTags(testRunName));
 
         this.client.updateTestRun(Converter.buildUpdateEmptyTestRunApiModel(testRun));
-    }
-
-    /**
-     * Initialize SyncStorageRunner
-     */
-    private SyncStorageRunner initializeSyncStorage() {
-        try {
-            // TODO: Получаем настройки из конфигурации
-            String port = "49152";
-
-            // create testrun if there are no existing one
-            String testRunId = clientConfiguration.getTestRunId();
-            if (testRunId == null || "null".equals(testRunId)) {
-                TestRunV2ApiResult response = this.client.createTestRun();
-                this.clientConfiguration.setTestRunId(
-                        response.getId().toString()
-                );
-                testRunId = response.getId().toString();
-            }
-
-            SyncStorageRunner runner = new SyncStorageRunner(
-                    testRunId,
-                    port,
-                    clientConfiguration.getUrl(),
-                    clientConfiguration.getPrivateToken()
-            );
-            runner.start();
-            return runner;
-        } catch (Exception e) {
-            LOGGER.warn(
-                    "Failed to initialize SyncStorage: {}",
-                    e.getMessage(),
-                    e
-            );
-            return null;
-        }
     }
 
     /**
@@ -467,13 +430,11 @@ public class AdapterManager {
         // если да - мы отправляем тест-результат в sync storage с финальным статусом
         // а в test it пишем его как in progress
         if (
-                syncStorageRunner != null &&
-                        syncStorageRunner.isMaster() &&
-                        !syncStorageRunner.isAlreadyInProgress()
+                syncStorageService.shouldSendInProgressResult()
         ) {
             // Отправляем тест-результат в SyncStorage
             sendTestResultToSyncStorage(testResult);
-            syncStorageRunner.setIsAlreadyInProgress(true);
+            syncStorageService.markInProgressResultSent();
             // Помечаем тест как in progress для Test IT
             markTestAsInProgress(testResult);
             // Первый всегда прольется в реалтайме либо же фича будет работать криво
@@ -1033,80 +994,7 @@ public class AdapterManager {
     }
 
     private void sendTestResultToSyncStorage(TestResult testResult) {
-        if (syncStorageRunner == null || !syncStorageRunner.isRunning()) {
-            return;
-        }
-
-        try {
-            // Создаем объект AutoTestResultsForTestRunModel из TestResult
-            AutoTestResultsForTestRunModel payload =
-                    Converter.testResultToAutoTestResultsForTestRunModel(
-                            testResult
-                    );
-
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            LOGGER.info("trying to send testResult to sync storage");
-            objectMapper.registerModule(new JavaTimeModule());
-            objectMapper.setDateFormat(
-                    new StdDateFormat().withColonInTimeZone(true)
-            );
-            objectMapper.registerModule(new JsonNullableModule());
-            String jsonPayload;
-            try {
-                jsonPayload = objectMapper.writeValueAsString(payload);
-                LOGGER.debug("Serialized payload: {}", jsonPayload);
-            } catch (JsonProcessingException e) {
-                LOGGER.warn(
-                        "Failed to serialize AutoTestResultsForTestRunModel to JSON: {}",
-                        e.getMessage()
-                );
-                return;
-            }
-
-            // Send POST to /in_progress_test_result
-            String url =
-                    syncStorageRunner.getUrl() +
-                            "/in_progress_test_result?testRunId=" +
-                            syncStorageRunner.getTestRunId();
-            int responseCode = postRequest(url, 10000, jsonPayload);
-            if (responseCode == 200) {
-                LOGGER.info(
-                        "Successfully sent test result to SyncStorage for test: {}",
-                        testResult.getExternalId()
-                );
-            } else {
-                LOGGER.warn(
-                        "Failed to send test result to SyncStorage. Response code: {}",
-                        responseCode
-                );
-            }
-        } catch (Exception e) {
-            LOGGER.warn(
-                    "Failed to send test result to SyncStorage: {}",
-                    e.getMessage()
-            );
-        }
-    }
-
-    private int postRequest(String url, int timeout, String jsonPayload)
-            throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(
-                url
-        ).openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setDoOutput(true);
-        connection.setConnectTimeout(timeout);
-        connection.setReadTimeout(timeout);
-
-        try (java.io.OutputStream os = connection.getOutputStream()) {
-            byte[] input = jsonPayload.getBytes("utf-8");
-            os.write(input, 0, input.length);
-        }
-
-        int responseCode = connection.getResponseCode();
-        return responseCode;
+        syncStorageService.sendTestResultToSyncStorage(testResult);
     }
 
     /**
@@ -1118,12 +1006,7 @@ public class AdapterManager {
     }
 
     public void setWorkerStatus(String status) {
-        LOGGER.info("Set worker status to " + status);
-        if (syncStorageRunner == null) {
-            LOGGER.warn("No runner");
-            return;
-        }
-        setWorkerStatus(syncStorageRunner.getWorkerPid(), status);
+        syncStorageService.setWorkerStatus(status);
     }
 
     /**
@@ -1133,43 +1016,6 @@ public class AdapterManager {
      * @param status the status to set
      */
     public void setWorkerStatus(String pid, String status) {
-        if (syncStorageRunner == null || !syncStorageRunner.isRunning()) {
-            LOGGER.info("not running???");
-            return;
-        }
-
-        try {
-            LOGGER.info(pid + ":" + status);
-            // make JSON payload
-            String jsonPayload =
-                    "{\"pid\": \"" +
-                            pid +
-                            "\", \"status\": \"" +
-                            status +
-                            "\", \"testRunId\": \"" +
-                            syncStorageRunner.getTestRunId() +
-                            "\"" +
-                            "}";
-
-            // Send POST to /set_worker_status
-            LOGGER.info(jsonPayload);
-            String url = syncStorageRunner.getUrl() + "/set_worker_status";
-            LOGGER.info("url: " + url.toString());
-            int responseCode = postRequest(url, 15000, jsonPayload);
-            if (responseCode == 200) {
-                LOGGER.info(
-                        "Successfully set status {} for worker with PID: {}",
-                        status,
-                        pid
-                );
-            } else {
-                LOGGER.warn(
-                        "Failed to set status for worker. Response code: {}",
-                        responseCode
-                );
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Failed to set worker status: {}", e.getMessage());
-        }
+        syncStorageService.setWorkerStatus(pid, status);
     }
 }

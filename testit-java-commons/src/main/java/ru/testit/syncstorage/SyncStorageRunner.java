@@ -45,6 +45,7 @@ public class SyncStorageRunner {
     private static final String SYNC_STORAGE_REPO_URL ="https://github.com/testit-tms/sync-storage-public/releases/download/";
     private static final String AMD64 = "amd64";
     private static final String ARM64 = "arm64";
+    private final ClientWrapper clientWrapper = new ClientWrapper();
 
     public SyncStorageRunner(
             String testRunId,
@@ -420,78 +421,23 @@ public class SyncStorageRunner {
      * API CALL
      */
     private boolean registerWorker() {
-        try {
-            workerPid =
-                    "worker-" +
-                            Thread.currentThread().getId() +
-                            "-" +
-                            System.currentTimeMillis();
+        ClientWrapper.RegistrationResult registrationResult =
+                clientWrapper.registerWorker(this.getUrl(), testRunId);
 
-            URL url = new URL(this.getUrl() + "/register");
-            LOGGER.info("register on " + url.toString());
-            HttpURLConnection connection =
-                    (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setConnectTimeout(2000);
-            connection.setReadTimeout(2000);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-
-            String jsonInputString =
-                    "{\"pid\": \"" +
-                            workerPid +
-                            "\", \"testRunId\": \"" +
-                            testRunId +
-                            "\"}";
-
-            java.io.OutputStream os = connection.getOutputStream();
-            try {
-                byte[] input = jsonInputString.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            } finally {
-                os.close();
-            }
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode == 200) {
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(connection.getInputStream())
-                );
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                reader.close();
-
-                // Parse JSON answer to check is_master
-                String responseStr = response.toString();
-                if (
-                        responseStr.contains("\"is_master\":true") ||
-                                responseStr.contains("\"is_master\": true")
-                ) {
-                    isMaster = true;
-                    LOGGER.info(
-                            "Master worker registered, PID: " +
-                                    workerPid
-                    );
-                } else {
-                    LOGGER.info(
-                            "Worker registered successfully, PID: " + workerPid
-                    );
-                }
-                return true;
-            } else {
-                LOGGER.warn(
-                        "Error worker register. Response code: " + responseCode
-                );
-            }
-        } catch (Exception e) {
-            LOGGER.error(
-                    "Error on worker registering: " + e.getMessage()
-            );
+        if (registrationResult == null) {
+            return false;
         }
-        return false;
+
+        workerPid = registrationResult.getWorkerPid();
+        isMaster = registrationResult.isMaster();
+
+        if (isMaster) {
+            LOGGER.info("Master worker registered, PID: {}", workerPid);
+        } else {
+            LOGGER.info("Worker registered successfully, PID: {}", workerPid);
+        }
+
+        return true;
     }
 
     /**
