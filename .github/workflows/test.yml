@@ -194,9 +194,10 @@ jobs:
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
 
           sleep 1
-          cat service.log
           
           curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} || true
+          
+          cat service.log
           # cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/shutdown.log
       - name: Validate
         run: |

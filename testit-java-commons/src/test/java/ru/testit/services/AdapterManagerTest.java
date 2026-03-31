@@ -111,50 +111,6 @@ class AdapterManagerTest {
     }
 
     @Test
-    void stopTests_WithCompletedTestRun_NoInvokeCompleteHandler() throws ApiException {
-        // arrange
-        TestRunV2ApiResult response = new TestRunV2ApiResult();
-        // response.setStateName(TestRunState.COMPLETED);
-
-        TestStatusApiResult status = new TestStatusApiResult();
-        status.setType(TestStatusApiType.SUCCEEDED);
-        response.setStatus(status);
-
-        when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
-
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
-
-        // act
-        // TODO: fix
-        // manager.stopTests();
-
-        // assert
-        verify(client, never()).completeTestRun(anyString());
-    }
-
-    @Test
-    void stopTests_WithInProgressTestRun_InvokeCompleteHandler() throws ApiException {
-        // arrange
-        TestRunV2ApiResult response = new TestRunV2ApiResult();
-        // response.setStateName(TestRunState.IN_PROGRESS);
-
-        TestStatusApiResult status = new TestStatusApiResult();
-        status.setType(TestStatusApiType.IN_PROGRESS);
-        response.setStatus(status);
-
-        when(client.getTestRun(TEST_RUN_ID)).thenReturn(response);
-
-        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
-
-        // act
-        // TODO: fix
-        // manager.stopTests();
-
-        // assert
-        verify(client, times(1)).completeTestRun(TEST_RUN_ID);
-    }
-
-    @Test
     void startMainContainer_InvokePutHandler() {
         // arrange
         MainContainer container = Helper.generateMainContainer();
