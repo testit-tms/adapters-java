@@ -16,7 +16,7 @@ package ru.testit.syncstorage.invoker;
 import java.util.Collection;
 import java.util.Iterator;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.18.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class StringUtil {
   /**
    * Check if the given array contains the given value (with case-insensitive comparison).

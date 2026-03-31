@@ -36,7 +36,7 @@ import ru.testit.syncstorage.invoker.JSON;
   RegisterResponse.JSON_PROPERTY_TEST_RUN_ID,
   RegisterResponse.JSON_PROPERTY_IS_MASTER
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.18.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class RegisterResponse {
   public static final String JSON_PROPERTY_STATUS = "status";
   @jakarta.annotation.Nullable
@@ -71,7 +71,7 @@ public class RegisterResponse {
    * @return status
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_STATUS, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getStatus() {
@@ -79,7 +79,7 @@ public class RegisterResponse {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_STATUS, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setStatus(@jakarta.annotation.Nullable String status) {
     this.status = status;
@@ -96,7 +96,7 @@ public class RegisterResponse {
    * @return message
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_MESSAGE, required = false)
+  @JsonProperty(JSON_PROPERTY_MESSAGE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getMessage() {
@@ -104,7 +104,7 @@ public class RegisterResponse {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_MESSAGE, required = false)
+  @JsonProperty(JSON_PROPERTY_MESSAGE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setMessage(@jakarta.annotation.Nullable String message) {
     this.message = message;
@@ -121,7 +121,7 @@ public class RegisterResponse {
    * @return pid
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_PID, required = false)
+  @JsonProperty(JSON_PROPERTY_PID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getPid() {
@@ -129,7 +129,7 @@ public class RegisterResponse {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_PID, required = false)
+  @JsonProperty(JSON_PROPERTY_PID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setPid(@jakarta.annotation.Nullable String pid) {
     this.pid = pid;
@@ -146,7 +146,7 @@ public class RegisterResponse {
    * @return testRunId
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_TEST_RUN_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_TEST_RUN_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getTestRunId() {
@@ -154,7 +154,7 @@ public class RegisterResponse {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_TEST_RUN_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_TEST_RUN_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setTestRunId(@jakarta.annotation.Nullable String testRunId) {
     this.testRunId = testRunId;
@@ -171,7 +171,7 @@ public class RegisterResponse {
    * @return isMaster
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_IS_MASTER, required = false)
+  @JsonProperty(JSON_PROPERTY_IS_MASTER)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public Boolean getIsMaster() {
@@ -179,7 +179,7 @@ public class RegisterResponse {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_IS_MASTER, required = false)
+  @JsonProperty(JSON_PROPERTY_IS_MASTER)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setIsMaster(@jakarta.annotation.Nullable Boolean isMaster) {
     this.isMaster = isMaster;

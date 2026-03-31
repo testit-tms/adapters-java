@@ -100,6 +100,14 @@ configure(subprojects) {
         //options.compilerArgs.add("-Xlint:-comment") // not supported in java 8
     }
 
+    tasks.withType<Javadoc>().configureEach {
+        // Приводим options к StandardJavadocDocletOptions, чтобы были доступны нужные методы
+        val options = options as StandardJavadocDocletOptions
+        options.addStringOption("Xdoclint:none", "-quiet")
+        options.encoding = "UTF-8"
+        options.charSet = "UTF-8"
+    }
+
     tasks.jar {
         manifest {
             attributes(mapOf(

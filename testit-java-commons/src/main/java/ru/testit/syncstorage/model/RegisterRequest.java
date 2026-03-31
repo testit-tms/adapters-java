@@ -33,7 +33,7 @@ import ru.testit.syncstorage.invoker.JSON;
   RegisterRequest.JSON_PROPERTY_PID,
   RegisterRequest.JSON_PROPERTY_TEST_RUN_ID
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.18.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class RegisterRequest {
   public static final String JSON_PROPERTY_PID = "pid";
   @jakarta.annotation.Nullable
@@ -56,7 +56,7 @@ public class RegisterRequest {
    * @return pid
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_PID, required = false)
+  @JsonProperty(JSON_PROPERTY_PID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getPid() {
@@ -64,7 +64,7 @@ public class RegisterRequest {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_PID, required = false)
+  @JsonProperty(JSON_PROPERTY_PID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setPid(@jakarta.annotation.Nullable String pid) {
     this.pid = pid;
@@ -81,7 +81,7 @@ public class RegisterRequest {
    * @return testRunId
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_TEST_RUN_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_TEST_RUN_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getTestRunId() {
@@ -89,7 +89,7 @@ public class RegisterRequest {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_TEST_RUN_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_TEST_RUN_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setTestRunId(@jakarta.annotation.Nullable String testRunId) {
     this.testRunId = testRunId;

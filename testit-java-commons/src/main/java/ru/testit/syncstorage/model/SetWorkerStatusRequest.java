@@ -34,7 +34,7 @@ import ru.testit.syncstorage.invoker.JSON;
   SetWorkerStatusRequest.JSON_PROPERTY_STATUS,
   SetWorkerStatusRequest.JSON_PROPERTY_TEST_RUN_ID
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.18.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class SetWorkerStatusRequest {
   public static final String JSON_PROPERTY_PID = "pid";
   @jakarta.annotation.Nullable
@@ -61,7 +61,7 @@ public class SetWorkerStatusRequest {
    * @return pid
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_PID, required = false)
+  @JsonProperty(JSON_PROPERTY_PID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getPid() {
@@ -69,7 +69,7 @@ public class SetWorkerStatusRequest {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_PID, required = false)
+  @JsonProperty(JSON_PROPERTY_PID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setPid(@jakarta.annotation.Nullable String pid) {
     this.pid = pid;
@@ -86,7 +86,7 @@ public class SetWorkerStatusRequest {
    * @return status
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_STATUS, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getStatus() {
@@ -94,7 +94,7 @@ public class SetWorkerStatusRequest {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_STATUS, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setStatus(@jakarta.annotation.Nullable String status) {
     this.status = status;
@@ -111,7 +111,7 @@ public class SetWorkerStatusRequest {
    * @return testRunId
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_TEST_RUN_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_TEST_RUN_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getTestRunId() {
@@ -119,7 +119,7 @@ public class SetWorkerStatusRequest {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_TEST_RUN_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_TEST_RUN_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setTestRunId(@jakarta.annotation.Nullable String testRunId) {
     this.testRunId = testRunId;

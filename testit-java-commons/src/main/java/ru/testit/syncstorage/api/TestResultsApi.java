@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.18.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class TestResultsApi {
   private ApiClient apiClient;
 
@@ -61,7 +61,7 @@ public class TestResultsApi {
        <tr><td> 200 </td><td> Test result saved successfully </td><td>  -  </td></tr>
      </table>
    */
-  public TestResultSaveResponse inProgressTestResultPost(@jakarta.annotation.Nonnull String testRunId, @jakarta.annotation.Nonnull TestResultCutApiModel testResultCutApiModel) throws ApiException {
+  public TestResultSaveResponse inProgressTestResultPost(String testRunId, TestResultCutApiModel testResultCutApiModel) throws ApiException {
     return inProgressTestResultPostWithHttpInfo(testRunId, testResultCutApiModel).getData();
   }
 
@@ -79,7 +79,7 @@ public class TestResultsApi {
        <tr><td> 200 </td><td> Test result saved successfully </td><td>  -  </td></tr>
      </table>
    */
-  public ApiResponse<TestResultSaveResponse> inProgressTestResultPostWithHttpInfo(@jakarta.annotation.Nonnull String testRunId, @jakarta.annotation.Nonnull TestResultCutApiModel testResultCutApiModel) throws ApiException {
+  public ApiResponse<TestResultSaveResponse> inProgressTestResultPostWithHttpInfo(String testRunId, TestResultCutApiModel testResultCutApiModel) throws ApiException {
     // Check required parameters
     if (testRunId == null) {
       throw new ApiException(400, "Missing the required parameter 'testRunId' when calling inProgressTestResultPost");

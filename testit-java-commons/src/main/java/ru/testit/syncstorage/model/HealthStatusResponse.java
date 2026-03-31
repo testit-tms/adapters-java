@@ -34,7 +34,7 @@ import ru.testit.syncstorage.invoker.JSON;
   HealthStatusResponse.JSON_PROPERTY_STATUS,
   HealthStatusResponse.JSON_PROPERTY_LAST_UPDATE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.18.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class HealthStatusResponse {
   public static final String JSON_PROPERTY_STATUS = "status";
   @jakarta.annotation.Nullable
@@ -57,7 +57,7 @@ public class HealthStatusResponse {
    * @return status
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_STATUS, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getStatus() {
@@ -65,7 +65,7 @@ public class HealthStatusResponse {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_STATUS, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setStatus(@jakarta.annotation.Nullable String status) {
     this.status = status;
@@ -82,7 +82,7 @@ public class HealthStatusResponse {
    * @return lastUpdate
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_LAST_UPDATE, required = false)
+  @JsonProperty(JSON_PROPERTY_LAST_UPDATE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public OffsetDateTime getLastUpdate() {
@@ -90,7 +90,7 @@ public class HealthStatusResponse {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_LAST_UPDATE, required = false)
+  @JsonProperty(JSON_PROPERTY_LAST_UPDATE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setLastUpdate(@jakarta.annotation.Nullable OffsetDateTime lastUpdate) {
     this.lastUpdate = lastUpdate;

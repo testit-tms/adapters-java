@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.18.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class WorkersApi {
   private ApiClient apiClient;
 
@@ -62,7 +62,7 @@ public class WorkersApi {
        <tr><td> 200 </td><td> Worker registered successfully </td><td>  -  </td></tr>
      </table>
    */
-  public RegisterResponse registerPost(@jakarta.annotation.Nonnull RegisterRequest registerRequest) throws ApiException {
+  public RegisterResponse registerPost(RegisterRequest registerRequest) throws ApiException {
     return registerPostWithHttpInfo(registerRequest).getData();
   }
 
@@ -79,7 +79,7 @@ public class WorkersApi {
        <tr><td> 200 </td><td> Worker registered successfully </td><td>  -  </td></tr>
      </table>
    */
-  public ApiResponse<RegisterResponse> registerPostWithHttpInfo(@jakarta.annotation.Nonnull RegisterRequest registerRequest) throws ApiException {
+  public ApiResponse<RegisterResponse> registerPostWithHttpInfo(RegisterRequest registerRequest) throws ApiException {
     // Check required parameters
     if (registerRequest == null) {
       throw new ApiException(400, "Missing the required parameter 'registerRequest' when calling registerPost");
@@ -107,7 +107,7 @@ public class WorkersApi {
        <tr><td> 405 </td><td> Method not allowed </td><td>  -  </td></tr>
      </table>
    */
-  public SetWorkerStatusResponse setWorkerStatusPost(@jakarta.annotation.Nonnull SetWorkerStatusRequest setWorkerStatusRequest) throws ApiException {
+  public SetWorkerStatusResponse setWorkerStatusPost(SetWorkerStatusRequest setWorkerStatusRequest) throws ApiException {
     return setWorkerStatusPostWithHttpInfo(setWorkerStatusRequest).getData();
   }
 
@@ -126,7 +126,7 @@ public class WorkersApi {
        <tr><td> 405 </td><td> Method not allowed </td><td>  -  </td></tr>
      </table>
    */
-  public ApiResponse<SetWorkerStatusResponse> setWorkerStatusPostWithHttpInfo(@jakarta.annotation.Nonnull SetWorkerStatusRequest setWorkerStatusRequest) throws ApiException {
+  public ApiResponse<SetWorkerStatusResponse> setWorkerStatusPostWithHttpInfo(SetWorkerStatusRequest setWorkerStatusRequest) throws ApiException {
     // Check required parameters
     if (setWorkerStatusRequest == null) {
       throw new ApiException(400, "Missing the required parameter 'setWorkerStatusRequest' when calling setWorkerStatusPost");

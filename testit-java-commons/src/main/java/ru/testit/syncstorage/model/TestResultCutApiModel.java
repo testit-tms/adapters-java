@@ -41,7 +41,7 @@ import ru.testit.syncstorage.invoker.JSON;
   TestResultCutApiModel.JSON_PROPERTY_STATUS_TYPE,
   TestResultCutApiModel.JSON_PROPERTY_STARTED_ON
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.18.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class TestResultCutApiModel {
   public static final String JSON_PROPERTY_PROJECT_ID = "projectId";
   @jakarta.annotation.Nullable
@@ -75,7 +75,7 @@ public class TestResultCutApiModel {
    * @return projectId
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_PROJECT_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_PROJECT_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getProjectId() {
@@ -83,7 +83,7 @@ public class TestResultCutApiModel {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_PROJECT_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_PROJECT_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setProjectId(@jakarta.annotation.Nullable String projectId) {
     this.projectId = projectId;
@@ -100,7 +100,7 @@ public class TestResultCutApiModel {
    * @return autoTestExternalId
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_AUTO_TEST_EXTERNAL_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_AUTO_TEST_EXTERNAL_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getAutoTestExternalId() {
@@ -108,7 +108,7 @@ public class TestResultCutApiModel {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_AUTO_TEST_EXTERNAL_ID, required = false)
+  @JsonProperty(JSON_PROPERTY_AUTO_TEST_EXTERNAL_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setAutoTestExternalId(@jakarta.annotation.Nullable String autoTestExternalId) {
     this.autoTestExternalId = autoTestExternalId;
@@ -125,7 +125,7 @@ public class TestResultCutApiModel {
    * @return statusCode
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_STATUS_CODE, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS_CODE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getStatusCode() {
@@ -133,7 +133,7 @@ public class TestResultCutApiModel {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_STATUS_CODE, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS_CODE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setStatusCode(@jakarta.annotation.Nullable String statusCode) {
     this.statusCode = statusCode;
@@ -150,7 +150,7 @@ public class TestResultCutApiModel {
    * @return statusType
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(value = JSON_PROPERTY_STATUS_TYPE, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS_TYPE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public String getStatusType() {
@@ -158,7 +158,7 @@ public class TestResultCutApiModel {
   }
 
 
-  @JsonProperty(value = JSON_PROPERTY_STATUS_TYPE, required = false)
+  @JsonProperty(JSON_PROPERTY_STATUS_TYPE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
   public void setStatusType(@jakarta.annotation.Nullable String statusType) {
     this.statusType = statusType;
@@ -181,7 +181,7 @@ public class TestResultCutApiModel {
         return startedOn.orElse(null);
   }
 
-  @JsonProperty(value = JSON_PROPERTY_STARTED_ON, required = false)
+  @JsonProperty(JSON_PROPERTY_STARTED_ON)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
   public JsonNullable<OffsetDateTime> getStartedOn_JsonNullable() {
