@@ -10,7 +10,7 @@ on:
       - ".github/**/test.yml"
 env:
   JAVA_DISTRIBUTION: "temurin"
-  JAVA_VERSION: 8
+  JAVA_VERSION: 11
 jobs:
 
   test-gradle:
