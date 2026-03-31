@@ -90,7 +90,7 @@ public class Converter {
      INPROGRESS("InProgress"),
      BLOCKED("Blocked")
      */
-    private static TestStatusType mapStatusType(String status) {
+    public static TestStatusType mapStatusType(String status) {
         status = status.toLowerCase();
         switch (status) {
             case "passed": return TestStatusType.SUCCEEDED;

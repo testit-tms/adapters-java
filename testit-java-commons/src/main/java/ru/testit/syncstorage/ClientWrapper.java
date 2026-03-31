@@ -15,6 +15,8 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import static ru.testit.clients.Converter.mapStatusType;
+
 public class ClientWrapper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientWrapper.class);
@@ -70,13 +72,14 @@ public class ClientWrapper {
     public boolean sendTestResultToSyncStorage(
             String url,
             String testRunId,
-            TestResult testResult
+            TestResult testResult,
+            String projectId
     ) {
         try {
             TestResultsApi testResultsApi = new TestResultsApi(buildApiClient(url));
             testResultsApi.inProgressTestResultPost(
                     testRunId,
-                    toTestResultCutApiModel(testResult)
+                    toTestResultCutApiModel(testResult, projectId)
             );
             return true;
         } catch (Exception e) {
@@ -92,11 +95,13 @@ public class ClientWrapper {
                 .setReadTimeout(API_READ_TIMEOUT_MS);
     }
 
-    private TestResultCutApiModel toTestResultCutApiModel(TestResult testResult) {
+    private TestResultCutApiModel toTestResultCutApiModel(TestResult testResult, String projectId) {
+        String status = testResult.getItemStatus().value();
         TestResultCutApiModel model = new TestResultCutApiModel()
+                .projectId(projectId)
                 .autoTestExternalId(testResult.getExternalId())
-                .statusCode(testResult.getItemStatus().value())
-                .statusType(testResult.getItemStatus().value());
+                .statusCode(status)
+                .statusType(mapStatusType(status).getValue());
 
         if (testResult.getStart() != null) {
             model.startedOn(

@@ -48,7 +48,8 @@ public class SyncStorageService {
         boolean isSent = clientWrapper.sendTestResultToSyncStorage(
                 syncStorageRunner.getUrl(),
                 syncStorageRunner.getTestRunId(),
-                testResult
+                testResult,
+                clientConfiguration.getProjectId()
         );
         if (isSent) {
             LOGGER.info(
