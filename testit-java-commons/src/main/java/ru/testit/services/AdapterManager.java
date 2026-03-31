@@ -7,21 +7,16 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.TestRunV2ApiResult;
 import ru.testit.clients.ClientConfiguration;
-import ru.testit.clients.Converter;
 import ru.testit.clients.ITmsApiClient;
-import ru.testit.clients.TmsApiClient;
 import ru.testit.listener.AdapterListener;
 import ru.testit.listener.ListenerManager;
 import ru.testit.listener.ServiceLoaderListener;
 import ru.testit.models.*;
 import ru.testit.properties.AdapterConfig;
 import ru.testit.properties.AdapterMode;
-import ru.testit.syncstorage.ClientWrapper;
-import ru.testit.syncstorage.SyncStorageService;
-import ru.testit.writers.HttpWriter;
+import ru.testit.services.core.AdapterCoreFacade;
+import ru.testit.services.core.AdapterSupportFacade;
 import ru.testit.writers.Writer;
 
 /**
@@ -29,9 +24,7 @@ import ru.testit.writers.Writer;
  */
 public class AdapterManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-            AdapterManager.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdapterManager.class);
     private final ThreadContext threadContext;
     private final ResultStorage storage;
     private final Writer writer;
@@ -39,11 +32,8 @@ public class AdapterManager {
     private final ClientConfiguration clientConfiguration;
     private final AdapterConfig adapterConfig;
 
-    private final ListenerManager listenerManager;
-    private final SyncStorageService syncStorageService;
-    private final AdapterMetadataHelper metadataHelper;
-    private final AdapterStepHelper stepHelper;
-    private final AdapterFixtureHelper fixtureHelper;
+    private final AdapterCoreFacade coreFacade;
+    private final AdapterSupportFacade supportFacade;
 
     public AdapterManager(
             ClientConfiguration clientConfiguration,
@@ -57,45 +47,28 @@ public class AdapterManager {
             AdapterConfig adapterConfig,
             ListenerManager listenerManager
     ) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Client configurations: {}", clientConfiguration);
-            LOGGER.debug("Adapter configurations: {}", adapterConfig);
-        }
+        this(
+                clientConfiguration,
+                adapterConfig,
+                AdapterManagerDefaultsFactory.create(clientConfiguration),
+                listenerManager
+        );
+    }
 
-        this.clientConfiguration = clientConfiguration;
-        this.adapterConfig = adapterConfig;
-        this.storage = Adapter.getResultStorage();
-        this.threadContext = new ThreadContext();
-        this.client = new TmsApiClient(this.clientConfiguration);
-        this.writer = new HttpWriter(
-                this.clientConfiguration,
-                this.client,
-                this.storage
-        );
-        this.listenerManager = listenerManager;
-        this.syncStorageService = new SyncStorageService(
-                this.clientConfiguration,
-                this.client,
-                new ClientWrapper()
-        );
-        this.metadataHelper = new AdapterMetadataHelper(
-                this.adapterConfig,
-                this.threadContext,
-                this.storage,
-                this.writer,
-                LOGGER
-        );
-        this.stepHelper = new AdapterStepHelper(
-                this.adapterConfig,
-                this.threadContext,
-                this.storage,
-                LOGGER
-        );
-        this.fixtureHelper = new AdapterFixtureHelper(
-                this.adapterConfig,
-                this.threadContext,
-                this.storage,
-                LOGGER
+    private AdapterManager(
+            ClientConfiguration clientConfiguration,
+            AdapterConfig adapterConfig,
+            AdapterManagerDefaultsFactory.ConstructorDefaults defaults,
+            ListenerManager listenerManager
+    ) {
+        this(
+                clientConfiguration,
+                adapterConfig,
+                defaults.threadContext,
+                defaults.storage,
+                defaults.writer,
+                defaults.client,
+                listenerManager
         );
     }
 
@@ -114,79 +87,22 @@ public class AdapterManager {
         this.storage = storage;
         this.writer = writer;
         this.client = client;
-        this.listenerManager = listenerManager;
-        this.syncStorageService = new SyncStorageService(
-                this.clientConfiguration,
-                this.client,
-                new ClientWrapper()
-        );
-        this.metadataHelper = new AdapterMetadataHelper(
+        AdapterManagerWiringFactory.HelperWiring wiring = AdapterManagerWiringFactory.create(
                 this.adapterConfig,
+                this.clientConfiguration,
                 this.threadContext,
                 this.storage,
                 this.writer,
+                this.client,
+                listenerManager,
                 LOGGER
         );
-        this.stepHelper = new AdapterStepHelper(
-                this.adapterConfig,
-                this.threadContext,
-                this.storage,
-                LOGGER
-        );
-        this.fixtureHelper = new AdapterFixtureHelper(
-                this.adapterConfig,
-                this.threadContext,
-                this.storage,
-                LOGGER
-        );
+        this.coreFacade = wiring.coreFacade;
+        this.supportFacade = wiring.supportFacade;
     }
 
     public void startTests() {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        LOGGER.debug("Start launch");
-
-        synchronized (this.clientConfiguration) {
-            if (
-                    Objects.equals(this.clientConfiguration.getTestRunId(), "null")
-            ) {
-                return;
-            }
-
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Test run is exist.");
-            }
-
-            try {
-                this.updateTestRunName();
-            } catch (ApiException e) {
-                LOGGER.error(
-                        "Can not update the launch: ".concat(e.getMessage())
-                );
-            }
-        }
-    }
-
-    private void updateTestRunName() throws ApiException {
-        String testRunName = this.clientConfiguration.getTestRunName();
-
-        if (testRunName.isEmpty() || Objects.equals(this.clientConfiguration.getTestRunName(), "null")) {
-            return;
-        }
-
-        TestRunV2ApiResult testRun = this.client.getTestRun(
-                this.clientConfiguration.getTestRunId()
-        );
-
-        if (testRun.getName().equals(testRunName)) {
-            return;
-        }
-
-        testRun.setName(HtmlEscapeUtils.escapeHtmlTags(testRunName));
-
-        this.client.updateTestRun(Converter.buildUpdateEmptyTestRunApiModel(testRun));
+        supportFacade.startTests();
     }
 
     /**
@@ -195,18 +111,7 @@ public class AdapterManager {
      * @param container the main container.
      */
     public void startMainContainer(final MainContainer container) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        container.setStart(System.currentTimeMillis());
-        storage.put(container.getUuid(), container);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start new main container {}", container);
-        }
-        LOGGER.info("Set in progress worker status");
-        setWorkerStatus("in_progress");
+        coreFacade.startMainContainer(container);
     }
 
     /**
@@ -215,29 +120,7 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopMainContainer(final String uuid) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        final Optional<MainContainer> found = storage.getTestsContainer(uuid);
-        if (!found.isPresent()) {
-            LOGGER.error(
-                    "Could not stop main container: container with uuid {} not found",
-                    uuid
-            );
-            return;
-        }
-        final MainContainer container = found.get();
-        container.setStop(System.currentTimeMillis());
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Stop main container {}", container);
-        }
-
-        writer.writeTests(container);
-
-        LOGGER.info("End of main container, set completed");
-        setWorkerStatus("completed");
+        coreFacade.stopMainContainer(uuid);
     }
 
     /**
@@ -250,24 +133,7 @@ public class AdapterManager {
             final String parentUuid,
             final ClassContainer container
     ) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        storage.getTestsContainer(parentUuid).ifPresent(parent -> {
-            storage.updateIfPresent(parentUuid, MainContainer.class, p -> p.getChildren().add(container.getUuid()));
-        });
-        container.setStart(System.currentTimeMillis());
-        storage.put(container.getUuid(), container);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(
-                    "Start new class container {} for parent {}",
-                    container,
-                    parentUuid
-            );
-        }
-        setWorkerStatus("in_progress");
+        coreFacade.startClassContainer(parentUuid, container);
     }
 
     /**
@@ -276,28 +142,7 @@ public class AdapterManager {
      * @param uuid the uuid of container.
      */
     public void stopClassContainer(final String uuid) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        final Optional<ClassContainer> found = storage.getClassContainer(uuid);
-        if (!found.isPresent()) {
-            LOGGER.debug(
-                    "Could not stop class container: container with uuid {} not found",
-                    uuid
-            );
-            return;
-        }
-        final ClassContainer container = found.get();
-        container.setStop(System.currentTimeMillis());
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Stop class container {}", container);
-        }
-
-        writer.writeClass(container);
-
-        LOGGER.info("End of class container");
+        coreFacade.stopClassContainer(uuid);
     }
 
     /**
@@ -310,24 +155,7 @@ public class AdapterManager {
             final String uuid,
             final Consumer<ClassContainer> update
     ) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Update class container {}", uuid);
-        }
-
-        final Optional<ClassContainer> found = storage.getClassContainer(uuid);
-        if (!found.isPresent()) {
-            LOGGER.debug(
-                    "Could not update class container: container with uuid {} not found",
-                    uuid
-            );
-            return;
-        }
-        final ClassContainer container = found.get();
-        update.accept(container);
+        coreFacade.updateClassContainer(uuid, update);
     }
 
     /**
@@ -336,30 +164,7 @@ public class AdapterManager {
      * @param uuid the uuid of test case to start.
      */
     public void startTestCase(final String uuid) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        threadContext.clear();
-        final Optional<TestResult> found = storage.getTestResult(uuid);
-        if (!found.isPresent()) {
-            LOGGER.error(
-                    "Could not start test case: test case with uuid {} is not scheduled",
-                    uuid
-            );
-            return;
-        }
-        final TestResult testResult = found.get();
-
-        testResult
-                .setItemStage(ItemStage.RUNNING)
-                .setStart(System.currentTimeMillis());
-
-        threadContext.start(uuid);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start test case {}", testResult);
-        }
+        coreFacade.startTestCase(uuid);
     }
 
     /**
@@ -368,20 +173,7 @@ public class AdapterManager {
      * @param result the test case to schedule.
      */
     public void scheduleTestCase(final TestResult result) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        result
-                .setItemStage(ItemStage.SCHEDULED)
-                .setAutomaticCreationTestCases(
-                        adapterConfig.shouldAutomaticCreationTestCases()
-                );
-        storage.put(result.getUuid(), result);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Schedule test case {}", result);
-        }
+        coreFacade.scheduleTestCase(result);
     }
 
     /**
@@ -390,18 +182,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateTestCase(final Consumer<TestResult> update) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        final Optional<String> root = threadContext.getRoot();
-        if (!root.isPresent()) {
-            LOGGER.error("Could not update test case: no test case running");
-            return;
-        }
-
-        final String uuid = root.get();
-        updateTestCase(uuid, update);
+        coreFacade.updateTestCase(update);
     }
 
     /**
@@ -414,25 +195,7 @@ public class AdapterManager {
             final String uuid,
             final Consumer<TestResult> update
     ) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Update test case {}", uuid);
-        }
-
-        final Optional<TestResult> found = storage.getTestResult(uuid);
-        if (!found.isPresent()) {
-            LOGGER.error(
-                    "Could not update test case: test case with uuid {} not found",
-                    uuid
-            );
-            return;
-        }
-        final TestResult testResult = found.get();
-
-        update.accept(testResult);
+        coreFacade.updateTestCase(uuid, update);
     }
 
     /**
@@ -441,49 +204,7 @@ public class AdapterManager {
      * @param uuid the uuid of test case to stop.
      */
     public void stopTestCase(final String uuid) {
-        if (!adapterConfig.shouldEnableTmsIntegration()) {
-            return;
-        }
-
-        final Optional<TestResult> found = storage.getTestResult(uuid);
-        if (!found.isPresent()) {
-            LOGGER.error(
-                    "Could not stop test case: test case with uuid {} not found",
-                    uuid
-            );
-            return;
-        }
-        final TestResult testResult = found.get();
-
-        listenerManager.beforeTestStop(testResult);
-
-        testResult
-                .setItemStage(ItemStage.FINISHED)
-                .setStop(System.currentTimeMillis());
-
-        threadContext.clear();
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Stop test case {}", testResult);
-        }
-
-        // Проверяем, если текущий раннер - мастер, и в раннере стоит флаг (no in progress)
-        // если да - мы отправляем тест-результат в sync storage с финальным статусом
-        // а в test it пишем его как in progress
-        if (
-                syncStorageService.shouldSendInProgressResult()
-        ) {
-            // Отправляем тест-результат в SyncStorage
-            sendTestResultToSyncStorage(testResult);
-            syncStorageService.markInProgressResultSent();
-            // Помечаем тест как in progress для Test IT
-            markTestAsInProgress(testResult);
-            // Первый всегда прольется в реалтайме либо же фича будет работать криво
-            writer.writeTestRealtime(testResult);
-            return;
-        }
-
-        writer.writeTest(testResult);
+        coreFacade.stopTestCase(uuid);
     }
 
     /**
@@ -498,7 +219,7 @@ public class AdapterManager {
             final String uuid,
             final FixtureResult result
     ) {
-        fixtureHelper.startPrepareFixtureAll(parentUuid, uuid, result);
+        coreFacade.startPrepareFixtureAll(parentUuid, uuid, result);
     }
 
     /**
@@ -513,7 +234,7 @@ public class AdapterManager {
             final String uuid,
             final FixtureResult result
     ) {
-        fixtureHelper.startTearDownFixtureAll(parentUuid, uuid, result);
+        coreFacade.startTearDownFixtureAll(parentUuid, uuid, result);
     }
 
     /**
@@ -528,7 +249,7 @@ public class AdapterManager {
             final String uuid,
             final FixtureResult result
     ) {
-        fixtureHelper.startPrepareFixture(parentUuid, uuid, result);
+        coreFacade.startPrepareFixture(parentUuid, uuid, result);
     }
 
     /**
@@ -543,7 +264,7 @@ public class AdapterManager {
             final String uuid,
             final FixtureResult result
     ) {
-        fixtureHelper.startTearDownFixture(parentUuid, uuid, result);
+        coreFacade.startTearDownFixture(parentUuid, uuid, result);
     }
 
     /**
@@ -558,7 +279,7 @@ public class AdapterManager {
             final String uuid,
             final FixtureResult result
     ) {
-        fixtureHelper.startPrepareFixtureEachTest(parentUuid, uuid, result);
+        coreFacade.startPrepareFixtureEachTest(parentUuid, uuid, result);
     }
 
     /**
@@ -573,7 +294,7 @@ public class AdapterManager {
             final String uuid,
             final FixtureResult result
     ) {
-        fixtureHelper.startTearDownFixtureEachTest(parentUuid, uuid, result);
+        coreFacade.startTearDownFixtureEachTest(parentUuid, uuid, result);
     }
 
     /**
@@ -586,7 +307,7 @@ public class AdapterManager {
             final String uuid,
             final Consumer<FixtureResult> update
     ) {
-        fixtureHelper.updateFixture(uuid, update);
+        coreFacade.updateFixture(uuid, update);
     }
 
     /**
@@ -595,7 +316,7 @@ public class AdapterManager {
      * @param uuid the uuid of fixture.
      */
     public void stopFixture(final String uuid) {
-        fixtureHelper.stopFixture(uuid);
+        coreFacade.stopFixture(uuid);
     }
 
     /**
@@ -605,7 +326,7 @@ public class AdapterManager {
      * @param result the step.
      */
     public void startStep(final String uuid, final StepResult result) {
-        stepHelper.startStep(uuid, result);
+        coreFacade.startStep(uuid, result);
     }
 
     /**
@@ -620,7 +341,7 @@ public class AdapterManager {
             final String uuid,
             final StepResult result
     ) {
-        stepHelper.startStep(parentUuid, uuid, result);
+        coreFacade.startStep(parentUuid, uuid, result);
     }
 
     /**
@@ -629,7 +350,7 @@ public class AdapterManager {
      * @param update the update function.
      */
     public void updateStep(final Consumer<StepResult> update) {
-        stepHelper.updateStep(update);
+        coreFacade.updateStep(update);
     }
 
     /**
@@ -642,14 +363,14 @@ public class AdapterManager {
             final String uuid,
             final Consumer<StepResult> update
     ) {
-        stepHelper.updateStep(uuid, update);
+        coreFacade.updateStep(uuid, update);
     }
 
     /**
      * Stops current running step.
      */
     public void stopStep() {
-        stepHelper.stopStep();
+        coreFacade.stopStep();
     }
 
     /**
@@ -658,23 +379,23 @@ public class AdapterManager {
      * @param uuid the uuid of step to stop.
      */
     public void stopStep(final String uuid) {
-        stepHelper.stopStep(uuid);
+        coreFacade.stopStep(uuid);
     }
 
     public void addAttachments(List<String> attachments) {
-        metadataHelper.addAttachments(attachments);
+        supportFacade.addAttachments(attachments);
     }
 
     public void addParameters(Map<String, String> parameters) {
-        metadataHelper.addParameters(parameters);
+        supportFacade.addParameters(parameters);
     }
 
     public void addTitle(String title) {
-        metadataHelper.addTitle(title);
+        supportFacade.addTitle(title);
     }
 
     public void addDescription(String description) {
-        metadataHelper.addDescription(description);
+        supportFacade.addDescription(description);
     }
 
     public boolean isFilteredMode() {
@@ -682,25 +403,7 @@ public class AdapterManager {
     }
 
     public List<String> getTestFromTestRun() {
-        if (adapterConfig.shouldEnableTmsIntegration()) {
-            try {
-                List<String> externalIds =
-                        client.getAutotestExternalIdsFromTestRun();
-
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(
-                            "List of tests from test run: {}",
-                            externalIds
-                    );
-                }
-
-                return externalIds;
-            } catch (ApiException e) {
-                LOGGER.error("Could not get tests from test run", e);
-            }
-        }
-
-        return new ArrayList<>();
+        return supportFacade.getTestFromTestRun();
     }
 
     public Optional<String> getCurrentTestCaseOrStep() {
@@ -715,20 +418,8 @@ public class AdapterManager {
         );
     }
 
-    private void sendTestResultToSyncStorage(TestResult testResult) {
-        syncStorageService.sendTestResultToSyncStorage(testResult);
-    }
-
-    /**
-     * Mark test as "in progress" for Test IT
-     */
-    private void markTestAsInProgress(TestResult testResult) {
-        // Меняем статус теста на InProgress перед отправкой в Test IT
-        testResult.setItemStatus(ItemStatus.INPROGRESS);
-    }
-
     public void setWorkerStatus(String status) {
-        syncStorageService.setWorkerStatus(status);
+        supportFacade.setWorkerStatus(status);
     }
 
     /**
@@ -738,6 +429,7 @@ public class AdapterManager {
      * @param status the status to set
      */
     public void setWorkerStatus(String pid, String status) {
-        syncStorageService.setWorkerStatus(pid, status);
+        supportFacade.setWorkerStatus(pid, status);
     }
+
 }

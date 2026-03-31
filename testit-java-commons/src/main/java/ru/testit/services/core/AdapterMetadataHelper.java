@@ -1,4 +1,4 @@
-package ru.testit.services;
+package ru.testit.services.core;
 
 import org.slf4j.Logger;
 import ru.testit.models.ResultWithAttachments;
@@ -6,6 +6,8 @@ import ru.testit.models.ResultWithDescription;
 import ru.testit.models.ResultWithParameters;
 import ru.testit.models.ResultWithTitle;
 import ru.testit.properties.AdapterConfig;
+import ru.testit.services.ResultStorage;
+import ru.testit.services.ThreadContext;
 import ru.testit.writers.Writer;
 
 import java.util.ArrayList;

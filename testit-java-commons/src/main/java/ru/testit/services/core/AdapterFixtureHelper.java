@@ -1,4 +1,4 @@
-package ru.testit.services;
+package ru.testit.services.core;
 
 import org.slf4j.Logger;
 import ru.testit.models.ClassContainer;
@@ -6,6 +6,8 @@ import ru.testit.models.FixtureResult;
 import ru.testit.models.ItemStage;
 import ru.testit.models.MainContainer;
 import ru.testit.properties.AdapterConfig;
+import ru.testit.services.ResultStorage;
+import ru.testit.services.ThreadContext;
 
 import java.util.Optional;
 import java.util.function.Consumer;

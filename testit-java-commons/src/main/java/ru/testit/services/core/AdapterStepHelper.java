@@ -1,10 +1,12 @@
-package ru.testit.services;
+package ru.testit.services.core;
 
 import org.slf4j.Logger;
 import ru.testit.models.ItemStage;
 import ru.testit.models.ResultWithSteps;
 import ru.testit.models.StepResult;
 import ru.testit.properties.AdapterConfig;
+import ru.testit.services.ResultStorage;
+import ru.testit.services.ThreadContext;
 
 import java.util.Objects;
 import java.util.Optional;

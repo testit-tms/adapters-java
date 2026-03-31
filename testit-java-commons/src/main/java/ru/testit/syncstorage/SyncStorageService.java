@@ -27,19 +27,28 @@ public class SyncStorageService {
         this.syncStorageRunner = initializeSyncStorage();
     }
 
-    public boolean shouldSendInProgressResult() {
+    private boolean shouldSendInProgressResult() {
         return syncStorageRunner != null &&
                 syncStorageRunner.isMaster() &&
                 !syncStorageRunner.isAlreadyInProgress();
     }
 
-    public void markInProgressResultSent() {
+    private void markInProgressResultSent() {
         if (syncStorageRunner != null) {
             syncStorageRunner.setIsAlreadyInProgress(true);
         }
     }
 
-    public void sendTestResultToSyncStorage(TestResult testResult) {
+    public boolean sendInProgressIfNeeded(TestResult testResult) {
+        if (!shouldSendInProgressResult()) {
+            return false;
+        }
+        sendTestResultToSyncStorage(testResult);
+        markInProgressResultSent();
+        return true;
+    }
+
+    private void sendTestResultToSyncStorage(TestResult testResult) {
         if (syncStorageRunner == null || syncStorageRunner.isNotRunning()) {
             return;
         }
@@ -70,7 +79,7 @@ public class SyncStorageService {
 
     public void setWorkerStatus(String pid, String status) {
         if (syncStorageRunner == null || syncStorageRunner.isNotRunning()) {
-            LOGGER.info("not running???");
+            LOGGER.info("not running!");
             return;
         }
 
