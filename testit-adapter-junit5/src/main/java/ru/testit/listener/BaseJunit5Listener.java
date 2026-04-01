@@ -20,9 +20,10 @@ import static java.util.Objects.nonNull;
 
 public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAllCallback, InvocationInterceptor, TestWatcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseJunit5Listener.class);
+    /** Shared across threads: parallel runs may execute @BeforeAll and @AfterAll on different threads. */
+    private static final ExtensionContext.Namespace LAUNCHER_NAMESPACE = ExtensionContext.Namespace.create(BaseJunit5Listener.class);
     private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
-    private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
     private Throwable beforeAllThrowable;
     private Throwable beforeEachThrowable;
 
@@ -38,15 +39,16 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
         adapterManager.startTests();
 
+        final String mainUuid = launcherUuid(context);
         final MainContainer mainContainer = new MainContainer()
-                .setUuid(launcherUUID.get());
+                .setUuid(mainUuid);
 
         adapterManager.startMainContainer(mainContainer);
 
         final ClassContainer classContainer = new ClassContainer()
                 .setUuid(Utils.getHash(context.getRequiredTestClass().getName()));
 
-        adapterManager.startClassContainer(launcherUUID.get(), classContainer);
+        adapterManager.startClassContainer(mainUuid, classContainer);
     }
 
     @Override
@@ -56,7 +58,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         }
 
         adapterManager.stopClassContainer(Utils.getHash(context.getRequiredTestClass().getName()));
-        adapterManager.stopMainContainer(launcherUUID.get());
+        adapterManager.stopMainContainer(launcherUuid(context));
 
         if (beforeAllThrowable != null)
         {
@@ -83,7 +85,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        adapterManager.startPrepareFixtureAll(launcherUUID.get(), uuid, fixture);
+        adapterManager.startPrepareFixtureAll(launcherUuid(extensionContext), uuid, fixture);
 
         try {
             invocation.proceed();
@@ -368,7 +370,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
 
         final String uuid = UUID.randomUUID().toString();
         FixtureResult fixture = getFixtureResult(invocationContext.getExecutable());
-        adapterManager.startTearDownFixtureAll(launcherUUID.get(), uuid, fixture);
+        adapterManager.startTearDownFixtureAll(launcherUuid(extensionContext), uuid, fixture);
 
         try {
             invocation.proceed();
@@ -378,6 +380,12 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         }
 
         adapterManager.stopFixture(uuid);
+    }
+
+    private String launcherUuid(ExtensionContext context) {
+        ExtensionContext.Store store = context.getRoot().getStore(LAUNCHER_NAMESPACE);
+        String key = "launcher." + context.getRequiredTestClass().getName();
+        return store.getOrComputeIfAbsent(key, k -> UUID.randomUUID().toString(), String.class);
     }
 
     private ExecutableTest refreshContext() {
