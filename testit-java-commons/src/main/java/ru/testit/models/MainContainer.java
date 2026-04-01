@@ -5,6 +5,7 @@ import ru.testit.services.Utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Model describes main container with.
@@ -13,7 +14,7 @@ public class MainContainer implements Serializable {
     private String uuid;
     private List<FixtureResult> beforeMethods = new ArrayList<>();
     private List<FixtureResult> afterMethods = new ArrayList<>();
-    private List<String> children = new ArrayList<>();
+    private List<String> children = new CopyOnWriteArrayList<>();
     private Long start;
     private Long stop;
 

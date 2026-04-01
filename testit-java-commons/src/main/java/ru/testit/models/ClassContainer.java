@@ -5,6 +5,7 @@ import ru.testit.services.Utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Model describes class container.
@@ -16,7 +17,7 @@ public class ClassContainer implements Serializable {
     private List<FixtureResult> afterEachTest = new ArrayList<>();
     private List<FixtureResult> beforeClassMethods = new ArrayList<>();
     private List<FixtureResult> afterClassMethods = new ArrayList<>();
-    private List<String> children = new ArrayList<>();
+    private List<String> children = new CopyOnWriteArrayList<>();
     private Long start;
     private Long stop;
 

@@ -141,8 +141,11 @@ public class AdapterContainerHelper {
 
         final Optional<ClassContainer> found = storage.getClassContainer(uuid);
         if (!found.isPresent()) {
-            logger.debug(
-                    "Could not update class container: container with uuid {} not found",
+            logger.warn(
+                    "Could not update class container: no container with uuid {}. "
+                            + "Test UUIDs scheduled after this will not be added to class children; "
+                            + "with importRealtime=false bulk import will skip those tests. "
+                            + "Check lifecycle order and parallel execution.",
                     uuid
             );
             return;

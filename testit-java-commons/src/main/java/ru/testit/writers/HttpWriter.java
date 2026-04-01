@@ -257,6 +257,8 @@ public class HttpWriter implements Writer {
     }
 
     private void writeTestsAfterAll(MainContainer container) {
+        logBulkImportTreeVsStorageDiagnostics(container);
+
         List<AutoTestStepApiModel> beforeAll = Converter.convertFixtureToApi(container.getBeforeMethods(), null);
         List<AutoTestStepApiModel> afterAll = Converter.convertFixtureToApi(container.getAfterMethods(), null);
         List<AttachmentPutModelAutoTestStepResultsModel> beforeResultAll = Converter.convertResultFixture(container.getBeforeMethods(), null);
@@ -352,6 +354,46 @@ public class HttpWriter implements Writer {
             bulkHelper.teardown();
         } catch (ApiException e) {
             LOGGER.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Diagnostics for importRealtime=false: bulk only sends tests reachable via MainContainer → ClassContainer.children.
+     */
+    private void logBulkImportTreeVsStorageDiagnostics(MainContainer container) {
+        Set<String> linkedTestUuids = new HashSet<>();
+        for (String classUuid : container.getChildren()) {
+            storage.getClassContainer(classUuid).ifPresent(cl -> linkedTestUuids.addAll(cl.getChildren()));
+        }
+        Set<String> storedTestUuids = storage.getAllTestResultUuids();
+        Set<String> inStorageNotInTree = new HashSet<>(storedTestUuids);
+        inStorageNotInTree.removeAll(linkedTestUuids);
+        Set<String> inTreeNotInStorage = new HashSet<>(linkedTestUuids);
+        inTreeNotInStorage.removeAll(storedTestUuids);
+        if (!inTreeNotInStorage.isEmpty()) {
+            LOGGER.warn(
+                    "Bulk import (importRealtime=false): {} UUID(s) in class container children but no TestResult in storage: {}",
+                    inTreeNotInStorage.size(),
+                    inTreeNotInStorage
+            );
+        }
+        if (!inStorageNotInTree.isEmpty()) {
+            LOGGER.warn(
+                    "Bulk import (importRealtime=false): {} TestResult(s) in ResultStorage are not linked under this MainContainer tree and will NOT be sent: {}. "
+                            + "Typical cause: updateClassContainer did not run (see WARN). "
+                            + "If multiple suites share ResultStorage, other classes' tests may appear here.",
+                    inStorageNotInTree.size(),
+                    inStorageNotInTree
+            );
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(
+                    "Bulk import scope: mainUuid={}, classContainerCount={}, linkedTestUuids={}, storedTestResultCount={}",
+                    container.getUuid(),
+                    container.getChildren().size(),
+                    linkedTestUuids.size(),
+                    storedTestUuids.size()
+            );
         }
     }
 
