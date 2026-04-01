@@ -130,16 +130,36 @@ public class TagParser {
         return getMetaProperty(scenarioMeta, key);
     }
 
+    /**
+     * JBehave variants: {@code @ExternalId value}, {@code @ExternalId} key with value in Properties,
+     * and {@code @ExternalId=value} where the whole string is stored as the property name (value empty).
+     */
     private static String getMetaProperty(Meta meta, String key) {
         if (meta == null || meta.isEmpty()) {
             return "";
         }
         if (meta.hasProperty(key)) {
-            return meta.getProperty(key);
+            String v = meta.getProperty(key);
+            if (!v.isEmpty()) {
+                return v;
+            }
         }
         String atKey = "@" + key;
         if (meta.hasProperty(atKey)) {
-            return meta.getProperty(atKey);
+            String v = meta.getProperty(atKey);
+            if (!v.isEmpty()) {
+                return v;
+            }
+        }
+        String prefix = key + "=";
+        String atPrefix = "@" + key + "=";
+        for (String name : meta.getPropertyNames()) {
+            if (name.startsWith(atPrefix)) {
+                return name.substring(atPrefix.length()).trim();
+            }
+            if (name.startsWith(prefix)) {
+                return name.substring(prefix.length()).trim();
+            }
         }
         return "";
     }
