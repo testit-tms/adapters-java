@@ -119,15 +119,28 @@ public class TagParser {
         }
     }
 
+    /**
+     * JBehave stores meta keys as in the story file, e.g. {@code @ExternalId}, not {@code ExternalId}.
+     */
     private String getMetaValue(Meta storyMeta, Meta scenarioMeta, String key) {
-        if (storyMeta.hasProperty(key)) {
-            return storyMeta.getProperty(key);
+        String v = getMetaProperty(storyMeta, key);
+        if (!v.isEmpty()) {
+            return v;
         }
+        return getMetaProperty(scenarioMeta, key);
+    }
 
-        if (scenarioMeta.hasProperty(key)) {
-            return scenarioMeta.getProperty(key);
+    private static String getMetaProperty(Meta meta, String key) {
+        if (meta == null || meta.isEmpty()) {
+            return "";
         }
-
+        if (meta.hasProperty(key)) {
+            return meta.getProperty(key);
+        }
+        String atKey = "@" + key;
+        if (meta.hasProperty(atKey)) {
+            return meta.getProperty(atKey);
+        }
         return "";
     }
 
