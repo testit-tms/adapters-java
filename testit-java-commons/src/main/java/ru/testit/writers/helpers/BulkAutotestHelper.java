@@ -9,7 +9,6 @@ import ru.testit.clients.ClientConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,16 +74,10 @@ public class BulkAutotestHelper {
 
     private void bulkCreate() throws ApiException {
         int n = autotestsForCreate.size();
-        List<AutoTestCreateApiModel> uniqueCreates = dedupeCreatesByExternalId(autotestsForCreate);
-        if (uniqueCreates.size() < n) {
-            LOGGER.info(
-                    "Bulk createAutoTests: {} unique externalId(s), {} duplicate row(s) omitted for API (TMS requires unique externalIds per batch)",
-                    uniqueCreates.size(),
-                    n - uniqueCreates.size()
-            );
+        LOGGER.info("Sequential createAutoTest ({} row(s)) then sendTestResults", n);
+        for (AutoTestCreateApiModel model : autotestsForCreate) {
+            apiClient.createAutoTest(model);
         }
-        LOGGER.info("Bulk createAutoTests + sendTestResults: {} autotest(s) in request, {} result row(s)", uniqueCreates.size(), n);
-        apiClient.createAutoTests(uniqueCreates);
         apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingCreated);
 
         autotestsForCreate.clear();
@@ -93,16 +86,11 @@ public class BulkAutotestHelper {
 
     private void bulkUpdate() throws ApiException {
         int n = autotestsForUpdate.size();
-        List<AutoTestUpdateApiModel> uniqueUpdates = dedupeUpdatesByExternalId(autotestsForUpdate);
-        if (uniqueUpdates.size() < n) {
-            LOGGER.info(
-                    "Bulk updateAutoTests: {} unique externalId(s), {} duplicate row(s) omitted for API (TMS requires unique externalIds per batch)",
-                    uniqueUpdates.size(),
-                    n - uniqueUpdates.size()
-            );
+        // Sequential updates: TMS rejects bulk updateMultiple under concurrency (DbUpdateConcurrencyException).
+        LOGGER.info("Sequential updateAutoTest ({} row(s)) then sendTestResults", n);
+        for (AutoTestUpdateApiModel model : autotestsForUpdate) {
+            apiClient.updateAutoTest(model);
         }
-        LOGGER.info("Bulk updateAutoTests + sendTestResults: {} autotest(s) in request, {} result row(s)", uniqueUpdates.size(), n);
-        apiClient.updateAutoTests(uniqueUpdates);
         apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingUpdated);
 
         Map<String, List<String>> wiBatch = new HashMap<>(autotestLinksToWIForUpdate);
@@ -120,32 +108,6 @@ public class BulkAutotestHelper {
 
         autotestsForUpdate.clear();
         resultsForAutotestsBeingUpdated.clear();
-    }
-
-    /**
-     * TMS bulk update rejects duplicate {@code externalId} in one request; parameterized / outline rows often share it.
-     * Last model wins per id; {@link #resultsForAutotestsBeingUpdated} stays 1:1 with all executions.
-     */
-    private static List<AutoTestUpdateApiModel> dedupeUpdatesByExternalId(List<AutoTestUpdateApiModel> models) {
-        Map<String, AutoTestUpdateApiModel> byKey = new LinkedHashMap<>();
-        for (int i = 0; i < models.size(); i++) {
-            AutoTestUpdateApiModel m = models.get(i);
-            String ext = m.getExternalId();
-            String key = (ext != null && !ext.isEmpty()) ? ext : "__noExternalId__" + i;
-            byKey.put(key, m);
-        }
-        return new ArrayList<>(byKey.values());
-    }
-
-    private static List<AutoTestCreateApiModel> dedupeCreatesByExternalId(List<AutoTestCreateApiModel> models) {
-        Map<String, AutoTestCreateApiModel> byKey = new LinkedHashMap<>();
-        for (int i = 0; i < models.size(); i++) {
-            AutoTestCreateApiModel m = models.get(i);
-            String ext = m.getExternalId();
-            String key = (ext != null && !ext.isEmpty()) ? ext : "__noExternalId__" + i;
-            byKey.put(key, m);
-        }
-        return new ArrayList<>(byKey.values());
     }
 
     //TODO: delete after fix PUT/api/v2/autoTests
