@@ -33,6 +33,25 @@ public class ResultStorage {
         return uuids;
     }
 
+    /**
+     * Test results belonging to one main container (parallel runs share one JVM storage).
+     */
+    public Set<String> getTestResultUuidsForMainContainer(final String mainUuid) {
+        if (mainUuid == null) {
+            return new HashSet<>();
+        }
+        Set<String> uuids = new HashSet<>();
+        for (Map.Entry<String, Object> e : storage.entrySet()) {
+            if (e.getValue() instanceof TestResult) {
+                TestResult tr = (TestResult) e.getValue();
+                if (mainUuid.equals(tr.getMainContainerUuid())) {
+                    uuids.add(e.getKey());
+                }
+            }
+        }
+        return uuids;
+    }
+
     public Optional<FixtureResult> getFixture(final String uuid) {
         return get(uuid, FixtureResult.class);
     }

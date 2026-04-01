@@ -365,7 +365,7 @@ public class HttpWriter implements Writer {
         for (String classUuid : container.getChildren()) {
             storage.getClassContainer(classUuid).ifPresent(cl -> linkedTestUuids.addAll(cl.getChildren()));
         }
-        Set<String> storedTestUuids = storage.getAllTestResultUuids();
+        Set<String> storedTestUuids = storedTestUuidsForBulkDiagnostics(container);
         Set<String> inStorageNotInTree = new HashSet<>(storedTestUuids);
         inStorageNotInTree.removeAll(linkedTestUuids);
         Set<String> inTreeNotInStorage = new HashSet<>(linkedTestUuids);
@@ -379,22 +379,35 @@ public class HttpWriter implements Writer {
         }
         if (!inStorageNotInTree.isEmpty()) {
             LOGGER.warn(
-                    "Bulk import (importRealtime=false): {} TestResult(s) in ResultStorage are not linked under this MainContainer tree and will NOT be sent: {}. "
-                            + "Typical cause: updateClassContainer did not run (see WARN). "
-                            + "If multiple suites share ResultStorage, other classes' tests may appear here.",
+                    "Bulk import (importRealtime=false): {} TestResult(s) for this main container are not linked under the class tree and will NOT be sent: {}. "
+                            + "Typical cause: updateClassContainer did not run (see WARN).",
                     inStorageNotInTree.size(),
                     inStorageNotInTree
             );
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(
-                    "Bulk import scope: mainUuid={}, classContainerCount={}, linkedTestUuids={}, storedTestResultCount={}",
+                    "Bulk import scope: mainUuid={}, classContainerCount={}, linkedTestCount={}, storedTestResultCount={}",
                     container.getUuid(),
                     container.getChildren().size(),
                     linkedTestUuids.size(),
                     storedTestUuids.size()
             );
         }
+    }
+
+    /** Per-main scope when TestResult.mainContainerUuid is set; otherwise global (legacy adapters, noisy with parallel classes). */
+    private Set<String> storedTestUuidsForBulkDiagnostics(MainContainer container) {
+        Set<String> scoped = storage.getTestResultUuidsForMainContainer(container.getUuid());
+        if (!scoped.isEmpty()) {
+            return scoped;
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(
+                    "Bulk import diagnostics: no TestResult with mainContainerUuid; comparing tree to global storage (parallel classes may false-positive)"
+            );
+        }
+        return storage.getAllTestResultUuids();
     }
 
     @Override

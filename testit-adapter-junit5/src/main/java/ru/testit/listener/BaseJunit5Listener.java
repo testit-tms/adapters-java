@@ -166,7 +166,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         test.setTestStatus();
 
         final String uuid = test.getUuid();
-        startTestCase(extensionContext.getRequiredTestMethod(), uuid, parameters);
+        startTestCase(extensionContext.getRequiredTestMethod(), uuid, parameters, extensionContext);
 
         adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
                 container -> container.getChildren().add(uuid));
@@ -220,7 +220,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         test.setTestStatus();
 
         final String uuid = test.getUuid();
-        startTestCase(extensionContext.getRequiredTestMethod(), uuid, null);
+        startTestCase(extensionContext.getRequiredTestMethod(), uuid, null, extensionContext);
 
         adapterManager.updateClassContainer(Utils.getHash(invocationContext.getTargetClass().getName()),
                 container -> container.getChildren().add(uuid));
@@ -229,11 +229,17 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         invocation.proceed();
     }
 
-    protected void startTestCase(Method method, final String uuid, Map<String, String> parameters) {
+    protected void startTestCase(
+            Method method,
+            final String uuid,
+            Map<String, String> parameters,
+            ExtensionContext extensionContext
+    ) {
         String testNode = method.getDeclaringClass().getCanonicalName() + "." + method.getName();
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
+                .setMainContainerUuid(launcherUuid(extensionContext))
                 .setLabels(Utils.extractLabels(method, parameters))
                 .setTags(Utils.extractTags(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
