@@ -7,8 +7,10 @@ import ru.testit.client.model.*;
 import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,11 +76,16 @@ public class BulkAutotestHelper {
 
     private void bulkCreate() throws ApiException {
         int n = autotestsForCreate.size();
-        LOGGER.info("Sequential createAutoTest ({} row(s)) then sendTestResults", n);
-        for (AutoTestCreateApiModel model : autotestsForCreate) {
-            apiClient.createAutoTest(model);
+        LOGGER.info("Sequential createAutoTest ({} row(s)), then sendTestResults batched (no duplicate autotest per request)", n);
+        for (int i = 0; i < n; i++) {
+            final AutoTestCreateApiModel createModel = autotestsForCreate.get(i);
+            retryApi(() -> apiClient.createAutoTest(createModel));
         }
-        apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingCreated);
+        List<List<AutoTestResultsForTestRunModel>> batches = partitionResultsUniqueAutotestPerBatch(resultsForAutotestsBeingCreated);
+        LOGGER.info("sendTestResults: {} batch(es), {} result row(s)", batches.size(), n);
+        for (List<AutoTestResultsForTestRunModel> batch : batches) {
+            retrySend(batch);
+        }
 
         autotestsForCreate.clear();
         resultsForAutotestsBeingCreated.clear();
@@ -86,12 +93,16 @@ public class BulkAutotestHelper {
 
     private void bulkUpdate() throws ApiException {
         int n = autotestsForUpdate.size();
-        // Sequential updates: TMS rejects bulk updateMultiple under concurrency (DbUpdateConcurrencyException).
-        LOGGER.info("Sequential updateAutoTest ({} row(s)) then sendTestResults", n);
-        for (AutoTestUpdateApiModel model : autotestsForUpdate) {
-            apiClient.updateAutoTest(model);
+        LOGGER.info("Sequential updateAutoTest ({} row(s)), then sendTestResults batched (no duplicate autotest per request)", n);
+        for (int i = 0; i < n; i++) {
+            final AutoTestUpdateApiModel updateModel = autotestsForUpdate.get(i);
+            retryApi(() -> apiClient.updateAutoTest(updateModel));
         }
-        apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingUpdated);
+        List<List<AutoTestResultsForTestRunModel>> batches = partitionResultsUniqueAutotestPerBatch(resultsForAutotestsBeingUpdated);
+        LOGGER.info("sendTestResults: {} batch(es), {} result row(s)", batches.size(), n);
+        for (List<AutoTestResultsForTestRunModel> batch : batches) {
+            retrySend(batch);
+        }
 
         Map<String, List<String>> wiBatch = new HashMap<>(autotestLinksToWIForUpdate);
         autotestLinksToWIForUpdate.clear();
@@ -99,7 +110,7 @@ public class BulkAutotestHelper {
         wiBatch.forEach((autotestId, workItemIds) ->
                 {
                     try {
-                        updateTestLinkToWorkItems(autotestId, workItemIds);
+                        retryApi(() -> updateTestLinkToWorkItems(autotestId, workItemIds));
                     } catch (ApiException e) {
                         throw new RuntimeException(e);
                     }
@@ -108,6 +119,92 @@ public class BulkAutotestHelper {
 
         autotestsForUpdate.clear();
         resultsForAutotestsBeingUpdated.clear();
+    }
+
+    /**
+     * TMS: do not put two results for the same autotest in one {@code sendTestResults} call.
+     * Groups by {@link AutoTestResultsForTestRunModel#getAutoTestExternalId()}, then round-robin so each batch has at most one row per autotest.
+     */
+    static List<List<AutoTestResultsForTestRunModel>> partitionResultsUniqueAutotestPerBatch(
+            List<AutoTestResultsForTestRunModel> all
+    ) {
+        Map<String, ArrayDeque<AutoTestResultsForTestRunModel>> byAutotest = new LinkedHashMap<>();
+        for (AutoTestResultsForTestRunModel m : all) {
+            String key = autotestKey(m);
+            byAutotest.computeIfAbsent(key, k -> new ArrayDeque<>()).addLast(m);
+        }
+        List<List<AutoTestResultsForTestRunModel>> batches = new ArrayList<>();
+        while (true) {
+            List<AutoTestResultsForTestRunModel> batch = new ArrayList<>();
+            for (ArrayDeque<AutoTestResultsForTestRunModel> q : byAutotest.values()) {
+                if (!q.isEmpty()) {
+                    batch.add(q.pollFirst());
+                }
+            }
+            if (batch.isEmpty()) {
+                break;
+            }
+            batches.add(batch);
+        }
+        return batches;
+    }
+
+    private static String autotestKey(AutoTestResultsForTestRunModel m) {
+        String id = m.getAutoTestExternalId();
+        return id != null && !id.isEmpty() ? id : "\0null";
+    }
+
+    private static boolean isDbConcurrency(ApiException e) {
+        String m = e.getMessage();
+        return m != null && m.contains("DbUpdateConcurrencyException");
+    }
+
+    private static void sleepBackoff(int attempt) throws ApiException {
+        try {
+            Thread.sleep(80L * attempt);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new ApiException(ie);
+        }
+    }
+
+    @FunctionalInterface
+    private interface ApiVoid {
+        void run() throws ApiException;
+    }
+
+    private void retryApi(ApiVoid call) throws ApiException {
+        final int maxAttempts = 6;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                call.run();
+                return;
+            } catch (ApiException e) {
+                if (attempt < maxAttempts && isDbConcurrency(e)) {
+                    LOGGER.warn("TMS API concurrency, retry {}/{}: {}", attempt, maxAttempts, e.getMessage());
+                    sleepBackoff(attempt);
+                } else {
+                    throw e;
+                }
+            }
+        }
+    }
+
+    private void retrySend(List<AutoTestResultsForTestRunModel> models) throws ApiException {
+        final int maxAttempts = 6;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                apiClient.sendTestResults(config.getTestRunId(), models);
+                return;
+            } catch (ApiException e) {
+                if (attempt < maxAttempts && isDbConcurrency(e)) {
+                    LOGGER.warn("sendTestResults concurrency, retry {}/{}: {}", attempt, maxAttempts, e.getMessage());
+                    sleepBackoff(attempt);
+                } else {
+                    throw e;
+                }
+            }
+        }
     }
 
     //TODO: delete after fix PUT/api/v2/autoTests

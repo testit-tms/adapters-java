@@ -76,6 +76,12 @@ public class AdapterContainerHelper {
             logger.debug("Stop main container {}", container);
         }
 
+        logger.info(
+                "TMS finalize: mainUuid={}, classContainersInMain={}",
+                uuid,
+                container.getChildren().size()
+        );
+
         writer.writeTests(container);
 
         logger.info("End of main container, set completed");
