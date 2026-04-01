@@ -96,15 +96,27 @@ public class AdapterContainerHelper {
             return;
         }
 
+        final String classUuid = container.getUuid();
+        // Cucumber reuses the same class UUID per thread; do not replace storage entry or accumulated children.
+        if (storage.getClassContainer(classUuid).isPresent()) {
+            storage.updateIfPresent(classUuid, ClassContainer.class, c -> c.setStart(System.currentTimeMillis()));
+            syncStorageService.setWorkerStatus("in_progress");
+            return;
+        }
+
         storage.getTestsContainer(parentUuid).ifPresent(parent ->
                 storage.updateIfPresent(
                         parentUuid,
                         MainContainer.class,
-                        p -> p.getChildren().add(container.getUuid())
+                        p -> {
+                            if (!p.getChildren().contains(classUuid)) {
+                                p.getChildren().add(classUuid);
+                            }
+                        }
                 )
         );
         container.setStart(System.currentTimeMillis());
-        storage.put(container.getUuid(), container);
+        storage.put(classUuid, container);
 
         if (logger.isDebugEnabled()) {
             logger.debug(

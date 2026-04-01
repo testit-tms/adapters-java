@@ -69,6 +69,16 @@ public class BulkAutotestHelper {
         }
     }
 
+    /** Autotest metadata unchanged; only {@link #sendTestResults} rows (after create/update batches). */
+    public void addTestRunResultOnly(AutoTestResultsForTestRunModel resultModel) throws ApiException {
+        resultsForAutotestsBeingUpdated.add(resultModel);
+        if (resultsForAutotestsBeingUpdated.size() >= MAX_TESTS_FOR_IMPORT
+                && autotestsForCreate.isEmpty()
+                && autotestsForUpdate.isEmpty()) {
+            flushPendingResultsOnly();
+        }
+    }
+
     public void teardown() throws ApiException {
         if (!autotestsForCreate.isEmpty())
         {
@@ -79,6 +89,23 @@ public class BulkAutotestHelper {
         {
             bulkUpdate();
         }
+
+        if (!resultsForAutotestsBeingUpdated.isEmpty()) {
+            flushPendingResultsOnly();
+        }
+    }
+
+    private void flushPendingResultsOnly() throws ApiException {
+        int n = resultsForAutotestsBeingUpdated.size();
+        if (n == 0) {
+            return;
+        }
+        List<List<AutoTestResultsForTestRunModel>> batches = partitionResultsUniqueAutotestPerBatch(resultsForAutotestsBeingUpdated);
+        LOGGER.info("sendTestResults (autotest unchanged): {} batch(es), {} result row(s)", batches.size(), n);
+        for (List<AutoTestResultsForTestRunModel> batch : batches) {
+            retrySend(batch);
+        }
+        resultsForAutotestsBeingUpdated.clear();
     }
 
     private void bulkCreate() throws ApiException {

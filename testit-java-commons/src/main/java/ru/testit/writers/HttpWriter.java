@@ -271,7 +271,8 @@ public class HttpWriter implements Writer {
         AtomicInteger missingTestResult = new AtomicInteger();
         AtomicInteger bulkApiErrors = new AtomicInteger();
 
-        for (final String classUuid : container.getChildren()) {
+        LinkedHashSet<String> classUuids = new LinkedHashSet<>(container.getChildren());
+        for (final String classUuid : classUuids) {
             Optional<ClassContainer> ocl = storage.getClassContainer(classUuid);
             if (!ocl.isPresent()) {
                 LOGGER.warn("Bulk import: MainContainer references classUuid={} but ClassContainer is missing in storage", classUuid);
@@ -352,11 +353,18 @@ public class HttpWriter implements Writer {
                         Map<String, List<String>> autotestLinksToWIForUpdate = new HashMap<>();
                         autotestLinksToWIForUpdate.put(id, wi);
 
-                        bulkHelper.addForUpdate(
-                                model,
-                                autoTestResultsForTestRunModel,
-                                autotestLinksToWIForUpdate
-                        );
+                        if (hasAutoTestChanged(autoTestApiResult, model)) {
+                            bulkHelper.addForUpdate(
+                                    model,
+                                    autoTestResultsForTestRunModel,
+                                    autotestLinksToWIForUpdate
+                            );
+                        } else {
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("Bulk import: autotest unchanged, skip PUT for {}", test.getExternalId());
+                            }
+                            bulkHelper.addTestRunResultOnly(autoTestResultsForTestRunModel);
+                        }
                     }
                 } catch (ApiException e) {
                     bulkApiErrors.incrementAndGet();
@@ -391,7 +399,7 @@ public class HttpWriter implements Writer {
      */
     private void logBulkImportTreeVsStorageDiagnostics(MainContainer container) {
         Set<String> linkedTestUuids = new HashSet<>();
-        for (String classUuid : container.getChildren()) {
+        for (String classUuid : new LinkedHashSet<>(container.getChildren())) {
             storage.getClassContainer(classUuid).ifPresent(cl -> linkedTestUuids.addAll(cl.getChildren()));
         }
         Set<String> storedTestUuids = storedTestUuidsForBulkDiagnostics(container);
@@ -418,7 +426,7 @@ public class HttpWriter implements Writer {
             LOGGER.debug(
                     "Bulk import scope: mainUuid={}, classContainerCount={}, linkedTestCount={}, storedTestResultCount={}",
                     container.getUuid(),
-                    container.getChildren().size(),
+                    new LinkedHashSet<>(container.getChildren()).size(),
                     linkedTestUuids.size(),
                     storedTestUuids.size()
             );

@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 
 public class BaseCucumber4Listener implements ConcurrentEventListener {
     private static final Logger log = LoggerFactory.getLogger(BaseCucumber4Listener.class);
+    private static final Set<String> MAIN_UUIDS_PENDING_FINALIZE = ConcurrentHashMap.newKeySet();
     private final AdapterManager adapterManager;
 
     private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
@@ -34,6 +35,7 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
     private final ThreadLocal<Boolean> forbidTestCaseStatusChange = new InheritableThreadLocal<>();
 
     private final EventHandler<TestRunStarted> testRunStartedEventHandler = this::handleTestRunStartedHandler;
+    private final EventHandler<TestRunFinished> testRunFinishedEventHandler = this::handleTestRunFinishedHandler;
     private final EventHandler<TestSourceRead> featureStartedEventHandler = this::handleFeatureStartedHandler;
     private final EventHandler<TestCaseStarted> caseStartedEventHandler = this::testStarted;
     private final EventHandler<TestCaseFinished> caseFinishedEventHandler = this::testFinished;
@@ -57,6 +59,7 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
     public void setEventPublisher(EventPublisher publisher) {
         publisher.registerHandlerFor(TestSourceRead.class, featureStartedEventHandler);
         publisher.registerHandlerFor(TestRunStarted.class, testRunStartedEventHandler);
+        publisher.registerHandlerFor(TestRunFinished.class, testRunFinishedEventHandler);
 
         publisher.registerHandlerFor(TestCaseStarted.class, caseStartedEventHandler);
         publisher.registerHandlerFor(TestCaseFinished.class, caseFinishedEventHandler);
@@ -69,7 +72,15 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
     }
 
     private void handleTestRunStartedHandler(TestRunStarted event) {
+        MAIN_UUIDS_PENDING_FINALIZE.clear();
         adapterManager.startTests();
+    }
+
+    private void handleTestRunFinishedHandler(TestRunFinished event) {
+        for (String uuid : new ArrayList<>(MAIN_UUIDS_PENDING_FINALIZE)) {
+            adapterManager.stopMainContainer(uuid);
+        }
+        MAIN_UUIDS_PENDING_FINALIZE.clear();
     }
 
     private void handleFeatureStartedHandler(TestSourceRead event) {
@@ -81,6 +92,7 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
                 .setUuid(launcherUUID.get());
 
         adapterManager.startMainContainer(mainContainer);
+        MAIN_UUIDS_PENDING_FINALIZE.add(launcherUUID.get());
 
         final ClassContainer classContainer = new ClassContainer()
                 .setUuid(classUUID.get());
@@ -184,7 +196,6 @@ public class BaseCucumber4Listener implements ConcurrentEventListener {
         }
         adapterManager.stopTestCase(uuid);
         adapterManager.stopClassContainer(classUUID.get());
-        adapterManager.stopMainContainer(launcherUUID.get());
     }
 
     private void stepStarted(final TestStepStarted event) {
