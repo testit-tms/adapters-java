@@ -388,10 +388,21 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         adapterManager.stopFixture(uuid);
     }
 
+    /**
+     * One launcher per top-level test class so @Nested methods share the same MainContainer as the outer {@code @BeforeAll}.
+     */
     private String launcherUuid(ExtensionContext context) {
         ExtensionContext.Store store = context.getRoot().getStore(LAUNCHER_NAMESPACE);
-        String key = "launcher." + context.getRequiredTestClass().getName();
+        String key = "launcher." + topLevelEnclosingTestClass(context.getRequiredTestClass()).getName();
         return store.getOrComputeIfAbsent(key, k -> UUID.randomUUID().toString(), String.class);
+    }
+
+    private static Class<?> topLevelEnclosingTestClass(Class<?> c) {
+        Class<?> cur = c;
+        while (cur.getEnclosingClass() != null) {
+            cur = cur.getEnclosingClass();
+        }
+        return cur;
     }
 
     private ExecutableTest refreshContext() {

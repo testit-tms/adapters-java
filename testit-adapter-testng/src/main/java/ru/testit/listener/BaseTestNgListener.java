@@ -44,9 +44,10 @@ public class BaseTestNgListener implements
      */
     private final ThreadLocal<String> executableFixture = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
     /**
-     * Store current executable context of tests.
+     * One MainContainer per {@link ITestContext} — a single shared UUID breaks when suite has multiple &lt;test&gt;
+     * nodes or parallel contexts (Gradle / TestNG overwrites the same storage key).
      */
-    private final String launcherUUID = UUID.randomUUID().toString();
+    private final Map<ITestContext, String> mainUuidByContext = new ConcurrentHashMap<>();
 
     /**
      * Store class container uuids.
@@ -69,15 +70,17 @@ public class BaseTestNgListener implements
 
     @Override
     public void onStart(final ITestContext context) {
-        final MainContainer container = new MainContainer()
-                .setUuid(launcherUUID);
-
-        adapterManager.startMainContainer(container);
+        final String mainUuid = UUID.randomUUID().toString();
+        mainUuidByContext.put(context, mainUuid);
+        adapterManager.startMainContainer(new MainContainer().setUuid(mainUuid));
     }
 
     @Override
     public void onFinish(final ITestContext context) {
-        adapterManager.stopMainContainer(launcherUUID);
+        final String mainUuid = mainUuidByContext.remove(context);
+        if (mainUuid != null) {
+            adapterManager.stopMainContainer(mainUuid);
+        }
     }
 
     @Override
@@ -104,8 +107,10 @@ public class BaseTestNgListener implements
         String testNode = testResult.getInstanceName() + "." + testResult.getName();
 
         Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
+        final String mainUuid = mainUuidForTestResult(testResult);
         final TestResult result = new TestResult()
                 .setUuid(uuid)
+                .setMainContainerUuid(mainUuid)
                 .setLabels(Utils.extractLabels(method, parameters))
                 .setTags(Utils.extractTags(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
@@ -227,12 +232,17 @@ public class BaseTestNgListener implements
 
     @Override
     public void onBeforeClass(ITestClass testClass) {
+        final String mainUuid = mainUuidForTestClass(testClass);
+        if (mainUuid == null) {
+            LOGGER.warn("Could not resolve MainContainer for class {}; skipping class container start", testClass.getName());
+            return;
+        }
         final String uuid = UUID.randomUUID().toString();
         final ClassContainer container = new ClassContainer()
                 .setUuid(uuid)
                 .setName(testClass.getName());
 
-        adapterManager.startClassContainer(launcherUUID, container);
+        adapterManager.startClassContainer(mainUuid, container);
 
         setClassContainer(testClass, uuid);
     }
@@ -246,20 +256,24 @@ public class BaseTestNgListener implements
     public void beforeInvocation(final IInvokedMethod method, final ITestResult testResult) {
         final ITestNGMethod testMethod = method.getTestMethod();
         if (isSupportedConfigurationFixture(testMethod)) {
-            ifTestFixtureStarted(testMethod);
+            ifTestFixtureStarted(testMethod, testResult);
             ifClassFixtureStarted(testMethod);
             ifMethodFixtureStarted(testMethod);
         }
     }
 
-    private void ifTestFixtureStarted(final ITestNGMethod testMethod) {
+    private void ifTestFixtureStarted(final ITestNGMethod testMethod, final ITestResult testResult) {
+        final String mainUuid = mainUuidForTestResult(testResult);
+        if (mainUuid == null) {
+            return;
+        }
         if (testMethod.isBeforeTestConfiguration()) {
             final String uuid = executableFixture.get();
-            adapterManager.startPrepareFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
+            adapterManager.startPrepareFixtureAll(mainUuid, uuid, getFixtureResult(testMethod));
         }
         if (testMethod.isAfterTestConfiguration()) {
             final String uuid = executableFixture.get();
-            adapterManager.startTearDownFixtureAll(launcherUUID, uuid, getFixtureResult(testMethod));
+            adapterManager.startTearDownFixtureAll(mainUuid, uuid, getFixtureResult(testMethod));
         }
     }
 
@@ -328,6 +342,40 @@ public class BaseTestNgListener implements
                         .setItemStatus(ItemStatus.FAILED));
             }
             adapterManager.stopFixture(executableUuid);
+        }
+    }
+
+    private String mainUuidForTestResult(final ITestResult testResult) {
+        if (testResult != null) {
+            ITestContext ctx = testResult.getTestContext();
+            if (ctx != null) {
+                String u = mainUuidByContext.get(ctx);
+                if (u != null) {
+                    return u;
+                }
+            }
+        }
+        return mainUuidByContext.size() == 1 ? mainUuidByContext.values().iterator().next() : null;
+    }
+
+    private String mainUuidForTestClass(final ITestClass testClass) {
+        ITestContext ctx = testContextFromTestClass(testClass);
+        if (ctx != null) {
+            String u = mainUuidByContext.get(ctx);
+            if (u != null) {
+                return u;
+            }
+        }
+        return mainUuidByContext.size() == 1 ? mainUuidByContext.values().iterator().next() : null;
+    }
+
+    /** TestNG does not expose ITestContext on {@link ITestClass}; internal API varies by version. */
+    private static ITestContext testContextFromTestClass(final ITestClass testClass) {
+        try {
+            final java.lang.reflect.Method m = testClass.getClass().getMethod("getTestContext");
+            return (ITestContext) m.invoke(testClass);
+        } catch (ReflectiveOperationException e) {
+            return null;
         }
     }
 

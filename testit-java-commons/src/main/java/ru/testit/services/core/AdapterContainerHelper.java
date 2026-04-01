@@ -38,8 +38,16 @@ public class AdapterContainerHelper {
             return;
         }
 
+        final String uuid = container.getUuid();
+        if (storage.getTestsContainer(uuid).isPresent()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Main container {} already registered, skip duplicate start (e.g. nested @BeforeAll)", uuid);
+            }
+            return;
+        }
+
         container.setStart(System.currentTimeMillis());
-        storage.put(container.getUuid(), container);
+        storage.put(uuid, container);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Start new main container {}", container);

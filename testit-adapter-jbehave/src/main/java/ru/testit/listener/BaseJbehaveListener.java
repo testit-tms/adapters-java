@@ -21,8 +21,9 @@ public class BaseJbehaveListener extends NullStoryReporter {
     private final ThreadLocal<Story> executableStory = new InheritableThreadLocal<>();
     private final ThreadLocal<Scenario> executableScenario = new InheritableThreadLocal<>();
     private final List<String> exampleUuids = new ArrayList<>();
-    private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
-    private final ThreadLocal<String> classUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
+    /** Must be {@link ThreadLocal#set} in {@link #beforeScenario} — {@code withInitial} breaks when afterScenario runs on another thread. */
+    private final ThreadLocal<String> launcherUUID = new ThreadLocal<>();
+    private final ThreadLocal<String> classUUID = new ThreadLocal<>();
     private boolean adapterLaunchIsStarted = false;
 
     public BaseJbehaveListener() {
@@ -55,13 +56,18 @@ public class BaseJbehaveListener extends NullStoryReporter {
 
     @Override
     public void beforeScenario(final Scenario scenario) {
+        final String mainUuid = UUID.randomUUID().toString();
+        final String classU = UUID.randomUUID().toString();
+        launcherUUID.set(mainUuid);
+        classUUID.set(classU);
+
         final MainContainer mainContainer = new MainContainer()
-                .setUuid(launcherUUID.get());
+                .setUuid(mainUuid);
         final ClassContainer classContainer = new ClassContainer()
-                .setUuid(classUUID.get());
+                .setUuid(classU);
 
         adapterManager.startMainContainer(mainContainer);
-        adapterManager.startClassContainer(launcherUUID.get(), classContainer);
+        adapterManager.startClassContainer(mainUuid, classContainer);
 
         executableScenario.set(scenario);
 
@@ -79,14 +85,20 @@ public class BaseJbehaveListener extends NullStoryReporter {
             adapterManager.updateClassContainer(classUUID.get(),
                     container -> container.getChildren().add(uuid));
 
-            startTestCase(scenario, uuid, null);
+            startTestCase(scenario, uuid, null, mainUuid);
         }
     }
 
-    protected void startTestCase(Scenario scenario, final String uuid, Map<String, String> parameters) {
+    protected void startTestCase(
+            Scenario scenario,
+            final String uuid,
+            Map<String, String> parameters,
+            String mainContainerUuid
+    ) {
         final TestResult result = ScenarioParser
                 .parseScenario(executableStory.get(), scenario, parameters)
-                .setUuid(uuid);
+                .setUuid(uuid)
+                .setMainContainerUuid(mainContainerUuid);
 
         adapterManager.scheduleTestCase(result);
         adapterManager.startTestCase(uuid);
@@ -119,7 +131,8 @@ public class BaseJbehaveListener extends NullStoryReporter {
         startTestCase(
                 executableScenario.get(),
                 uuid,
-                tableRow);
+                tableRow,
+                launcherUUID.get());
     }
 
     @Override
@@ -137,8 +150,16 @@ public class BaseJbehaveListener extends NullStoryReporter {
             exampleUuids.clear();
         }
 
-        adapterManager.stopClassContainer(classUUID.get());
-        adapterManager.stopMainContainer(launcherUUID.get());
+        final String classU = classUUID.get();
+        final String mainUuid = launcherUUID.get();
+        if (classU != null) {
+            adapterManager.stopClassContainer(classU);
+        }
+        if (mainUuid != null) {
+            adapterManager.stopMainContainer(mainUuid);
+        }
+        classUUID.remove();
+        launcherUUID.remove();
         executableTest.remove();
     }
 
