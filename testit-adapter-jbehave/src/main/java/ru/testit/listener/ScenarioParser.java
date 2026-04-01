@@ -11,7 +11,7 @@ public class ScenarioParser {
     private ScenarioParser() {}
 
     public static TestResult parseScenario(final Story story, final Scenario scenario, Map<String, String> parameters) {
-        final TagParser tagParser = new TagParser(story, scenario);
+        final TagParser tagParser = new TagParser(story, scenario, parameters);
         final String featureName = story.getName();
 
         String nameSpace = story.getPath().split(featureName)[0];

@@ -14,6 +14,7 @@ import ru.testit.services.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class TagParser {
     private static final String TAG_VALUE_DELIMITER = ",";
@@ -36,29 +37,56 @@ public class TagParser {
     private final String descriptionValue;
 
     TagParser(final Story story, final Scenario scenario) {
+        this(story, scenario, null);
+    }
+
+    TagParser(final Story story, final Scenario scenario, final Map<String, String> exampleParameters) {
         Meta storyMeta = story.getMeta();
         Meta scenarioMeta = scenario.getMeta();
 
-        externalIdValue = getMetaValue(storyMeta, scenarioMeta, EXTERNAL_ID);
-        titleValue = getMetaValue(storyMeta, scenarioMeta, TITLE);
-        displayNameValue = getMetaValue(storyMeta, scenarioMeta, DISPLAY_NAME);
-        descriptionValue = getMetaValue(storyMeta, scenarioMeta, DESCRIPTION);
+        externalIdValue = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, EXTERNAL_ID),
+                exampleParameters
+        );
+        String titleRaw = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, TITLE),
+                exampleParameters
+        );
+        displayNameValue = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, DISPLAY_NAME),
+                exampleParameters
+        );
+        String descriptionRaw = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, DESCRIPTION),
+                exampleParameters
+        );
+        titleValue = titleRaw;
+        descriptionValue = descriptionRaw;
 
-        String labelsValue = getMetaValue(storyMeta, scenarioMeta, LABELS);
+        String labelsValue = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, LABELS),
+                exampleParameters
+        );
 
         if (!labelsValue.isEmpty()) {
             Arrays.stream(labelsValue.split(TAG_VALUE_DELIMITER))
                     .forEach(label -> getLabelList().add(getTagLabel(label)));
         }
 
-        String tagsValue = getMetaValue(storyMeta, scenarioMeta, TAGS);
+        String tagsValue = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, TAGS),
+                exampleParameters
+        );
 
         if (!tagsValue.isEmpty()) {
             Arrays.stream(tagsValue.split(TAG_VALUE_DELIMITER))
                     .forEach(tag -> getTagList().add(tag));
         }
 
-        String linksValue = getMetaValue(storyMeta, scenarioMeta, LINKS);
+        String linksValue = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, LINKS),
+                exampleParameters
+        );
 
         if (isJson(linksValue)) {
             getLinkItemList().add(getLinkItem(linksValue));
@@ -66,7 +94,10 @@ public class TagParser {
             getLinkItemList().addAll(getLinkItems(linksValue));
         }
 
-        String workItemIdsValue = getMetaValue(storyMeta, scenarioMeta, WORK_ITEM_IDS);
+        String workItemIdsValue = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, WORK_ITEM_IDS),
+                exampleParameters
+        );
 
         if (!workItemIdsValue.isEmpty()) {
             Arrays.stream(workItemIdsValue.split(TAG_VALUE_DELIMITER))
@@ -76,7 +107,11 @@ public class TagParser {
         final String name = scenario.getTitle();
 
         if (externalIdValue.isEmpty()) {
-            externalIdValue = Utils.getHash(story.getPath() + name);
+            String key = story.getPath() + name;
+            if (exampleParameters != null && !exampleParameters.isEmpty()) {
+                key += exampleParameters.toString();
+            }
+            externalIdValue = Utils.getHash(key);
         }
 
         if (displayNameValue.isEmpty()) {
@@ -94,6 +129,26 @@ public class TagParser {
         }
 
         return "";
+    }
+
+    /**
+     * Fills {@code {name}} and {@code <name>} from Examples column names (JBehave example row map keys).
+     */
+    static String substituteExampleParameters(String value, Map<String, String> exampleParameters) {
+        if (value == null || value.isEmpty() || exampleParameters == null || exampleParameters.isEmpty()) {
+            return value == null ? "" : value;
+        }
+        String result = value;
+        for (Map.Entry<String, String> e : exampleParameters.entrySet()) {
+            String key = e.getKey();
+            if (key == null) {
+                continue;
+            }
+            String v = e.getValue() != null ? e.getValue() : "";
+            result = result.replace("{" + key + "}", v);
+            result = result.replace("<" + key + ">", v);
+        }
+        return result;
     }
 
     public List<Label> getLabelList() {
