@@ -1,5 +1,7 @@
 package ru.testit.writers.helpers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.testit.client.invoker.ApiException;
 import ru.testit.client.model.*;
 import ru.testit.clients.ITmsApiClient;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BulkAutotestHelper {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BulkAutotestHelper.class);
     private final ITmsApiClient apiClient;
     private final ClientConfiguration config;
     private static final int MAX_TESTS_FOR_IMPORT = 100;
@@ -70,6 +73,8 @@ public class BulkAutotestHelper {
     }
 
     private void bulkCreate() throws ApiException {
+        int n = autotestsForCreate.size();
+        LOGGER.info("Bulk createAutoTests + sendTestResults: {} autotest(s)", n);
         apiClient.createAutoTests(autotestsForCreate);
         apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingCreated);
 
@@ -78,10 +83,15 @@ public class BulkAutotestHelper {
     }
 
     private void bulkUpdate() throws ApiException {
+        int n = autotestsForUpdate.size();
+        LOGGER.info("Bulk updateAutoTests + sendTestResults: {} autotest(s)", n);
         apiClient.updateAutoTests(autotestsForUpdate);
         apiClient.sendTestResults(config.getTestRunId(), resultsForAutotestsBeingUpdated);
 
-        autotestLinksToWIForUpdate.forEach((autotestId, workItemIds) ->
+        Map<String, List<String>> wiBatch = new HashMap<>(autotestLinksToWIForUpdate);
+        autotestLinksToWIForUpdate.clear();
+
+        wiBatch.forEach((autotestId, workItemIds) ->
                 {
                     try {
                         updateTestLinkToWorkItems(autotestId, workItemIds);
@@ -97,13 +107,14 @@ public class BulkAutotestHelper {
 
     //TODO: delete after fix PUT/api/v2/autoTests
     private void updateTestLinkToWorkItems(String autoTestId, List<String> workItemIds) throws ApiException {
+        List<String> wi = new ArrayList<>(workItemIds);
         List<AutoTestWorkItemIdentifierApiResult> linkedWorkItems = apiClient.getWorkItemsLinkedToTest(autoTestId);
 
         for (AutoTestWorkItemIdentifierApiResult linkedWorkItem : linkedWorkItems) {
             String linkedWorkItemId = linkedWorkItem.getGlobalId().toString();
 
-            if (workItemIds.contains(linkedWorkItemId)) {
-                workItemIds.remove(linkedWorkItemId);
+            if (wi.contains(linkedWorkItemId)) {
+                wi.remove(linkedWorkItemId);
 
                 continue;
             }
@@ -113,6 +124,6 @@ public class BulkAutotestHelper {
             }
         }
 
-        apiClient.linkAutoTestToWorkItems(autoTestId, workItemIds);
+        apiClient.linkAutoTestToWorkItems(autoTestId, wi);
     }
 }

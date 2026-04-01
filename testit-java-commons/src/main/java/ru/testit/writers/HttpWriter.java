@@ -14,6 +14,7 @@ import ru.testit.services.ResultStorage;
 import ru.testit.writers.helpers.BulkAutotestHelper;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HttpWriter implements Writer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpWriter.class);
@@ -266,95 +267,123 @@ public class HttpWriter implements Writer {
 
         BulkAutotestHelper bulkHelper = new BulkAutotestHelper(apiClient, config);
 
+        AtomicInteger testsInTree = new AtomicInteger();
+        AtomicInteger missingTestResult = new AtomicInteger();
+        AtomicInteger bulkApiErrors = new AtomicInteger();
+
         for (final String classUuid : container.getChildren()) {
-            storage.getClassContainer(classUuid).ifPresent(cl -> {
-                List<AutoTestStepApiModel> beforeClass = Converter.convertFixtureToApi(cl.getBeforeClassMethods(), null);
-                List<AttachmentPutModelAutoTestStepResultsModel> beforeResultClass = Converter.convertResultFixture(cl.getBeforeClassMethods(), null);
-                List<AutoTestStepApiModel> afterClass = Converter.convertFixtureToApi(cl.getAfterClassMethods(), null);
-                List<AttachmentPutModelAutoTestStepResultsModel> afterResultClass = Converter.convertResultFixture(cl.getAfterClassMethods(), null);
+            Optional<ClassContainer> ocl = storage.getClassContainer(classUuid);
+            if (!ocl.isPresent()) {
+                LOGGER.warn("Bulk import: MainContainer references classUuid={} but ClassContainer is missing in storage", classUuid);
+                continue;
+            }
+            ClassContainer cl = ocl.get();
+            List<AutoTestStepApiModel> beforeClass = Converter.convertFixtureToApi(cl.getBeforeClassMethods(), null);
+            List<AttachmentPutModelAutoTestStepResultsModel> beforeResultClass = Converter.convertResultFixture(cl.getBeforeClassMethods(), null);
+            List<AutoTestStepApiModel> afterClass = Converter.convertFixtureToApi(cl.getAfterClassMethods(), null);
+            List<AttachmentPutModelAutoTestStepResultsModel> afterResultClass = Converter.convertResultFixture(cl.getAfterClassMethods(), null);
 
-                for (final String testUuid : cl.getChildren()) {
-                    storage.getTestResult(testUuid).ifPresent(test -> {
-                        try {
-                            List<AutoTestStepApiModel> beforeEach = Converter.convertFixtureToApi(cl.getBeforeEachTest(), testUuid);
-                            List<AttachmentPutModelAutoTestStepResultsModel> beforeResultEach = Converter.convertResultFixture(cl.getBeforeEachTest(), testUuid);
-                            List<AttachmentPutModelAutoTestStepResultsModel> beforeResultFinish = new ArrayList<>();
-                            beforeResultFinish.addAll(beforeResultAll);
-                            beforeResultFinish.addAll(beforeResultClass);
-                            beforeResultFinish.addAll(beforeResultEach);
-
-                            List<AutoTestStepApiModel> afterEach = Converter.convertFixtureToApi(cl.getAfterEachTest(), testUuid);
-                            List<AttachmentPutModelAutoTestStepResultsModel> afterResultEach = Converter.convertResultFixture(cl.getAfterEachTest(), testUuid);
-                            List<AttachmentPutModelAutoTestStepResultsModel> afterResultFinish = new ArrayList<>();
-                            afterResultFinish.addAll(afterResultEach);
-                            afterResultFinish.addAll(afterResultClass);
-                            afterResultFinish.addAll(afterResultAll);
-
-                            List<AutoTestStepApiModel> beforeFinish = new ArrayList<>();
-                            beforeFinish.addAll(beforeAll);
-                            beforeFinish.addAll(beforeClass);
-                            beforeFinish.addAll(beforeEach);
-
-                            List<AutoTestStepApiModel> afterFinish = new ArrayList<>();
-                            afterFinish.addAll(afterEach);
-                            afterFinish.addAll(afterClass);
-                            afterFinish.addAll(afterAll);
-
-                            AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
-
-                            AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
-                                    test,
-                                    config.getConfigurationId()
-                            );
-
-                            autoTestResultsForTestRunModel.setSetupResults(beforeResultFinish);
-                            autoTestResultsForTestRunModel.setTeardownResults(afterResultFinish);
-
-                            if (autoTestApiResult == null) {
-                                AutoTestCreateApiModel model = Converter.prepareToCreateAutoTest(
-                                        test,
-                                        config.getProjectId()
-                                );
-
-                                model.setSetup(beforeFinish);
-                                model.setTeardown(afterFinish);
-                                bulkHelper.addForCreate(model, autoTestResultsForTestRunModel);
-                            } else {
-                                AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
-                                        test,
-                                        autoTestApiResult,
-                                        config.getProjectId()
-                                );
-
-                                model.setSetup(beforeFinish);
-                                model.setTeardown(afterFinish);
-
-                                String id = autoTestApiResult.getGlobalId().toString();
-                                List<String> wi = test.getWorkItemIds();
-
-                                Map<String, List<String>> autotestLinksToWIForUpdate = new HashMap<>();
-                                autotestLinksToWIForUpdate.put(id, wi);
-
-                                bulkHelper.addForUpdate(
-                                        model,
-                                        autoTestResultsForTestRunModel,
-                                        autotestLinksToWIForUpdate
-                                );
-                            }
-                        } catch (ApiException e) {
-                            LOGGER.error(e.getMessage());
-                        }
-                    });
+            for (final String testUuid : cl.getChildren()) {
+                testsInTree.incrementAndGet();
+                Optional<TestResult> otr = storage.getTestResult(testUuid);
+                if (!otr.isPresent()) {
+                    missingTestResult.incrementAndGet();
+                    LOGGER.warn("Bulk import: class tree lists uuid={} but TestResult is absent in storage (skipped)", testUuid);
+                    continue;
                 }
-            });
-        }
+                TestResult test = otr.get();
+                try {
+                    List<AutoTestStepApiModel> beforeEach = Converter.convertFixtureToApi(cl.getBeforeEachTest(), testUuid);
+                    List<AttachmentPutModelAutoTestStepResultsModel> beforeResultEach = Converter.convertResultFixture(cl.getBeforeEachTest(), testUuid);
+                    List<AttachmentPutModelAutoTestStepResultsModel> beforeResultFinish = new ArrayList<>();
+                    beforeResultFinish.addAll(beforeResultAll);
+                    beforeResultFinish.addAll(beforeResultClass);
+                    beforeResultFinish.addAll(beforeResultEach);
 
+                    List<AutoTestStepApiModel> afterEach = Converter.convertFixtureToApi(cl.getAfterEachTest(), testUuid);
+                    List<AttachmentPutModelAutoTestStepResultsModel> afterResultEach = Converter.convertResultFixture(cl.getAfterEachTest(), testUuid);
+                    List<AttachmentPutModelAutoTestStepResultsModel> afterResultFinish = new ArrayList<>();
+                    afterResultFinish.addAll(afterResultEach);
+                    afterResultFinish.addAll(afterResultClass);
+                    afterResultFinish.addAll(afterResultAll);
+
+                    List<AutoTestStepApiModel> beforeFinish = new ArrayList<>();
+                    beforeFinish.addAll(beforeAll);
+                    beforeFinish.addAll(beforeClass);
+                    beforeFinish.addAll(beforeEach);
+
+                    List<AutoTestStepApiModel> afterFinish = new ArrayList<>();
+                    afterFinish.addAll(afterEach);
+                    afterFinish.addAll(afterClass);
+                    afterFinish.addAll(afterAll);
+
+                    AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
+
+                    AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
+                            test,
+                            config.getConfigurationId()
+                    );
+
+                    autoTestResultsForTestRunModel.setSetupResults(beforeResultFinish);
+                    autoTestResultsForTestRunModel.setTeardownResults(afterResultFinish);
+
+                    if (autoTestApiResult == null) {
+                        AutoTestCreateApiModel model = Converter.prepareToCreateAutoTest(
+                                test,
+                                config.getProjectId()
+                        );
+
+                        model.setSetup(beforeFinish);
+                        model.setTeardown(afterFinish);
+                        bulkHelper.addForCreate(model, autoTestResultsForTestRunModel);
+                    } else {
+                        AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
+                                test,
+                                autoTestApiResult,
+                                config.getProjectId()
+                        );
+
+                        model.setSetup(beforeFinish);
+                        model.setTeardown(afterFinish);
+
+                        String id = autoTestApiResult.getGlobalId().toString();
+                        List<String> wi = test.getWorkItemIds();
+
+                        Map<String, List<String>> autotestLinksToWIForUpdate = new HashMap<>();
+                        autotestLinksToWIForUpdate.put(id, wi);
+
+                        bulkHelper.addForUpdate(
+                                model,
+                                autoTestResultsForTestRunModel,
+                                autotestLinksToWIForUpdate
+                        );
+                    }
+                } catch (ApiException e) {
+                    bulkApiErrors.incrementAndGet();
+                    LOGGER.error(
+                            "Bulk import API error for externalId={}, testUuid={}: {}",
+                            test.getExternalId(),
+                            test.getUuid(),
+                            e.getMessage(),
+                            e
+                    );
+                }
+            }
+        }
 
         try {
             bulkHelper.teardown();
         } catch (ApiException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Bulk import teardown failed: {}", e.getMessage(), e);
         }
+
+        LOGGER.info(
+                "Bulk import finished: mainUuid={}, testsInTree={}, missingTestResultInStorage={}, bulkApiErrors={}",
+                container.getUuid(),
+                testsInTree.get(),
+                missingTestResult.get(),
+                bulkApiErrors.get()
+        );
     }
 
     /**

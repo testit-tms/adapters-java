@@ -85,6 +85,8 @@ public class BaseTestNgListener implements
 
     @Override
     public void onTestStart(final ITestResult testResult) {
+        ensureClassContainerRegistered(testResult);
+
         ExecutableTest test = this.executableTest.get();
         if (test.isStarted()) {
             test = refreshContext();
@@ -232,19 +234,48 @@ public class BaseTestNgListener implements
 
     @Override
     public void onBeforeClass(ITestClass testClass) {
-        final String mainUuid = mainUuidForTestClass(testClass);
-        if (mainUuid == null) {
-            LOGGER.warn("Could not resolve MainContainer for class {}; skipping class container start", testClass.getName());
+        if (getClassContainer(testClass).isPresent()) {
             return;
         }
+        final String mainUuid = mainUuidForTestClass(testClass);
+        if (mainUuid == null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
+                        "TestIT: defer class container for {} until onTestStart (ITestContext not available on ITestClass here)",
+                        testClass.getName()
+                );
+            }
+            return;
+        }
+        registerClassContainer(testClass, mainUuid);
+    }
+
+    private void registerClassContainer(final ITestClass testClass, final String mainUuid) {
         final String uuid = UUID.randomUUID().toString();
         final ClassContainer container = new ClassContainer()
                 .setUuid(uuid)
                 .setName(testClass.getName());
-
         adapterManager.startClassContainer(mainUuid, container);
-
         setClassContainer(testClass, uuid);
+    }
+
+    /**
+     * When {@link #onBeforeClass} could not resolve {@link ITestContext}, register using {@link ITestResult#getTestContext()}.
+     */
+    private void ensureClassContainerRegistered(final ITestResult testResult) {
+        final ITestClass testClass = testResult.getMethod().getTestClass();
+        if (getClassContainer(testClass).isPresent()) {
+            return;
+        }
+        final String mainUuid = mainUuidForTestResult(testResult);
+        if (mainUuid == null) {
+            LOGGER.warn("TestIT: cannot resolve MainContainer for class {}; tests may be missing from TMS bulk import", testClass.getName());
+            return;
+        }
+        registerClassContainer(testClass, mainUuid);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("TestIT: lazy class container registered for {}", testClass.getName());
+        }
     }
 
     @Override
@@ -369,14 +400,23 @@ public class BaseTestNgListener implements
         return mainUuidByContext.size() == 1 ? mainUuidByContext.values().iterator().next() : null;
     }
 
-    /** TestNG does not expose ITestContext on {@link ITestClass}; internal API varies by version. */
+    /** TestNG does not expose ITestContext on {@link ITestClass}; try non-public methods on implementation class. */
     private static ITestContext testContextFromTestClass(final ITestClass testClass) {
-        try {
-            final java.lang.reflect.Method m = testClass.getClass().getMethod("getTestContext");
-            return (ITestContext) m.invoke(testClass);
-        } catch (ReflectiveOperationException e) {
+        if (testClass == null) {
             return null;
         }
+        for (Class<?> clazz = testClass.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
+            try {
+                final java.lang.reflect.Method m = clazz.getDeclaredMethod("getTestContext");
+                m.setAccessible(true);
+                return (ITestContext) m.invoke(testClass);
+            } catch (NoSuchMethodException e) {
+                // try superclass
+            } catch (ReflectiveOperationException e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     private void addClassContainerChild(final ITestClass cl, final String childUuid) {
