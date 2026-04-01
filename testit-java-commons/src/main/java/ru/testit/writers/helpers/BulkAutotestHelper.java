@@ -13,12 +13,19 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Function;
 
 public class BulkAutotestHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(BulkAutotestHelper.class);
     private final ITmsApiClient apiClient;
     private final ClientConfiguration config;
     private static final int MAX_TESTS_FOR_IMPORT = 100;
+    /** Cap parallel TMS autoTest create/update calls to reduce DbUpdateConcurrencyException noise. */
+    private static final int MAX_PARALLEL_AUTO_TEST_OPS = 16;
     private final List<AutoTestCreateApiModel> autotestsForCreate;
     private final List<AutoTestUpdateApiModel> autotestsForUpdate;
     private final Map<String, List<String>> autotestLinksToWIForUpdate;
@@ -76,11 +83,13 @@ public class BulkAutotestHelper {
 
     private void bulkCreate() throws ApiException {
         int n = autotestsForCreate.size();
-        LOGGER.info("Sequential createAutoTest ({} row(s)), then sendTestResults batched (no duplicate autotest per request)", n);
-        for (int i = 0; i < n; i++) {
-            final AutoTestCreateApiModel createModel = autotestsForCreate.get(i);
-            retryApi(() -> apiClient.createAutoTest(createModel));
-        }
+        List<AutoTestCreateApiModel> unique = dedupeCreatesLastWins(autotestsForCreate);
+        LOGGER.info(
+                "Parallel createAutoTest ({} unique / {} row(s)), then sendTestResults batched (no duplicate autotest per request)",
+                unique.size(),
+                n
+        );
+        parallelAutoTestOps(unique, m -> () -> apiClient.createAutoTest(m));
         List<List<AutoTestResultsForTestRunModel>> batches = partitionResultsUniqueAutotestPerBatch(resultsForAutotestsBeingCreated);
         LOGGER.info("sendTestResults: {} batch(es), {} result row(s)", batches.size(), n);
         for (List<AutoTestResultsForTestRunModel> batch : batches) {
@@ -93,11 +102,13 @@ public class BulkAutotestHelper {
 
     private void bulkUpdate() throws ApiException {
         int n = autotestsForUpdate.size();
-        LOGGER.info("Sequential updateAutoTest ({} row(s)), then sendTestResults batched (no duplicate autotest per request)", n);
-        for (int i = 0; i < n; i++) {
-            final AutoTestUpdateApiModel updateModel = autotestsForUpdate.get(i);
-            retryApi(() -> apiClient.updateAutoTest(updateModel));
-        }
+        List<AutoTestUpdateApiModel> unique = dedupeUpdatesLastWins(autotestsForUpdate);
+        LOGGER.info(
+                "Parallel updateAutoTest ({} unique / {} row(s)), then sendTestResults batched (no duplicate autotest per request)",
+                unique.size(),
+                n
+        );
+        parallelAutoTestOps(unique, m -> () -> apiClient.updateAutoTest(m));
         List<List<AutoTestResultsForTestRunModel>> batches = partitionResultsUniqueAutotestPerBatch(resultsForAutotestsBeingUpdated);
         LOGGER.info("sendTestResults: {} batch(es), {} result row(s)", batches.size(), n);
         for (List<AutoTestResultsForTestRunModel> batch : batches) {
@@ -149,9 +160,64 @@ public class BulkAutotestHelper {
         return batches;
     }
 
-    private static String autotestKey(AutoTestResultsForTestRunModel m) {
-        String id = m.getAutoTestExternalId();
+    private static String externalIdKey(String id) {
         return id != null && !id.isEmpty() ? id : "\0null";
+    }
+
+    private static String autotestKey(AutoTestResultsForTestRunModel m) {
+        return externalIdKey(m.getAutoTestExternalId());
+    }
+
+    /** One API call per externalId; last row wins (same metadata as sequential tail). */
+    private static List<AutoTestCreateApiModel> dedupeCreatesLastWins(List<AutoTestCreateApiModel> list) {
+        Map<String, AutoTestCreateApiModel> m = new LinkedHashMap<>();
+        for (AutoTestCreateApiModel x : list) {
+            m.put(externalIdKey(x.getExternalId()), x);
+        }
+        return new ArrayList<>(m.values());
+    }
+
+    private static List<AutoTestUpdateApiModel> dedupeUpdatesLastWins(List<AutoTestUpdateApiModel> list) {
+        Map<String, AutoTestUpdateApiModel> m = new LinkedHashMap<>();
+        for (AutoTestUpdateApiModel x : list) {
+            m.put(externalIdKey(x.getExternalId()), x);
+        }
+        return new ArrayList<>(m.values());
+    }
+
+    private <T> void parallelAutoTestOps(List<T> unique, Function<T, ApiVoid> toCall) throws ApiException {
+        int u = unique.size();
+        if (u == 0) {
+            return;
+        }
+        int poolSize = Math.min(MAX_PARALLEL_AUTO_TEST_OPS, u);
+        ExecutorService pool = Executors.newFixedThreadPool(poolSize);
+        List<Future<?>> futures = new ArrayList<>(u);
+        try {
+            for (T item : unique) {
+                ApiVoid call = toCall.apply(item);
+                futures.add(pool.submit(() -> {
+                    retryApi(call);
+                    return null;
+                }));
+            }
+            for (Future<?> f : futures) {
+                try {
+                    f.get();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new ApiException(e);
+                } catch (ExecutionException e) {
+                    Throwable c = e.getCause();
+                    if (c instanceof ApiException) {
+                        throw (ApiException) c;
+                    }
+                    throw new ApiException(e);
+                }
+            }
+        } finally {
+            pool.shutdownNow();
+        }
     }
 
     private static boolean isDbConcurrency(ApiException e) {

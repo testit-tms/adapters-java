@@ -20,7 +20,7 @@ public class TmsApiClient implements ITmsApiClient {
     private static final boolean INCLUDE_STEPS = true;
     private static final boolean INCLUDE_LABELS = true;
     private static final boolean INCLUDE_LINKS = true;
-    private static final int MAX_TRIES = 10;
+    private static final int MAX_TRIES = 4;
     private static final int WAITING_TIME = 100;
     private static final int TESTS_LIMIT = 100;
 
