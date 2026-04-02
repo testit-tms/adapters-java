@@ -28,7 +28,7 @@ env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
   JAVA_DISTRIBUTION: "temurin"
-  JAVA_TOOL_OPTIONS: "-Dorg.slf4j.simpleLogger.defaultLogLevel=debug"
+  JAVA_TOOL_OPTIONS: "-Dorg.slf4j.simpleLogger.defaultLogLevel=info"
   JAVA_VERSION: 8
   PYTHON_VERSION: 3.12
   TEMP_FILE: tmp/output.txt
