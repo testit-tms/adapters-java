@@ -48,10 +48,10 @@ public class AdapterConfig implements Serializable {
         try {
             this.syncStoragePort = String.valueOf(properties.get(AppProperties.SYNC_STORAGE_PORT));
             if ("null".equals(this.syncStoragePort)) {
-                this.syncStoragePort = "8080"; // Порт по умолчанию
+                this.syncStoragePort = "49152"; // Порт по умолчанию
             }
         } catch (NullPointerException ignored) {
-            this.syncStoragePort = "8080"; // Порт по умолчанию
+            this.syncStoragePort = "49152"; // Порт по умолчанию
         }
     }
 

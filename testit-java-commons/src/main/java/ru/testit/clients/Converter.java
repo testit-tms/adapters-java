@@ -118,7 +118,7 @@ public class Converter {
         model.attachments(convertAttachments(result.getAttachments()));
         model.setMessage(result.getMessage());
         model.setParameters(result.getParameters());
-        model.setOutcome(AvailableTestResultOutcome.fromValue(result.getItemStatus().value()));
+        //model.setOutcome(AvailableTestResultOutcome.fromValue(result.getItemStatus().value()));
 
         Throwable throwable = result.getThrowable();
         if (throwable != null) {
