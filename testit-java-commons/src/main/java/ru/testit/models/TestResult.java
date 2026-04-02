@@ -72,7 +72,9 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Resul
      * @return self for method chaining
      */
     public TestResult setExternalId(String externalId) {
-        this.externalId = HtmlEscapeUtils.escapeHtmlTags(externalId);
+        // externalId is an identifier, not a user-facing HTML field.
+        // Do not escape '<'/'>' here: escaping changes the identity and may cause duplicates.
+        this.externalId = externalId;
         return this;
     }
 
