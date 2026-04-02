@@ -36,7 +36,7 @@ env:
   TMS_CERT_VALIDATION: false
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
   TMS_URL: ${{ secrets.TESTIT_URL }}
-  TMS_IMPORT_REALTIME: false
+  TMS_IMPORT_REALTIME: true
 jobs:
   # should control launch of everything else depending on this step
   check-label:
