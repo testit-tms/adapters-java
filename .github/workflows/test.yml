@@ -28,7 +28,7 @@ env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
   JAVA_DISTRIBUTION: "temurin"
-  JAVA_TOOL_OPTIONS: "-Dorg.slf4j.simpleLogger.defaultLogLevel=info"
+  JAVA_TOOL_OPTIONS: "-Dorg.slf4j.simpleLogger.defaultLogLevel=debug"
   JAVA_VERSION: 8
   PYTHON_VERSION: 3.12
   TEMP_FILE: tmp/output.txt
@@ -36,7 +36,7 @@ env:
   TMS_CERT_VALIDATION: false
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
   TMS_URL: ${{ secrets.TESTIT_URL }}
-  TMS_IMPORT_REALTIME: true
+  TMS_IMPORT_REALTIME: false
 jobs:
   # should control launch of everything else depending on this step
   check-label:
