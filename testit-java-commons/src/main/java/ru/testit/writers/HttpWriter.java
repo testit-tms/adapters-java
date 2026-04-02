@@ -155,23 +155,9 @@ public class HttpWriter implements Writer {
 
                     autoTestUpdateApiModel.setIsFlaky(autoTestApiResult.getIsFlaky());
 
-                    // Оптимизация: сравниваем модель с сервера с той, которую хотим отправить
-                    if (hasAutoTestChanged(autoTestApiResult, autoTestUpdateApiModel)) {
-                        apiClient.updateAutoTest(autoTestUpdateApiModel);
+                    apiClient.updateAutoTest(autoTestUpdateApiModel);
+                    if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("AutoTest {} updated", test.getExternalId());
-                    } else {
-                        LOGGER.warn(
-                                "AutoTest {} has not changed, skipping update (setup steps server/update: {}/{}; teardown steps server/update: {}/{}; first nested setup steps server/update: {}/{}; first nested teardown steps server/update: {}/{})",
-                                test.getExternalId(),
-                                countSteps(autoTestApiResult.getSetup()),
-                                countSteps(autoTestUpdateApiModel.getSetup()),
-                                countSteps(autoTestApiResult.getTeardown()),
-                                countSteps(autoTestUpdateApiModel.getTeardown()),
-                                firstNestedServerStepsCount(autoTestApiResult.getSetup()),
-                                firstNestedUpdateStepsCount(autoTestUpdateApiModel.getSetup()),
-                                firstNestedServerStepsCount(autoTestApiResult.getTeardown()),
-                                firstNestedUpdateStepsCount(autoTestUpdateApiModel.getTeardown())
-                        );
                     }
                 } catch (ApiException e) {
                     LOGGER.error("Can not write the class: {}", (e.getMessage()));
@@ -226,23 +212,7 @@ public class HttpWriter implements Writer {
 
                             autoTestUpdateApiModel.setIsFlaky(autoTestApiResult.getIsFlaky());
 
-                            // Оптимизация: сравниваем модель с сервера с той, которую хотим отправить
-                            if (hasAutoTestChanged(autoTestApiResult, autoTestUpdateApiModel)) {
-                                apiClient.updateAutoTest(autoTestUpdateApiModel);
-                            } else {
-                                LOGGER.warn(
-                                        "AutoTest {} has not changed, skipping update (setup steps server/update: {}/{}; teardown steps server/update: {}/{}; first nested setup steps server/update: {}/{}; first nested teardown steps server/update: {}/{})",
-                                        test.getExternalId(),
-                                        countSteps(autoTestApiResult.getSetup()),
-                                        countSteps(autoTestUpdateApiModel.getSetup()),
-                                        countSteps(autoTestApiResult.getTeardown()),
-                                        countSteps(autoTestUpdateApiModel.getTeardown()),
-                                        firstNestedServerStepsCount(autoTestApiResult.getSetup()),
-                                        firstNestedUpdateStepsCount(autoTestUpdateApiModel.getSetup()),
-                                        firstNestedServerStepsCount(autoTestApiResult.getTeardown()),
-                                        firstNestedUpdateStepsCount(autoTestUpdateApiModel.getTeardown())
-                                );
-                            }
+                            apiClient.updateAutoTest(autoTestUpdateApiModel);
 
                             AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.testResultToAutoTestResultsForTestRunModel(test);
 
@@ -569,26 +539,6 @@ public class HttpWriter implements Writer {
         }
 
         return false;
-    }
-
-    private static int countSteps(List<?> steps) {
-        return steps == null ? 0 : steps.size();
-    }
-
-    private static int firstNestedServerStepsCount(List<AutoTestStepApiResult> steps) {
-        if (steps == null || steps.isEmpty()) {
-            return 0;
-        }
-        AutoTestStepApiResult first = steps.get(0);
-        return (first == null || first.getSteps() == null) ? 0 : first.getSteps().size();
-    }
-
-    private static int firstNestedUpdateStepsCount(List<AutoTestStepApiModel> steps) {
-        if (steps == null || steps.isEmpty()) {
-            return 0;
-        }
-        AutoTestStepApiModel first = steps.get(0);
-        return (first == null || first.getSteps() == null) ? 0 : first.getSteps().size();
     }
 
 }
