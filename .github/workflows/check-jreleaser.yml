@@ -19,4 +19,3 @@ jobs:
       JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
 
 
- 

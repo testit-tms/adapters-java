@@ -105,9 +105,7 @@ class FullBeforeAfterTests {
     @Test
     @ExternalId("failed_full_before_after_with_required_annotations")
     @DisplayName("Failed test with required annotations")
-    void requiredAnnotationsTest() {
-        Assertions.fail();
-    }
+    void requiredAnnotationsTest() { Assertions.fail(); }
 
     @AfterEach
     @Title("Log out the system")

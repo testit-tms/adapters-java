@@ -5,6 +5,9 @@ import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;
 
 public interface Writer {
+
+    void writeTestRealtime(TestResult testResult);
+
     void writeTest(TestResult testResult);
 
     void writeClass(ClassContainer container);

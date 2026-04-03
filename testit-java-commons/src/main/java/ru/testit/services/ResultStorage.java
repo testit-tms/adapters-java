@@ -2,9 +2,11 @@ package ru.testit.services;
 
 import ru.testit.models.*;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -16,6 +18,38 @@ public class ResultStorage {
 
     public Optional<TestResult> getTestResult(final String uuid) {
         return get(uuid, TestResult.class);
+    }
+
+    /**
+     * All keys that currently hold a {@link TestResult} (for diagnostics, e.g. bulk vs tree mismatch).
+     */
+    public Set<String> getAllTestResultUuids() {
+        Set<String> uuids = new HashSet<>();
+        for (Map.Entry<String, Object> e : storage.entrySet()) {
+            if (e.getValue() instanceof TestResult) {
+                uuids.add(e.getKey());
+            }
+        }
+        return uuids;
+    }
+
+    /**
+     * Test results belonging to one main container (parallel runs share one JVM storage).
+     */
+    public Set<String> getTestResultUuidsForMainContainer(final String mainUuid) {
+        if (mainUuid == null) {
+            return new HashSet<>();
+        }
+        Set<String> uuids = new HashSet<>();
+        for (Map.Entry<String, Object> e : storage.entrySet()) {
+            if (e.getValue() instanceof TestResult) {
+                TestResult tr = (TestResult) e.getValue();
+                if (mainUuid.equals(tr.getMainContainerUuid())) {
+                    uuids.add(e.getKey());
+                }
+            }
+        }
+        return uuids;
     }
 
     public Optional<FixtureResult> getFixture(final String uuid) {

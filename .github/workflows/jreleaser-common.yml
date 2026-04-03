@@ -31,19 +31,19 @@ on:
 jobs:
   jreleaser:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Full history for JReleaser
-    
+
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-    
+
     - name: Cache Gradle dependencies
       uses: actions/cache@v4
       with:
@@ -53,25 +53,25 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-    
+
     - name: Install JReleaser CLI (manual setup)
       run: |
         # Try to install a working version manually
         JRELEASER_VERSION="1.18.0"
         mkdir -p ~/.jreleaser/bin
-        
+
         # Download the tar.gz version which usually contains all dependencies
         curl -sL "https://github.com/jreleaser/jreleaser/releases/download/v${JRELEASER_VERSION}/jreleaser-tool-provider-${JRELEASER_VERSION}.jar" -o ~/.jreleaser/bin/jreleaser.jar
-        
+
         # Create a wrapper script
         cat > ~/.jreleaser/bin/jreleaser << 'EOF'
         #!/bin/bash
         java -jar ~/.jreleaser/bin/jreleaser.jar "$@"
         EOF
         chmod +x ~/.jreleaser/bin/jreleaser
-        
+
         echo "$HOME/.jreleaser/bin" >> $GITHUB_PATH
-    
+
     - name: Print JReleaser version and check Java
       run: |
         echo "Java version:"
@@ -106,20 +106,20 @@ jobs:
             exit 1
             ;;
         esac
-        
+
         # Validate that version is not empty
         if [ -z "$VERSION" ]; then
           echo "❌ Error: Could not determine version!"
           exit 1
         fi
-        
+
         echo "PROJECT_VERSION=$VERSION" >> $GITHUB_ENV
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "✅ Final version: $VERSION"
-    
+
     - name: Make publish script executable
       run: chmod +x scripts/publish-maven-central.sh
-        
+
     - name: Run JReleaser
       env:
         DEPLOY: ${{ inputs.deploy_enabled }}
@@ -137,11 +137,11 @@ jobs:
           echo "🔍 Checking JReleaser configuration for version $PROJECT_VERSION..."
         fi
         ./scripts/publish-maven-central.sh
-    
+
     - name: Upload JReleaser logs
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: jreleaser-logs-${{ github.run_id }}
         path: out/jreleaser/
-        retention-days: 5 
+        retention-days: 5

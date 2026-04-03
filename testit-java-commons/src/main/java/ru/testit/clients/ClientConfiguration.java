@@ -43,7 +43,8 @@ public class ClientConfiguration implements Serializable {
             String importRealtime = String.valueOf(properties.get(AppProperties.TMS_IMPORT_REALTIME));
             this.tmsImportRealtime = Objects.equals(importRealtime, "true");
         } catch (NullPointerException ignored) {
-            this.tmsImportRealtime = true;
+            // false by default
+            this.tmsImportRealtime = false;
         }
 
         this.certValidation = Boolean.parseBoolean(validationCert);

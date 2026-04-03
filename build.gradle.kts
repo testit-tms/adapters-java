@@ -4,7 +4,6 @@ plugins {
     java
     `maven-publish`
     signing
-    id("org.sonarqube") version "7.2.0.6526"
 }
 
 repositories {
@@ -97,6 +96,15 @@ configure(subprojects) {
         options.encoding = "utf-8"
         options.setIncremental(true)
         options.isFork = true
+        //options.compilerArgs.add("-Xlint:-comment") // not supported in java 8
+    }
+
+    tasks.withType<Javadoc>().configureEach {
+        // Приводим options к StandardJavadocDocletOptions, чтобы были доступны нужные методы
+        val options = options as StandardJavadocDocletOptions
+        options.addStringOption("Xdoclint:none", "-quiet")
+        options.encoding = "UTF-8"
+        options.charSet = "UTF-8"
     }
 
     tasks.jar {

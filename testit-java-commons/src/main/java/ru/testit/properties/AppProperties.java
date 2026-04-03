@@ -24,6 +24,10 @@ public class AppProperties {
     public static final String TMS_INTEGRATION = "testIt";
     public static final String TMS_IMPORT_REALTIME = "importRealtime";
 
+    // SyncStorage properties
+    public static final String SYNC_STORAGE_PATH = "syncStoragePath";
+    public static final String SYNC_STORAGE_PORT = "syncStoragePort";
+
     private static final String PROPERTIES_FILE = "testit.properties";
     private static final Logger log = LoggerFactory.getLogger(AppProperties.class);
     private static final HashMap<String, HashMap<String, String>> envVarsNames  = new HashMap<String, HashMap<String, String>>() {{
@@ -40,6 +44,8 @@ public class AppProperties {
             put(CERT_VALIDATION, "TMS_CERT_VALIDATION");
             put(TMS_INTEGRATION, "TMS_TEST_IT");
             put(TMS_IMPORT_REALTIME, "TMS_IMPORT_REALTIME");
+            put(SYNC_STORAGE_PATH, "SYNC_STORAGE_PATH");
+            put(SYNC_STORAGE_PORT, "SYNC_STORAGE_PORT");
         }});
         put("cli", new HashMap<String, String>() {{
             put(URL, "tmsUrl");
@@ -54,6 +60,8 @@ public class AppProperties {
             put(CERT_VALIDATION, "tmsCertValidation");
             put(TMS_INTEGRATION, "tmsTestIt");
             put(TMS_IMPORT_REALTIME, "tmsImportRealtime");
+            put(SYNC_STORAGE_PATH, "syncStoragePath");
+            put(SYNC_STORAGE_PORT, "syncStoragePort");
         }});
     }};
 
@@ -219,6 +227,24 @@ public class AppProperties {
             String tmsImportRealtime = properties.getProperty(varNames.get(TMS_IMPORT_REALTIME), null);
             if (Objects.equals(tmsImportRealtime, "false") || Objects.equals(tmsImportRealtime, "true")) {
                 result.put(TMS_IMPORT_REALTIME, tmsImportRealtime);
+            }
+        } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
+        }
+
+        try {
+            String syncStoragePath = properties.getProperty(varNames.get(SYNC_STORAGE_PATH), null);
+            if (syncStoragePath != null && !syncStoragePath.isEmpty() && !syncStoragePath.equals("null")) {
+                result.put(SYNC_STORAGE_PATH, syncStoragePath);
+            }
+        } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
+        }
+
+        try {
+            String syncStoragePort = properties.getProperty(varNames.get(SYNC_STORAGE_PORT), null);
+            if (syncStoragePort != null && !syncStoragePort.isEmpty() && !syncStoragePort.equals("null")) {
+                result.put(SYNC_STORAGE_PORT, syncStoragePort);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
             // empty
