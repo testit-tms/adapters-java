@@ -17,7 +17,7 @@ The repository contains new versions of adaptors for JVM-based test frameworks.
 | 5.5     | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 |
 | 5.6     | 2.9.1-TMS-5.6 | 2.9.1-TMS-5.6 | 2.9.1-TMS-5.6 | 2.9.1-TMS-5.6 |
 | 5.7     | 3.0.0-TMS-5.7 | 3.0.0-TMS-5.7 | 3.0.0-TMS-5.7 | 3.0.0-TMS-5.7 |
-| Cloud   | 2.10.0 +      | 2.10.0 +      | 2.10.0 +      | 2.10.0 +      |
+| Cloud   | 3.0.0  +      | 3.0.0  +      | 3.0.0  +      | 3.0.0  +      |
 
 1. For current versions, see the releases tab. 
 2. Starting with 5.2, we have added a TMS postscript, which means that the utility is compatible with a specific enterprise version. 
