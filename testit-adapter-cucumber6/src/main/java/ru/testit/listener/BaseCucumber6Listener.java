@@ -71,23 +71,23 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         publisher.registerHandlerFor(EmbedEvent.class, embedEventHandler);
     }
 
-    private void handleTestRunStartedHandler(TestRunStarted event) {
+    public void handleTestRunStartedHandler(TestRunStarted event) {
         MAIN_UUIDS_PENDING_FINALIZE.clear();
         adapterManager.startTests();
     }
 
-    private void handleTestRunFinishedHandler(TestRunFinished event) {
+    public void handleTestRunFinishedHandler(TestRunFinished event) {
         for (String uuid : new ArrayList<>(MAIN_UUIDS_PENDING_FINALIZE)) {
             adapterManager.stopMainContainer(uuid);
         }
         MAIN_UUIDS_PENDING_FINALIZE.clear();
     }
 
-    private void handleFeatureStartedHandler(TestSourceRead event) {
+    public void handleFeatureStartedHandler(TestSourceRead event) {
         scenarioParser.addScenarioEvent(event.getUri(), event);
     }
 
-    private void testStarted(final TestCaseStarted event) {
+    public void testStarted(final TestCaseStarted event) {
         final MainContainer mainContainer = new MainContainer()
                 .setUuid(launcherUUID.get());
 
@@ -155,7 +155,7 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
                 container -> container.getChildren().add(uuid));
     }
 
-    private Map<String, String> getParameters(
+    public Map<String, String> getParameters(
             final Scenario scenario, final TestCase localCurrentTestCase
     ) {
         final Optional<Examples> maybeExample =
@@ -193,7 +193,7 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         return parameters;
     }
 
-    private void testFinished(final TestCaseFinished event) {
+    public void testFinished(final TestCaseFinished event) {
         final String uuid = getTestCaseUuid(event.getTestCase());
         Throwable throwable = event.getResult().getError();
         if (throwable != null) {
@@ -206,7 +206,7 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         adapterManager.stopClassContainer(classUUID.get());
     }
 
-    private void stepStarted(final TestStepStarted event) {
+    public void stepStarted(final TestStepStarted event) {
         if (event.getTestStep() instanceof PickleStepTestStep) {
             final PickleStepTestStep pickleStep = (PickleStepTestStep) event.getTestStep();
             final String stepKeyword = Optional.ofNullable(
@@ -223,7 +223,7 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         }
     }
 
-    private void stepFinished(final TestStepFinished event) {
+    public void stepFinished(final TestStepFinished event) {
         if (event.getTestStep() instanceof HookTestStep) {
             handleHookStep(event);
         } else {
@@ -231,7 +231,7 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         }
     }
 
-    private void handleHookStep(final TestStepFinished event) {
+    public void handleHookStep(final TestStepFinished event) {
         final HookTestStep hookStep = (HookTestStep) event.getTestStep();
         final String uuid = getHookStepUuid(hookStep);
         final FixtureResult fixtureResult = new FixtureResult()
@@ -263,7 +263,7 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         adapterManager.stopFixture(uuid);
     }
 
-    private void handlePickleStep(final TestStepFinished event) {
+    public void handlePickleStep(final TestStepFinished event) {
         final ItemStatus stepStatus = convertStatus(event.getResult());
 
         if (event.getResult().getStatus() == io.cucumber.plugin.event.Status.UNDEFINED) {
@@ -285,11 +285,11 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         adapterManager.stopStep(getStepUuid((PickleStepTestStep) event.getTestStep()));
     }
 
-    private void handleEmbedEvent(final EmbedEvent event) {
+    public void handleEmbedEvent(final EmbedEvent event) {
         Adapter.addAttachments("Screenshot", new String(event.getData()));
     }
 
-    private void initHook(final HookTestStep hook) {
+    public void initHook(final HookTestStep hook) {
         final FixtureResult hookResult = new FixtureResult()
                 .setTitle(hook.getCodeLocation())
                 .setStart(System.currentTimeMillis());
@@ -301,22 +301,22 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         }
     }
 
-    private void handleWriteEvent(final WriteEvent event) {
+    public void handleWriteEvent(final WriteEvent event) {
         Adapter.addAttachments(Objects.toString(event.getText()), "Output.txt");
     }
 
-    private void updateTestCaseStatus(final ItemStatus status) {
+    public void updateTestCaseStatus(final ItemStatus status) {
         if (!Boolean.TRUE.equals(forbidTestCaseStatusChange.get())) {
             adapterManager.updateTestCase(getTestCaseUuid(currentTestCase.get()),
                     result -> result.setItemStatus(status));
         }
     }
 
-    private String getTestCaseUuid(final TestCase testCase) {
+    public String getTestCaseUuid(final TestCase testCase) {
         return scenarioUuids.computeIfAbsent(getId(testCase), it -> UUID.randomUUID().toString());
     }
 
-    private String getTestCaseUri(final TestCase testCase) {
+    public String getTestCaseUri(final TestCase testCase) {
         final String testCaseUri = testCase.getUri().toString();
         if (testCaseUri.startsWith(CUCUMBER_WORKING_DIR)) {
             return testCaseUri.substring(CUCUMBER_WORKING_DIR.length());
@@ -324,29 +324,29 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
         return testCaseUri;
     }
 
-    private String getId(final TestCase testCase) {
+    public String getId(final TestCase testCase) {
         int line = testCase.getLocation().getLine();
         final String testCaseLocation = getTestCaseUri(testCase) + ":" + line;
         return Utils.getHash(testCaseLocation);
     }
 
-    private String getClassContainerUuid() {
+    public String getClassContainerUuid() {
         return classUUID.get();
     }
 
-    private String getStepUuid(final PickleStepTestStep step) {
+    public String getStepUuid(final PickleStepTestStep step) {
         final String stepPath = currentFeature.get().getName() + currentTestCase.get().getName()
                 + step.getStep().getText() + step.getStep().getLine();
         return Utils.getHash(stepPath);
     }
 
-    private String getHookStepUuid(final HookTestStep step) {
+    public String getHookStepUuid(final HookTestStep step) {
         final String stepPath = currentFeature.get().getName() + currentTestCase.get().getName()
                 + step.getHookType().toString() + step.getCodeLocation();
         return Utils.getHash(stepPath);
     }
 
-    private ItemStatus convertStatus(final Result testCaseResult) {
+    public ItemStatus convertStatus(final Result testCaseResult) {
         switch (testCaseResult.getStatus()) {
             case FAILED:
                 return ItemStatus.FAILED;
