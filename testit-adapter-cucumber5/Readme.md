@@ -28,6 +28,17 @@ implementation "ru.testit:testit-adapter-cucumber5:2.3.4"
 
 ## Usage
 
+
+You should add plugin ru.testit.listener.BaseCucumber7Listener to your Cucumber parameters:
+
+examples:
+
+[junit4](https://github.com/testit-tms/java-examples/blob/main/cucumber5-gradle-junit4/src/test/java/examples/CucumberTest.java)
+[junit5](https://github.com/testit-tms/java-examples/blob/main/cucumber5-gradle-junit5/src/test/resources/junit-platform.properties)
+[testng](https://github.com/testit-tms/java-examples/blob/main/cucumber5-gradle-testng/src/test/java/examples/CucumberTest.java)
+
+
+
 #### Maven Users
 
 ##### TestNG
