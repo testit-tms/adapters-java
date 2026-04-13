@@ -8,6 +8,7 @@ import ru.testit.syncstorage.invoker.Pair;
 
 import jakarta.ws.rs.core.GenericType;
 
+import ru.testit.syncstorage.model.CompletionResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class CompletionApi {
    * Force completion of a test run
    *  Force processing completion for a specific test run.
    * @param testRunId Test Run ID (required)
-   * @return Object
+   * @return CompletionResponse
    * @throws ApiException if fails to make API call
    * @http.response.details
      <table border="1">
@@ -58,7 +59,7 @@ public class CompletionApi {
        <tr><td> 200 </td><td> Completion status JSON </td><td>  -  </td></tr>
      </table>
    */
-  public Object forceCompletionGet(String testRunId) throws ApiException {
+  public CompletionResponse forceCompletionGet(String testRunId) throws ApiException {
     return forceCompletionGetWithHttpInfo(testRunId).getData();
   }
 
@@ -66,7 +67,7 @@ public class CompletionApi {
    * Force completion of a test run
    *  Force processing completion for a specific test run.
    * @param testRunId Test Run ID (required)
-   * @return ApiResponse&lt;Object&gt;
+   * @return ApiResponse&lt;CompletionResponse&gt;
    * @throws ApiException if fails to make API call
    * @http.response.details
      <table border="1">
@@ -75,7 +76,7 @@ public class CompletionApi {
        <tr><td> 200 </td><td> Completion status JSON </td><td>  -  </td></tr>
      </table>
    */
-  public ApiResponse<Object> forceCompletionGetWithHttpInfo(String testRunId) throws ApiException {
+  public ApiResponse<CompletionResponse> forceCompletionGetWithHttpInfo(String testRunId) throws ApiException {
     // Check required parameters
     if (testRunId == null) {
       throw new ApiException(400, "Missing the required parameter 'testRunId' when calling forceCompletionGet");
@@ -88,7 +89,7 @@ public class CompletionApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    GenericType<Object> localVarReturnType = new GenericType<Object>() {};
+    GenericType<CompletionResponse> localVarReturnType = new GenericType<CompletionResponse>() {};
     return apiClient.invokeAPI("CompletionApi.forceCompletionGet", "/force-completion", "GET", localVarQueryParams, null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                null, localVarReturnType, false);
@@ -97,7 +98,7 @@ public class CompletionApi {
    * Wait for completion
    *  Wait until processing is completed for a test run.
    * @param testRunId Test Run ID (required)
-   * @return Object
+   * @return CompletionResponse
    * @throws ApiException if fails to make API call
    * @http.response.details
      <table border="1">
@@ -106,7 +107,7 @@ public class CompletionApi {
        <tr><td> 200 </td><td> Completion status </td><td>  -  </td></tr>
      </table>
    */
-  public Object waitCompletionGet(String testRunId) throws ApiException {
+  public CompletionResponse waitCompletionGet(String testRunId) throws ApiException {
     return waitCompletionGetWithHttpInfo(testRunId).getData();
   }
 
@@ -114,7 +115,7 @@ public class CompletionApi {
    * Wait for completion
    *  Wait until processing is completed for a test run.
    * @param testRunId Test Run ID (required)
-   * @return ApiResponse&lt;Object&gt;
+   * @return ApiResponse&lt;CompletionResponse&gt;
    * @throws ApiException if fails to make API call
    * @http.response.details
      <table border="1">
@@ -123,7 +124,7 @@ public class CompletionApi {
        <tr><td> 200 </td><td> Completion status </td><td>  -  </td></tr>
      </table>
    */
-  public ApiResponse<Object> waitCompletionGetWithHttpInfo(String testRunId) throws ApiException {
+  public ApiResponse<CompletionResponse> waitCompletionGetWithHttpInfo(String testRunId) throws ApiException {
     // Check required parameters
     if (testRunId == null) {
       throw new ApiException(400, "Missing the required parameter 'testRunId' when calling waitCompletionGet");
@@ -136,7 +137,7 @@ public class CompletionApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    GenericType<Object> localVarReturnType = new GenericType<Object>() {};
+    GenericType<CompletionResponse> localVarReturnType = new GenericType<CompletionResponse>() {};
     return apiClient.invokeAPI("CompletionApi.waitCompletionGet", "/wait-completion", "GET", localVarQueryParams, null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                null, localVarReturnType, false);
