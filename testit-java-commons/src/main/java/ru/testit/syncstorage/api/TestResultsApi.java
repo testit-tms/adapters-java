@@ -8,6 +8,7 @@ import ru.testit.syncstorage.invoker.Pair;
 
 import jakarta.ws.rs.core.GenericType;
 
+import ru.testit.syncstorage.model.InProgressPublishedResponse;
 import ru.testit.syncstorage.model.TestResultCutApiModel;
 import ru.testit.syncstorage.model.TestResultSaveResponse;
 
@@ -47,6 +48,54 @@ public class TestResultsApi {
     this.apiClient = apiClient;
   }
 
+  /**
+   * Get in-progress published state
+   *  Get whether in-progress status has already been published by master node.
+   * @param testRunId Test Run ID (required)
+   * @return InProgressPublishedResponse
+   * @throws ApiException if fails to make API call
+   * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+       <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+       <tr><td> 200 </td><td> State JSON </td><td>  -  </td></tr>
+     </table>
+   */
+  public InProgressPublishedResponse inProgressPublishedGet(String testRunId) throws ApiException {
+    return inProgressPublishedGetWithHttpInfo(testRunId).getData();
+  }
+
+  /**
+   * Get in-progress published state
+   *  Get whether in-progress status has already been published by master node.
+   * @param testRunId Test Run ID (required)
+   * @return ApiResponse&lt;InProgressPublishedResponse&gt;
+   * @throws ApiException if fails to make API call
+   * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+       <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+       <tr><td> 200 </td><td> State JSON </td><td>  -  </td></tr>
+     </table>
+   */
+  public ApiResponse<InProgressPublishedResponse> inProgressPublishedGetWithHttpInfo(String testRunId) throws ApiException {
+    // Check required parameters
+    if (testRunId == null) {
+      throw new ApiException(400, "Missing the required parameter 'testRunId' when calling inProgressPublishedGet");
+    }
+
+    // Query parameters
+    List<Pair> localVarQueryParams = new ArrayList<>(
+            apiClient.parameterToPairs("", "testRunId", testRunId)
+    );
+
+    String localVarAccept = apiClient.selectHeaderAccept("application/json");
+    String localVarContentType = apiClient.selectHeaderContentType();
+    GenericType<InProgressPublishedResponse> localVarReturnType = new GenericType<InProgressPublishedResponse>() {};
+    return apiClient.invokeAPI("TestResultsApi.inProgressPublishedGet", "/in_progress_published", "GET", localVarQueryParams, null,
+                               new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
+                               null, localVarReturnType, false);
+  }
   /**
    * Save in-progress test result
    *  Save a test result with InProgress status.
