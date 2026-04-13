@@ -31,7 +31,9 @@ import ru.testit.syncstorage.invoker.JSON;
  */
 @JsonPropertyOrder({
   RegisterRequest.JSON_PROPERTY_PID,
-  RegisterRequest.JSON_PROPERTY_TEST_RUN_ID
+  RegisterRequest.JSON_PROPERTY_TEST_RUN_ID,
+  RegisterRequest.JSON_PROPERTY_BASE_URL,
+  RegisterRequest.JSON_PROPERTY_PRIVATE_TOKEN
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class RegisterRequest {
@@ -42,6 +44,14 @@ public class RegisterRequest {
   public static final String JSON_PROPERTY_TEST_RUN_ID = "testRunId";
   @jakarta.annotation.Nullable
   private String testRunId;
+
+  public static final String JSON_PROPERTY_BASE_URL = "baseUrl";
+  @jakarta.annotation.Nullable
+  private String baseUrl;
+
+  public static final String JSON_PROPERTY_PRIVATE_TOKEN = "privateToken";
+  @jakarta.annotation.Nullable
+  private String privateToken;
 
   public RegisterRequest() { 
   }
@@ -96,6 +106,56 @@ public class RegisterRequest {
   }
 
 
+  public RegisterRequest baseUrl(@jakarta.annotation.Nullable String baseUrl) {
+    this.baseUrl = baseUrl;
+    return this;
+  }
+
+  /**
+   * Get baseUrl
+   * @return baseUrl
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_BASE_URL)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public String getBaseUrl() {
+    return baseUrl;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_BASE_URL)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setBaseUrl(@jakarta.annotation.Nullable String baseUrl) {
+    this.baseUrl = baseUrl;
+  }
+
+
+  public RegisterRequest privateToken(@jakarta.annotation.Nullable String privateToken) {
+    this.privateToken = privateToken;
+    return this;
+  }
+
+  /**
+   * Get privateToken
+   * @return privateToken
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_PRIVATE_TOKEN)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public String getPrivateToken() {
+    return privateToken;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_PRIVATE_TOKEN)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setPrivateToken(@jakarta.annotation.Nullable String privateToken) {
+    this.privateToken = privateToken;
+  }
+
+
   /**
    * Return true if this RegisterRequest object is equal to o.
    */
@@ -109,12 +169,14 @@ public class RegisterRequest {
     }
     RegisterRequest registerRequest = (RegisterRequest) o;
     return Objects.equals(this.pid, registerRequest.pid) &&
-        Objects.equals(this.testRunId, registerRequest.testRunId);
+        Objects.equals(this.testRunId, registerRequest.testRunId) &&
+        Objects.equals(this.baseUrl, registerRequest.baseUrl) &&
+        Objects.equals(this.privateToken, registerRequest.privateToken);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(pid, testRunId);
+    return Objects.hash(pid, testRunId, baseUrl, privateToken);
   }
 
   @Override
@@ -123,6 +185,8 @@ public class RegisterRequest {
     sb.append("class RegisterRequest {\n");
     sb.append("    pid: ").append(toIndentedString(pid)).append("\n");
     sb.append("    testRunId: ").append(toIndentedString(testRunId)).append("\n");
+    sb.append("    baseUrl: ").append(toIndentedString(baseUrl)).append("\n");
+    sb.append("    privateToken: ").append(toIndentedString(privateToken)).append("\n");
     sb.append("}");
     return sb.toString();
   }
