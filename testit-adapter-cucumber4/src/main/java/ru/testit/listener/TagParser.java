@@ -164,7 +164,7 @@ public class TagParser {
                         parseSpaceInTag(link.getString("description")))
                 .setTitle(
                         parseSpaceInTag(link.getString("title")))
-                .setType(LinkType.fromString(link.getString("type")));
+                .setType(LinkType.fromString(link.optString("type", LinkType.RELATED.getValue())));
     }
 
     private List<LinkItem> getLinkItems(String json) {
@@ -178,7 +178,8 @@ public class TagParser {
                                     parseSpaceInTag(linksArr.getJSONObject(i).getString("description")))
                             .setTitle(
                                     parseSpaceInTag(linksArr.getJSONObject(i).getString("title")))
-                            .setType(LinkType.fromString(linksArr.getJSONObject(i).getString("type")))
+                            .setType(LinkType.fromString(
+                                    linksArr.getJSONObject(i).optString("type", LinkType.RELATED.getValue())))
             );
         }
         return items;

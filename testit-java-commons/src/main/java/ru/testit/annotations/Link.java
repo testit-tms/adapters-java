@@ -16,5 +16,5 @@ public @interface Link {
     
     String description() default "";
     
-    LinkType type();
+    LinkType type() default LinkType.RELATED;
 }

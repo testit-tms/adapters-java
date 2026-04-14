@@ -13,7 +13,7 @@ public class LinkItem implements Serializable
     private String title;
     private String url;
     private String description;
-    private LinkType type;
+    private LinkType type = LinkType.RELATED;
 
     /**
      * Gets title.
