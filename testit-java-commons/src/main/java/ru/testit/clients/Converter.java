@@ -217,7 +217,7 @@ public class Converter {
                     model.setTitle(link.getTitle());
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
-                    model.setType(LinkType.fromValue(link.getType().getValue()));
+                    model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
                     model.setHasInfo(false);
 
                     return model;
@@ -233,7 +233,7 @@ public class Converter {
                     model.setTitle(link.getTitle());
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
-                    model.setType(LinkType.fromValue(link.getType().getValue()));
+                    model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
                     model.setHasInfo(false);
 
                     return model;
@@ -249,7 +249,7 @@ public class Converter {
                     model.setTitle(link.getTitle());
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
-                    model.setType(LinkType.fromValue(link.getType().getValue()));
+                    model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
                     model.setHasInfo(false);
 
                     return model;
@@ -509,7 +509,7 @@ public class Converter {
                     model.setTitle(link.getTitle());
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
-                    model.setType(LinkType.fromValue(link.getType().getValue()));
+                    model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
                     model.setHasInfo(false);
 
                     return model;
@@ -526,7 +526,7 @@ public class Converter {
                     model.setTitle(link.getTitle());
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
-                    model.setType(LinkType.fromValue(link.getType().getValue()));
+                    model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
                     model.setHasInfo(false);
 
                     return model;

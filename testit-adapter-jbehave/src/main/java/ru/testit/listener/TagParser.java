@@ -246,7 +246,7 @@ public class TagParser {
                 .setUrl(link.getString("url"))
                 .setDescription(link.getString("description"))
                 .setTitle(link.getString("title"))
-                .setType(LinkType.fromString(link.getString("type")));
+                .setType(LinkType.fromString(link.optString("type", LinkType.RELATED.getValue())));
     }
 
     private List<LinkItem> getLinkItems(String json) {
@@ -258,7 +258,8 @@ public class TagParser {
                             .setUrl(linksArr.getJSONObject(i).getString("url"))
                             .setDescription(linksArr.getJSONObject(i).getString("description"))
                             .setTitle(linksArr.getJSONObject(i).getString("title"))
-                            .setType(LinkType.fromString(linksArr.getJSONObject(i).getString("type")))
+                            .setType(LinkType.fromString(
+                                    linksArr.getJSONObject(i).optString("type", LinkType.RELATED.getValue())))
             );
         }
         return items;
