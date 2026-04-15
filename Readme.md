@@ -51,7 +51,7 @@ You can change nothing, it's full compatible with previous versions of adapters 
 
 For CI/CD pipelines, we recommend starting the sync-storage instance before the adapter and waiting for its completion within the same job.
 
-It can be OK for `adapterMode=2` and automatic creation of new test-run + call for `curl -v http://127.0.0.1:49152/wait-completion || true` in the end.  
+(Java adapters right now is not adapted for running with `adapterMode: 2` in CI/CD environments) 
 
 There is a guide how to do everything with `adapterMode` `1` or `0`:
 
