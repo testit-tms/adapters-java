@@ -41,7 +41,6 @@ Supported test frameworks :
 - New logic with a fix for test results loading
 - Added sync-storage subprocess usage for worker synchronization on port **49152** by defailt.
 - importRealtime=false is a default mode (previously true)
-- minor fixes for jest and playwright adapters, common adapters logic
 
 ### How to run 3.0+ locally?
 
