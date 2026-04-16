@@ -56,7 +56,7 @@ jobs:
   test-gradle:
     needs: check-label
     name: ${{ matrix.project_name }}
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -170,39 +170,39 @@ jobs:
         run: |
           testit testrun create --token ${{ env.TMS_PRIVATE_TOKEN }} --output ${{ env.TEMP_FILE }}
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
-      # - name: Test
-      #   run: |
-      #     export SYNC_STORAGE_VERSION=$(grep -o 'SYNC_STORAGE_VERSION = "[^"]*"' testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java | cut -d'"' -f2)
-      #     # current location - /adapters-java/
+      - name: Test
+        run: |
+          export SYNC_STORAGE_VERSION=$(grep -o 'SYNC_STORAGE_VERSION = "[^"]*"' testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java | cut -d'"' -f2)
+          # current location - /adapters-java/
           
-      #     cd java-examples/${{ matrix.project_name }}
+          cd java-examples/${{ matrix.project_name }}
 
-      #     mkdir -p .caches
-      #     wget -O .caches/syncstorage-linux-amd64 \
-      #     "https://github.com/testit-tms/sync-storage-public/releases/download/${SYNC_STORAGE_VERSION}/syncstorage-${SYNC_STORAGE_VERSION}-linux_amd64"
-      #     chmod +x .caches/syncstorage-linux-amd64
-      #     nohup .caches/syncstorage-linux-amd64 --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
-      #     --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 & 
+          mkdir -p .caches
+          wget -O .caches/syncstorage-linux-amd64 \
+          "https://github.com/testit-tms/sync-storage-public/releases/download/${SYNC_STORAGE_VERSION}/syncstorage-${SYNC_STORAGE_VERSION}-linux_amd64"
+          chmod +x .caches/syncstorage-linux-amd64
+          nohup .caches/syncstorage-linux-amd64 --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
+          --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 & 
           
-      #     sleep 1
+          sleep 1
           
-      #     curl -v http://127.0.0.1:49152/health || true
+          curl -v http://127.0.0.1:49152/health || true
 
-      #     chmod +x ./gradlew
-      #     ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
-      #     -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
-      #     -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
-      #     -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
+          chmod +x ./gradlew
+          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
+          -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
 
-      #     sleep 1
+          sleep 1
           
-      #     curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} --max-time 100 || true
+          curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} --max-time 100 || true
           
-      #     cat service.log
-      #     # cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/shutdown.log
-      # - name: Validate
-      #   run: |
-      #     dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+          cat service.log
+          # cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/shutdown.log
+      - name: Validate
+        run: |
+          dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
 
       - name: Test Adapter Mode 2
         run: |
