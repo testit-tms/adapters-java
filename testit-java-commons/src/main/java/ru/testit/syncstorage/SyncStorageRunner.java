@@ -32,6 +32,8 @@ public class SyncStorageRunner {
 
     private final String privateToken;
 
+    private final String executablePath;
+
     private String workerPid;
 
     private boolean isMaster = false;
@@ -53,12 +55,14 @@ public class SyncStorageRunner {
             String testRunId,
             String port,
             String baseURL,
-            String privateToken
+            String privateToken,
+            String executablePath
     ) {
         this.testRunId = testRunId;
         this.port = port;
         this.baseURL = baseURL;
         this.privateToken = privateToken;
+        this.executablePath = executablePath;
     }
 
     /**
@@ -68,7 +72,7 @@ public class SyncStorageRunner {
      * @return path to correct file
      * @throws IOException FS / Network errors
      */
-    private String prepareExecutableFile(String originalExecutablePath)
+    private String prepareBundledExecutableFile(String originalExecutablePath)
             throws IOException {
         String currentDir = System.getProperty("user.dir");
         Path cachesDir = Paths.get(currentDir, "build/.caches");
@@ -253,13 +257,16 @@ public class SyncStorageRunner {
             return;
         }
 
-        String executablePath = getFileNameByArchAndOS();
+        String binaryPath = executablePath;
+        if (binaryPath == null || binaryPath.isEmpty()) {
+            binaryPath = getFileNameByArchAndOS();
+        }
 
-        List<String> command = getCommand(executablePath);
+        List<String> command = getCommand(binaryPath);
 
 
         // prepare executable file
-        String preparedExecutablePath = prepareExecutableFile(executablePath);
+        String preparedExecutablePath = prepareExecutablePath(binaryPath);
 
         // Update command with selected file
         command.set(0, preparedExecutablePath);
@@ -270,17 +277,21 @@ public class SyncStorageRunner {
                 "Starting SyncStorage with command: " + String.join(" ", command)
         );
 
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
-        processBuilder.directory(
-                new File(new File(preparedExecutablePath).getParent())
-        );
+        File workingDirectory = new File(new File(preparedExecutablePath).getParent());
+        if (isLinux(System.getProperty("os.name").toLowerCase())) {
+            startDetachedProcess(command, workingDirectory);
+            isExternal = true;
+            syncStorageProcess = null;
+        } else {
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.directory(workingDirectory);
+            processBuilder.redirectErrorStream(true);
 
-        processBuilder.redirectErrorStream(true);
+            syncStorageProcess = processBuilder.start();
 
-        syncStorageProcess = processBuilder.start();
-
-        // Read output as different thread
-        startOutputReader();
+            // Read output as different thread
+            startOutputReader();
+        }
 
         if (waitForServerStartup(30)) {
             isRunning = true;
@@ -329,6 +340,31 @@ public class SyncStorageRunner {
         return command;
     }
 
+    private String prepareExecutableFileFromPath(String executablePath)
+            throws IOException {
+        Path path = Paths.get(executablePath);
+        if (!Files.exists(path)) {
+            throw new FileNotFoundException(
+                    "SyncStorage executable not found: " + executablePath
+            );
+        }
+
+        if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
+            path.toFile().setExecutable(true);
+        }
+
+        return path.toAbsolutePath().toString();
+    }
+
+    private String prepareExecutablePath(String executablePath)
+            throws IOException {
+        Path path = Paths.get(executablePath);
+        if (path.isAbsolute() || Files.exists(path)) {
+            return prepareExecutableFileFromPath(executablePath);
+        }
+        return prepareBundledExecutableFile(path.toString());
+    }
+
     private void registerWorkerWithRetry() {
         // Register current process as worker
         // try 5 times in a row
@@ -336,6 +372,33 @@ public class SyncStorageRunner {
             boolean isRegistered = registerWorker();
             if (isRegistered) break;
         }
+    }
+
+    private void startDetachedProcess(List<String> command, File workingDirectory)
+            throws IOException {
+        File logFile = new File(workingDirectory, "syncstorage.log");
+        StringBuilder shellCommand = new StringBuilder("setsid ");
+
+        for (String arg : command) {
+            shellCommand.append(escapeShellArgument(arg)).append(" ");
+        }
+
+        shellCommand
+                .append("</dev/null >>")
+                .append(escapeShellArgument(logFile.getAbsolutePath()))
+                .append(" 2>&1 &");
+
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "sh",
+                "-c",
+                shellCommand.toString()
+        );
+        processBuilder.directory(workingDirectory);
+        processBuilder.start();
+    }
+
+    private String escapeShellArgument(String value) {
+        return "'" + value.replace("'", "'\"'\"'") + "'";
     }
 
     /**
