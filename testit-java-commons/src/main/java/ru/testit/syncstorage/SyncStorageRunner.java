@@ -278,11 +278,7 @@ public class SyncStorageRunner {
         );
 
         File workingDirectory = new File(new File(preparedExecutablePath).getParent());
-        if (isLinux(System.getProperty("os.name").toLowerCase())) {
-            startDetachedProcess(command, workingDirectory);
-            isExternal = true;
-            syncStorageProcess = null;
-        } else {
+        if (!startDetachedProcessIfSupported(command, workingDirectory)) {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.directory(workingDirectory);
             processBuilder.redirectErrorStream(true);
@@ -374,7 +370,32 @@ public class SyncStorageRunner {
         }
     }
 
-    private void startDetachedProcess(List<String> command, File workingDirectory)
+    private boolean startDetachedProcessIfSupported(
+            List<String> command,
+            File workingDirectory
+    ) {
+        String osName = System.getProperty("os.name").toLowerCase();
+        try {
+            if (isLinux(osName) || isMacOs(osName)) {
+                startDetachedUnixProcess(command, workingDirectory);
+            } else if (osName.contains("win")) {
+                startDetachedWindowsProcess(command, workingDirectory);
+            } else {
+                return false;
+            }
+            isExternal = true;
+            syncStorageProcess = null;
+            return true;
+        } catch (IOException e) {
+            LOGGER.warn(
+                    "Detached SyncStorage launch failed, fallback to embedded mode: {}",
+                    e.getMessage()
+            );
+            return false;
+        }
+    }
+
+    private void startDetachedUnixProcess(List<String> command, File workingDirectory)
             throws IOException {
         File logFile = new File(workingDirectory, "syncstorage.log");
         StringBuilder shellCommand = new StringBuilder("setsid ");
@@ -397,8 +418,35 @@ public class SyncStorageRunner {
         processBuilder.start();
     }
 
+    private void startDetachedWindowsProcess(List<String> command, File workingDirectory)
+            throws IOException {
+        File logFile = new File(workingDirectory, "syncstorage.log");
+        StringBuilder shellCommand = new StringBuilder();
+
+        shellCommand.append("start \"sync-storage\" /b cmd /c \"");
+        for (String arg : command) {
+            shellCommand.append(escapeWindowsArgument(arg)).append(" ");
+        }
+        shellCommand
+                .append("1>>")
+                .append(escapeWindowsArgument(logFile.getAbsolutePath()))
+                .append(" 2>&1\"");
+
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "cmd",
+                "/c",
+                shellCommand.toString()
+        );
+        processBuilder.directory(workingDirectory);
+        processBuilder.start();
+    }
+
     private String escapeShellArgument(String value) {
         return "'" + value.replace("'", "'\"'\"'") + "'";
+    }
+
+    private String escapeWindowsArgument(String value) {
+        return "\"" + value.replace("\"", "\"\"") + "\"";
     }
 
     /**
