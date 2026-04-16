@@ -33,6 +33,7 @@ final class AdapterManagerWiringFactory {
             Logger logger
     ) {
         SyncStorageService syncStorageService = new SyncStorageService(
+                adapterConfig,
                 clientConfiguration,
                 client,
                 new ClientWrapper()

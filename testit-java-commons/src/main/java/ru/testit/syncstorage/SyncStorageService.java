@@ -6,21 +6,25 @@ import ru.testit.client.model.TestRunV2ApiResult;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.ITmsApiClient;
 import ru.testit.models.TestResult;
+import ru.testit.properties.AdapterConfig;
 
 public class SyncStorageService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SyncStorageService.class);
 
+    private final AdapterConfig adapterConfig;
     private final ClientConfiguration clientConfiguration;
     private final ITmsApiClient client;
     private final ClientWrapper clientWrapper;
     private final SyncStorageRunner syncStorageRunner;
 
     public SyncStorageService(
+            AdapterConfig adapterConfig,
             ClientConfiguration clientConfiguration,
             ITmsApiClient client,
             ClientWrapper clientWrapper
     ) {
+        this.adapterConfig = adapterConfig;
         this.clientConfiguration = clientConfiguration;
         this.client = client;
         this.clientWrapper = clientWrapper;
@@ -101,7 +105,7 @@ public class SyncStorageService {
 
     private SyncStorageRunner initializeSyncStorage() {
         try {
-            String port = "49152";
+            String port = adapterConfig.getSyncStoragePort();
             String testRunId = clientConfiguration.getTestRunId();
             if (testRunId == null || "null".equals(testRunId)) {
                 TestRunV2ApiResult response = this.client.createTestRun();
@@ -113,7 +117,8 @@ public class SyncStorageService {
                     testRunId,
                     port,
                     clientConfiguration.getUrl(),
-                    clientConfiguration.getPrivateToken()
+                    clientConfiguration.getPrivateToken(),
+                    adapterConfig.getSyncStoragePath()
             );
             runner.start();
             return runner;
