@@ -69,7 +69,12 @@ public class SyncStorageService {
                     "Successfully sent test result to SyncStorage for test: {}",
                     testResult.getExternalId()
             );
+            return;
         }
+
+        throw new IllegalStateException(
+                "Failed to send test result to SyncStorage after retry attempts"
+        );
     }
 
     public void setWorkerStatus(String status) {

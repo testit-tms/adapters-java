@@ -151,7 +151,18 @@ public class AdapterTestCaseHelper {
             logger.debug("Stop test case {}", testResult);
         }
 
-        if (syncStorageService.sendInProgressIfNeeded(testResult)) {
+        boolean inProgressSent = false;
+        try {
+            inProgressSent = syncStorageService.sendInProgressIfNeeded(testResult);
+        } catch (Exception e) {
+            logger.warn(
+                    "Failed to send in-progress result to SyncStorage, fallback to final Test IT result: {}",
+                    e.getMessage()
+            );
+        }
+
+        // отправлять в Test IT inProgress только при успешной записи в sync-storage
+        if (inProgressSent) {
             markTestAsInProgress(testResult);
             writer.writeTestRealtime(testResult);
             return;
