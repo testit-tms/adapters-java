@@ -22,17 +22,17 @@ public class ClientWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientWrapper.class);
     private static final int API_CONNECT_TIMEOUT_MS = 10000;
     private static final int API_READ_TIMEOUT_MS = 10000;
+    private static final int RETRY_MAX_ATTEMPTS = 5;
+    private static final long RETRY_DELAY_MS = 1000L;
 
     public RegistrationResult registerWorker(String url, String testRunId) {
-        try {
+        return executeWithRetry("register worker", () -> {
             String workerPid =
                     "worker-" +
                             Thread.currentThread().getId() +
                             "-" +
                             System.currentTimeMillis();
-
             LOGGER.info("register on {}/register", url);
-
             WorkersApi workersApi = new WorkersApi(buildApiClient(url));
             RegisterResponse response = workersApi.registerPost(
                     new RegisterRequest()
@@ -40,12 +40,8 @@ public class ClientWrapper {
                             .testRunId(testRunId)
             );
             boolean isMaster = Boolean.TRUE.equals(response.getIsMaster());
-
             return new RegistrationResult(workerPid, isMaster);
-        } catch (Exception e) {
-            LOGGER.error("Error on worker registering: {}", e.getMessage());
-            return null;
-        }
+        }, null);
     }
 
     public boolean setWorkerStatus(
@@ -54,7 +50,7 @@ public class ClientWrapper {
             String status,
             String testRunId
     ) {
-        try {
+        Boolean result = executeWithRetry("set worker status", () -> {
             WorkersApi workersApi = new WorkersApi(buildApiClient(url));
             workersApi.setWorkerStatusPost(
                     new SetWorkerStatusRequest()
@@ -62,11 +58,9 @@ public class ClientWrapper {
                             .status(status)
                             .testRunId(testRunId)
             );
-            return true;
-        } catch (Exception e) {
-            LOGGER.warn("Failed to set worker status: {}", e.getMessage());
-            return false;
-        }
+            return Boolean.TRUE;
+        }, Boolean.FALSE);
+        return Boolean.TRUE.equals(result);
     }
 
     public boolean sendTestResultToSyncStorage(
@@ -75,17 +69,58 @@ public class ClientWrapper {
             TestResult testResult,
             String projectId
     ) {
-        try {
+        Boolean result = executeWithRetry("send test result to SyncStorage", () -> {
             TestResultsApi testResultsApi = new TestResultsApi(buildApiClient(url));
             testResultsApi.inProgressTestResultPost(
                     testRunId,
                     toTestResultCutApiModel(testResult, projectId)
             );
-            return true;
-        } catch (Exception e) {
-            LOGGER.warn("Failed to send test result to SyncStorage: {}", e.getMessage());
-            return false;
+            return Boolean.TRUE;
+        }, Boolean.FALSE);
+        return Boolean.TRUE.equals(result);
+    }
+
+    private <T> T executeWithRetry(String operationName, RetryOperation<T> operation, T fallbackValue) {
+        Exception lastException = null;
+        for (int attempt = 1; attempt <= RETRY_MAX_ATTEMPTS; attempt++) {
+            try {
+                return operation.execute();
+            } catch (Exception e) {
+                lastException = e;
+                LOGGER.warn(
+                        "Failed to {} (attempt {}/{}): {}",
+                        operationName,
+                        attempt,
+                        RETRY_MAX_ATTEMPTS,
+                        e.getMessage()
+                );
+                if (attempt == RETRY_MAX_ATTEMPTS) {
+                    break;
+                }
+                try {
+                    Thread.sleep(RETRY_DELAY_MS);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException(
+                            "Interrupted while retrying SyncStorage request",
+                            ie
+                    );
+                }
+            }
         }
+
+        LOGGER.error(
+                "Failed to {} after {} attempts",
+                operationName,
+                RETRY_MAX_ATTEMPTS,
+                lastException
+        );
+        return fallbackValue;
+    }
+
+    @FunctionalInterface
+    private interface RetryOperation<T> {
+        T execute() throws Exception;
     }
 
     private ApiClient buildApiClient(String url) {
