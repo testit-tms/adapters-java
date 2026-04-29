@@ -292,12 +292,13 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
     public void initHook(final HookTestStep hook) {
         final FixtureResult hookResult = new FixtureResult()
                 .setTitle(hook.getCodeLocation())
-                .setStart(System.currentTimeMillis());
+                .setStart(System.currentTimeMillis())
+                .setParent(getTestCaseUuid(currentTestCase.get()));
 
         if (hook.getHookType() == HookType.BEFORE) {
-            adapterManager.startPrepareFixture(getClassContainerUuid(), getHookStepUuid(hook), hookResult);
+            adapterManager.startPrepareFixtureEachTest(getClassContainerUuid(), getHookStepUuid(hook), hookResult);
         } else {
-            adapterManager.startTearDownFixture(getClassContainerUuid(), getHookStepUuid(hook), hookResult);
+            adapterManager.startTearDownFixtureEachTest(getClassContainerUuid(), getHookStepUuid(hook), hookResult);
         }
     }
 
