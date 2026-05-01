@@ -9,6 +9,9 @@ import ru.testit.syncstorage.SyncStorageService;
 import ru.testit.writers.Writer;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class AdapterContainerHelper {
@@ -18,6 +21,11 @@ public class AdapterContainerHelper {
     private final Writer writer;
     private final Logger logger;
     private final SyncStorageService syncStorageService;
+
+    private final AtomicInteger activeMainContainers = new AtomicInteger(0);
+    private final Set<String> finalizedMainContainers = ConcurrentHashMap.newKeySet();
+    /** Uuids registered by a non-duplicate {@link #startMainContainer}; drives refcount on stop. */
+    private final Set<String> registeredMainContainers = ConcurrentHashMap.newKeySet();
 
     public AdapterContainerHelper(
             AdapterConfig adapterConfig,
@@ -48,6 +56,8 @@ public class AdapterContainerHelper {
 
         container.setStart(System.currentTimeMillis());
         storage.put(uuid, container);
+        registeredMainContainers.add(uuid);
+        activeMainContainers.incrementAndGet();
 
         if (logger.isDebugEnabled()) {
             logger.debug("Start new main container {}", container);
@@ -61,8 +71,16 @@ public class AdapterContainerHelper {
             return;
         }
 
+        if (!finalizedMainContainers.add(uuid)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Main container {} already finalized, skip duplicate stop", uuid);
+            }
+            return;
+        }
+
         final Optional<MainContainer> found = storage.getTestsContainer(uuid);
         if (!found.isPresent()) {
+            finalizedMainContainers.remove(uuid);
             logger.error(
                     "Could not stop main container: container with uuid {} not found",
                     uuid
@@ -82,10 +100,22 @@ public class AdapterContainerHelper {
                 container.getChildren().size()
         );
 
-        writer.writeTests(container);
+        try {
+            writer.writeTests(container);
+        } catch (RuntimeException e) {
+            finalizedMainContainers.remove(uuid);
+            throw e;
+        }
 
-        logger.info("End of main container, set completed");
-        syncStorageService.setWorkerStatus("completed");
+        if (!registeredMainContainers.remove(uuid)) {
+            logger.warn("stopMainContainer: no matching start for {}; skip worker refcount", uuid);
+            return;
+        }
+        int remaining = activeMainContainers.decrementAndGet();
+        logger.info("End of main container, remainingMainContainers={}", remaining);
+        if (remaining == 0) {
+            syncStorageService.setWorkerStatus("completed");
+        }
     }
 
     public void startClassContainer(

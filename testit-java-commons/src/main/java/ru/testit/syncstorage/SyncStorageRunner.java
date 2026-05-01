@@ -86,7 +86,7 @@ public class SyncStorageRunner {
         Path targetPath = cachesDir.resolve(fileName);
 
         if (Files.exists(targetPath)) {
-            LOGGER.info(
+            LOGGER.debug(
                     "Using existing file: " +
                             targetPath.toString()
             );
@@ -101,7 +101,7 @@ public class SyncStorageRunner {
             return targetPath.toString();
         }
 
-        LOGGER.info(
+        LOGGER.debug(
                 "File not present, downloading from GitHub Releases"
         );
         downloadExecutableFromGitHub(targetPath);
@@ -120,8 +120,8 @@ public class SyncStorageRunner {
         // Determine OS and arch
         String downloadUrl = getDownloadUrlForCurrentPlatform();
 
-        LOGGER.info("Downloading file from: " + downloadUrl);
-        LOGGER.info("Saving in: " + targetPath.toString());
+        LOGGER.debug("Downloading file from: " + downloadUrl);
+        LOGGER.debug("Saving in: " + targetPath.toString());
 
         URL url = new URL(downloadUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -151,7 +151,7 @@ public class SyncStorageRunner {
                 }
             }
 
-            LOGGER.info("File downloaded successfully: " + targetPath.toString());
+            LOGGER.debug("File downloaded successfully: " + targetPath.toString());
 
             // Делаем файл исполняемым (для Unix-систем)
             if (
@@ -233,13 +233,13 @@ public class SyncStorageRunner {
      */
     public void start() throws IOException, InterruptedException {
         if (isRunning) {
-            System.out.println("SyncStorage уже запущен");
+            LOGGER.debug("SyncStorage already running");
             return;
         }
 
         // check if SyncStorage running on selected port
         if (isSyncStorageAlreadyRunning()) {
-            System.out.println(
+            LOGGER.debug(
                     "SyncStorage already started " +
                             port +
                             ". Connecting to existing one..."
@@ -251,7 +251,7 @@ public class SyncStorageRunner {
                 registerWorkerWithRetry();
             }
             catch (Exception e) {
-                LOGGER.error(e.getMessage());
+                LOGGER.warn("Failed to register sync-storage worker: {}", e.getMessage());
             }
 
             return;
@@ -273,7 +273,7 @@ public class SyncStorageRunner {
 
         // String osName = System.getProperty("os.name").toLowerCase();
 
-        System.out.println(
+        LOGGER.debug(
                 "Starting SyncStorage with command: " + String.join(" ", command)
         );
 
@@ -295,13 +295,13 @@ public class SyncStorageRunner {
 
         if (waitForServerStartup(30)) {
             isRunning = true;
-            System.out.println("SyncStorage started successfully on port " + port);
+            LOGGER.debug("SyncStorage started successfully on port {}", port);
             Thread.sleep(2000);
             try {
                 registerWorkerWithRetry();
             }
             catch (Exception e) {
-                LOGGER.error(e.getMessage());
+                LOGGER.warn("Failed to register sync-storage worker: {}", e.getMessage());
             }
         } else {
             throw new RuntimeException(
@@ -416,12 +416,13 @@ public class SyncStorageRunner {
                         (line = reader.readLine()) != null &&
                                 !Thread.currentThread().isInterrupted()
                 ) {
-                    System.out.println("[SyncStorage] " + line);
+                    LOGGER.debug("[SyncStorage] {}", line);
                 }
             } catch (IOException e) {
                 if (!Thread.currentThread().isInterrupted()) {
-                    System.err.println(
-                            "Ошибка чтения вывода SyncStorage: " + e.getMessage()
+                    LOGGER.debug(
+                            "Failed to read SyncStorage output: {}",
+                            e.getMessage()
                     );
                 }
             }
@@ -483,9 +484,9 @@ public class SyncStorageRunner {
         isMaster = registrationResult.isMaster();
 
         if (isMaster) {
-            LOGGER.info("Master worker registered, PID: {}", workerPid);
+            LOGGER.debug("Master worker registered, PID: {}", workerPid);
         } else {
-            LOGGER.info("Worker registered successfully, PID: {}", workerPid);
+            LOGGER.debug("Worker registered successfully, PID: {}", workerPid);
         }
 
         return true;
@@ -525,8 +526,8 @@ public class SyncStorageRunner {
     }
 
     public boolean isRunningAsProcess() {
-        LOGGER.info("isRunning" + isRunning);
-        LOGGER.info("not null" + (syncStorageProcess != null));
+        LOGGER.debug("isRunning{}", isRunning);
+        LOGGER.debug("processNotNull{}", syncStorageProcess != null);
 
         return (
                 isRunning &&

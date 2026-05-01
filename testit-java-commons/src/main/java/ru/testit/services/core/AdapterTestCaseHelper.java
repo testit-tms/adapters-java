@@ -161,11 +161,18 @@ public class AdapterTestCaseHelper {
             );
         }
 
-        // отправлять в Test IT inProgress только при успешной записи в sync-storage
+        // InProgress in Test IT only after SyncStorage write; if realtime fails, fall back to final status
         if (inProgressSent) {
+            ItemStatus finalStatus = testResult.getItemStatus();
             markTestAsInProgress(testResult);
-            writer.writeTestRealtime(testResult);
-            return;
+            if (writer.writeTestRealtime(testResult)) {
+                return;
+            }
+            logger.warn(
+                    "Test IT realtime write failed after SyncStorage success; exporting final status for {}",
+                    testResult.getExternalId()
+            );
+            testResult.setItemStatus(finalStatus);
         }
 
         writer.writeTest(testResult);

@@ -6,7 +6,8 @@ import ru.testit.models.TestResult;
 
 public interface Writer {
 
-    void writeTestRealtime(TestResult testResult);
+    /** @return {@code false} if the result could not be written to Test IT */
+    boolean writeTestRealtime(TestResult testResult);
 
     void writeTest(TestResult testResult);
 

@@ -36,11 +36,13 @@ public class HttpWriter implements Writer {
             return;
         }
 
-        writeTestRealtime(testResult);
+        if (!writeTestRealtime(testResult)) {
+            LOGGER.warn("writeTest: realtime export failed for {}", testResult.getExternalId());
+        }
     }
 
     @Override
-    public void writeTestRealtime(TestResult testResult) {
+    public boolean writeTestRealtime(TestResult testResult) {
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Write the auto test {}", testResult.getExternalId());
@@ -83,8 +85,10 @@ public class HttpWriter implements Writer {
             results.add(autoTestResultsForTestRunModel);
             List<UUID> ids = apiClient.sendTestResults(config.getTestRunId(), results);
             testResults.put(testResult.getUuid(), ids.get(0));
+            return true;
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: {}", e.getMessage());
+            return false;
         }
     }
 

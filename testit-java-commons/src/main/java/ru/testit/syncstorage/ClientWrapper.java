@@ -32,7 +32,7 @@ public class ClientWrapper {
                             Thread.currentThread().getId() +
                             "-" +
                             System.currentTimeMillis();
-            LOGGER.info("register on {}/register", url);
+            LOGGER.debug("register on {}/register", url);
             WorkersApi workersApi = new WorkersApi(buildApiClient(url));
             RegisterResponse response = workersApi.registerPost(
                     new RegisterRequest()
@@ -101,10 +101,11 @@ public class ClientWrapper {
                     Thread.sleep(RETRY_DELAY_MS);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    throw new IllegalStateException(
-                            "Interrupted while retrying SyncStorage request",
-                            ie
+                    LOGGER.warn(
+                            "Interrupted while retrying SyncStorage request for {}, continue with fallback",
+                            operationName
                     );
+                    return fallbackValue;
                 }
             }
         }

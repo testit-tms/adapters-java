@@ -43,21 +43,26 @@ public class SyncStorageService {
         }
     }
 
-    public boolean sendInProgressIfNeeded(TestResult testResult) {
+    public synchronized boolean sendInProgressIfNeeded(TestResult testResult) {
         if (!shouldSendInProgressResult()) {
             return false;
         }
-        sendTestResultToSyncStorage(testResult);
+        if (!sendTestResultToSyncStorage(testResult)) {
+            return false;
+        }
         markInProgressResultSent();
         return true;
     }
 
-    private void sendTestResultToSyncStorage(TestResult testResult) {
+    /**
+     * @return {@code false} if SyncStorage is not running (fallback to direct Test IT export)
+     */
+    private boolean sendTestResultToSyncStorage(TestResult testResult) {
         if (syncStorageRunner == null || syncStorageRunner.isNotRunning()) {
-            return;
+            return false;
         }
 
-        LOGGER.info("trying to send testResult to sync storage");
+        LOGGER.debug("trying to send testResult to sync storage");
         boolean isSent = clientWrapper.sendTestResultToSyncStorage(
                 syncStorageRunner.getUrl(),
                 syncStorageRunner.getTestRunId(),
@@ -65,11 +70,11 @@ public class SyncStorageService {
                 clientConfiguration.getProjectId()
         );
         if (isSent) {
-            LOGGER.info(
+            LOGGER.debug(
                     "Successfully sent test result to SyncStorage for test: {}",
                     testResult.getExternalId()
             );
-            return;
+            return true;
         }
 
         throw new IllegalStateException(
@@ -78,32 +83,51 @@ public class SyncStorageService {
     }
 
     public void setWorkerStatus(String status) {
-        LOGGER.info("Set worker status to {}", status);
+        LOGGER.debug("Set worker status to {}", status);
         if (syncStorageRunner == null) {
             LOGGER.warn("No runner");
             return;
         }
-        setWorkerStatus(syncStorageRunner.getWorkerPid(), status);
+        try {
+            setWorkerStatus(syncStorageRunner.getWorkerPid(), status);
+        } catch (RuntimeException e) {
+            LOGGER.warn("Failed to set worker status {}, continue without sync-storage: {}", status, e.getMessage());
+        }
     }
 
     public void setWorkerStatus(String pid, String status) {
         if (syncStorageRunner == null || syncStorageRunner.isNotRunning()) {
-            LOGGER.info("not running!");
+            LOGGER.debug("not running!");
             return;
         }
 
-        LOGGER.info("{}:{}", pid, status);
-        boolean isUpdated = clientWrapper.setWorkerStatus(
-                syncStorageRunner.getUrl(),
-                pid,
-                status,
-                syncStorageRunner.getTestRunId()
-        );
-        if (isUpdated) {
-            LOGGER.info(
-                    "Successfully set status {} for worker with PID: {}",
+        LOGGER.debug("{}:{}", pid, status);
+        try {
+            boolean isUpdated = clientWrapper.setWorkerStatus(
+                    syncStorageRunner.getUrl(),
+                    pid,
                     status,
-                    pid
+                    syncStorageRunner.getTestRunId()
+            );
+            if (isUpdated) {
+                LOGGER.debug(
+                        "Successfully set status {} for worker with PID: {}",
+                        status,
+                        pid
+                );
+            } else {
+                LOGGER.warn(
+                        "Failed to set status {} for worker with PID: {}, continue without sync-storage",
+                        status,
+                        pid
+                );
+            }
+        } catch (RuntimeException e) {
+            LOGGER.warn(
+                    "Unexpected error setting worker status {} for PID {}, continue without sync-storage: {}",
+                    status,
+                    pid,
+                    e.getMessage()
             );
         }
     }
