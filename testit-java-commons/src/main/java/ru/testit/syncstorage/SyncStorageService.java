@@ -43,18 +43,23 @@ public class SyncStorageService {
         }
     }
 
-    public boolean sendInProgressIfNeeded(TestResult testResult) {
+    public synchronized boolean sendInProgressIfNeeded(TestResult testResult) {
         if (!shouldSendInProgressResult()) {
             return false;
         }
-        sendTestResultToSyncStorage(testResult);
+        if (!sendTestResultToSyncStorage(testResult)) {
+            return false;
+        }
         markInProgressResultSent();
         return true;
     }
 
-    private void sendTestResultToSyncStorage(TestResult testResult) {
+    /**
+     * @return {@code false} if SyncStorage is not running (fallback to direct Test IT export)
+     */
+    private boolean sendTestResultToSyncStorage(TestResult testResult) {
         if (syncStorageRunner == null || syncStorageRunner.isNotRunning()) {
-            return;
+            return false;
         }
 
         LOGGER.info("trying to send testResult to sync storage");
@@ -69,7 +74,7 @@ public class SyncStorageService {
                     "Successfully sent test result to SyncStorage for test: {}",
                     testResult.getExternalId()
             );
-            return;
+            return true;
         }
 
         throw new IllegalStateException(
