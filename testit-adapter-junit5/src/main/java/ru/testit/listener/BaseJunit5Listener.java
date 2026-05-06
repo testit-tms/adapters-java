@@ -11,6 +11,7 @@ import ru.testit.services.Utils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -182,25 +183,44 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
         Map<String, String> testParameters = new HashMap<>();
 
         for (int i = 0; i < parameters.length; i++) {
-            try {
-                final Parameter parameter = parameters[i];
-                final Class<?> parameterType = parameter.getType();
+            final Parameter parameter = parameters[i];
+            final Class<?> parameterType = parameter.getType();
 
-                if (parameterType.getCanonicalName().startsWith("org.junit.jupiter.api")) {
-                    continue;
-                }
-
-                String name = parameter.getName();
-                String value = invocationContext.getArguments().get(i).toString();
-
-                testParameters.put(name, value);
+            if (parameterType.getCanonicalName().startsWith("org.junit.jupiter.api")) {
+                continue;
             }
-            catch (NullPointerException e) {
-                LOGGER.warn("Exception on parsing junit test parameter: {}", e.getMessage());
-            }
+
+            String name = parameter.getName();
+            Object arg = invocationContext.getArguments().get(i);
+            String value = stringifyArgument(arg);
+
+            testParameters.put(name, value);
         }
 
         return testParameters;
+    }
+
+    private static String stringifyArgument(Object arg) {
+        if (arg == null) {
+            return "null";
+        }
+
+        Class<?> c = arg.getClass();
+        if (!c.isArray()) {
+            return String.valueOf(arg);
+        }
+
+        if (arg instanceof Object[]) return Arrays.deepToString((Object[]) arg);
+        if (arg instanceof int[]) return Arrays.toString((int[]) arg);
+        if (arg instanceof long[]) return Arrays.toString((long[]) arg);
+        if (arg instanceof short[]) return Arrays.toString((short[]) arg);
+        if (arg instanceof byte[]) return Arrays.toString((byte[]) arg);
+        if (arg instanceof char[]) return Arrays.toString((char[]) arg);
+        if (arg instanceof boolean[]) return Arrays.toString((boolean[]) arg);
+        if (arg instanceof float[]) return Arrays.toString((float[]) arg);
+        if (arg instanceof double[]) return Arrays.toString((double[]) arg);
+
+        return String.valueOf(arg);
     }
 
     @Override
