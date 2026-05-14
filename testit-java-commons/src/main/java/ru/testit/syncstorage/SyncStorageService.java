@@ -133,6 +133,9 @@ public class SyncStorageService {
     }
 
     private SyncStorageRunner initializeSyncStorage() {
+        if (!adapterConfig.shouldEnableTmsIntegration()) {
+            return null;
+        }
         try {
             String port = adapterConfig.getSyncStoragePort();
             String testRunId = clientConfiguration.getTestRunId();
