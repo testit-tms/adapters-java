@@ -121,6 +121,7 @@ jobs:
           - project_name: selenide-gradle-junit5
             configuration_id: SELENIDE_GRADLE_JUNIT5_CONFIGURATION_ID
             project_id: SELENIDE_GRADLE_JUNIT5_PROJECT_ID
+            needs_chrome: true
           - project_name: serenity2-gradle-junit4
             configuration_id: SERENITY2_GRADLE_JUNIT4_CONFIGURATION_ID
             project_id: SERENITY2_GRADLE_JUNIT4_PROJECT_ID
@@ -133,32 +134,45 @@ jobs:
       TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
     steps:
       - name: Checkout adapters-java
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Checkout api-validator-dotnet
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: testit-tms/api-validator-dotnet
           token: ${{ env.GITHUB_PAT }}
           path: api-validator-dotnet
       - name: Checkout java-examples
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: testit-tms/java-examples
           path: java-examples
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Setup java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: jdk
           java-version: ${{ env.JAVA_VERSION }}
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+      - name: Setup Chrome
+        if: matrix.needs_chrome == true
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+      - name: Configure Selenide for CI
+        if: matrix.needs_chrome == true
+        run: |
+          CHROME_BASE="/tmp/chrome-${{ github.run_id }}-${{ matrix.project_name }}"
+          CHROME_ARGS="--no-sandbox,--disable-dev-shm-usage,--disable-gpu,--remote-allow-origins=*"
+          echo "SELENIDE_CHROME_BASE=${CHROME_BASE}" >> $GITHUB_ENV
+          echo "SELENIDE_OPTS=-Dselenide.headless=true -Dchromeoptions.args=${CHROME_ARGS},--user-data-dir=${CHROME_BASE}-run1" >> $GITHUB_ENV
+          echo "SELENIDE_OPTS_MODE2=-Dselenide.headless=true -Dchromeoptions.args=${CHROME_ARGS},--user-data-dir=${CHROME_BASE}-run2" >> $GITHUB_ENV
       - name: Setup environment
         run: |
           ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
@@ -188,8 +202,15 @@ jobs:
           
           curl -v http://127.0.0.1:49152/health || true
 
+          if [ -n "${SELENIDE_CHROME_BASE:-}" ]; then
+            pkill -f chromedriver || true
+            pkill -f "chrome.*--user-data-dir" || true
+            rm -rf "${SELENIDE_CHROME_BASE}"-* || true
+            sleep 1
+          fi
+
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          ./gradlew test --no-daemon ${SELENIDE_OPTS:-} -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
@@ -208,9 +229,16 @@ jobs:
         run: |
           export TMS_ADAPTER_MODE=2
           cd java-examples/${{ matrix.project_name }}
+
+          if [ -n "${SELENIDE_CHROME_BASE:-}" ]; then
+            pkill -f chromedriver || true
+            pkill -f "chrome.*--user-data-dir" || true
+            rm -rf "${SELENIDE_CHROME_BASE}"-* || true
+            sleep 2
+          fi
           
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          ./gradlew test --no-daemon ${SELENIDE_OPTS_MODE2:-${SELENIDE_OPTS:-}} -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} \
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
