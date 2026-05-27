@@ -50,7 +50,7 @@ You can change nothing, it's full compatible with previous versions of adapters 
 
 The adapter tries to download the correct sync-storage version from GitHub. If that is not possible, prepare the sync-storage binary yourself:
 
-1. Find the sync-storage version for your adapter release: check out the release tag and look for the `SYNC_STORAGE_VERSION` value. You can use our [script](https://github.com/testit-tms/adapters-python/tree/main/scripts/get_sync_storage_version.sh).
+1. Find the sync-storage version for your adapter release: check out the release tag and look for the `SYNC_STORAGE_VERSION` value. You can use our [script](https://github.com/testit-tms/adapters-java/blob/main/scripts/get_version.sh).
 
 2. Download the correct binary for your OS and version from our [release page](https://github.com/testit-tms/sync-storage-public/releases).
 
