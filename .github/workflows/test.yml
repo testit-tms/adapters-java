@@ -204,6 +204,46 @@ jobs:
         run: |
           dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
 
+
+      - name: Create TestRun
+        run: |
+          testit testrun create --token ${{ env.TMS_PRIVATE_TOKEN }} --output ${{ env.TEMP_FILE }}
+          echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
+
+      - name: Test importRealtime=true
+        run: |
+          export TMS_IMPORT_REALTIME=true
+          cd java-examples/${{ matrix.project_name }}
+
+          SYNC_STORAGE_BIN=".caches/syncstorage-linux-amd64"
+          pkill -f "syncstorage.*--port 49152" || true
+          pkill -f "syncstorage-linux-amd64" || true
+          sleep 1
+
+          nohup "$SYNC_STORAGE_BIN" --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
+          --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 & 
+          
+          sleep 1
+          
+          curl -v http://127.0.0.1:49152/health || true
+
+          chmod +x ./gradlew
+          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
+          -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
+
+          sleep 1
+          
+          curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} --max-time 100 || true
+          
+          cat service.log
+
+      - name: Validate importRealtime=true
+        run: |
+          dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+
+
       - name: Test Adapter Mode 2
         run: |
           export TMS_ADAPTER_MODE=2
