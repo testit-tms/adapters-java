@@ -190,4 +190,31 @@ public class Utils {
         }
         return hexText.toUpperCase();
     }
+
+    private static final Pattern WEB_DRIVER_HOST_INFO = Pattern.compile(
+            "\\n?Host info: host: '[^']*', ip: '[^']*'"
+    );
+    private static final Pattern WEB_DRIVER_SESSION_NOT_CREATED = Pattern.compile(
+            "session not created: [^\\n]+",
+            Pattern.CASE_INSENSITIVE
+    );
+    private static final Pattern WEB_DRIVER_OS_VERSION = Pattern.compile("os\\.version: '[^']*'");
+    private static final Pattern WEB_DRIVER_JAVA_VERSION = Pattern.compile("java\\.version: '[^']*'");
+
+    /**
+     * Stabilizes Selenium/Selenide session startup errors for CI: host, Java/OS versions
+     * and Chrome failure reasons vary between runners.
+     */
+    public static String normalizeWebDriverMessage(String message) {
+        if (message == null || !message.contains("Could not start a new session")) {
+            return message;
+        }
+
+        String normalized = WEB_DRIVER_HOST_INFO.matcher(message).replaceAll("");
+        normalized = WEB_DRIVER_SESSION_NOT_CREATED.matcher(normalized)
+                .replaceAll("session not created: <unspecified>");
+        normalized = WEB_DRIVER_OS_VERSION.matcher(normalized).replaceAll("os.version: '*'");
+        normalized = WEB_DRIVER_JAVA_VERSION.matcher(normalized).replaceAll("java.version: '*'");
+        return normalized;
+    }
 }

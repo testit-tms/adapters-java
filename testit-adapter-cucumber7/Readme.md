@@ -584,7 +584,7 @@ Feature: Rule
   Tests that use Rule
 
   @DisplayName=sum:{left}+{right}={result}
-  @ExternalId={result}
+  @ExternalId=Summing_{left}_{right}_{result}
   Scenario Outline: Summing
     When Summing <left>+<right>
     Then Result is <result>
