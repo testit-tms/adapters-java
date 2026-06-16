@@ -11,6 +11,10 @@ import ru.testit.syncstorage.model.RegisterResponse;
 import ru.testit.syncstorage.model.SetWorkerStatusRequest;
 import ru.testit.syncstorage.model.TestResultCutApiModel;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -22,6 +26,7 @@ public class ClientWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientWrapper.class);
     private static final int API_CONNECT_TIMEOUT_MS = 10000;
     private static final int API_READ_TIMEOUT_MS = 10000;
+    private static final int KEEP_ALIVE_TIMEOUT_MS = 5000;
     private static final int RETRY_MAX_ATTEMPTS = 5;
     private static final long RETRY_DELAY_MS = 1000L;
 
@@ -61,6 +66,49 @@ public class ClientWrapper {
             return Boolean.TRUE;
         }, Boolean.FALSE);
         return Boolean.TRUE.equals(result);
+    }
+
+    /**
+     * Single non-retried ping; failures are logged and ignored (see sync-storage KEEP_ALIVE.md).
+     */
+    public boolean sendKeepAlive(String url, String pid, String testRunId) {
+        if (pid == null || pid.isEmpty() || testRunId == null || testRunId.isEmpty()) {
+            return false;
+        }
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url + "/keep_alive").openConnection();
+            connection.setRequestMethod("POST");
+            connection.setConnectTimeout(KEEP_ALIVE_TIMEOUT_MS);
+            connection.setReadTimeout(KEEP_ALIVE_TIMEOUT_MS);
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
+
+            String body = "{\"pid\":\"" + jsonEscape(pid) + "\",\"testRunId\":\"" + jsonEscape(testRunId) + "\"}";
+            try (OutputStream out = connection.getOutputStream()) {
+                out.write(body.getBytes(StandardCharsets.UTF_8));
+            }
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                LOGGER.trace("keep_alive accepted for pid={}", pid);
+                return true;
+            }
+            if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+                LOGGER.warn("keep_alive: worker not found (pid={})", pid);
+            } else {
+                LOGGER.debug("keep_alive failed: HTTP {} (pid={})", responseCode, pid);
+            }
+            return false;
+        } catch (Exception e) {
+            LOGGER.debug("keep_alive failed for pid={}: {}", pid, e.getMessage());
+            return false;
+        }
+    }
+
+    private static String jsonEscape(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"");
     }
 
     public boolean sendTestResultToSyncStorage(
