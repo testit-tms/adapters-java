@@ -1,4 +1,4 @@
-# Improvements specification — 2026-05-19
+# Improvements specification — 2026-06-16
 
 Technical specification of adapter, CI, and bulk-import improvements delivered or prepared on **2026-05-19**.  
 Audience: maintainers and reviewers integrating changes across branches.
@@ -141,12 +141,11 @@ Documented in detail: [cucumber-bulk-import-lifecycle.md](./cucumber-bulk-import
 
 | Event | Action |
 |-------|--------|
-| `beforeStoriesSteps(BEFORE)` | Reset run state |
-| `beforeStory` | One shared `runMainUuid` for embedder run; new `ClassContainer` per story file |
+| `beforeStory` (first call → `startAdapterLaunch`) | Reset run state; one shared `runMainUuid`; new `ClassContainer` per story file |
 | `beforeScenario` / `example` | Schedule/start test; `updateClassContainer` only |
 | `afterScenario` | `stopTestCase` only |
 | `afterStory` | `stopClassContainer` for that story |
-| `afterStoriesSteps(AFTER)` **or** last `afterStory` | `finalizeRunMainContainers()` → single `writeTests` |
+| last `afterStory` (`storyClassUuids` empty) | `finalizeRunMainContainers()` → single `writeTests` |
 
 ### 6.3 Thread safety
 

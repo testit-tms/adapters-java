@@ -44,7 +44,7 @@ public class SyncStorageRunner {
     private boolean isExternal = false;
 
 
-    private static final String SYNC_STORAGE_VERSION = "v0.3.6-tms-5.7";
+    private static final String SYNC_STORAGE_VERSION = "v0.3.7-tms-5.7";
 
     private static final String SYNC_STORAGE_REPO_URL ="https://github.com/testit-tms/sync-storage-public/releases/download/";
     private static final String AMD64 = "amd64";

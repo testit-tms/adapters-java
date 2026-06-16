@@ -3,7 +3,6 @@ package ru.testit.listener;
 import org.jbehave.core.model.Scenario;
 import org.jbehave.core.model.Story;
 import org.jbehave.core.reporters.NullStoryReporter;
-import org.jbehave.core.steps.StepCollector.Stage;
 import ru.testit.models.*;
 import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
@@ -38,24 +37,11 @@ public class BaseJbehaveListener extends NullStoryReporter {
     }
 
     private void startAdapterLaunch() {
+        MAIN_UUIDS_PENDING_FINALIZE.clear();
+        runMainUuid.set(null);
+        storyClassUuids.clear();
         adapterManager.startTests();
         adapterLaunchIsStarted = true;
-    }
-
-    @Override
-    public void beforeStoriesSteps(final Stage stage) {
-        if (stage == Stage.BEFORE) {
-            MAIN_UUIDS_PENDING_FINALIZE.clear();
-            runMainUuid.set(null);
-            storyClassUuids.clear();
-        }
-    }
-
-    @Override
-    public void afterStoriesSteps(final Stage stage) {
-        if (stage == Stage.AFTER) {
-            finalizeRunMainContainers();
-        }
     }
 
     private void finalizeRunMainContainers() {
