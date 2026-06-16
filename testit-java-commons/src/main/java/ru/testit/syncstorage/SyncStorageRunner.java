@@ -44,12 +44,13 @@ public class SyncStorageRunner {
     private boolean isExternal = false;
 
 
-    private static final String SYNC_STORAGE_VERSION = "v0.3.2";
+    private static final String SYNC_STORAGE_VERSION = "v0.3.7-tms-5.7";
 
     private static final String SYNC_STORAGE_REPO_URL ="https://github.com/testit-tms/sync-storage-public/releases/download/";
     private static final String AMD64 = "amd64";
     private static final String ARM64 = "arm64";
     private final ClientWrapper clientWrapper = new ClientWrapper();
+    private SyncStorageKeepAlive keepAlive;
 
     public SyncStorageRunner(
             String testRunId,
@@ -489,7 +490,26 @@ public class SyncStorageRunner {
             LOGGER.debug("Worker registered successfully, PID: {}", workerPid);
         }
 
+        startKeepAlive();
         return true;
+    }
+
+    private void startKeepAlive() {
+        if (workerPid == null || workerPid.isEmpty()) {
+            return;
+        }
+        if (keepAlive != null) {
+            keepAlive.stop();
+        }
+        keepAlive = new SyncStorageKeepAlive(clientWrapper, getUrl(), workerPid, testRunId);
+        keepAlive.start();
+    }
+
+    void stopKeepAlive() {
+        if (keepAlive != null) {
+            keepAlive.stop();
+            keepAlive = null;
+        }
     }
 
     /**

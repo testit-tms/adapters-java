@@ -115,6 +115,9 @@ public class SyncStorageService {
                         status,
                         pid
                 );
+                if ("completed".equalsIgnoreCase(status)) {
+                    syncStorageRunner.stopKeepAlive();
+                }
             } else {
                 LOGGER.warn(
                         "Failed to set status {} for worker with PID: {}, continue without sync-storage",

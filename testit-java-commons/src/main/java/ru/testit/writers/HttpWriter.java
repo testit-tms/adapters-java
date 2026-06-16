@@ -236,6 +236,15 @@ public class HttpWriter implements Writer {
                             autoTestResultsForTestRunModel.setTeardownResults(afterResultFinish);
 
                             UUID testResultId = testResults.get(test.getUuid());
+                            if (testResultId == null) {
+                                LOGGER.warn(
+                                        "Realtime import: no test result id for testUuid={}, externalId={}; "
+                                                + "skip setup/teardown result update",
+                                        test.getUuid(),
+                                        test.getExternalId()
+                                );
+                                return;
+                            }
 
                             TestResultResponse resultModel = apiClient.getTestResult(testResultId);
                             TestResultUpdateV2Request model = Converter.testResultToTestResultUpdateModel(resultModel);

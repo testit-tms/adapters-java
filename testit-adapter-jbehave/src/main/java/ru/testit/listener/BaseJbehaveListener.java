@@ -11,19 +11,25 @@ import ru.testit.services.ExecutableTest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.nonNull;
 
 public class BaseJbehaveListener extends NullStoryReporter {
+    private static final Set<String> MAIN_UUIDS_PENDING_FINALIZE = ConcurrentHashMap.newKeySet();
+
     private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
     private final ThreadLocal<Story> executableStory = new InheritableThreadLocal<>();
     private final ThreadLocal<Scenario> executableScenario = new InheritableThreadLocal<>();
+    /** Set in {@link #beforeScenario} — {@code afterScenario} may run on another thread. */
+    private final ThreadLocal<String> scenarioClassUuid = new ThreadLocal<>();
     private final List<String> exampleUuids = new ArrayList<>();
-    /** Must be {@link ThreadLocal#set} in {@link #beforeScenario} — {@code withInitial} breaks when afterScenario runs on another thread. */
-    private final ThreadLocal<String> launcherUUID = new ThreadLocal<>();
-    private final ThreadLocal<String> classUUID = new ThreadLocal<>();
+    private final ConcurrentHashMap<String, String> storyClassUuids = new ConcurrentHashMap<>();
+    private final AtomicReference<String> runMainUuid = new AtomicReference<>();
     private boolean adapterLaunchIsStarted = false;
 
     public BaseJbehaveListener() {
@@ -31,9 +37,20 @@ public class BaseJbehaveListener extends NullStoryReporter {
     }
 
     private void startAdapterLaunch() {
+        MAIN_UUIDS_PENDING_FINALIZE.clear();
+        runMainUuid.set(null);
+        storyClassUuids.clear();
         adapterManager.startTests();
-
         adapterLaunchIsStarted = true;
+    }
+
+    private void finalizeRunMainContainers() {
+        for (String uuid : new ArrayList<>(MAIN_UUIDS_PENDING_FINALIZE)) {
+            adapterManager.stopMainContainer(uuid);
+        }
+        MAIN_UUIDS_PENDING_FINALIZE.clear();
+        runMainUuid.set(null);
+        storyClassUuids.clear();
     }
 
     @Override
@@ -44,31 +61,40 @@ public class BaseJbehaveListener extends NullStoryReporter {
 
         if (!givenStory) {
             executableStory.set(story);
+
+            final String mainUuid = runMainUuid.updateAndGet(
+                    existing -> existing != null ? existing : UUID.randomUUID().toString());
+            if (MAIN_UUIDS_PENDING_FINALIZE.add(mainUuid)) {
+                adapterManager.startMainContainer(new MainContainer().setUuid(mainUuid));
+            }
+
+            final String classUuid = UUID.randomUUID().toString();
+            storyClassUuids.put(story.getPath(), classUuid);
+            adapterManager.startClassContainer(mainUuid, new ClassContainer().setUuid(classUuid));
         }
     }
 
     @Override
     public void afterStory(final boolean givenStory) {
         if (!givenStory) {
+            final Story story = executableStory.get();
+            if (story != null) {
+                final String classUuid = storyClassUuids.remove(story.getPath());
+                if (classUuid != null) {
+                    adapterManager.stopClassContainer(classUuid);
+                }
+                if (storyClassUuids.isEmpty()) {
+                    finalizeRunMainContainers();
+                }
+            }
             executableStory.remove();
         }
     }
 
     @Override
     public void beforeScenario(final Scenario scenario) {
-        final String mainUuid = UUID.randomUUID().toString();
-        final String classU = UUID.randomUUID().toString();
-        launcherUUID.set(mainUuid);
-        classUUID.set(classU);
-
-        final MainContainer mainContainer = new MainContainer()
-                .setUuid(mainUuid);
-        final ClassContainer classContainer = new ClassContainer()
-                .setUuid(classU);
-
-        adapterManager.startMainContainer(mainContainer);
-        adapterManager.startClassContainer(mainUuid, classContainer);
-
+        final String classUuid = storyClassUuids.get(executableStory.get().getPath());
+        scenarioClassUuid.set(classUuid);
         executableScenario.set(scenario);
 
         if (notParameterised(scenario)) {
@@ -82,10 +108,10 @@ public class BaseJbehaveListener extends NullStoryReporter {
 
             final String uuid = test.getUuid();
 
-            adapterManager.updateClassContainer(classUUID.get(),
+            adapterManager.updateClassContainer(classUuid,
                     container -> container.getChildren().add(uuid));
 
-            startTestCase(scenario, uuid, null, mainUuid);
+            startTestCase(scenario, uuid, null, runMainUuid.get());
         }
     }
 
@@ -124,15 +150,16 @@ public class BaseJbehaveListener extends NullStoryReporter {
         test.setTestStatus();
 
         final String uuid = test.getUuid();
+        final String classUuid = scenarioClassUuid.get();
 
-        adapterManager.updateClassContainer(classUUID.get(),
+        adapterManager.updateClassContainer(classUuid,
                 container -> container.getChildren().add(uuid));
         exampleUuids.add(uuid);
         startTestCase(
                 executableScenario.get(),
                 uuid,
                 tableRow,
-                launcherUUID.get());
+                runMainUuid.get());
     }
 
     @Override
@@ -150,16 +177,7 @@ public class BaseJbehaveListener extends NullStoryReporter {
             exampleUuids.clear();
         }
 
-        final String classU = classUUID.get();
-        final String mainUuid = launcherUUID.get();
-        if (classU != null) {
-            adapterManager.stopClassContainer(classU);
-        }
-        if (mainUuid != null) {
-            adapterManager.stopMainContainer(mainUuid);
-        }
-        classUUID.remove();
-        launcherUUID.remove();
+        scenarioClassUuid.remove();
         executableTest.remove();
     }
 

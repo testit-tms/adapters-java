@@ -128,6 +128,7 @@ public class BaseCucumber6Listener implements ConcurrentEventListener {
 
         final TestResult result = new TestResult()
                 .setUuid(uuid)
+                .setMainContainerUuid(launcherUUID.get())
                 .setExternalId(tagParser.getExternalIdValue())
                 .setName(tagParser.getDisplayNameValue())
                 .setTitle(tagParser.getTitleValue())

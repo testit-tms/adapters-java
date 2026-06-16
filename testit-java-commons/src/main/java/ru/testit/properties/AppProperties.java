@@ -353,8 +353,8 @@ public class AppProperties {
 
         String tmsImportRealtime = properties.getProperty(TMS_IMPORT_REALTIME);
         if (!Objects.equals(tmsImportRealtime, "false") && !Objects.equals(tmsImportRealtime, "true")) {
-            log.warn("Invalid tmsImportRealtime: {}. Use default value instead: true", tmsImportRealtime);
-            properties.setProperty(TMS_IMPORT_REALTIME, "true");
+            log.warn("Invalid tmsImportRealtime: {}. Use default value instead: false", tmsImportRealtime);
+            properties.setProperty(TMS_IMPORT_REALTIME, "false");
         }
 
         String errors = errorsBuilder.toString();
