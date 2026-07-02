@@ -58,13 +58,7 @@ public class ScenarioParser {
     }
 
     private Step getStep(final URI uri, final int stepLine) {
-        Scenario scenario = getScenarioDefinition(uri, stepLine);
-
-        if (scenario == null) {
-            return null;
-        }
-
-        return scenario.getSteps().stream().filter(s -> s.getLocation().getLine().equals((long) stepLine)).findFirst().orElse(null);
+        return ScenarioStorage.getStepDefinition(scenarioStorage.getCucumberNode(uri, stepLine));
     }
 
     private Map<String, String> updateParameters(DataTable dataTable, Map<String, String> parameters) {
