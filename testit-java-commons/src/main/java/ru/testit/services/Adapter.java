@@ -72,19 +72,17 @@ public final class Adapter {
             fileName = UUID.randomUUID() + "-attachment.txt";
         }
 
-        Path path = Paths.get(fileName);
-        try (BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset())) {
-            writer.write(content);
+        Path path = null;
+        try {
+            path = createUniqueAttachmentPath(fileName);
+            try (BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset())) {
+                writer.write(content);
+            }
+            addAttachments(path.toString());
         } catch (IOException e) {
             LOGGER.error(String.format("Can not write file '%s':", fileName), e);
-        }
-
-        addAttachments(fileName);
-
-        try {
-            Files.deleteIfExists(path);
-        } catch (IOException e) {
-            LOGGER.error(String.format("Can not delete file '%s':", fileName), e);
+        } finally {
+            deleteAttachmentPath(path);
         }
     }
 
@@ -94,20 +92,45 @@ public final class Adapter {
             return;
         }
 
-        Path path = Paths.get(fileName);
+        Path path = null;
         try {
+            path = createUniqueAttachmentPath(fileName);
             Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+            addAttachments(path.toString());
         } catch (IOException e) {
             LOGGER.error(String.format("Can not write file '%s':", fileName), e);
+        } finally {
+            deleteAttachmentPath(path);
         }
+    }
 
-        addAttachments(fileName);
+    static Path createUniqueAttachmentPath(String fileName) throws IOException {
+        Path tempDir = Files.createTempDirectory("testit-attachment-");
+        String safeName = Paths.get(fileName).getFileName().toString();
+        return tempDir.resolve(safeName);
+    }
+
+    static void deleteAttachmentPath(Path path) {
+        if (path == null) {
+            return;
+        }
 
         try {
             Files.deleteIfExists(path);
+            Path parent = path.getParent();
+            if (parent != null) {
+                Files.deleteIfExists(parent);
+            }
         } catch (IOException e) {
-            LOGGER.error(String.format("Can not delete file '%s':", fileName), e);
+            LOGGER.error(String.format("Can not delete file '%s':", path), e);
         }
+    }
+
+    public static String scopedAttachmentFileName(String baseFileName) {
+        String safeName = Paths.get(baseFileName).getFileName().toString();
+        return getAdapterManager().getCurrentTestCaseOrStep()
+                .map(scope -> scope + "-" + safeName)
+                .orElse(safeName);
     }
 
     public static void addMessage(String message) {
