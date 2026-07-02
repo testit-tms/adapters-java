@@ -26,6 +26,13 @@ public class ScenarioStorage {
         return candidate == null ? null : (Scenario) candidate.node;
     }
 
+    public static Step getStepDefinition(final CucumberNode cucumberNode) {
+        if (cucumberNode != null && cucumberNode.node instanceof Step) {
+            return (Step) cucumberNode.node;
+        }
+        return null;
+    }
+
     public void addScenarioEvent(final URI path, final TestSourceRead event) {
         pathToScenarioMap.put(path, event);
     }
