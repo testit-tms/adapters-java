@@ -156,7 +156,7 @@ public class Converter {
         model.setDuration(result.getDurationInMs());
         // здесь корректное использование code из ответа с сервера
         model.setStatusCode(result.getStatus().getCode());
-        model.setLinks(result.getLinks());
+        model.setLinks(convertCreateLinkApiModels(result.getLinks()));
         model.setStepResults(result.getStepResults());
         model.setFailureClassIds(result.getFailureClassIds());
         model.setComment(result.getComment());
@@ -229,6 +229,22 @@ public class Converter {
         return links.stream().map(
                 link -> {
                     LinkCreateApiModel model = new LinkCreateApiModel();
+
+                    model.setTitle(link.getTitle());
+                    model.setDescription(link.getDescription());
+                    model.setUrl(link.getUrl());
+                    model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
+                    model.setHasInfo(false);
+
+                    return model;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    private static List<CreateLinkApiModel> convertCreateLinkApiModels(List<LinkApiResult> links) {
+        return links.stream().map(
+                link -> {
+                    CreateLinkApiModel model = new CreateLinkApiModel();
 
                     model.setTitle(link.getTitle());
                     model.setDescription(link.getDescription());
