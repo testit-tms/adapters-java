@@ -2,10 +2,10 @@ package ru.testit.clients;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.testit.client.api.*;
-import ru.testit.client.invoker.ApiClient;
-import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.*;
+import ru.testit.adaptersapi.api.*;
+import ru.testit.adaptersapi.invoker.ApiClient;
+import ru.testit.adaptersapi.invoker.ApiException;
+import ru.testit.adaptersapi.model.*;
 import ru.testit.services.HtmlEscapeUtils;
 
 import java.io.File;
@@ -48,7 +48,7 @@ public class TmsApiClient implements ITmsApiClient {
     }
 
     @Override
-    public TestRunV2ApiResult createTestRun() throws ApiException {
+    public TestRunApiResult createTestRun() throws ApiException {
         CreateEmptyTestRunApiModel model = new CreateEmptyTestRunApiModel();
         model.setProjectId(UUID.fromString(clientConfiguration.getProjectId()));
 
@@ -60,8 +60,8 @@ public class TmsApiClient implements ITmsApiClient {
             LOGGER.debug("Create new test run: {}", model);
         }
 
-        TestRunV2ApiResult response = testRunsApi.createEmpty(model);
-        testRunsApi.startTestRun(response.getId());
+        TestRunApiResult response = testRunsApi.adaptersTestRunsPost(model);
+        testRunsApi.adaptersTestRunsIdStartPost(response.getId());
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("The test run created: {}", response);
@@ -71,42 +71,42 @@ public class TmsApiClient implements ITmsApiClient {
     }
 
     @Override
-    public TestRunV2ApiResult getTestRun(String uuid) throws ApiException {
-        return testRunsApi.getTestRunById(UUID.fromString(uuid));
+    public TestRunApiResult getTestRun(String uuid) throws ApiException {
+        return testRunsApi.adaptersTestRunsIdGet(UUID.fromString(uuid));
     }
 
     @Override
     public void updateTestRun(UpdateEmptyTestRunApiModel testRun) throws ApiException {
-        testRunsApi.updateEmpty(testRun);
+        testRunsApi.adaptersTestRunsPut(testRun);
     }
 
     @Override
     public void completeTestRun(String uuid) throws ApiException {
-        testRunsApi.completeTestRun(UUID.fromString(uuid));
+        testRunsApi.adaptersTestRunsIdCompletePost(UUID.fromString(uuid));
     }
 
     @Override
     public void updateAutoTest(AutoTestUpdateApiModel model) throws ApiException {
         // Escape HTML tags in model before sending
-        autoTestsApi.updateAutoTest(model);
+        autoTestsApi.adaptersAutoTestsPut(model);
     }
 
     @Override
     public String createAutoTest(AutoTestCreateApiModel model) throws ApiException {
         // Escape HTML tags in model before sending
-        return Objects.requireNonNull(autoTestsApi.createAutoTest(model).getId()).toString();
+        return Objects.requireNonNull(autoTestsApi.adaptersAutoTestsPost(model).getId()).toString();
     }
 
     @Override
     public void updateAutoTests(List<AutoTestUpdateApiModel> models) throws ApiException {
         // Escape HTML tags in models before sending
-        autoTestsApi.updateMultiple(models);
+        autoTestsApi.adaptersAutoTestsBulkPut(models);
     }
 
     @Override
     public List<AutoTestApiResult> createAutoTests(List<AutoTestCreateApiModel> models) throws ApiException {
         // Escape HTML tags in models before sending
-        return autoTestsApi.createMultiple(models);
+        return autoTestsApi.adaptersAutoTestsBulkPost(models);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class TmsApiClient implements ITmsApiClient {
         for (String workItemId : workItemIds) {
             try
             {
-                WorkItemApiResult workItem = workItemsApi.getWorkItemById(workItemId, null, null);
+                WorkItemApiResult workItem = workItemsApi.adaptersWorkItemsIdGet(workItemId, null, null);
 
                 workItemUuids.add(workItem.getId());
             } catch (ApiException e) {
@@ -149,7 +149,7 @@ public class TmsApiClient implements ITmsApiClient {
         model.setFilter(filter);
         model.setIncludes(includes);
 
-        List<AutoTestApiResult> tests = autoTestsApi.apiV2AutoTestsSearchPost(null,
+        List<AutoTestApiResult> tests = autoTestsApi.adaptersAutoTestsSearchPost(null,
                 null,
                 null,
                 null,
@@ -175,7 +175,7 @@ public class TmsApiClient implements ITmsApiClient {
 
         for (int attempts = 0; attempts < MAX_TRIES; attempts++) {
             try {
-                autoTestsApi.linkAutoTestToWorkItem(id, new WorkItemIdApiModel().id(workItemId));
+                autoTestsApi.adaptersAutoTestsIdWorkItemsPost(id, new WorkItemIdApiModel().id(workItemId));
                 LOGGER.debug("Link autotest {} to workitem {} is successfully", id, workItemId);
 
                 return;
@@ -198,7 +198,7 @@ public class TmsApiClient implements ITmsApiClient {
 
         for (int attempts = 0; attempts < MAX_TRIES; attempts++) {
             try {
-                autoTestsApi.deleteAutoTestLinkFromWorkItem(id, workItemId);
+                autoTestsApi.adaptersAutoTestsIdWorkItemsDelete(id, workItemId);
                 LOGGER.debug("Unlink autotest {} from workitem {} is successfully", id, workItemId);
 
                 return;
@@ -217,37 +217,56 @@ public class TmsApiClient implements ITmsApiClient {
 
     @Override
     public List<AutoTestWorkItemIdentifierApiResult> getWorkItemsLinkedToTest(String id) throws ApiException {
-        return autoTestsApi.getWorkItemsLinkedToAutoTest(id, false, false);
+        return autoTestsApi.adaptersAutoTestsIdWorkItemsGet(id, false, false);
     }
 
     @Override
     public List<UUID> sendTestResults(String testRunUuid, List<AutoTestResultsForTestRunModel> models) throws ApiException {
         // Escape HTML tags in models before sending
-        return testRunsApi.setAutoTestResultsForTestRun(UUID.fromString(testRunUuid), models);
+        return testRunsApi.adaptersTestRunsIdTestResultsPost(UUID.fromString(testRunUuid), models);
     }
 
     @Override
     public String addAttachment(String path) throws ApiException {
         File file = new File(path);
-        AttachmentModel model = attachmentsApi.apiV2AttachmentsPost(file);
+        AttachmentModel model = attachmentsApi.adaptersAttachmentsPost(file);
 
         return model.getId().toString();
     }
 
+    @Override
     public List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException {
-        TestRunV2ApiResult model = testRunsApi.getTestRunById(UUID.fromString(testRunUuid));
-        UUID configUUID = UUID.fromString(configurationId);
+        List<TestResultShortResponse> allTestResults = new ArrayList<>();
+        TestResultsFilterApiModel model = new TestResultsFilterApiModel();
+        model.setTestRunIds(Collections.singletonList(UUID.fromString(testRunUuid)));
+        model.setConfigurationIds(Collections.singletonList(UUID.fromString(configurationId)));
+        int skip = 0;
 
-        if (Objects.requireNonNull(model.getTestResults()).isEmpty()) {
-            return new ArrayList<>();
-        }
+        do {
+            List<TestResultShortResponse> testResults = testResultsApi.adaptersTestResultsSearchPost(
+                    skip,
+                    TESTS_LIMIT,
+                    null,
+                    null,
+                    null,
+                    model
+            );
 
-        return model.getTestResults().stream()
-                .filter(result -> Objects.equals(result.getConfigurationId(), configUUID))
-                .map(result -> Objects.requireNonNull(result.getAutoTest()).getExternalId()).collect(Collectors.toList());
+            allTestResults.addAll(testResults);
+            skip += TESTS_LIMIT;
+
+            if (testResults.isEmpty()) {
+                skip = -1;
+            }
+        } while (skip >= 0);
+
+        return allTestResults.stream()
+                .map(result -> Objects.requireNonNull(result).getAutotestExternalId())
+                .collect(Collectors.toList());
     }
 
-    public List<String> getAutotestExternalIdsFromTestRun() throws  ApiException {
+    @Override
+    public List<String> getAutotestExternalIdsFromTestRun() throws ApiException {
         List<TestResultShortResponse> allTestResults = new ArrayList<>();
         TestResultsFilterApiModel model = Converter.buildTestResultsFilterApiModelWithInProgressOutcome(
                 UUID.fromString(clientConfiguration.getTestRunId()),
@@ -257,7 +276,7 @@ public class TmsApiClient implements ITmsApiClient {
 
         do
         {
-            List<TestResultShortResponse> testResults = testResultsApi.apiV2TestResultsSearchPost(
+            List<TestResultShortResponse> testResults = testResultsApi.adaptersTestResultsSearchPost(
                     skip,
                     TESTS_LIMIT,
                     null,
@@ -281,12 +300,12 @@ public class TmsApiClient implements ITmsApiClient {
 
     @Override
     public TestResultResponse getTestResult(UUID uuid) throws ApiException {
-        return testResultsApi.apiV2TestResultsIdGet(uuid);
+        return testResultsApi.adaptersTestResultsIdGet(uuid);
     }
 
     @Override
-    public void updateTestResult(UUID uuid, TestResultUpdateV2Request model) throws ApiException {
+    public void updateTestResult(UUID uuid, TestResultUpdateRequest model) throws ApiException {
         // Escape HTML tags in model before sending
-        testResultsApi.apiV2TestResultsIdPut(uuid, model);
+        testResultsApi.adaptersTestResultsIdPut(uuid, model);
     }
 }

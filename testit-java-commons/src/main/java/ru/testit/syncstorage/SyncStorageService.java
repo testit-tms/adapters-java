@@ -2,7 +2,7 @@ package ru.testit.syncstorage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.testit.client.model.TestRunV2ApiResult;
+import ru.testit.adaptersapi.model.TestRunApiResult;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.ITmsApiClient;
 import ru.testit.models.TestResult;
@@ -143,7 +143,7 @@ public class SyncStorageService {
             String port = adapterConfig.getSyncStoragePort();
             String testRunId = clientConfiguration.getTestRunId();
             if (testRunId == null || "null".equals(testRunId)) {
-                TestRunV2ApiResult response = this.client.createTestRun();
+                TestRunApiResult response = this.client.createTestRun();
                 this.clientConfiguration.setTestRunId(response.getId().toString());
                 testRunId = response.getId().toString();
             }

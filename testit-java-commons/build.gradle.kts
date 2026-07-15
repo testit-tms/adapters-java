@@ -4,7 +4,6 @@ plugins {
     java
 }
 
-var apiClientVersion = "2.4.4"
 val slf4jVersion = "1.7.36"
 val jacksonVersion = "2.17.1"
 val aspectjrtVersion = "1.9.22"
@@ -25,7 +24,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:$commonsLang3Version")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
-    implementation("ru.testit:testit-api-client:$apiClientVersion")
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:$jakartaWsRsVersion")
     // Source: https://mvnrepository.com/artifact/org.openapitools/jackson-databind-nullable
     implementation("org.openapitools:jackson-databind-nullable:$jacksonDatabindNullable")
@@ -36,6 +34,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api:${jakartaAnnotationApiVersion}")
     // Source: https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-client
     implementation("org.glassfish.jersey.core:jersey-client:$jerseyVersion")
+    implementation("org.glassfish.jersey.inject:jersey-hk2:$jerseyVersion")
     // Source: https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-multipart
     implementation("org.glassfish.jersey.media:jersey-media-multipart:$jerseyVersion")
     // Source: https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson

@@ -2,8 +2,8 @@ package ru.testit.writers.helpers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.*;
+import ru.testit.adaptersapi.invoker.ApiException;
+import ru.testit.adaptersapi.model.*;
 import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 
