@@ -1,8 +1,8 @@
 package ru.testit.services.core;
 
 import org.slf4j.Logger;
-import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.TestRunV2ApiResult;
+import ru.testit.adaptersapi.invoker.ApiException;
+import ru.testit.adaptersapi.model.TestRunApiResult;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.Converter;
 import ru.testit.clients.ITmsApiClient;
@@ -80,7 +80,7 @@ public class AdapterStartupHelper {
             return;
         }
 
-        TestRunV2ApiResult testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
+        TestRunApiResult testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
 
         if (testRun.getName().equals(testRunName)) {
             return;

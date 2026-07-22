@@ -1,6 +1,6 @@
 package ru.testit;
 
-import ru.testit.client.model.*;
+import ru.testit.adaptersapi.model.*;
 import ru.testit.models.Label;
 import ru.testit.models.LinkType;
 import ru.testit.models.*;
@@ -346,7 +346,7 @@ public class Helper {
         link.setTitle(LINK_TITLE);
         link.setDescription(LINK_DESCRIPTION);
         link.setUrl(LINK_URL);
-        link.setType(ru.testit.client.model.LinkType.fromValue(LINK_TYPE.getValue()));
+        link.setType(ru.testit.adaptersapi.model.LinkType.fromValue(LINK_TYPE.getValue()));
 
         links.add(link);
 
@@ -360,7 +360,7 @@ public class Helper {
         link.setTitle(LINK_TITLE);
         link.setDescription(LINK_DESCRIPTION);
         link.setUrl(LINK_URL);
-        link.setType(ru.testit.client.model.LinkType.fromValue(LINK_TYPE.getValue()));
+        link.setType(ru.testit.adaptersapi.model.LinkType.fromValue(LINK_TYPE.getValue()));
 
         links.add(link);
 
@@ -374,7 +374,7 @@ public class Helper {
         link.setTitle(LINK_TITLE);
         link.setDescription(LINK_DESCRIPTION);
         link.setUrl(LINK_URL);
-        link.setType(ru.testit.client.model.LinkType.fromValue(LINK_TYPE.getValue()));
+        link.setType(ru.testit.adaptersapi.model.LinkType.fromValue(LINK_TYPE.getValue()));
 
         links.add(link);
 

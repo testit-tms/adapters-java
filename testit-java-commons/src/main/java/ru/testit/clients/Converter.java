@@ -3,9 +3,9 @@ package ru.testit.clients;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.LinkType;
-import ru.testit.client.model.*;
+import ru.testit.adaptersapi.invoker.ApiException;
+import ru.testit.adaptersapi.model.LinkType;
+import ru.testit.adaptersapi.model.*;
 import ru.testit.models.*;
 import ru.testit.models.StepResult;
 import ru.testit.models.Label;
@@ -150,13 +150,13 @@ public class Converter {
                 ).collect(Collectors.toList());
     }
 
-    public static TestResultUpdateV2Request testResultToTestResultUpdateModel(TestResultResponse result) {
-        TestResultUpdateV2Request model = new TestResultUpdateV2Request();
+    public static TestResultUpdateRequest testResultToTestResultUpdateModel(TestResultResponse result) {
+        TestResultUpdateRequest model = new TestResultUpdateRequest();
 
         model.setDuration(result.getDurationInMs());
         // здесь корректное использование code из ответа с сервера
         model.setStatusCode(result.getStatus().getCode());
-        model.setLinks(result.getLinks());
+        model.setLinks(convertLinkApiResultsToCreateLinks(result.getLinks()));
         model.setStepResults(result.getStepResults());
         model.setFailureClassIds(result.getFailureClassIds());
         model.setComment(result.getComment());
@@ -234,7 +234,24 @@ public class Converter {
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
                     model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
-                    model.setHasInfo(false);
+
+                    return model;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    private static List<CreateLinkApiModel> convertLinkApiResultsToCreateLinks(List<LinkApiResult> links) {
+        if (links == null) {
+            return null;
+        }
+        return links.stream().map(
+                link -> {
+                    CreateLinkApiModel model = new CreateLinkApiModel();
+
+                    model.setTitle(link.getTitle());
+                    model.setDescription(link.getDescription());
+                    model.setUrl(link.getUrl());
+                    model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
 
                     return model;
                 }
@@ -250,7 +267,6 @@ public class Converter {
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
                     model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
-                    model.setHasInfo(false);
 
                     return model;
                 }
@@ -475,15 +491,14 @@ public class Converter {
         return model;
     }
 
-    public static UpdateEmptyTestRunApiModel buildUpdateEmptyTestRunApiModel(TestRunV2ApiResult testRun) {
+    public static UpdateEmptyTestRunApiModel buildUpdateEmptyTestRunApiModel(TestRunApiResult testRun) {
         UpdateEmptyTestRunApiModel model = new UpdateEmptyTestRunApiModel();
 
         model.setId(testRun.getId());
         model.setName(testRun.getName());
-        model.setDescription(testRun.getDescription());
         model.setAttachments(Converter.buildAssignAttachmentApiModels(testRun.getAttachments()));
         model.setLinks(Converter.buildUpdateLinkApiModels(testRun.getLinks()));
-        model.setLaunchSource(testRun.getLaunchSource());
+        model.setTags(testRun.getTags());
 
         return model;
     }
@@ -510,7 +525,6 @@ public class Converter {
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
                     model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
-                    model.setHasInfo(false);
 
                     return model;
                 }
@@ -527,7 +541,6 @@ public class Converter {
                     model.setDescription(link.getDescription());
                     model.setUrl(link.getUrl());
                     model.setType(LinkType.fromValue(link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
-                    model.setHasInfo(false);
 
                     return model;
                 }

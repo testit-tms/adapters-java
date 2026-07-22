@@ -5,10 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.testit.Helper;
-import ru.testit.client.invoker.ApiException;
-import ru.testit.client.model.TestRunV2ApiResult;
-import ru.testit.client.model.TestStatusApiResult;
-import ru.testit.client.model.TestStatusApiType;
+import ru.testit.adaptersapi.invoker.ApiException;
+import ru.testit.adaptersapi.model.TestRunApiResult;
 import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.listener.ListenerManager;
@@ -73,7 +71,7 @@ class AdapterManagerTest {
         when(clientConfiguration.getTestRunId()).thenReturn("null");
         when(clientConfiguration.getTestRunName()).thenReturn("null");
 
-        TestRunV2ApiResult response = new TestRunV2ApiResult();
+        TestRunApiResult response = new TestRunApiResult();
         response.setId(UUID.fromString(TEST_RUN_ID));
 
         when(client.createTestRun()).thenReturn(response);
@@ -94,7 +92,7 @@ class AdapterManagerTest {
         when(clientConfiguration.getTestRunId()).thenReturn("null");
         when(clientConfiguration.getTestRunName()).thenReturn("Test run name");
 
-        TestRunV2ApiResult response = new TestRunV2ApiResult();
+        TestRunApiResult response = new TestRunApiResult();
         response.setId(UUID.fromString(TEST_RUN_ID));
         response.setName("Test run name");
 
