@@ -1,10 +1,12 @@
 package ru.testit.services.core;
 
 import org.slf4j.Logger;
+import ru.testit.models.FixtureResult;
 import ru.testit.models.ResultWithAttachments;
 import ru.testit.models.ResultWithDescription;
 import ru.testit.models.ResultWithParameters;
 import ru.testit.models.ResultWithTitle;
+import ru.testit.models.TestResult;
 import ru.testit.properties.AdapterConfig;
 import ru.testit.services.ResultStorage;
 import ru.testit.services.ThreadContext;
@@ -57,13 +59,46 @@ public class AdapterMetadataHelper {
             return;
         }
 
-        storage.get(current.get(), ResultWithAttachments.class).ifPresent(
+        // During Cucumber/TestNG @After hooks the current context is a fixture.
+        // Attachments must land on the parent test result so they appear in the
+        // Attachments tab and stay linked (not orphan-cleaned).
+        final String targetUuid = resolveAttachmentTargetUuid(current.get());
+
+        storage.get(targetUuid, ResultWithAttachments.class).ifPresent(
                 result -> storage.updateIfPresent(
-                        current.get(),
+                        targetUuid,
                         ResultWithAttachments.class,
                         r -> r.getAttachments().addAll(uuids)
                 )
         );
+    }
+
+    /**
+     * If the current context is a fixture with a known parent test case,
+     * return that test case uuid; otherwise return the current uuid.
+     */
+    private String resolveAttachmentTargetUuid(final String currentUuid) {
+        final Optional<FixtureResult> fixture = storage.getFixture(currentUuid);
+        if (!fixture.isPresent()) {
+            return currentUuid;
+        }
+
+        final String parentUuid = fixture.get().getParent();
+        if (parentUuid == null || parentUuid.isEmpty()) {
+            return currentUuid;
+        }
+
+        final Optional<TestResult> parentTest = storage.getTestResult(parentUuid);
+        if (!parentTest.isPresent()) {
+            logger.warn(
+                    "Fixture {} has parent {}, but test result is missing; attaching to fixture",
+                    currentUuid,
+                    parentUuid
+            );
+            return currentUuid;
+        }
+
+        return parentUuid;
     }
 
     public void addParameters(Map<String, String> parameters) {
