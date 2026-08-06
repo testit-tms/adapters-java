@@ -24,6 +24,8 @@ public interface ITmsApiClient {
     String addAttachment(String path) throws ApiException;
     List<String> getTestFromTestRun(String testRunUuid, String configurationId) throws ApiException;
     List<String> getAutotestExternalIdsFromTestRun() throws ApiException;
+    /** Existing InProgress result for externalId; prefers one bound to a test point. */
+    UUID findInProgressTestResultId(String externalId) throws ApiException;
     TestResultResponse getTestResult(UUID uuid) throws ApiException;
     void updateTestResult(UUID uuid, TestResultUpdateRequest model) throws ApiException;
 }
