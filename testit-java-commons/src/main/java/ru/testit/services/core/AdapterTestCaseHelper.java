@@ -3,7 +3,6 @@ package ru.testit.services.core;
 import org.slf4j.Logger;
 import ru.testit.listener.ListenerManager;
 import ru.testit.models.ItemStage;
-import ru.testit.models.ItemStatus;
 import ru.testit.models.TestResult;
 import ru.testit.properties.AdapterConfig;
 import ru.testit.services.ResultStorage;
@@ -151,9 +150,9 @@ public class AdapterTestCaseHelper {
             logger.debug("Stop test case {}", testResult);
         }
 
-        boolean inProgressSent = false;
+        boolean syncAccepted = false;
         try {
-            inProgressSent = syncStorageService.sendInProgressIfNeeded(testResult);
+            syncAccepted = syncStorageService.sendInProgressIfNeeded(testResult);
         } catch (Exception e) {
             logger.warn(
                     "Failed to send in-progress result to SyncStorage, fallback to final Test IT result: {}",
@@ -161,25 +160,19 @@ public class AdapterTestCaseHelper {
             );
         }
 
-        // InProgress in Test IT only after SyncStorage write; if realtime fails, fall back to final status
-        if (inProgressSent) {
-            ItemStatus finalStatus = testResult.getItemStatus();
-            markTestAsInProgress(testResult);
-            if (writer.writeTestRealtime(testResult)) {
-                return;
+        // Keep final ItemStatus. Prefer PUT on existing TP-bound InProgress (mode=0);
+        // never invent a second InProgress via setAutoTestResultsForTestRun.
+        if (syncAccepted) {
+            if (!writer.writeTestRealtime(testResult)) {
+                logger.warn(
+                        "Test IT update/export failed after SyncStorage success for {}; Work X may still finalize",
+                        testResult.getExternalId()
+                );
             }
-            logger.warn(
-                    "Test IT realtime write failed after SyncStorage success; exporting final status for {}",
-                    testResult.getExternalId()
-            );
-            testResult.setItemStatus(finalStatus);
+            return;
         }
 
         writer.writeTest(testResult);
-    }
-
-    private void markTestAsInProgress(TestResult testResult) {
-        testResult.setItemStatus(ItemStatus.INPROGRESS);
     }
 
     private boolean isTmsEnabled() {

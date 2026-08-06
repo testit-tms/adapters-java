@@ -280,6 +280,68 @@ public class TmsApiClient implements ITmsApiClient {
     }
 
     @Override
+    public UUID findInProgressTestResultId(String externalId) throws ApiException {
+        if (externalId == null || externalId.isEmpty()) {
+            return null;
+        }
+
+        List<TestResultShortResponse> matches = new ArrayList<>();
+        TestResultsFilterApiModel model = Converter.buildTestResultsFilterApiModelWithInProgressOutcome(
+                UUID.fromString(clientConfiguration.getTestRunId()),
+                UUID.fromString(clientConfiguration.getConfigurationId())
+        );
+        int skip = 0;
+
+        do {
+            List<TestResultShortResponse> page = testResultsApi.apiV2TestResultsSearchPost(
+                    skip,
+                    TESTS_LIMIT,
+                    null,
+                    null,
+                    null,
+                    model
+            );
+            for (TestResultShortResponse item : page) {
+                if (item != null && externalId.equals(item.getAutotestExternalId())) {
+                    matches.add(item);
+                }
+            }
+            skip += TESTS_LIMIT;
+            if (page.isEmpty()) {
+                skip = -1;
+            }
+        } while (skip >= 0);
+
+        if (matches.isEmpty()) {
+            return null;
+        }
+
+        UUID orphanId = null;
+        for (TestResultShortResponse item : matches) {
+            UUID id = item.getId();
+            if (id == null) {
+                continue;
+            }
+            TestResultResponse full = getTestResult(id);
+            if (hasValidTestPointId(full)) {
+                return id;
+            }
+            if (orphanId == null) {
+                orphanId = id;
+            }
+        }
+        return orphanId;
+    }
+
+    private static boolean hasValidTestPointId(TestResultResponse full) {
+        if (full == null || full.getTestPointId() == null) {
+            return false;
+        }
+        UUID tp = full.getTestPointId();
+        return !"00000000-0000-0000-0000-000000000000".equals(tp.toString());
+    }
+
+    @Override
     public TestResultResponse getTestResult(UUID uuid) throws ApiException {
         return testResultsApi.apiV2TestResultsIdGet(uuid);
     }

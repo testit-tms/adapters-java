@@ -76,6 +76,11 @@ public class HttpWriter implements Writer {
                 updateTestLinkToWorkItems(autoTestId, workItemIds);
             }
 
+            UUID existingId = apiClient.findInProgressTestResultId(testResult.getExternalId());
+            if (existingId != null) {
+                return updateExistingTestResult(existingId, testResult);
+            }
+
             AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
                     testResult,
                     config.getConfigurationId()
@@ -90,6 +95,32 @@ public class HttpWriter implements Writer {
             LOGGER.error("Can not write the autotest: {}", e.getMessage());
             return false;
         }
+    }
+
+    private boolean updateExistingTestResult(UUID testResultId, TestResult testResult) throws ApiException {
+        TestResultResponse existing = apiClient.getTestResult(testResultId);
+        TestResultUpdateV2Request model = Converter.testResultToTestResultUpdateModel(existing);
+
+        if (testResult.getItemStatus() != null) {
+            model.setStatusCode(testResult.getItemStatus().value());
+        }
+        if (testResult.getStart() != null && testResult.getStop() != null) {
+            model.setDuration(testResult.getStop() - testResult.getStart());
+        }
+
+        Throwable throwable = testResult.getThrowable();
+        if (throwable != null) {
+            model.setMessage(ru.testit.services.HtmlEscapeUtils.escapeHtmlTags(throwable.getMessage()));
+        } else if (testResult.getMessage() != null) {
+            model.setMessage(testResult.getMessage());
+        }
+
+        apiClient.updateTestResult(testResultId, model);
+        testResults.put(testResult.getUuid(), testResultId);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Updated existing test result {} for {}", testResultId, testResult.getExternalId());
+        }
+        return true;
     }
 
     // TODO: use after refactoring
