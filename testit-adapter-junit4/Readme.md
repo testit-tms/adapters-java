@@ -1,4 +1,4 @@
-# Test IT TMS adapter for JUnit 4
+﻿# Test IT TMS adapter for JUnit 4
 
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
@@ -182,6 +182,8 @@ test {
 | ID of configuration in TMS instance [How to getting configuration ID?](https://github.com/testit-tms/.github/tree/main/configuration#configurationid)                                                                                                                                                                                                                                                                            | configurationId                   | TMS_CONFIGURATION_ID                       | tmsConfigurationId                   |
 | ID of the created test run in TMS instance.<br/>It's necessary for **adapterMode** 0 or 1                                                                                                                                                                                                                                                                                                                                        | testRunId                         | TMS_TEST_RUN_ID                            | tmsTestRunId                         |
 | Parameter for specifying the name of test run in TMS instance (**It's optional**). If it is not provided, it is created automatically                                                                                                                                                                                                                                                                                            | testRunName                       | TMS_TEST_RUN_NAME                          | tmsTestRunName                       |
+| Tags for the test run (**It's optional**). Comma-separated or JSON array | testRunTags | TMS_TEST_RUN_TAGS | tmsTestRunTags |
+| Links for the test run (**It's optional**). JSON array (`url` required; optional `title`, `description`, `type`). Applied on create / early merge at startup.<br/>**Link `type` values:** `Related` (default), `BlockedBy`, `Defect`, `Issue`, `Requirement`, `Repository` | testRunLinks | TMS_TEST_RUN_LINKS | tmsTestRunLinks |
 | Adapter mode. Default value - 0. The adapter supports following modes:<br/>0 - in this mode, the adapter filters tests by test run ID and configuration ID, and sends the results to the test run<br/>1 - in this mode, the adapter sends all results to the test run without filtering or [with filtering CLI](#run-with-filter)<br/>2 - in this mode, the adapter creates a new test run and sends results to the new test run | adapterMode                       | TMS_ADAPTER_MODE                           | tmsAdapterMode                       |
 | It enables/disables certificate validation (**It's optional**). Default value - true                                                                                                                                                                                                                                                                                                                                             | certValidation                    | TMS_CERT_VALIDATION                        | tmsCertValidation                    |
 | It enables/disables TMS integration (**It's optional**). Default value - true                                                                                                                                                                                                                                                                                                                                                    | testIt                            | TMS_TEST_IT                                | tmsTestIt                            |
@@ -323,7 +325,7 @@ public class SampleTest {
     @ExternalId("Simple_test_2")
     @WorkItemIds({"12345", "54321"})
     @DisplayName("Simple test 2")
-    @Title("test №2")
+    @Title("test â„–2")
     @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
             @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
             @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})

@@ -62,6 +62,16 @@ public class TmsApiClient implements ITmsApiClient {
             model.setName(HtmlEscapeUtils.escapeHtmlTags(this.clientConfiguration.getTestRunName()));
         }
 
+        List<String> tags = clientConfiguration.getTestRunTags();
+        if (!tags.isEmpty()) {
+            model.setTags(new ArrayList<>(tags));
+        }
+
+        List<CreateLinkApiModel> links = Converter.convertTestRunCreateLinks(clientConfiguration.getTestRunLinks());
+        if (!links.isEmpty()) {
+            model.setLinks(links);
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Create new test run: {}", model);
         }
