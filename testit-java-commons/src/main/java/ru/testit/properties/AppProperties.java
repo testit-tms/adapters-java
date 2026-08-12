@@ -17,6 +17,8 @@ public class AppProperties {
     public static final String CONFIGURATION_ID = "configurationId";
     public static final String TEST_RUN_ID = "testRunId";
     public static final String TEST_RUN_NAME = "testRunName";
+    public static final String TEST_RUN_TAGS = "testRunTags";
+    public static final String TEST_RUN_LINKS = "testRunLinks";
     public static final String ADAPTER_MODE = "adapterMode";
     public static final String AUTOMATIC_CREATION_TEST_CASES = "automaticCreationTestCases";
     public static final String AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES = "automaticUpdationLinksToTestCases";
@@ -38,6 +40,8 @@ public class AppProperties {
             put(CONFIGURATION_ID, "TMS_CONFIGURATION_ID");
             put(TEST_RUN_ID, "TMS_TEST_RUN_ID");
             put(TEST_RUN_NAME, "TMS_TEST_RUN_NAME");
+            put(TEST_RUN_TAGS, "TMS_TEST_RUN_TAGS");
+            put(TEST_RUN_LINKS, "TMS_TEST_RUN_LINKS");
             put(ADAPTER_MODE, "TMS_ADAPTER_MODE");
             put(AUTOMATIC_CREATION_TEST_CASES, "TMS_AUTOMATIC_CREATION_TEST_CASES");
             put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, "TMS_AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES");
@@ -54,6 +58,8 @@ public class AppProperties {
             put(CONFIGURATION_ID, "tmsConfigurationId");
             put(TEST_RUN_ID, "tmsTestRunId");
             put(TEST_RUN_NAME, "tmsTestRunName");
+            put(TEST_RUN_TAGS, "tmsTestRunTags");
+            put(TEST_RUN_LINKS, "tmsTestRunLinks");
             put(ADAPTER_MODE, "tmsAdapterMode");
             put(AUTOMATIC_CREATION_TEST_CASES, "tmsAutomaticCreationTestCases");
             put(AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES, "tmsAutomaticUpdationLinksToTestCases");
@@ -171,6 +177,24 @@ public class AppProperties {
             String testRunName = properties.getProperty(varNames.get(TEST_RUN_NAME), null);
             if (testRunName != null && !testRunName.isEmpty() && !testRunName.equals("null")) {
                 result.put(TEST_RUN_NAME, testRunName);
+            }
+        } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
+        }
+
+        try {
+            String testRunTags = properties.getProperty(varNames.get(TEST_RUN_TAGS), null);
+            if (testRunTags != null && !testRunTags.isEmpty() && !testRunTags.equals("null")) {
+                result.put(TEST_RUN_TAGS, testRunTags);
+            }
+        } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
+            // empty
+        }
+
+        try {
+            String testRunLinks = properties.getProperty(varNames.get(TEST_RUN_LINKS), null);
+            if (testRunLinks != null && !testRunLinks.isEmpty() && !testRunLinks.equals("null")) {
+                result.put(TEST_RUN_LINKS, testRunLinks);
             }
         } catch (SecurityException | NullPointerException | IllegalArgumentException ignored) {
             // empty

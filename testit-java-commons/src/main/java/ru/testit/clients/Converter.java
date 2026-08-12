@@ -503,6 +503,36 @@ public class Converter {
         return model;
     }
 
+    public static List<CreateLinkApiModel> convertTestRunCreateLinks(List<LinkItem> links) {
+        if (links == null || links.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return links.stream().map(link -> {
+            CreateLinkApiModel model = new CreateLinkApiModel();
+            model.setUrl(link.getUrl());
+            model.setTitle(link.getTitle());
+            model.setDescription(link.getDescription());
+            model.setType(LinkType.fromValue(
+                    link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
+            return model;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<UpdateLinkApiModel> convertTestRunUpdateLinks(List<LinkItem> links) {
+        if (links == null || links.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return links.stream().map(link -> {
+            UpdateLinkApiModel model = new UpdateLinkApiModel();
+            model.setUrl(link.getUrl());
+            model.setTitle(link.getTitle());
+            model.setDescription(link.getDescription());
+            model.setType(LinkType.fromValue(
+                    link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()));
+            return model;
+        }).collect(Collectors.toList());
+    }
+
     public static List<AssignAttachmentApiModel> buildAssignAttachmentApiModels(List<AttachmentApiResult> attachments) {
         return attachments.stream().map(
                 attachment -> {
