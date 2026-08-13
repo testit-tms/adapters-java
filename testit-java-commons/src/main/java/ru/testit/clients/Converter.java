@@ -10,6 +10,7 @@ import ru.testit.models.*;
 import ru.testit.models.StepResult;
 import ru.testit.models.Label;
 import ru.testit.services.HtmlEscapeUtils;
+import ru.testit.services.Utils;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -122,8 +123,10 @@ public class Converter {
 
         Throwable throwable = result.getThrowable();
         if (throwable != null) {
-            model.setMessage(HtmlEscapeUtils.escapeHtmlTags(throwable.getMessage()));
-            model.setTraces(HtmlEscapeUtils.escapeHtmlTags(ExceptionUtils.getStackTrace(throwable)));
+            String message = Utils.normalizeWebDriverMessage(throwable.getMessage());
+            String traces = Utils.normalizeWebDriverMessage(ExceptionUtils.getStackTrace(throwable));
+            model.setMessage(HtmlEscapeUtils.escapeHtmlTags(message));
+            model.setTraces(HtmlEscapeUtils.escapeHtmlTags(traces));
         }
 
         return model;
