@@ -324,6 +324,7 @@ public class Converter {
             LabelApiModel model = new LabelApiModel();
 
             model.setName(label.getName());
+            model.setGlobalId(0L);
 
             return model;
         }).collect(Collectors.toList());
@@ -334,6 +335,7 @@ public class Converter {
             LabelApiModel model = new LabelApiModel();
 
             model.setName(label.getName());
+            model.setGlobalId(0L);
 
             return model;
         }).collect(Collectors.toList());
