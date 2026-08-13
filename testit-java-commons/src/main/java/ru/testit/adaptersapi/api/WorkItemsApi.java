@@ -116,7 +116,7 @@ public class WorkItemsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<WorkItemApiResult> localVarReturnType = new GenericType<WorkItemApiResult>() {};
     return apiClient.invokeAPI("WorkItemsApi.adaptersWorkItemsIdGet", localVarPath, "GET", localVarQueryParams, null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -167,7 +167,7 @@ public class WorkItemsApi {
   public ApiResponse<WorkItemApiResult> adaptersWorkItemsPostWithHttpInfo(CreateWorkItemApiModel createWorkItemApiModel) throws ApiException {
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<WorkItemApiResult> localVarReturnType = new GenericType<WorkItemApiResult>() {};
     return apiClient.invokeAPI("WorkItemsApi.adaptersWorkItemsPost", "/adapters/workItems", "POST", new ArrayList<>(), createWorkItemApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -237,7 +237,7 @@ public class WorkItemsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<WorkItemShortApiResult>> localVarReturnType = new GenericType<List<WorkItemShortApiResult>>() {};
     return apiClient.invokeAPI("WorkItemsApi.adaptersWorkItemsSearchPost", "/adapters/workItems/search", "POST", localVarQueryParams, workItemSelectApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,

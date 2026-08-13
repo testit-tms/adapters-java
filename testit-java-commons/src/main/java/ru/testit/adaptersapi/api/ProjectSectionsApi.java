@@ -122,7 +122,7 @@ public class ProjectSectionsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<SectionModel>> localVarReturnType = new GenericType<List<SectionModel>>() {};
     return apiClient.invokeAPI("ProjectSectionsApi.adaptersProjectsProjectIdSectionsGet", localVarPath, "GET", localVarQueryParams, null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,

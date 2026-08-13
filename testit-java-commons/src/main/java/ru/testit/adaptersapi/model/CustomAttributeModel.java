@@ -36,20 +36,24 @@ import ru.testit.adaptersapi.invoker.JSON;
 
 
 /**
- * CustomAttributePutModel
+ * CustomAttributeModel
  */
 @JsonPropertyOrder({
-  CustomAttributePutModel.JSON_PROPERTY_ID,
-  CustomAttributePutModel.JSON_PROPERTY_TYPE,
-  CustomAttributePutModel.JSON_PROPERTY_IS_DELETED,
-  CustomAttributePutModel.JSON_PROPERTY_NAME,
-  CustomAttributePutModel.JSON_PROPERTY_IS_ENABLED,
-  CustomAttributePutModel.JSON_PROPERTY_IS_REQUIRED,
-  CustomAttributePutModel.JSON_PROPERTY_IS_GLOBAL,
-  CustomAttributePutModel.JSON_PROPERTY_OPTIONS
+  CustomAttributeModel.JSON_PROPERTY_ID,
+  CustomAttributeModel.JSON_PROPERTY_TYPE,
+  CustomAttributeModel.JSON_PROPERTY_OPTIONS,
+  CustomAttributeModel.JSON_PROPERTY_TARGETS,
+  CustomAttributeModel.JSON_PROPERTY_IS_READ_ONLY,
+  CustomAttributeModel.JSON_PROPERTY_IS_DELETED,
+  CustomAttributeModel.JSON_PROPERTY_IS_SYSTEM,
+  CustomAttributeModel.JSON_PROPERTY_NAME,
+  CustomAttributeModel.JSON_PROPERTY_IS_ENABLED,
+  CustomAttributeModel.JSON_PROPERTY_IS_REQUIRED,
+  CustomAttributeModel.JSON_PROPERTY_IS_GLOBAL,
+  CustomAttributeModel.JSON_PROPERTY_CODE
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
-public class CustomAttributePutModel {
+public class CustomAttributeModel {
   public static final String JSON_PROPERTY_ID = "id";
   @jakarta.annotation.Nonnull
   private UUID id;
@@ -58,9 +62,25 @@ public class CustomAttributePutModel {
   @jakarta.annotation.Nonnull
   private CustomAttributeTypesEnum type;
 
+  public static final String JSON_PROPERTY_OPTIONS = "options";
+  @jakarta.annotation.Nonnull
+  private List<CustomAttributeOptionModel> options = new ArrayList<>();
+
+  public static final String JSON_PROPERTY_TARGETS = "targets";
+  @jakarta.annotation.Nonnull
+  private List<String> targets = new ArrayList<>();
+
+  public static final String JSON_PROPERTY_IS_READ_ONLY = "isReadOnly";
+  @jakarta.annotation.Nonnull
+  private Boolean isReadOnly;
+
   public static final String JSON_PROPERTY_IS_DELETED = "isDeleted";
   @jakarta.annotation.Nonnull
   private Boolean isDeleted;
+
+  public static final String JSON_PROPERTY_IS_SYSTEM = "isSystem";
+  @jakarta.annotation.Nonnull
+  private Boolean isSystem;
 
   public static final String JSON_PROPERTY_NAME = "name";
   @jakarta.annotation.Nonnull
@@ -78,19 +98,19 @@ public class CustomAttributePutModel {
   @jakarta.annotation.Nonnull
   private Boolean isGlobal;
 
-  public static final String JSON_PROPERTY_OPTIONS = "options";
-  private JsonNullable<List<CustomAttributeOptionModel>> options = JsonNullable.<List<CustomAttributeOptionModel>>undefined();
+  public static final String JSON_PROPERTY_CODE = "code";
+  private JsonNullable<String> code = JsonNullable.<String>undefined();
 
-  public CustomAttributePutModel() { 
+  public CustomAttributeModel() { 
   }
 
-  public CustomAttributePutModel id(@jakarta.annotation.Nonnull UUID id) {
+  public CustomAttributeModel id(@jakarta.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
 
   /**
-   * Unique ID of the attribute
+   * Unique ID of the attribute.
    * @return id
    */
   @jakarta.annotation.Nonnull
@@ -109,13 +129,13 @@ public class CustomAttributePutModel {
   }
 
 
-  public CustomAttributePutModel type(@jakarta.annotation.Nonnull CustomAttributeTypesEnum type) {
+  public CustomAttributeModel type(@jakarta.annotation.Nonnull CustomAttributeTypesEnum type) {
     this.type = type;
     return this;
   }
 
   /**
-   * Type of the attribute
+   * Type of the attribute.
    * @return type
    */
   @jakarta.annotation.Nonnull
@@ -134,13 +154,104 @@ public class CustomAttributePutModel {
   }
 
 
-  public CustomAttributePutModel isDeleted(@jakarta.annotation.Nonnull Boolean isDeleted) {
+  public CustomAttributeModel options(@jakarta.annotation.Nonnull List<CustomAttributeOptionModel> options) {
+    this.options = options;
+    return this;
+  }
+
+  public CustomAttributeModel addOptionsItem(CustomAttributeOptionModel optionsItem) {
+    if (this.options == null) {
+      this.options = new ArrayList<>();
+    }
+    this.options.add(optionsItem);
+    return this;
+  }
+
+  /**
+   * Collection of the attribute options.
+   * @return options
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_OPTIONS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public List<CustomAttributeOptionModel> getOptions() {
+    return options;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_OPTIONS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setOptions(@jakarta.annotation.Nonnull List<CustomAttributeOptionModel> options) {
+    this.options = options;
+  }
+
+
+  public CustomAttributeModel targets(@jakarta.annotation.Nonnull List<String> targets) {
+    this.targets = targets;
+    return this;
+  }
+
+  public CustomAttributeModel addTargetsItem(String targetsItem) {
+    if (this.targets == null) {
+      this.targets = new ArrayList<>();
+    }
+    this.targets.add(targetsItem);
+    return this;
+  }
+
+  /**
+   * Collection of the attribute targets.   Defines where the attribute can be used (e.g., TestCases, AutoTestCases, TestPlans).
+   * @return targets
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_TARGETS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public List<String> getTargets() {
+    return targets;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_TARGETS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setTargets(@jakarta.annotation.Nonnull List<String> targets) {
+    this.targets = targets;
+  }
+
+
+  public CustomAttributeModel isReadOnly(@jakarta.annotation.Nonnull Boolean isReadOnly) {
+    this.isReadOnly = isReadOnly;
+    return this;
+  }
+
+  /**
+   * Indicates if the attribute is read-only.
+   * @return isReadOnly
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_IS_READ_ONLY)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public Boolean getIsReadOnly() {
+    return isReadOnly;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_IS_READ_ONLY)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setIsReadOnly(@jakarta.annotation.Nonnull Boolean isReadOnly) {
+    this.isReadOnly = isReadOnly;
+  }
+
+
+  public CustomAttributeModel isDeleted(@jakarta.annotation.Nonnull Boolean isDeleted) {
     this.isDeleted = isDeleted;
     return this;
   }
 
   /**
-   * Indicates if the entity is deleted
+   * Indicates if the attribute is deleted.
    * @return isDeleted
    */
   @jakarta.annotation.Nonnull
@@ -159,7 +270,32 @@ public class CustomAttributePutModel {
   }
 
 
-  public CustomAttributePutModel name(@jakarta.annotation.Nonnull String name) {
+  public CustomAttributeModel isSystem(@jakarta.annotation.Nonnull Boolean isSystem) {
+    this.isSystem = isSystem;
+    return this;
+  }
+
+  /**
+   * Indicates if the attribute is system.
+   * @return isSystem
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_IS_SYSTEM)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public Boolean getIsSystem() {
+    return isSystem;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_IS_SYSTEM)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setIsSystem(@jakarta.annotation.Nonnull Boolean isSystem) {
+    this.isSystem = isSystem;
+  }
+
+
+  public CustomAttributeModel name(@jakarta.annotation.Nonnull String name) {
     this.name = name;
     return this;
   }
@@ -184,7 +320,7 @@ public class CustomAttributePutModel {
   }
 
 
-  public CustomAttributePutModel isEnabled(@jakarta.annotation.Nonnull Boolean isEnabled) {
+  public CustomAttributeModel isEnabled(@jakarta.annotation.Nonnull Boolean isEnabled) {
     this.isEnabled = isEnabled;
     return this;
   }
@@ -209,7 +345,7 @@ public class CustomAttributePutModel {
   }
 
 
-  public CustomAttributePutModel isRequired(@jakarta.annotation.Nonnull Boolean isRequired) {
+  public CustomAttributeModel isRequired(@jakarta.annotation.Nonnull Boolean isRequired) {
     this.isRequired = isRequired;
     return this;
   }
@@ -234,7 +370,7 @@ public class CustomAttributePutModel {
   }
 
 
-  public CustomAttributePutModel isGlobal(@jakarta.annotation.Nonnull Boolean isGlobal) {
+  public CustomAttributeModel isGlobal(@jakarta.annotation.Nonnull Boolean isGlobal) {
     this.isGlobal = isGlobal;
     return this;
   }
@@ -259,53 +395,41 @@ public class CustomAttributePutModel {
   }
 
 
-  public CustomAttributePutModel options(@jakarta.annotation.Nullable List<CustomAttributeOptionModel> options) {
-    this.options = JsonNullable.<List<CustomAttributeOptionModel>>of(options);
-    return this;
-  }
-
-  public CustomAttributePutModel addOptionsItem(CustomAttributeOptionModel optionsItem) {
-    if (this.options == null || !this.options.isPresent()) {
-      this.options = JsonNullable.<List<CustomAttributeOptionModel>>of(new ArrayList<>());
-    }
-    try {
-      this.options.get().add(optionsItem);
-    } catch (java.util.NoSuchElementException e) {
-      // this can never happen, as we make sure above that the value is present
-    }
+  public CustomAttributeModel code(@jakarta.annotation.Nullable String code) {
+    this.code = JsonNullable.<String>of(code);
     return this;
   }
 
   /**
-   * Collection of the attribute options   Available for attributes of type &#x60;options&#x60; and &#x60;multiple options&#x60; only
-   * @return options
+   * Optional code identifier for the attribute.
+   * @return code
    */
   @jakarta.annotation.Nullable
   @JsonIgnore
 
-  public List<CustomAttributeOptionModel> getOptions() {
-        return options.orElse(null);
+  public String getCode() {
+        return code.orElse(null);
   }
 
-  @JsonProperty(JSON_PROPERTY_OPTIONS)
+  @JsonProperty(JSON_PROPERTY_CODE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public JsonNullable<List<CustomAttributeOptionModel>> getOptions_JsonNullable() {
-    return options;
+  public JsonNullable<String> getCode_JsonNullable() {
+    return code;
   }
   
-  @JsonProperty(JSON_PROPERTY_OPTIONS)
-  public void setOptions_JsonNullable(JsonNullable<List<CustomAttributeOptionModel>> options) {
-    this.options = options;
+  @JsonProperty(JSON_PROPERTY_CODE)
+  public void setCode_JsonNullable(JsonNullable<String> code) {
+    this.code = code;
   }
 
-  public void setOptions(@jakarta.annotation.Nullable List<CustomAttributeOptionModel> options) {
-    this.options = JsonNullable.<List<CustomAttributeOptionModel>>of(options);
+  public void setCode(@jakarta.annotation.Nullable String code) {
+    this.code = JsonNullable.<String>of(code);
   }
 
 
   /**
-   * Return true if this CustomAttributePutModel object is equal to o.
+   * Return true if this CustomAttributeModel object is equal to o.
    */
   @Override
   public boolean equals(Object o) {
@@ -315,15 +439,19 @@ public class CustomAttributePutModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CustomAttributePutModel customAttributePutModel = (CustomAttributePutModel) o;
-    return Objects.equals(this.id, customAttributePutModel.id) &&
-        Objects.equals(this.type, customAttributePutModel.type) &&
-        Objects.equals(this.isDeleted, customAttributePutModel.isDeleted) &&
-        Objects.equals(this.name, customAttributePutModel.name) &&
-        Objects.equals(this.isEnabled, customAttributePutModel.isEnabled) &&
-        Objects.equals(this.isRequired, customAttributePutModel.isRequired) &&
-        Objects.equals(this.isGlobal, customAttributePutModel.isGlobal) &&
-        equalsNullable(this.options, customAttributePutModel.options);
+    CustomAttributeModel customAttributeModel = (CustomAttributeModel) o;
+    return Objects.equals(this.id, customAttributeModel.id) &&
+        Objects.equals(this.type, customAttributeModel.type) &&
+        Objects.equals(this.options, customAttributeModel.options) &&
+        Objects.equals(this.targets, customAttributeModel.targets) &&
+        Objects.equals(this.isReadOnly, customAttributeModel.isReadOnly) &&
+        Objects.equals(this.isDeleted, customAttributeModel.isDeleted) &&
+        Objects.equals(this.isSystem, customAttributeModel.isSystem) &&
+        Objects.equals(this.name, customAttributeModel.name) &&
+        Objects.equals(this.isEnabled, customAttributeModel.isEnabled) &&
+        Objects.equals(this.isRequired, customAttributeModel.isRequired) &&
+        Objects.equals(this.isGlobal, customAttributeModel.isGlobal) &&
+        equalsNullable(this.code, customAttributeModel.code);
   }
 
   private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
@@ -332,7 +460,7 @@ public class CustomAttributePutModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, type, isDeleted, name, isEnabled, isRequired, isGlobal, hashCodeNullable(options));
+    return Objects.hash(id, type, options, targets, isReadOnly, isDeleted, isSystem, name, isEnabled, isRequired, isGlobal, hashCodeNullable(code));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -345,15 +473,19 @@ public class CustomAttributePutModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CustomAttributePutModel {\n");
+    sb.append("class CustomAttributeModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    options: ").append(toIndentedString(options)).append("\n");
+    sb.append("    targets: ").append(toIndentedString(targets)).append("\n");
+    sb.append("    isReadOnly: ").append(toIndentedString(isReadOnly)).append("\n");
     sb.append("    isDeleted: ").append(toIndentedString(isDeleted)).append("\n");
+    sb.append("    isSystem: ").append(toIndentedString(isSystem)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
     sb.append("    isRequired: ").append(toIndentedString(isRequired)).append("\n");
     sb.append("    isGlobal: ").append(toIndentedString(isGlobal)).append("\n");
-    sb.append("    options: ").append(toIndentedString(options)).append("\n");
+    sb.append("    code: ").append(toIndentedString(code)).append("\n");
     sb.append("}");
     return sb.toString();
   }

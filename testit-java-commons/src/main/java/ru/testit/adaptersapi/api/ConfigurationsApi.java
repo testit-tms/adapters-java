@@ -113,7 +113,7 @@ public class ConfigurationsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<ConfigurationModel>> localVarReturnType = new GenericType<List<ConfigurationModel>>() {};
     return apiClient.invokeAPI("ConfigurationsApi.adaptersConfigurationsSearchPost", "/adapters/configurations/search", "POST", localVarQueryParams, configurationFilterModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,

@@ -2,8 +2,6 @@ package ru.testit.clients;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.testit.adaptersapi.api.*;
 import ru.testit.adaptersapi.invoker.ApiClient;
 import ru.testit.adaptersapi.invoker.ApiException;
@@ -11,9 +9,6 @@ import ru.testit.adaptersapi.model.*;
 import ru.testit.services.HtmlEscapeUtils;
 
 import java.io.File;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +23,7 @@ public class TmsApiClient implements ITmsApiClient {
     private static final int MAX_TRIES = 4;
     private static final int WAITING_TIME = 100;
     private static final int TESTS_LIMIT = 100;
-    private static final ObjectMapper V2_JSON = new ObjectMapper();
+    private static final UUID EMPTY_TEST_POINT_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
@@ -357,8 +352,7 @@ public class TmsApiClient implements ITmsApiClient {
             if (id == null) {
                 continue;
             }
-            // adapters DTO has no testPointId — resolve via raw v2 GET
-            if (hasValidTestPointIdV2(id)) {
+            if (hasValidTestPointId(id)) {
                 return id;
             }
             if (orphanId == null) {
@@ -368,45 +362,13 @@ public class TmsApiClient implements ITmsApiClient {
         return orphanId;
     }
 
-    /**
-     * Hack: adapters OpenAPI for 5.8 omits testPointId. Read it from GET /api/v2/testResults/{id}.
-     */
-    private boolean hasValidTestPointIdV2(UUID testResultId) {
+    private boolean hasValidTestPointId(UUID testResultId) {
         try {
-            String base = clientConfiguration.getUrl();
-            if (base.endsWith("/")) {
-                base = base.substring(0, base.length() - 1);
-            }
-            URL url = new URL(base + "/api/v2/testResults/" + testResultId);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(10000);
-            connection.setReadTimeout(10000);
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setRequestProperty(
-                    "Authorization",
-                    AUTH_PREFIX + " " + clientConfiguration.getPrivateToken()
-            );
-
-            int code = connection.getResponseCode();
-            if (code < 200 || code >= 300) {
-                LOGGER.debug("v2 getTestResult {} HTTP {}", testResultId, code);
-                return false;
-            }
-
-            try (InputStream in = connection.getInputStream()) {
-                JsonNode root = V2_JSON.readTree(in);
-                JsonNode tp = root.get("testPointId");
-                if (tp == null || tp.isNull()) {
-                    return false;
-                }
-                String value = tp.asText();
-                return value != null
-                        && !value.isEmpty()
-                        && !"00000000-0000-0000-0000-000000000000".equals(value);
-            }
-        } catch (Exception e) {
-            LOGGER.debug("v2 getTestResult {} failed: {}", testResultId, e.getMessage());
+            TestResultResponse result = testResultsApi.adaptersTestResultsIdGet(testResultId);
+            UUID testPointId = result.getTestPointId();
+            return testPointId != null && !EMPTY_TEST_POINT_ID.equals(testPointId);
+        } catch (ApiException e) {
+            LOGGER.debug("getTestResult {} failed: {}", testResultId, e.getMessage());
             return false;
         }
     }
