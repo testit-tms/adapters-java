@@ -50,6 +50,7 @@ import ru.testit.adaptersapi.invoker.JSON;
   TestResultResponse.JSON_PROPERTY_ID,
   TestResultResponse.JSON_PROPERTY_FAILURE_CLASS_IDS,
   TestResultResponse.JSON_PROPERTY_CONFIGURATION_ID,
+  TestResultResponse.JSON_PROPERTY_TEST_POINT_ID,
   TestResultResponse.JSON_PROPERTY_TEST_RUN_ID,
   TestResultResponse.JSON_PROPERTY_STEP_COMMENTS,
   TestResultResponse.JSON_PROPERTY_OUTCOME,
@@ -83,6 +84,10 @@ public class TestResultResponse {
   public static final String JSON_PROPERTY_CONFIGURATION_ID = "configurationId";
   @jakarta.annotation.Nonnull
   private UUID configurationId;
+
+  public static final String JSON_PROPERTY_TEST_POINT_ID = "testPointId";
+  @jakarta.annotation.Nonnull
+  private UUID testPointId;
 
   public static final String JSON_PROPERTY_TEST_RUN_ID = "testRunId";
   @jakarta.annotation.Nonnull
@@ -226,6 +231,31 @@ public class TestResultResponse {
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setConfigurationId(@jakarta.annotation.Nonnull UUID configurationId) {
     this.configurationId = configurationId;
+  }
+
+
+  public TestResultResponse testPointId(@jakarta.annotation.Nonnull UUID testPointId) {
+    this.testPointId = testPointId;
+    return this;
+  }
+
+  /**
+   * Get testPointId
+   * @return testPointId
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_TEST_POINT_ID)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public UUID getTestPointId() {
+    return testPointId;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_TEST_POINT_ID)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setTestPointId(@jakarta.annotation.Nonnull UUID testPointId) {
+    this.testPointId = testPointId;
   }
 
 
@@ -975,6 +1005,7 @@ public class TestResultResponse {
     return Objects.equals(this.id, testResultResponse.id) &&
         Objects.equals(this.failureClassIds, testResultResponse.failureClassIds) &&
         Objects.equals(this.configurationId, testResultResponse.configurationId) &&
+        Objects.equals(this.testPointId, testResultResponse.testPointId) &&
         Objects.equals(this.testRunId, testResultResponse.testRunId) &&
         equalsNullable(this.stepComments, testResultResponse.stepComments) &&
         equalsNullable(this.outcome, testResultResponse.outcome) &&
@@ -1002,7 +1033,7 @@ public class TestResultResponse {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, failureClassIds, configurationId, testRunId, hashCodeNullable(stepComments), hashCodeNullable(outcome), hashCodeNullable(status), hashCodeNullable(comment), hashCodeNullable(links), hashCodeNullable(stepResults), hashCodeNullable(attachments), hashCodeNullable(autoTestId), hashCodeNullable(durationInMs), hashCodeNullable(traces), hashCodeNullable(failureType), hashCodeNullable(message), hashCodeNullable(autoTest), hashCodeNullable(autoTestStepResults), hashCodeNullable(setupResults), hashCodeNullable(teardownResults), hashCodeNullable(parameters), hashCodeNullable(properties));
+    return Objects.hash(id, failureClassIds, configurationId, testPointId, testRunId, hashCodeNullable(stepComments), hashCodeNullable(outcome), hashCodeNullable(status), hashCodeNullable(comment), hashCodeNullable(links), hashCodeNullable(stepResults), hashCodeNullable(attachments), hashCodeNullable(autoTestId), hashCodeNullable(durationInMs), hashCodeNullable(traces), hashCodeNullable(failureType), hashCodeNullable(message), hashCodeNullable(autoTest), hashCodeNullable(autoTestStepResults), hashCodeNullable(setupResults), hashCodeNullable(teardownResults), hashCodeNullable(parameters), hashCodeNullable(properties));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -1019,6 +1050,7 @@ public class TestResultResponse {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    failureClassIds: ").append(toIndentedString(failureClassIds)).append("\n");
     sb.append("    configurationId: ").append(toIndentedString(configurationId)).append("\n");
+    sb.append("    testPointId: ").append(toIndentedString(testPointId)).append("\n");
     sb.append("    testRunId: ").append(toIndentedString(testRunId)).append("\n");
     sb.append("    stepComments: ").append(toIndentedString(stepComments)).append("\n");
     sb.append("    outcome: ").append(toIndentedString(outcome)).append("\n");

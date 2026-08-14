@@ -112,7 +112,7 @@ public class SectionsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<SectionWithStepsModel> localVarReturnType = new GenericType<SectionWithStepsModel>() {};
     return apiClient.invokeAPI("SectionsApi.adaptersSectionsIdGet", localVarPath, "GET", localVarQueryParams, null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -163,7 +163,7 @@ public class SectionsApi {
   public ApiResponse<SectionWithStepsModel> adaptersSectionsPostWithHttpInfo(SectionPostModel sectionPostModel) throws ApiException {
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<SectionWithStepsModel> localVarReturnType = new GenericType<SectionWithStepsModel>() {};
     return apiClient.invokeAPI("SectionsApi.adaptersSectionsPost", "/adapters/sections", "POST", new ArrayList<>(), sectionPostModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,

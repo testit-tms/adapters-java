@@ -108,7 +108,7 @@ public class ProjectsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     return apiClient.invokeAPI("ProjectsApi.adaptersProjectsIdAttributesGlobalPost", localVarPath, "POST", new ArrayList<>(), UUID,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                localVarAuthNames, null, false);
@@ -167,7 +167,7 @@ public class ProjectsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<DetailedProjectApiResult> localVarReturnType = new GenericType<DetailedProjectApiResult>() {};
     return apiClient.invokeAPI("ProjectsApi.adaptersProjectsIdGet", localVarPath, "GET", new ArrayList<>(), null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -218,7 +218,7 @@ public class ProjectsApi {
   public ApiResponse<ProjectApiResult> adaptersProjectsPostWithHttpInfo(CreateProjectApiModel createProjectApiModel) throws ApiException {
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<ProjectApiResult> localVarReturnType = new GenericType<ProjectApiResult>() {};
     return apiClient.invokeAPI("ProjectsApi.adaptersProjectsPost", "/adapters/projects", "POST", new ArrayList<>(), createProjectApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -288,7 +288,7 @@ public class ProjectsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<ProjectApiResult>> localVarReturnType = new GenericType<List<ProjectApiResult>>() {};
     return apiClient.invokeAPI("ProjectsApi.adaptersProjectsSearchPost", "/adapters/projects/search", "POST", localVarQueryParams, projectsFilterModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
