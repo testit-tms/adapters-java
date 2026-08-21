@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class HttpWriter implements Writer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpWriter.class);
+
     private final Map<String, UUID> testResults;
     private final ITmsApiClient apiClient;
     private final ResultStorage storage;
@@ -78,6 +79,7 @@ public class HttpWriter implements Writer {
 
             UUID existingId = apiClient.findInProgressTestResultId(testResult.getExternalId());
             if (existingId != null) {
+                // Temporary workaround (mode 0): PUT existing TP-bound row; never create a second result.
                 return updateExistingTestResult(existingId, testResult);
             }
 
@@ -99,21 +101,13 @@ public class HttpWriter implements Writer {
 
     private boolean updateExistingTestResult(UUID testResultId, TestResult testResult) throws ApiException {
         TestResultResponse existing = apiClient.getTestResult(testResultId);
-        TestResultUpdateV2Request model = Converter.testResultToTestResultUpdateModel(existing);
-
-        if (testResult.getItemStatus() != null) {
-            model.setStatusCode(testResult.getItemStatus().value());
-        }
-        if (testResult.getStart() != null && testResult.getStop() != null) {
-            model.setDuration(testResult.getStop() - testResult.getStart());
-        }
-
-        Throwable throwable = testResult.getThrowable();
-        if (throwable != null) {
-            model.setMessage(ru.testit.services.HtmlEscapeUtils.escapeHtmlTags(throwable.getMessage()));
-        } else if (testResult.getMessage() != null) {
-            model.setMessage(testResult.getMessage());
-        }
+        // Temporary workaround (mode 0): enrich TP-bound result via PUT; never create a second result.
+        TestResultUpdateRequestExt model = Converter.buildFinalTestResultUpdate(
+                existing,
+                testResult,
+                null,
+                null
+        );
 
         apiClient.updateTestResult(testResultId, model);
         testResults.put(testResult.getUuid(), testResultId);
@@ -356,6 +350,39 @@ public class HttpWriter implements Writer {
 
                     AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
 
+                    // Temporary workaround (mode 0 + SyncStorage): stopTestCase already PUT the TP-bound result.
+                    // Do not sendTestResults (that creates an orphan). Re-PUT with fixtures; TMS may ignore
+                    // parameters / autoTestStepResults on PUT until API supports them.
+                    if (testResults.containsKey(test.getUuid())) {
+                        UUID resultId = testResults.get(test.getUuid());
+                        LOGGER.info(
+                                "Bulk import: enrich existing result via PUT for {} (resultId={}), skip sendTestResults",
+                                test.getExternalId(),
+                                resultId
+                        );
+                        if (autoTestApiResult != null) {
+                            AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
+                                    test,
+                                    autoTestApiResult,
+                                    config.getProjectId()
+                            );
+                            model.setSetup(beforeFinish);
+                            model.setTeardown(afterFinish);
+                            if (hasAutoTestChanged(autoTestApiResult, model)) {
+                                apiClient.updateAutoTest(model);
+                            }
+                        }
+                        TestResultResponse existing = apiClient.getTestResult(resultId);
+                        TestResultUpdateRequestExt update = Converter.buildFinalTestResultUpdate(
+                                existing,
+                                test,
+                                beforeResultFinish,
+                                afterResultFinish
+                        );
+                        apiClient.updateTestResult(resultId, update);
+                        continue;
+                    }
+
                     AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
                             test,
                             config.getConfigurationId()
@@ -481,6 +508,24 @@ public class HttpWriter implements Writer {
             );
         }
         return storage.getAllTestResultUuids();
+    }
+
+    /**
+     * Temporary workaround: mode 0 + SyncStorage may leave the run In Progress after PUT-only export.
+     * Complete when the last main container finishes. Remove when TMS closes the run itself.
+     */
+    @Override
+    public void onAllMainContainersFinished() {
+        String testRunId = config.getTestRunId();
+        if (testRunId == null || testRunId.isEmpty()) {
+            return;
+        }
+        try {
+            apiClient.completeTestRun(testRunId);
+            LOGGER.info("Completed test run {}", testRunId);
+        } catch (ApiException e) {
+            LOGGER.warn("Failed to complete test run {}: {}", testRunId, e.getMessage());
+        }
     }
 
     @Override
