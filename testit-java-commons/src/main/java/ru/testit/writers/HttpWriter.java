@@ -356,6 +356,29 @@ public class HttpWriter implements Writer {
 
                     AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
 
+                    // Mode 0 + SyncStorage: stopTestCase already did writeTestRealtime (PUT TP-bound).
+                    // Bulk must not call sendTestResults again — that creates an orphan without testPointId.
+                    if (testResults.containsKey(test.getUuid())) {
+                        LOGGER.info(
+                                "Bulk import: skip sendTestResults for {} — already finalized via realtime (resultId={})",
+                                test.getExternalId(),
+                                testResults.get(test.getUuid())
+                        );
+                        if (autoTestApiResult != null) {
+                            AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
+                                    test,
+                                    autoTestApiResult,
+                                    config.getProjectId()
+                            );
+                            model.setSetup(beforeFinish);
+                            model.setTeardown(afterFinish);
+                            if (hasAutoTestChanged(autoTestApiResult, model)) {
+                                apiClient.updateAutoTest(model);
+                            }
+                        }
+                        continue;
+                    }
+
                     AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
                             test,
                             config.getConfigurationId()
