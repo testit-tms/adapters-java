@@ -16,4 +16,8 @@ public interface Writer {
     void writeTests(MainContainer container);
 
     String writeAttachment(String path);
+
+    /** Called once when the last main container of this process is finalized. */
+    default void onAllMainContainersFinished() {
+    }
 }

@@ -114,6 +114,7 @@ public class AdapterContainerHelper {
         int remaining = activeMainContainers.decrementAndGet();
         logger.info("End of main container, remainingMainContainers={}", remaining);
         if (remaining == 0) {
+            writer.onAllMainContainersFinished();
             syncStorageService.setWorkerStatus("completed");
         }
     }
