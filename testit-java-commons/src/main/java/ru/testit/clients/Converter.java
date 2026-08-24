@@ -166,69 +166,6 @@ public class Converter {
         return model;
     }
 
-    /**
-     * Full PUT for an existing TP-bound result: status + parameters + autoTestStepResults (+ optional fixtures).
-     * Same payload richness as {@code sendTestResults}, without creating a second run result.
-     */
-    public static ru.testit.writers.TestResultUpdateRequestExt buildFinalTestResultUpdate(
-            TestResultResponse existing,
-            TestResult testResult,
-            List<AttachmentPutModelAutoTestStepResultsModel> setupResults,
-            List<AttachmentPutModelAutoTestStepResultsModel> teardownResults
-    ) {
-        ru.testit.writers.TestResultUpdateRequestExt model = new ru.testit.writers.TestResultUpdateRequestExt();
-
-        model.setFailureClassIds(existing.getFailureClassIds());
-        model.setComment(existing.getComment());
-        if (existing.getAttachments() != null) {
-            model.setAttachments(convertAttachmentsFromModel(existing.getAttachments()));
-        }
-
-        AutoTestResultsForTestRunModel prepared = testResultToAutoTestResultsForTestRunModel(testResult);
-
-        if (testResult.getItemStatus() != null) {
-            model.setStatusCode(testResult.getItemStatus().value());
-        } else if (existing.getStatus() != null) {
-            model.setStatusCode(existing.getStatus().getCode());
-        }
-
-        if (prepared.getDuration() != null) {
-            model.setDuration(prepared.getDuration());
-        } else if (existing.getDurationInMs() != null) {
-            model.setDuration(existing.getDurationInMs());
-        }
-
-        if (prepared.getMessage() != null) {
-            model.setMessage(prepared.getMessage());
-        }
-        if (prepared.getTraces() != null) {
-            model.setTrace(prepared.getTraces());
-        }
-
-        if (testResult.getResultLinks() != null && !testResult.getResultLinks().isEmpty()) {
-            model.setLinks(convertTestRunCreateLinks(testResult.getResultLinks()));
-        } else {
-            model.setLinks(convertLinkApiResultsToCreateLinks(existing.getLinks()));
-        }
-
-        if (prepared.getParameters() != null && !prepared.getParameters().isEmpty()) {
-            model.setParameters(new LinkedHashMap<>(prepared.getParameters()));
-        }
-
-        if (prepared.getStepResults() != null && !prepared.getStepResults().isEmpty()) {
-            model.setAutoTestStepResults(stepResultsToRequests(prepared.getStepResults()));
-        }
-
-        if (setupResults != null && !setupResults.isEmpty()) {
-            model.setSetupResults(stepResultsToRequests(setupResults));
-        }
-        if (teardownResults != null && !teardownResults.isEmpty()) {
-            model.setTeardownResults(stepResultsToRequests(teardownResults));
-        }
-
-        return model;
-    }
-
     public static AutoTestUpdateApiModel testResultToAutoTestUpdateApiModel(TestResult result) {
         AutoTestUpdateApiModel model = new AutoTestUpdateApiModel();
 

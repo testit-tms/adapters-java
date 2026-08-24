@@ -160,8 +160,7 @@ public class AdapterTestCaseHelper {
             );
         }
 
-        // Keep final ItemStatus. Prefer PUT on existing TP-bound InProgress (mode=0);
-        // never invent a second InProgress via setAutoTestResultsForTestRun.
+        // Final status via sendTestResults (create); never change status via PUT.
         if (syncAccepted) {
             if (!writer.writeTestRealtime(testResult)) {
                 logger.warn(

@@ -77,41 +77,29 @@ public class HttpWriter implements Writer {
                 updateTestLinkToWorkItems(autoTestId, workItemIds);
             }
 
-            UUID existingId = apiClient.findInProgressTestResultId(testResult.getExternalId());
-            if (existingId != null) {
-                // Temporary workaround (mode 0): PUT existing TP-bound row; never create a second result.
-                return updateExistingTestResult(existingId, testResult);
-            }
-
-            AutoTestResultsForTestRunModel autoTestResultsForTestRunModel = Converter.prepareTestResultForTestRun(
-                    testResult,
-                    config.getConfigurationId()
-            );
-
-            List<AutoTestResultsForTestRunModel> results = new ArrayList<>();
-            results.add(autoTestResultsForTestRunModel);
-            List<UUID> ids = apiClient.sendTestResults(config.getTestRunId(), results);
-            testResults.put(testResult.getUuid(), ids.get(0));
-            return true;
+            return sendTestResultForTestRun(testResult);
         } catch (ApiException e) {
             LOGGER.error("Can not write the autotest: {}", e.getMessage());
             return false;
         }
     }
 
-    private boolean updateExistingTestResult(UUID testResultId, TestResult testResult) throws ApiException {
-        TestResultResponse existing = apiClient.getTestResult(testResultId);
-        TestResultUpdateRequestExt model = Converter.buildFinalTestResultUpdate(
-                existing,
+    private boolean sendTestResultForTestRun(TestResult testResult) throws ApiException {
+        AutoTestResultsForTestRunModel model = Converter.prepareTestResultForTestRun(
                 testResult,
-                null,
-                null
+                config.getConfigurationId()
         );
-
-        apiClient.updateTestResult(testResultId, model);
-        testResults.put(testResult.getUuid(), testResultId);
+        List<UUID> ids = apiClient.sendTestResults(
+                config.getTestRunId(),
+                Collections.singletonList(model)
+        );
+        testResults.put(testResult.getUuid(), ids.get(0));
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Updated existing test result {} for {}", testResultId, testResult.getExternalId());
+            LOGGER.debug(
+                    "Finalized test result via sendTestResults for {} (resultId={})",
+                    testResult.getExternalId(),
+                    ids.get(0)
+            );
         }
         return true;
     }
@@ -271,6 +259,7 @@ public class HttpWriter implements Writer {
                             }
 
                             TestResultResponse resultModel = apiClient.getTestResult(testResultId);
+                            // Status as on server; do not overwrite with final test status (finalization is sendTestResults).
                             TestResultUpdateRequest model = Converter.testResultToTestResultUpdateModel(resultModel);
                             model.setSetupResults(Converter.stepResultsToRequests(beforeResultFinish));
                             model.setTeardownResults(Converter.stepResultsToRequests(afterResultFinish));
@@ -349,15 +338,10 @@ public class HttpWriter implements Writer {
 
                     AutoTestApiResult autoTestApiResult = apiClient.getAutoTestByExternalId(test.getExternalId());
 
-                    // Temporary workaround (mode 0 + SyncStorage): stopTestCase already PUT the TP-bound result.
-                    // Do not sendTestResults (that creates an orphan). Re-PUT with fixtures; TMS may ignore
-                    // parameters / autoTestStepResults on PUT until API supports them.
                     if (testResults.containsKey(test.getUuid())) {
-                        UUID resultId = testResults.get(test.getUuid());
                         LOGGER.info(
-                                "Bulk import: enrich existing result via PUT for {} (resultId={}), skip sendTestResults",
-                                test.getExternalId(),
-                                resultId
+                                "Bulk import: skip sendTestResults for {} (already finalized at test finish)",
+                                test.getExternalId()
                         );
                         if (autoTestApiResult != null) {
                             AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
@@ -371,14 +355,6 @@ public class HttpWriter implements Writer {
                                 apiClient.updateAutoTest(model);
                             }
                         }
-                        TestResultResponse existing = apiClient.getTestResult(resultId);
-                        TestResultUpdateRequestExt update = Converter.buildFinalTestResultUpdate(
-                                existing,
-                                test,
-                                beforeResultFinish,
-                                afterResultFinish
-                        );
-                        apiClient.updateTestResult(resultId, update);
                         continue;
                     }
 
@@ -510,8 +486,7 @@ public class HttpWriter implements Writer {
     }
 
     /**
-     * Temporary workaround: mode 0 + SyncStorage may leave the run In Progress after PUT-only export.
-     * Complete when the last main container finishes. Remove when TMS closes the run itself.
+     * Close the test run when the last main container finishes (mode 0).
      */
     @Override
     public void onAllMainContainersFinished() {
