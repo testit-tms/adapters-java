@@ -2,18 +2,18 @@ package ru.testit.writers;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import ru.testit.adaptersapi.model.AutoTestStepResultUpdateRequest;
-import ru.testit.adaptersapi.model.TestResultUpdateRequest;
+import ru.testit.client.model.AutoTestStepResultUpdateRequest;
+import ru.testit.client.model.TestResultUpdateV2Request;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Temporary workaround (mode 0): extend PUT body with {@code parameters} / {@code autoTestStepResults}
+ * Temporary workaround (mode 0): extend V2 PUT body with {@code parameters} / {@code autoTestStepResults}
  * so we can avoid orphan {@code sendTestResults}. OpenAPI update model omits them; TMS may still ignore
  * these fields until the API supports enrich-via-PUT properly.
  */
-public class TestResultUpdateRequestExt extends TestResultUpdateRequest {
+public class TestResultUpdateRequestExt extends TestResultUpdateV2Request {
 
     public static final String JSON_PROPERTY_PARAMETERS = "parameters";
     public static final String JSON_PROPERTY_AUTO_TEST_STEP_RESULTS = "autoTestStepResults";

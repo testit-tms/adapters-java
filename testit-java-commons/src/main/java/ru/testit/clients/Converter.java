@@ -167,8 +167,8 @@ public class Converter {
     }
 
     /**
-     * Full PUT for an existing TP-bound result: status + parameters + autoTestStepResults (+ optional fixtures).
-     * Same payload richness as {@code sendTestResults}, without creating a second run result.
+     * Temporary workaround (mode 0): full PUT for an existing TP-bound result
+     * (status + parameters + autoTestStepResults + optional fixtures) without a second sendTestResults.
      */
     public static ru.testit.writers.TestResultUpdateRequestExt buildFinalTestResultUpdate(
             TestResultResponse existing,
@@ -178,6 +178,12 @@ public class Converter {
     ) {
         ru.testit.writers.TestResultUpdateRequestExt model = new ru.testit.writers.TestResultUpdateRequestExt();
 
+        model.setDuration(existing.getDurationInMs());
+        if (existing.getStatus() != null) {
+            model.setStatusCode(existing.getStatus().getCode());
+        }
+        model.setLinks(existing.getLinks());
+        model.setStepResults(existing.getStepResults());
         model.setFailureClassIds(existing.getFailureClassIds());
         model.setComment(existing.getComment());
         if (existing.getAttachments() != null) {
@@ -188,8 +194,6 @@ public class Converter {
 
         if (testResult.getItemStatus() != null) {
             model.setStatusCode(testResult.getItemStatus().value());
-        } else if (existing.getStatus() != null) {
-            model.setStatusCode(existing.getStatus().getCode());
         }
 
         if (prepared.getDuration() != null) {
@@ -206,9 +210,7 @@ public class Converter {
         }
 
         if (testResult.getResultLinks() != null && !testResult.getResultLinks().isEmpty()) {
-            model.setLinks(convertTestRunCreateLinks(testResult.getResultLinks()));
-        } else {
-            model.setLinks(convertLinkApiResultsToCreateLinks(existing.getLinks()));
+            model.setLinks(convertResultLinksToUpdateLinks(testResult.getResultLinks()));
         }
 
         if (prepared.getParameters() != null && !prepared.getParameters().isEmpty()) {
@@ -227,6 +229,20 @@ public class Converter {
         }
 
         return model;
+    }
+
+    private static List<Link> convertResultLinksToUpdateLinks(List<LinkItem> links) {
+        return links.stream().map(link -> {
+            Link model = new Link();
+            model.setTitle(link.getTitle());
+            model.setDescription(link.getDescription());
+            model.setUrl(link.getUrl());
+            model.setHasInfo(false);
+            model.setType(LinkType.fromValue(
+                    link.getType() != null ? link.getType().getValue() : LinkType.RELATED.getValue()
+            ));
+            return model;
+        }).collect(Collectors.toList());
     }
 
     public static AutoTestUpdateApiModel testResultToAutoTestUpdateApiModel(TestResult result) {
