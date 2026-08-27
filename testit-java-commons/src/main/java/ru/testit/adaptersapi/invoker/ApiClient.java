@@ -37,9 +37,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URI;
+import java.net.Socket;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
 import java.security.cert.X509Certificate;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -1232,11 +1234,13 @@ public class ApiClient extends JavaTimeFormatter {
    * @throws java.security.NoSuchAlgorithmException if any.
    */
   protected void disableCertificateValidation(ClientBuilder clientBuilder) throws KeyManagementException, NoSuchAlgorithmException {
-    TrustManager[] trustAllCerts = new X509TrustManager[] {
-      new X509TrustManager() {
+    // X509ExtendedTrustManager: plain X509TrustManager is wrapped by JDK and still
+    // runs hostname/IP SAN checks (CertificateException on https://<ip>).
+    TrustManager[] trustAllCerts = new TrustManager[] {
+      new X509ExtendedTrustManager() {
         @Override
         public X509Certificate[] getAcceptedIssuers() {
-          return null;
+          return new X509Certificate[0];
         }
         @Override
         public void checkClientTrusted(X509Certificate[] certs, String authType) {
@@ -1244,11 +1248,24 @@ public class ApiClient extends JavaTimeFormatter {
         @Override
         public void checkServerTrusted(X509Certificate[] certs, String authType) {
         }
+        @Override
+        public void checkClientTrusted(X509Certificate[] certs, String authType, Socket socket) {
+        }
+        @Override
+        public void checkServerTrusted(X509Certificate[] certs, String authType, Socket socket) {
+        }
+        @Override
+        public void checkClientTrusted(X509Certificate[] certs, String authType, SSLEngine engine) {
+        }
+        @Override
+        public void checkServerTrusted(X509Certificate[] certs, String authType, SSLEngine engine) {
+        }
       }
     };
     SSLContext sslContext = SSLContext.getInstance("TLS");
     sslContext.init(null, trustAllCerts, new SecureRandom());
     clientBuilder.sslContext(sslContext);
+    clientBuilder.hostnameVerifier((hostname, session) -> true);
   }
 
   /**

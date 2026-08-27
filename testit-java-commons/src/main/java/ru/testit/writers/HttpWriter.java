@@ -96,9 +96,10 @@ public class HttpWriter implements Writer {
         testResults.put(testResult.getUuid(), ids.get(0));
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(
-                    "Finalized test result via sendTestResults for {} (resultId={})",
+                    "Exported test result via sendTestResults for {} (resultId={}, status={})",
                     testResult.getExternalId(),
-                    ids.get(0)
+                    ids.get(0),
+                    testResult.getItemStatus()
             );
         }
         return true;
@@ -483,23 +484,6 @@ public class HttpWriter implements Writer {
             );
         }
         return storage.getAllTestResultUuids();
-    }
-
-    /**
-     * Close the test run when the last main container finishes (mode 0).
-     */
-    @Override
-    public void onAllMainContainersFinished() {
-        String testRunId = config.getTestRunId();
-        if (testRunId == null || testRunId.isEmpty()) {
-            return;
-        }
-        try {
-            apiClient.completeTestRun(testRunId);
-            LOGGER.info("Completed test run {}", testRunId);
-        } catch (ApiException e) {
-            LOGGER.warn("Failed to complete test run {}: {}", testRunId, e.getMessage());
-        }
     }
 
     @Override

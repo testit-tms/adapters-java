@@ -22,13 +22,17 @@ import static org.mockito.Mockito.*;
 class AdapterTestCaseHelperStopTest {
 
     @Test
-    void stopTestCase_afterSync_writesFinalStatusNotInProgress() {
+    void stopTestCase_afterSync_writesInProgressToTestIt_keepsFinalLocally() {
         AdapterConfig config = new AdapterConfig(enabledProps());
         ResultStorage storage = new ResultStorage();
         Writer writer = mock(Writer.class);
         SyncStorageService sync = mock(SyncStorageService.class);
         when(sync.sendInProgressIfNeeded(any())).thenReturn(true);
-        when(writer.writeTestRealtime(any())).thenReturn(true);
+        when(writer.writeTestRealtime(any())).thenAnswer(invocation -> {
+            TestResult sent = invocation.getArgument(0);
+            assertEquals(ItemStatus.INPROGRESS, sent.getItemStatus());
+            return true;
+        });
 
         AdapterTestCaseHelper helper = new AdapterTestCaseHelper(
                 config,
