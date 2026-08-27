@@ -20,16 +20,17 @@ Root cause: the adapter finalized the test twice — once at **test finish**, ag
 
 ## Current behaviour (fixed)
 
-**Rule:** final status goes only through **`sendTestResults`** (`setAutoTestResultsForTestRun`).  
-**PUT** `/api/v2/testResults/{id}` is **not** used to finalize; if used at all, status is sent **as on the server** (no overwrite with the adapter’s final status).
+**Rule:** with SyncStorage — cut (final) goes to sync-storage; Test IT at test finish gets **InProgress** only via `sendTestResults`. Work X finalizes later. Without SyncStorage — Test IT gets the final status as before.  
+**PUT** `/api/v2/testResults/{id}` is **not** used to finalize; if used at all (fixtures), status is sent **as on the server**.
 
 ### End of test — `AdapterTestCaseHelper.stopTestCase`
 
 When SyncStorage accepts the cut (`sendInProgressIfNeeded` → true):
 
-1. `HttpWriter.writeTestRealtime` — update/create autotest metadata, link work items.
-2. **`sendTestResults`** — full result body (`statusType`, steps, parameters, message, …).
+1. Cut to SyncStorage with **final** status (Passed/Failed/…).
+2. `HttpWriter.writeTestRealtime` — autotest metadata, then **`sendTestResults` with InProgress** (not the final status).
 3. Store `testUuid → resultId` in the writer map.
+4. Work X later finalizes the TMS result.
 
 When SyncStorage is unavailable: `writeTest` → same `writeTestRealtime` path if `importRealtime=true`; otherwise export waits until bulk at run end.
 
@@ -57,19 +58,17 @@ Bulk import: skip sendTestResults for <externalId> (already finalized at test fi
 After per-test `sendTestResults`, run end may **PUT** setup/teardown fixtures onto the **same** result id.  
 Status in PUT body = current server value (`Converter.testResultToTestResultUpdateModel`); **not** replaced with final adapter status.
 
-### Run completion
-
-When the last main container finishes: `HttpWriter.onAllMainContainersFinished` → `completeTestRun` (mode 0 runs that would otherwise stay open).
+The adapter does **not** call `completeTestRun` — TMS / SyncStorage Work X own run status transitions.
 
 ---
 
 ## Flow (mode 0 + SyncStorage + `importRealtime=false`)
 
 ```text
-Plan start     → TMS creates TP-bound InProgress
-stopTestCase   → SyncStorage cut + sendTestResults (Passed/Failed + full payload)
+Plan start     → TMS creates TP-bound InProgress (mode 0)
+stopTestCase   → SyncStorage cut (final) + sendTestResults (InProgress)
 stopMainContainer → bulk skips sendTestResults for that test; autotest metadata only
-last container → completeTestRun
+Work X         → finalizes TMS result
 ```
 
 Expected API outcome: **one** finalized result row per autotest in the run (the one from `sendTestResults` at test finish), with steps/parameters from the create payload.
@@ -81,13 +80,14 @@ Expected API outcome: **one** finalized result row per autotest in the run (the 
 1. Mode 0, one autotest, SyncStorage on, `importRealtime=false`.
 2. Log: `Finalized test result via sendTestResults` at test end.
 3. Log: `Bulk import: skip sendTestResults …` at run end (not a second batch row for the same test).
-4. `testResults/search`: one hit per `externalId`; run status **Completed**.
+4. `testResults/search`: one hit per `externalId`.
 
 **Bad signs (bug is back):**
 
 - PUT with explicit final `statusCode` at test finish (`Updated existing test result …` after overwriting InProgress).
 - Bulk `sendTestResults` for a test that was already finalized at test finish (no skip line).
 - Two Passed rows for the same `externalId` in one run.
+- Adapter calling `completeTestRun` (can fail with BadRequest on status transition).
 
 ---
 

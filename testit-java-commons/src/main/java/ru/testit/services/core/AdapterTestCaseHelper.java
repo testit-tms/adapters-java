@@ -3,6 +3,7 @@ package ru.testit.services.core;
 import org.slf4j.Logger;
 import ru.testit.listener.ListenerManager;
 import ru.testit.models.ItemStage;
+import ru.testit.models.ItemStatus;
 import ru.testit.models.TestResult;
 import ru.testit.properties.AdapterConfig;
 import ru.testit.services.ResultStorage;
@@ -160,13 +161,22 @@ public class AdapterTestCaseHelper {
             );
         }
 
-        // Final status via sendTestResults (create); never change status via PUT.
+        // SyncStorage gets the final cut (above). Test IT gets InProgress only;
+        // Work X finalizes the result later. Without sync — export final status as before.
         if (syncAccepted) {
-            if (!writer.writeTestRealtime(testResult)) {
-                logger.warn(
-                        "Test IT update/export failed after SyncStorage success for {}; Work X may still finalize",
-                        testResult.getExternalId()
-                );
+            ItemStatus finalStatus = testResult.getItemStatus();
+            testResult.setItemStatus(ItemStatus.INPROGRESS);
+            try {
+                if (!writer.writeTestRealtime(testResult)) {
+                    logger.warn(
+                            "Test IT InProgress export failed after SyncStorage success for {}; Work X may still finalize",
+                            testResult.getExternalId()
+                    );
+                }
+            } finally {
+                if (finalStatus != null) {
+                    testResult.setItemStatus(finalStatus);
+                }
             }
             return;
         }
