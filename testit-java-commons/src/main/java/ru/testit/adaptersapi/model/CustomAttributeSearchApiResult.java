@@ -28,6 +28,7 @@ import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
 import ru.testit.adaptersapi.model.CustomAttributeOptionApiResult;
 import ru.testit.adaptersapi.model.CustomAttributeType;
+import ru.testit.adaptersapi.model.ProjectShortestApiResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.util.NoSuchElementException;
@@ -36,24 +37,34 @@ import ru.testit.adaptersapi.invoker.JSON;
 
 
 /**
- * CustomAttributeApiResult
+ * CustomAttributeSearchApiResult
  */
 @JsonPropertyOrder({
-  CustomAttributeApiResult.JSON_PROPERTY_ID,
-  CustomAttributeApiResult.JSON_PROPERTY_OPTIONS,
-  CustomAttributeApiResult.JSON_PROPERTY_TYPE,
-  CustomAttributeApiResult.JSON_PROPERTY_IS_DELETED,
-  CustomAttributeApiResult.JSON_PROPERTY_NAME,
-  CustomAttributeApiResult.JSON_PROPERTY_IS_ENABLED,
-  CustomAttributeApiResult.JSON_PROPERTY_IS_REQUIRED,
-  CustomAttributeApiResult.JSON_PROPERTY_IS_GLOBAL,
-  CustomAttributeApiResult.JSON_PROPERTY_IS_READ_ONLY,
-  CustomAttributeApiResult.JSON_PROPERTY_IS_SYSTEM,
-  CustomAttributeApiResult.JSON_PROPERTY_TARGETS,
-  CustomAttributeApiResult.JSON_PROPERTY_CODE
+  CustomAttributeSearchApiResult.JSON_PROPERTY_WORK_ITEM_USAGE,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_TEST_PLAN_USAGE,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_ID,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_OPTIONS,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_TYPE,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_IS_DELETED,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_NAME,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_IS_ENABLED,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_IS_REQUIRED,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_IS_GLOBAL,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_IS_READ_ONLY,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_IS_SYSTEM,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_TARGETS,
+  CustomAttributeSearchApiResult.JSON_PROPERTY_CODE
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
-public class CustomAttributeApiResult {
+public class CustomAttributeSearchApiResult {
+  public static final String JSON_PROPERTY_WORK_ITEM_USAGE = "workItemUsage";
+  @jakarta.annotation.Nonnull
+  private List<ProjectShortestApiResult> workItemUsage = new ArrayList<>();
+
+  public static final String JSON_PROPERTY_TEST_PLAN_USAGE = "testPlanUsage";
+  @jakarta.annotation.Nonnull
+  private List<ProjectShortestApiResult> testPlanUsage = new ArrayList<>();
+
   public static final String JSON_PROPERTY_ID = "id";
   @jakarta.annotation.Nonnull
   private UUID id;
@@ -101,10 +112,76 @@ public class CustomAttributeApiResult {
   public static final String JSON_PROPERTY_CODE = "code";
   private JsonNullable<String> code = JsonNullable.<String>undefined();
 
-  public CustomAttributeApiResult() { 
+  public CustomAttributeSearchApiResult() { 
   }
 
-  public CustomAttributeApiResult id(@jakarta.annotation.Nonnull UUID id) {
+  public CustomAttributeSearchApiResult workItemUsage(@jakarta.annotation.Nonnull List<ProjectShortestApiResult> workItemUsage) {
+    this.workItemUsage = workItemUsage;
+    return this;
+  }
+
+  public CustomAttributeSearchApiResult addWorkItemUsageItem(ProjectShortestApiResult workItemUsageItem) {
+    if (this.workItemUsage == null) {
+      this.workItemUsage = new ArrayList<>();
+    }
+    this.workItemUsage.add(workItemUsageItem);
+    return this;
+  }
+
+  /**
+   * Projects where attribute is used in work items
+   * @return workItemUsage
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_WORK_ITEM_USAGE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public List<ProjectShortestApiResult> getWorkItemUsage() {
+    return workItemUsage;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_WORK_ITEM_USAGE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setWorkItemUsage(@jakarta.annotation.Nonnull List<ProjectShortestApiResult> workItemUsage) {
+    this.workItemUsage = workItemUsage;
+  }
+
+
+  public CustomAttributeSearchApiResult testPlanUsage(@jakarta.annotation.Nonnull List<ProjectShortestApiResult> testPlanUsage) {
+    this.testPlanUsage = testPlanUsage;
+    return this;
+  }
+
+  public CustomAttributeSearchApiResult addTestPlanUsageItem(ProjectShortestApiResult testPlanUsageItem) {
+    if (this.testPlanUsage == null) {
+      this.testPlanUsage = new ArrayList<>();
+    }
+    this.testPlanUsage.add(testPlanUsageItem);
+    return this;
+  }
+
+  /**
+   * Projects where attribute is used in test plans
+   * @return testPlanUsage
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_TEST_PLAN_USAGE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public List<ProjectShortestApiResult> getTestPlanUsage() {
+    return testPlanUsage;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_TEST_PLAN_USAGE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setTestPlanUsage(@jakarta.annotation.Nonnull List<ProjectShortestApiResult> testPlanUsage) {
+    this.testPlanUsage = testPlanUsage;
+  }
+
+
+  public CustomAttributeSearchApiResult id(@jakarta.annotation.Nonnull UUID id) {
     this.id = id;
     return this;
   }
@@ -129,12 +206,12 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult options(@jakarta.annotation.Nonnull List<CustomAttributeOptionApiResult> options) {
+  public CustomAttributeSearchApiResult options(@jakarta.annotation.Nonnull List<CustomAttributeOptionApiResult> options) {
     this.options = options;
     return this;
   }
 
-  public CustomAttributeApiResult addOptionsItem(CustomAttributeOptionApiResult optionsItem) {
+  public CustomAttributeSearchApiResult addOptionsItem(CustomAttributeOptionApiResult optionsItem) {
     if (this.options == null) {
       this.options = new ArrayList<>();
     }
@@ -162,7 +239,7 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult type(@jakarta.annotation.Nonnull CustomAttributeType type) {
+  public CustomAttributeSearchApiResult type(@jakarta.annotation.Nonnull CustomAttributeType type) {
     this.type = type;
     return this;
   }
@@ -187,7 +264,7 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult isDeleted(@jakarta.annotation.Nonnull Boolean isDeleted) {
+  public CustomAttributeSearchApiResult isDeleted(@jakarta.annotation.Nonnull Boolean isDeleted) {
     this.isDeleted = isDeleted;
     return this;
   }
@@ -212,7 +289,7 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult name(@jakarta.annotation.Nonnull String name) {
+  public CustomAttributeSearchApiResult name(@jakarta.annotation.Nonnull String name) {
     this.name = name;
     return this;
   }
@@ -237,7 +314,7 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult isEnabled(@jakarta.annotation.Nonnull Boolean isEnabled) {
+  public CustomAttributeSearchApiResult isEnabled(@jakarta.annotation.Nonnull Boolean isEnabled) {
     this.isEnabled = isEnabled;
     return this;
   }
@@ -262,7 +339,7 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult isRequired(@jakarta.annotation.Nonnull Boolean isRequired) {
+  public CustomAttributeSearchApiResult isRequired(@jakarta.annotation.Nonnull Boolean isRequired) {
     this.isRequired = isRequired;
     return this;
   }
@@ -287,7 +364,7 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult isGlobal(@jakarta.annotation.Nonnull Boolean isGlobal) {
+  public CustomAttributeSearchApiResult isGlobal(@jakarta.annotation.Nonnull Boolean isGlobal) {
     this.isGlobal = isGlobal;
     return this;
   }
@@ -312,7 +389,7 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult isReadOnly(@jakarta.annotation.Nonnull Boolean isReadOnly) {
+  public CustomAttributeSearchApiResult isReadOnly(@jakarta.annotation.Nonnull Boolean isReadOnly) {
     this.isReadOnly = isReadOnly;
     return this;
   }
@@ -337,7 +414,7 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult isSystem(@jakarta.annotation.Nonnull Boolean isSystem) {
+  public CustomAttributeSearchApiResult isSystem(@jakarta.annotation.Nonnull Boolean isSystem) {
     this.isSystem = isSystem;
     return this;
   }
@@ -362,12 +439,12 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult targets(@jakarta.annotation.Nonnull List<String> targets) {
+  public CustomAttributeSearchApiResult targets(@jakarta.annotation.Nonnull List<String> targets) {
     this.targets = targets;
     return this;
   }
 
-  public CustomAttributeApiResult addTargetsItem(String targetsItem) {
+  public CustomAttributeSearchApiResult addTargetsItem(String targetsItem) {
     if (this.targets == null) {
       this.targets = new ArrayList<>();
     }
@@ -395,7 +472,7 @@ public class CustomAttributeApiResult {
   }
 
 
-  public CustomAttributeApiResult code(@jakarta.annotation.Nullable String code) {
+  public CustomAttributeSearchApiResult code(@jakarta.annotation.Nullable String code) {
     this.code = JsonNullable.<String>of(code);
     return this;
   }
@@ -429,7 +506,7 @@ public class CustomAttributeApiResult {
 
 
   /**
-   * Return true if this CustomAttributeApiResult object is equal to o.
+   * Return true if this CustomAttributeSearchApiResult object is equal to o.
    */
   @Override
   public boolean equals(Object o) {
@@ -439,19 +516,21 @@ public class CustomAttributeApiResult {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CustomAttributeApiResult customAttributeApiResult = (CustomAttributeApiResult) o;
-    return Objects.equals(this.id, customAttributeApiResult.id) &&
-        Objects.equals(this.options, customAttributeApiResult.options) &&
-        Objects.equals(this.type, customAttributeApiResult.type) &&
-        Objects.equals(this.isDeleted, customAttributeApiResult.isDeleted) &&
-        Objects.equals(this.name, customAttributeApiResult.name) &&
-        Objects.equals(this.isEnabled, customAttributeApiResult.isEnabled) &&
-        Objects.equals(this.isRequired, customAttributeApiResult.isRequired) &&
-        Objects.equals(this.isGlobal, customAttributeApiResult.isGlobal) &&
-        Objects.equals(this.isReadOnly, customAttributeApiResult.isReadOnly) &&
-        Objects.equals(this.isSystem, customAttributeApiResult.isSystem) &&
-        Objects.equals(this.targets, customAttributeApiResult.targets) &&
-        equalsNullable(this.code, customAttributeApiResult.code);
+    CustomAttributeSearchApiResult customAttributeSearchApiResult = (CustomAttributeSearchApiResult) o;
+    return Objects.equals(this.workItemUsage, customAttributeSearchApiResult.workItemUsage) &&
+        Objects.equals(this.testPlanUsage, customAttributeSearchApiResult.testPlanUsage) &&
+        Objects.equals(this.id, customAttributeSearchApiResult.id) &&
+        Objects.equals(this.options, customAttributeSearchApiResult.options) &&
+        Objects.equals(this.type, customAttributeSearchApiResult.type) &&
+        Objects.equals(this.isDeleted, customAttributeSearchApiResult.isDeleted) &&
+        Objects.equals(this.name, customAttributeSearchApiResult.name) &&
+        Objects.equals(this.isEnabled, customAttributeSearchApiResult.isEnabled) &&
+        Objects.equals(this.isRequired, customAttributeSearchApiResult.isRequired) &&
+        Objects.equals(this.isGlobal, customAttributeSearchApiResult.isGlobal) &&
+        Objects.equals(this.isReadOnly, customAttributeSearchApiResult.isReadOnly) &&
+        Objects.equals(this.isSystem, customAttributeSearchApiResult.isSystem) &&
+        Objects.equals(this.targets, customAttributeSearchApiResult.targets) &&
+        equalsNullable(this.code, customAttributeSearchApiResult.code);
   }
 
   private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
@@ -460,7 +539,7 @@ public class CustomAttributeApiResult {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, options, type, isDeleted, name, isEnabled, isRequired, isGlobal, isReadOnly, isSystem, targets, hashCodeNullable(code));
+    return Objects.hash(workItemUsage, testPlanUsage, id, options, type, isDeleted, name, isEnabled, isRequired, isGlobal, isReadOnly, isSystem, targets, hashCodeNullable(code));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -473,7 +552,9 @@ public class CustomAttributeApiResult {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CustomAttributeApiResult {\n");
+    sb.append("class CustomAttributeSearchApiResult {\n");
+    sb.append("    workItemUsage: ").append(toIndentedString(workItemUsage)).append("\n");
+    sb.append("    testPlanUsage: ").append(toIndentedString(testPlanUsage)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
