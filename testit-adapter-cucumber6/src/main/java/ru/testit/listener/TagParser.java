@@ -23,6 +23,7 @@ public class TagParser {
     private static final String TAGS = "@TAGS";
     private static final String LINKS = "@LINKS";
     private static final String WORK_ITEM_IDS = "@WORKITEMIDS";
+    private static final String LAYER = "@LAYER";
 
     private final List<Label> labelList = new ArrayList<>();
     private final List<String> tagList = new ArrayList<>();
@@ -32,6 +33,7 @@ public class TagParser {
     private String titleValue = "";
     private String displayNameValue = "";
     private String descriptionValue = "";
+    private String layerValue;
 
     TagParser(final Feature feature, final TestCase scenario, final Deque<String> tags, Map<String, String> parameters) {
         while (tags.peek() != null) {
@@ -78,6 +80,9 @@ public class TagParser {
                     case WORK_ITEM_IDS:
                         Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(id -> getWorkItemIdList().add(id));
+                        break;
+                    case LAYER:
+                        layerValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     default:
                         break;
@@ -127,6 +132,10 @@ public class TagParser {
 
     public String getDescriptionValue() {
         return descriptionValue;
+    }
+
+    public String getLayerValue() {
+        return (layerValue == null || layerValue.trim().isEmpty()) ? null : layerValue;
     }
 
     private Label getTagLabel(final String tag) {

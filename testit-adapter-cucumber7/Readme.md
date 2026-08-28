@@ -441,6 +441,7 @@ Description of tags:
 - `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
 - `Description` - autotest description specified in the autotest card
 - `Labels` - labels listed in the autotest card
+- `Layer` - test pyramid layer for the autotest card (scenario tag `@Layer=API`)
 - `Tags` - tags listed in the autotest card
 - `Links` - links listed in the autotest card
 

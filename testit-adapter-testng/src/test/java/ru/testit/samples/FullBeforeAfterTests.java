@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.*;
 import ru.testit.annotations.*;
 import ru.testit.models.LinkType;
+import ru.testit.models.TestLayers;
 import ru.testit.services.Adapter;
 
 class FullBeforeAfterTests {
@@ -85,6 +86,7 @@ class FullBeforeAfterTests {
     @Title("Title in the autotest card")
     @Description("Test with all Before, After and all annotations")
     @Labels({"Tag1","Tag2"})
+    @Layer(TestLayers.API)
     @Links(links = {
             @Link(url = "https://dumps.example.com/module/repository", title = "Repository", description = "Example of repository", type = LinkType.REPOSITORY),
             @Link(url = "https://dumps.example.com/module/projects", title = "Projects", type = LinkType.REQUIREMENT),

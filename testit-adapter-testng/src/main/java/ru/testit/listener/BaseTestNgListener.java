@@ -115,6 +115,7 @@ public class BaseTestNgListener implements
                 .setMainContainerUuid(mainUuid)
                 .setLabels(Utils.extractLabels(method, parameters))
                 .setTags(Utils.extractTags(method, parameters))
+                .setLayer(Utils.extractLayer(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
                 .setWorkItemIds(Utils.extractWorkItemIds(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters, true))

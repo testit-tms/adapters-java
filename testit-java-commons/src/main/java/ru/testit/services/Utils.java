@@ -84,6 +84,15 @@ public class Utils {
         return tags;
     }
 
+    public static String extractLayer(final Method atomicTest, Map<String, String> parameters) {
+        final Layer annotation = atomicTest.getAnnotation(Layer.class);
+        if (annotation == null) {
+            return null;
+        }
+        final String value = setParameters(annotation.value(), parameters);
+        return (value == null || value.trim().isEmpty()) ? null : value;
+    }
+
     public static String extractClassname(final Method atomicTest, String className, Map<String, String> parameters) {
         Classname annotation = atomicTest.getAnnotation(Classname.class);
 
