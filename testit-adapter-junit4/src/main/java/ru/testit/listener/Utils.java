@@ -95,6 +95,15 @@ public class Utils {
         return tags;
     }
 
+    public static String extractLayer(final Description method) {
+        final Layer annotation = method.getAnnotation(Layer.class);
+        if (annotation == null) {
+            return null;
+        }
+        final String value = annotation.value();
+        return (value == null || value.trim().isEmpty()) ? null : value;
+    }
+
     public static String extractTitle(final Description method) {
         final Title annotation = method.getAnnotation(Title.class);
 

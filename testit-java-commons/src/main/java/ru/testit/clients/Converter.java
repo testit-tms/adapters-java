@@ -39,6 +39,7 @@ public class Converter {
         model.setTags(result.getTags());
         model.shouldCreateWorkItem(result.getAutomaticCreationTestCases());
         model.externalKey(result.getExternalKey());
+        applyLayerIfPresent(result, model);
 
         return model;
     }
@@ -182,6 +183,7 @@ public class Converter {
         model.setSetup(new ArrayList<>());
         model.setTeardown(new ArrayList<>());
         model.externalKey(result.getExternalKey());
+        applyLayerOnUpdate(result, model);
 
         return model;
     }
@@ -456,6 +458,7 @@ public class Converter {
         }
 
         model.setIsFlaky(autotest.getIsFlaky());
+        applyLayerOnUpdate(testResult, model);
 
         // TODO: add WorkItemIds to AutoTestUpdateApiModel and AutoTestCreateApiModel models after fixing the API
         // List<UUID> workItemUuids = apiClient.GetWorkItemUuidsByIds(testResult.getWorkItemIds());
@@ -575,6 +578,23 @@ public class Converter {
                     return model;
                 }
         ).collect(Collectors.toList());
+    }
+
+    private static void applyLayerIfPresent(TestResult result, AutoTestCreateApiModel model) {
+        String layer = result.getLayer();
+        if (layer == null || layer.trim().isEmpty()) {
+            return;
+        }
+        model.setLayer(new LayerApiModel().name(layer).source(LayerSource.RUN));
+    }
+
+    public static void applyLayerOnUpdate(TestResult result, AutoTestUpdateApiModel model) {
+        model.setResetLayer(false);
+        String layer = result.getLayer();
+        if (layer == null || layer.trim().isEmpty()) {
+            return;
+        }
+        model.setLayer(new LayerApiModel().name(layer).source(LayerSource.RUN));
     }
 
     @SafeVarargs

@@ -28,6 +28,7 @@ import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
 import ru.testit.adaptersapi.model.AutoTestStepApiModel;
 import ru.testit.adaptersapi.model.LabelApiModel;
+import ru.testit.adaptersapi.model.LayerApiModel;
 import ru.testit.adaptersapi.model.LinkCreateApiModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -49,6 +50,7 @@ import ru.testit.adaptersapi.invoker.JSON;
   AutoTestCreateApiModel.JSON_PROPERTY_TITLE,
   AutoTestCreateApiModel.JSON_PROPERTY_DESCRIPTION,
   AutoTestCreateApiModel.JSON_PROPERTY_IS_FLAKY,
+  AutoTestCreateApiModel.JSON_PROPERTY_LAYER,
   AutoTestCreateApiModel.JSON_PROPERTY_STEPS,
   AutoTestCreateApiModel.JSON_PROPERTY_SETUP,
   AutoTestCreateApiModel.JSON_PROPERTY_TEARDOWN,
@@ -88,6 +90,9 @@ public class AutoTestCreateApiModel {
 
   public static final String JSON_PROPERTY_IS_FLAKY = "isFlaky";
   private JsonNullable<Boolean> isFlaky = JsonNullable.<Boolean>undefined();
+
+  public static final String JSON_PROPERTY_LAYER = "layer";
+  private JsonNullable<LayerApiModel> layer = JsonNullable.<LayerApiModel>undefined();
 
   public static final String JSON_PROPERTY_STEPS = "steps";
   private JsonNullable<List<AutoTestStepApiModel>> steps = JsonNullable.<List<AutoTestStepApiModel>>undefined();
@@ -383,6 +388,39 @@ public class AutoTestCreateApiModel {
 
   public void setIsFlaky(@jakarta.annotation.Nullable Boolean isFlaky) {
     this.isFlaky = JsonNullable.<Boolean>of(isFlaky);
+  }
+
+
+  public AutoTestCreateApiModel layer(@jakarta.annotation.Nullable LayerApiModel layer) {
+    this.layer = JsonNullable.<LayerApiModel>of(layer);
+    return this;
+  }
+
+  /**
+   * Layer of the autotest. Assigns layer by rules if omitted.
+   * @return layer
+   */
+  @jakarta.annotation.Nullable
+  @JsonIgnore
+
+  public LayerApiModel getLayer() {
+        return layer.orElse(null);
+  }
+
+  @JsonProperty(JSON_PROPERTY_LAYER)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public JsonNullable<LayerApiModel> getLayer_JsonNullable() {
+    return layer;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_LAYER)
+  public void setLayer_JsonNullable(JsonNullable<LayerApiModel> layer) {
+    this.layer = layer;
+  }
+
+  public void setLayer(@jakarta.annotation.Nullable LayerApiModel layer) {
+    this.layer = JsonNullable.<LayerApiModel>of(layer);
   }
 
 
@@ -710,6 +748,7 @@ public class AutoTestCreateApiModel {
         equalsNullable(this.title, autoTestCreateApiModel.title) &&
         equalsNullable(this.description, autoTestCreateApiModel.description) &&
         equalsNullable(this.isFlaky, autoTestCreateApiModel.isFlaky) &&
+        equalsNullable(this.layer, autoTestCreateApiModel.layer) &&
         equalsNullable(this.steps, autoTestCreateApiModel.steps) &&
         equalsNullable(this.setup, autoTestCreateApiModel.setup) &&
         equalsNullable(this.teardown, autoTestCreateApiModel.teardown) &&
@@ -725,7 +764,7 @@ public class AutoTestCreateApiModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(projectId, externalId, name, hashCodeNullable(externalKey), hashCodeNullable(namespace), hashCodeNullable(classname), hashCodeNullable(title), hashCodeNullable(description), hashCodeNullable(isFlaky), hashCodeNullable(steps), hashCodeNullable(setup), hashCodeNullable(teardown), hashCodeNullable(shouldCreateWorkItem), hashCodeNullable(labels), hashCodeNullable(links), hashCodeNullable(tags));
+    return Objects.hash(projectId, externalId, name, hashCodeNullable(externalKey), hashCodeNullable(namespace), hashCodeNullable(classname), hashCodeNullable(title), hashCodeNullable(description), hashCodeNullable(isFlaky), hashCodeNullable(layer), hashCodeNullable(steps), hashCodeNullable(setup), hashCodeNullable(teardown), hashCodeNullable(shouldCreateWorkItem), hashCodeNullable(labels), hashCodeNullable(links), hashCodeNullable(tags));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -748,6 +787,7 @@ public class AutoTestCreateApiModel {
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    isFlaky: ").append(toIndentedString(isFlaky)).append("\n");
+    sb.append("    layer: ").append(toIndentedString(layer)).append("\n");
     sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
     sb.append("    setup: ").append(toIndentedString(setup)).append("\n");
     sb.append("    teardown: ").append(toIndentedString(teardown)).append("\n");

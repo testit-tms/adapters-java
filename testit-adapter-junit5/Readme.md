@@ -291,6 +291,7 @@ Description of annotations:
 - `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
 - `Description` - autotest description specified in the autotest card
 - `Labels` - labels listed in the autotest card
+- `Layer` - test pyramid layer for the autotest card (e.g. `API`, `E2E`; use `TestLayers` constants or any custom string)
 - `Tags` - tags listed in the autotest card
 - `Links` - links listed in the autotest card
 - `Step` - the designation of the step

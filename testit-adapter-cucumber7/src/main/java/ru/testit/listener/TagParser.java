@@ -23,6 +23,7 @@ public class TagParser {
     private static final String TAGS = "@TAGS";
     private static final String LINKS = "@LINKS";
     private static final String WORK_ITEM_IDS = "@WORKITEMIDS";
+    private static final String LAYER = "@LAYER";
     private static final String NAMESPACE = "@NAMESPACE";
     private static final String CLASS_NAME = "@CLASSNAME";
 
@@ -36,6 +37,7 @@ public class TagParser {
     private String descriptionValue = "";
     private String nameSpaceValue = "";
     private String classNameValue;
+    private String layerValue;
 
     TagParser(final Feature feature, final TestCase scenario, final Deque<String> tags, Map<String, String> parameters) {
         nameSpaceValue = getFileName(scenario);
@@ -91,6 +93,9 @@ public class TagParser {
                     case WORK_ITEM_IDS:
                         Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(id -> getWorkItemIdList().add(id));
+                        break;
+                    case LAYER:
+                        layerValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     default:
                         break;
@@ -148,6 +153,10 @@ public class TagParser {
 
     public String getClassNameValue() {
         return classNameValue;
+    }
+
+    public String getLayerValue() {
+        return (layerValue == null || layerValue.trim().isEmpty()) ? null : layerValue;
     }
 
     private Label getTagLabel(final String tag) {

@@ -35,6 +35,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Resul
     private Map<String, String> parameters;
     private boolean automaticCreationTestCases;
     private String externalKey;
+    private String layer;
     /** Owning {@link MainContainer#getUuid()} when set (e.g. JUnit 5); used to scope bulk diagnostics in shared {@link ru.testit.services.ResultStorage}. */
     private String mainContainerUuid;
 
@@ -500,6 +501,15 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Resul
         return this;
     }
 
+    public String getLayer() {
+        return layer;
+    }
+
+    public TestResult setLayer(String layer) {
+        this.layer = layer;
+        return this;
+    }
+
     public String getMainContainerUuid() {
         return mainContainerUuid;
     }
@@ -535,6 +545,7 @@ public class TestResult implements ResultWithSteps, ResultWithAttachments, Resul
         sb.append("    parameters: ").append(Utils.toIndentedString(this.parameters)).append("\n");
         sb.append("    automaticCreationTestCases: ").append(Utils.toIndentedString(this.automaticCreationTestCases)).append("\n");
         sb.append("    externalKey: ").append(Utils.toIndentedString(this.externalKey)).append("\n");
+        sb.append("    layer: ").append(Utils.toIndentedString(this.layer)).append("\n");
         sb.append("    mainContainerUuid: ").append(Utils.toIndentedString(this.mainContainerUuid)).append("\n");
         sb.append("}");
 
