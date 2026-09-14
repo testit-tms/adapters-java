@@ -172,7 +172,17 @@ public final class Adapter {
         getAdapterManager().updateTestCase(testResult -> testResult.setExternalId(externalId));
     }
 
+    public static void addWorkItemId(String globalId) {
+        getAdapterManager().updateTestCase(testResult ->
+                testResult.setWorkItemIds(Collections.singletonList(globalId)));
+    }
+
+    /**
+     * @deprecated Use {@link #addWorkItemId(String)} with a single globalId instead.
+     */
+    @Deprecated
     public static void addWorkItemIds(String[] workItemIds) {
+        Utils.warnDeprecated("addWorkItemIds", "addWorkItemId");
         getAdapterManager().updateTestCase(testResult -> testResult.setWorkItemIds(Arrays.asList(workItemIds)));
     }
 

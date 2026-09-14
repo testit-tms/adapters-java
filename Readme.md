@@ -112,4 +112,4 @@ curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID
 
 # 🚀 Warning
 Since 2.2.0 version:
-- If value from @WorkItemIds annotation not found in TMS then test result will NOT be uploaded.
+- If value from @WorkItemId annotation not found in TMS then test result will NOT be uploaded.

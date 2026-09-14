@@ -209,14 +209,14 @@ class UtilsTest {
         String textAfterSetParameters = UtilsHelper.generateTextAfterSetParameters(parameters);
 
         class TestClass {
-            @WorkItemIds("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            @WorkItemId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
                 // empty
             }
         }
 
         Method testMethod = TestClass.class.getDeclaredMethods()[0];
-        when(atomicTest.getAnnotation(WorkItemIds.class)).thenReturn(testMethod.getAnnotation(WorkItemIds.class));
+        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(testMethod.getAnnotation(WorkItemId.class));
 
         // act
         List<String> workItemIds = Utils.extractWorkItemIds(atomicTest, parameters);
@@ -232,14 +232,14 @@ class UtilsTest {
         String textBeforeSetParameters = UtilsHelper.generateTextBeforeSetParameters(parameters);
 
         class TestClass {
-            @WorkItemIds("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
+            @WorkItemId("{Param date} = {date}; {Param number} = {number}; {Param name} = {name}; ")
             void testMethod() {
                 // empty
             }
         }
 
         Method testMethod = TestClass.class.getDeclaredMethods()[0];
-        when(atomicTest.getAnnotation(WorkItemIds.class)).thenReturn(testMethod.getAnnotation(WorkItemIds.class));
+        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(testMethod.getAnnotation(WorkItemId.class));
 
         // act
         List<String> workItemIds = Utils.extractWorkItemIds(atomicTest, null);
@@ -254,14 +254,14 @@ class UtilsTest {
         Map<String, String> parameters = UtilsHelper.generateParameters();
 
         class TestClass {
-            @WorkItemIds("Text without parameters")
+            @WorkItemId("Text without parameters")
             void testMethod() {
                 // empty
             }
         }
 
         Method testMethod = TestClass.class.getDeclaredMethods()[0];
-        when(atomicTest.getAnnotation(WorkItemIds.class)).thenReturn(testMethod.getAnnotation(WorkItemIds.class));
+        when(atomicTest.getAnnotation(WorkItemId.class)).thenReturn(testMethod.getAnnotation(WorkItemId.class));
 
         // act
         List<String> workItemIds = Utils.extractWorkItemIds(atomicTest, parameters);
@@ -284,6 +284,23 @@ class UtilsTest {
         // assert
         Assertions.assertTrue(workItemIdWithoutInputParameters.isEmpty());
         Assertions.assertTrue(workItemIdWithInputParameters.isEmpty());
+    }
+
+    @Test
+    void extractWorkItemIds_WithDeprecatedWorkItemIdsAnnotation() {
+        class TestClass {
+            @WorkItemIds("123")
+            void testMethod() {
+                // empty
+            }
+        }
+
+        Method testMethod = TestClass.class.getDeclaredMethods()[0];
+        when(atomicTest.getAnnotation(WorkItemIds.class)).thenReturn(testMethod.getAnnotation(WorkItemIds.class));
+
+        List<String> workItemIds = Utils.extractWorkItemIds(atomicTest, null);
+
+        Assertions.assertEquals("123", workItemIds.get(0));
     }
 
     @Test

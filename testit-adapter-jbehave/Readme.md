@@ -323,7 +323,8 @@ If you want to add attachment for a failed test then see [How to add an attachme
 Use tags to specify information about autotest.
 
 Description of tags:
-- `WorkItemIds` - a method that links autotests with manual tests. Receives the array of manual tests' IDs
+- `WorkItemId` - a method that links an autotest with a manual test. Receives a single globalId
+- `WorkItemIds` - deprecated, use `WorkItemId` instead
 - `DisplayName` - internal autotest name (used in Test IT)
 - `ExternalId` - unique internal autotest ID (used in Test IT)
 - `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
@@ -337,7 +338,8 @@ Description of methods:
 - `Adapter.addLinks` - add links to the autotest result.
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
-- `Adapter.addWorkItemIds` - a dynamic method that links autotests with manual tests. Receives the array of manual tests' IDs
+- `Adapter.addWorkItemId` - a dynamic method that links an autotest with a manual test. Receives a single globalId
+- `Adapter.addWorkItemIds` - deprecated, use `Adapter.addWorkItemId` instead
 - `Adapter.addDisplayName` - a dynamic method for adding internal autotest name (used in Test IT)
 - `Adapter.addExternalId` - a dynamic method for adding unique internal autotest ID (used in Test IT)
 - `Adapter.addTitle` - a dynamic method for adding autotest name specified in the autotest card or the step. If not specified, the name from the displayName method is used
@@ -397,7 +399,7 @@ Scenario: Add a to b
 Meta:
 @ExternalId failed_with_all_annotations
 @DisplayName Failed_test_with_all_annotations
-@WorkItemIds 123
+@WorkItemId 123
 @Title Title_in_the_autotest_card
 @Description Test_with_all_annotations
 @Tags Tag1,Tag2

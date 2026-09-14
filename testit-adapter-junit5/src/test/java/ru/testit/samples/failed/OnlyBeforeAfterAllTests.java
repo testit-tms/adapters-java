@@ -77,7 +77,7 @@ class OnlyBeforeAfterAllTests {
     @Test
     @ExternalId("failed_BeforeAll_AfterAll_with_all_annotations")
     @DisplayName("Failed test with all annotations")
-    @WorkItemIds("123")
+    @WorkItemId("123")
     @Title("Title in the autotest card")
     @Description("Test with BeforeAll, AfterAll and all annotations")
     @Labels({"Tag1","Tag2"})
