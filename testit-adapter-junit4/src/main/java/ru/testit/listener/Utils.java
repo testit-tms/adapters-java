@@ -30,7 +30,18 @@ public class Utils {
 
     public static List<String> extractWorkItemIds(final Description method) {
         final List<String> workItemIds = new ArrayList<>();
+        final WorkItemId workItem = method.getAnnotation(WorkItemId.class);
         final WorkItemIds workItems = method.getAnnotation(WorkItemIds.class);
+
+        if (workItems != null) {
+            ru.testit.services.Utils.warnDeprecated("WorkItemIds", "WorkItemId");
+        }
+
+        if (workItem != null) {
+            workItemIds.add(workItem.value());
+            return workItemIds;
+        }
+
         if (workItems != null) {
             workItemIds.addAll(Arrays.asList(workItems.value()));
         }

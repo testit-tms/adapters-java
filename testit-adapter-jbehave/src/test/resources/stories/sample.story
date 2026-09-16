@@ -2,7 +2,7 @@ Scenario: Add a to b
 Meta:
 @ExternalId failed_with_all_annotations
 @DisplayName Failed_test_with_all_annotations
-@WorkItemIds 123
+@WorkItemId 123
 @Title Title_in_the_autotest_card
 @Description Test_with_all_annotations
 @Labels Tag1,Tag2

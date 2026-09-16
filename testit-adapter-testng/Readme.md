@@ -260,7 +260,8 @@ Use annotations to specify information about autotest.
 
 Description of annotations:
 
-- `WorkItemIds` - a method that links autotests with manual tests. Receives the array of manual tests' IDs
+- `WorkItemId` - a method that links an autotest with a manual test. Receives a single globalId
+- `WorkItemIds` - deprecated, use `WorkItemId` instead
 - `DisplayName` - internal autotest name (used in Test IT)
 - `ExternalId` - unique internal autotest ID (used in Test IT)
 - `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
@@ -277,7 +278,8 @@ Description of methods:
 - `Adapter.addLinks` - add links to the autotest result.
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
-- `Adapter.addWorkItemIds` - a dynamic method that links autotests with manual tests. Receives the array of manual tests' IDs
+- `Adapter.addWorkItemId` - a dynamic method that links an autotest with a manual test. Receives a single globalId
+- `Adapter.addWorkItemIds` - deprecated, use `Adapter.addWorkItemId` instead
 - `Adapter.addDisplayName` - a dynamic method for adding internal autotest name (used in Test IT)
 - `Adapter.addExternalId` - a dynamic method for adding unique internal autotest ID (used in Test IT)
 - `Adapter.addTitle` - a dynamic method for adding autotest name specified in the autotest card or the step. If not specified, the name from the displayName method is used
@@ -327,7 +329,7 @@ public class SampleTests {
     @Test
     @ExternalId("Simple_test_2")
     @DisplayName("Simple test 2")
-    @WorkItemIds({"12345", "54321"})
+    @WorkItemId("12345")
     @Title("Simple test 2")
     @Description("Simple test 2 description")
     @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
@@ -371,7 +373,7 @@ public class DataProviderParameterizedTests {
     @Test(dataProvider = "allParameters")
     @ExternalId("Parameterized_test_with_data_provider_parameters_{number}")
     @DisplayName("Test with title = {title}, number = {number}, url = {url} parameters")
-    @WorkItemIds("{number}")
+    @WorkItemId("{number}")
     @Title("Title in the autotest card {number}")
     @Description("{title}")
     @Tags({"Tag{number}"})

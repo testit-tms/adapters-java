@@ -26,6 +26,7 @@ public class TagParser {
     private static final String TAGS = "Tags";
     private static final String LINKS = "Links";
     private static final String WORK_ITEM_IDS = "WorkItemIds";
+    private static final String WORK_ITEM_ID = "WorkItemId";
     private static final String LAYER = "Layer";
 
     private final List<Label> labelList = new ArrayList<>();
@@ -102,8 +103,19 @@ public class TagParser {
         );
 
         if (!workItemIdsValue.isEmpty()) {
+            Utils.warnDeprecated("WorkItemIds", "WorkItemId");
             Arrays.stream(workItemIdsValue.split(TAG_VALUE_DELIMITER))
                     .forEach(id -> getWorkItemIdList().add(id));
+        }
+
+        String workItemIdValue = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, WORK_ITEM_ID),
+                exampleParameters
+        );
+
+        if (!workItemIdValue.isEmpty()) {
+            workItemIdList.clear();
+            workItemIdList.add(workItemIdValue);
         }
 
         layerValue = substituteExampleParameters(
