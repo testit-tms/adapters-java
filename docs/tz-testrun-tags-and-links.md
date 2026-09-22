@@ -172,3 +172,8 @@ Implemented in `testit-java-commons` (all Java adapters share this):
 - Config: `testRunTags` / `TMS_TEST_RUN_TAGS` / `tmsTestRunTags`, `testRunLinks` / `TMS_TEST_RUN_LINKS` / `tmsTestRunLinks`
 - Create path: tags/links on `createTestRun`
 - Existing run: early merge in `AdapterStartupHelper` at startup
+- **TODO — TEMPORARY WORKAROUND (remove after TMS fix):**
+  `GET /adapters/testRuns/{id}` returns empty `links`/`attachments`.
+  `TmsApiClient.getTestRun` falls back to `GET /api/v2/testRuns/{id}` for merge-on-update
+  (adapters `PUT` replaces those collections; tags are merged server-side).
+  Switch back to adapters GET once it returns links/attachments.

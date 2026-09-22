@@ -3,6 +3,7 @@ package ru.testit.services.core;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
+import ru.testit.adaptersapi.model.AttachmentApiResult;
 import ru.testit.adaptersapi.model.LinkApiResult;
 import ru.testit.adaptersapi.model.LinkType;
 import ru.testit.adaptersapi.model.TestRunApiResult;
@@ -54,16 +55,23 @@ class AdapterStartupHelperTestRunMetaTest {
         existing.setName("Old");
         existing.setTags(Collections.singletonList("smoke"));
         LinkApiResult oldLink = new LinkApiResult();
+        oldLink.setId(UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"));
         oldLink.setUrl("https://existing.example");
         oldLink.setType(LinkType.RELATED);
         existing.setLinks(Collections.singletonList(oldLink));
+        AttachmentApiResult oldAttachment = new AttachmentApiResult();
+        oldAttachment.setId(UUID.fromString("11111111-2222-3333-4444-555555555555"));
+        oldAttachment.setFileId("file-1");
+        oldAttachment.setType("text/plain");
+        oldAttachment.setSize(1f);
+        oldAttachment.setName("note.txt");
+        existing.setAttachments(Collections.singletonList(oldAttachment));
         when(client.getTestRun(RUN_ID)).thenReturn(existing);
 
         AdapterStartupHelper helper = new AdapterStartupHelper(
                 adapterConfig, config, client, LoggerFactory.getLogger(getClass()));
         helper.startTests();
 
-        verify(client).updateTestRun(any(UpdateEmptyTestRunApiModel.class));
         org.mockito.ArgumentCaptor<UpdateEmptyTestRunApiModel> captor =
                 org.mockito.ArgumentCaptor.forClass(UpdateEmptyTestRunApiModel.class);
         verify(client).updateTestRun(captor.capture());
@@ -71,6 +79,44 @@ class AdapterStartupHelperTestRunMetaTest {
         assertTrue(model.getTags().contains("smoke"));
         assertTrue(model.getTags().contains("nightly"));
         assertEquals(2, model.getLinks().size());
+        assertEquals(1, model.getAttachments().size());
+        assertEquals(oldAttachment.getId(), model.getAttachments().get(0).getId());
+        assertEquals(oldLink.getId(), model.getLinks().get(0).getId());
+    }
+
+    @Test
+    void startTests_tagsOnly_keepsExistingLinksAndAttachments() throws Exception {
+        ClientConfiguration config = configWith(RUN_ID, null, "nightly", null);
+
+        TestRunApiResult existing = new TestRunApiResult();
+        existing.setId(UUID.fromString(RUN_ID));
+        existing.setName("Old");
+        existing.setTags(Collections.singletonList("smoke"));
+        LinkApiResult oldLink = new LinkApiResult();
+        oldLink.setId(UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"));
+        oldLink.setUrl("https://existing.example");
+        oldLink.setType(LinkType.RELATED);
+        existing.setLinks(Collections.singletonList(oldLink));
+        AttachmentApiResult oldAttachment = new AttachmentApiResult();
+        oldAttachment.setId(UUID.fromString("11111111-2222-3333-4444-555555555555"));
+        oldAttachment.setFileId("file-1");
+        oldAttachment.setType("text/plain");
+        oldAttachment.setSize(1f);
+        oldAttachment.setName("note.txt");
+        existing.setAttachments(Collections.singletonList(oldAttachment));
+        when(client.getTestRun(RUN_ID)).thenReturn(existing);
+
+        AdapterStartupHelper helper = new AdapterStartupHelper(
+                adapterConfig, config, client, LoggerFactory.getLogger(getClass()));
+        helper.startTests();
+
+        org.mockito.ArgumentCaptor<UpdateEmptyTestRunApiModel> captor =
+                org.mockito.ArgumentCaptor.forClass(UpdateEmptyTestRunApiModel.class);
+        verify(client).updateTestRun(captor.capture());
+        UpdateEmptyTestRunApiModel model = captor.getValue();
+        assertEquals(1, model.getLinks().size());
+        assertEquals(1, model.getAttachments().size());
+        assertEquals("https://existing.example", model.getLinks().get(0).getUrl());
     }
 
     @Test
