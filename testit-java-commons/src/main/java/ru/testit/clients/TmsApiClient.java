@@ -2,6 +2,7 @@ package ru.testit.clients;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.ws.rs.core.GenericType;
 import ru.testit.adaptersapi.api.*;
 import ru.testit.adaptersapi.invoker.ApiClient;
 import ru.testit.adaptersapi.invoker.ApiException;
@@ -25,6 +26,7 @@ public class TmsApiClient implements ITmsApiClient {
     private static final int TESTS_LIMIT = 100;
     private static final UUID EMPTY_TEST_POINT_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
+    private final ApiClient apiClient;
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
     private final AttachmentsApi attachmentsApi;
@@ -41,6 +43,7 @@ public class TmsApiClient implements ITmsApiClient {
         apiClient.setApiKey(config.getPrivateToken());
 
         clientConfiguration = config;
+        this.apiClient = apiClient;
         testRunsApi = new TestRunsApi(apiClient);
         autoTestsApi = new AutoTestsApi(apiClient);
         attachmentsApi = new AttachmentsApi(apiClient);
@@ -83,7 +86,38 @@ public class TmsApiClient implements ITmsApiClient {
 
     @Override
     public TestRunApiResult getTestRun(String uuid) throws ApiException {
-        return testRunsApi.adaptersTestRunsIdGet(UUID.fromString(uuid));
+        // TODO(TEMPORARY WORKAROUND): remove getTestRunViaPublicApi once
+        // GET /adapters/testRuns/{id} returns links and attachments.
+        // Adapters GET currently stubs them as empty; UpdateEmptyTestRun then
+        // replaces those collections and wipes existing data on merge.
+        return getTestRunViaPublicApi(UUID.fromString(uuid));
+    }
+
+    /**
+     * FIXME: temporary workaround — delete this method when adapters GET is fixed.
+     * Until then, public API is the only source of real links/attachments for merge.
+     */
+    private TestRunApiResult getTestRunViaPublicApi(UUID id) throws ApiException {
+        String path = "/api/v2/testRuns/" + apiClient.escapeString(id.toString());
+        String accept = apiClient.selectHeaderAccept("application/json");
+        String contentType = apiClient.selectHeaderContentType();
+        String[] authNames = new String[]{"PrivateToken", "Identity.Application"};
+        GenericType<TestRunApiResult> returnType = new GenericType<TestRunApiResult>() {};
+        return apiClient.invokeAPI(
+                "TmsApiClient.getTestRunViaPublicApi",
+                path,
+                "GET",
+                new ArrayList<>(),
+                null,
+                new LinkedHashMap<>(),
+                new LinkedHashMap<>(),
+                new LinkedHashMap<>(),
+                accept,
+                contentType,
+                authNames,
+                returnType,
+                false
+        ).getData();
     }
 
     @Override

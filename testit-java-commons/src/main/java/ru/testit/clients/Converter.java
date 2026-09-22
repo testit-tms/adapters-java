@@ -537,6 +537,9 @@ public class Converter {
     }
 
     public static List<AssignAttachmentApiModel> buildAssignAttachmentApiModels(List<AttachmentApiResult> attachments) {
+        if (attachments == null || attachments.isEmpty()) {
+            return Collections.emptyList();
+        }
         return attachments.stream().map(
                 attachment -> {
                     AssignAttachmentApiModel model = new AssignAttachmentApiModel();
@@ -549,6 +552,9 @@ public class Converter {
     }
 
     public static List<UpdateLinkApiModel> buildUpdateLinkApiModels(List<LinkApiResult> links) {
+        if (links == null || links.isEmpty()) {
+            return Collections.emptyList();
+        }
         return links.stream().map(
                 link -> {
                     UpdateLinkApiModel model = new UpdateLinkApiModel();
