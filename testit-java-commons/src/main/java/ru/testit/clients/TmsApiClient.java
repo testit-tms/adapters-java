@@ -91,25 +91,20 @@ public class TmsApiClient implements ITmsApiClient {
 
     @Override
     public TestRunApiResult getTestRun(String uuid) throws ApiException {
-        // TODO(TEMPORARY WORKAROUND): remove getTestRunViaPublicApi once
-        // GET /adapters/testRuns/{id} returns links and attachments.
-        // Adapters GET currently stubs them as empty; UpdateEmptyTestRun then
-        // replaces those collections and wipes existing data on merge.
-        return getTestRunViaPublicApi(UUID.fromString(uuid));
+        // TMS 5.8: GET /adapters/testRuns/{id} omits description/launchSource and returns
+        // empty links/attachments. Read via v2; TestRunApiResult keeps only merge fields
+        // (id/name/description/launchSource/tags/links/attachments) — testResults ignored.
+        return getTestRunByIdV2(UUID.fromString(uuid));
     }
 
-    /**
-     * FIXME: temporary workaround — delete this method when adapters GET is fixed.
-     * Until then, public API is the only source of real links/attachments for merge.
-     */
-    private TestRunApiResult getTestRunViaPublicApi(UUID id) throws ApiException {
+    private TestRunApiResult getTestRunByIdV2(UUID id) throws ApiException {
         String path = "/api/v2/testRuns/" + apiClient.escapeString(id.toString());
         String accept = apiClient.selectHeaderAccept("application/json");
         String contentType = apiClient.selectHeaderContentType();
         String[] authNames = new String[]{"PrivateToken", "Identity.Application"};
         GenericType<TestRunApiResult> returnType = new GenericType<TestRunApiResult>() {};
         return apiClient.invokeAPI(
-                "TmsApiClient.getTestRunViaPublicApi",
+                "TmsApiClient.getTestRunByIdV2",
                 path,
                 "GET",
                 new ArrayList<>(),

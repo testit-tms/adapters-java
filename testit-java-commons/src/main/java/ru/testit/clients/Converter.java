@@ -498,6 +498,8 @@ public class Converter {
 
         model.setId(testRun.getId());
         model.setName(testRun.getName());
+        model.setDescription(testRun.getDescription());
+        model.setLaunchSource(testRun.getLaunchSource());
         model.setAttachments(Converter.buildAssignAttachmentApiModels(testRun.getAttachments()));
         model.setLinks(Converter.buildUpdateLinkApiModels(testRun.getLinks()));
         model.setTags(testRun.getTags());

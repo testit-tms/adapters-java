@@ -95,8 +95,7 @@ public class AdapterStartupHelper {
         }
 
         TestRunApiResult testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
-        // getTestRun uses a temporary v2 fallback (see TmsApiClient) until adapters GET
-        // returns links/attachments; without that, merge would wipe them on PUT.
+        // getTestRun is GET /api/v2/testRuns/{id} (adapters GET is incomplete on TMS 5.8).
         UpdateEmptyTestRunApiModel model = Converter.buildUpdateEmptyTestRunApiModel(testRun);
         boolean changed = false;
 

@@ -53,6 +53,8 @@ class AdapterStartupHelperTestRunMetaTest {
         TestRunApiResult existing = new TestRunApiResult();
         existing.setId(UUID.fromString(RUN_ID));
         existing.setName("Old");
+        existing.setDescription("Keep me");
+        existing.setLaunchSource("CI");
         existing.setTags(Collections.singletonList("smoke"));
         LinkApiResult oldLink = new LinkApiResult();
         oldLink.setId(UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"));
@@ -82,6 +84,8 @@ class AdapterStartupHelperTestRunMetaTest {
         assertEquals(1, model.getAttachments().size());
         assertEquals(oldAttachment.getId(), model.getAttachments().get(0).getId());
         assertEquals(oldLink.getId(), model.getLinks().get(0).getId());
+        assertEquals("Keep me", model.getDescription());
+        assertEquals("CI", model.getLaunchSource());
     }
 
     @Test
@@ -91,6 +95,8 @@ class AdapterStartupHelperTestRunMetaTest {
         TestRunApiResult existing = new TestRunApiResult();
         existing.setId(UUID.fromString(RUN_ID));
         existing.setName("Old");
+        existing.setDescription("Keep me");
+        existing.setLaunchSource("CI");
         existing.setTags(Collections.singletonList("smoke"));
         LinkApiResult oldLink = new LinkApiResult();
         oldLink.setId(UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"));
@@ -117,6 +123,8 @@ class AdapterStartupHelperTestRunMetaTest {
         assertEquals(1, model.getLinks().size());
         assertEquals(1, model.getAttachments().size());
         assertEquals("https://existing.example", model.getLinks().get(0).getUrl());
+        assertEquals("Keep me", model.getDescription());
+        assertEquals("CI", model.getLaunchSource());
     }
 
     @Test

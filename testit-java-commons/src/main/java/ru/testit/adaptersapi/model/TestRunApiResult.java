@@ -43,7 +43,9 @@ import ru.testit.adaptersapi.invoker.JSON;
   TestRunApiResult.JSON_PROPERTY_STATUS,
   TestRunApiResult.JSON_PROPERTY_ATTACHMENTS,
   TestRunApiResult.JSON_PROPERTY_LINKS,
-  TestRunApiResult.JSON_PROPERTY_TAGS
+  TestRunApiResult.JSON_PROPERTY_TAGS,
+  TestRunApiResult.JSON_PROPERTY_DESCRIPTION,
+  TestRunApiResult.JSON_PROPERTY_LAUNCH_SOURCE
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class TestRunApiResult {
@@ -75,6 +77,15 @@ public class TestRunApiResult {
   public static final String JSON_PROPERTY_TAGS = "tags";
   @jakarta.annotation.Nonnull
   private List<String> tags = new ArrayList<>();
+
+  // Keep on OpenAPI regen: required so merge-on-update does not wipe these fields.
+  public static final String JSON_PROPERTY_DESCRIPTION = "description";
+  @jakarta.annotation.Nullable
+  private String description;
+
+  public static final String JSON_PROPERTY_LAUNCH_SOURCE = "launchSource";
+  @jakarta.annotation.Nullable
+  private String launchSource;
 
   public TestRunApiResult() { 
   }
@@ -283,6 +294,41 @@ public class TestRunApiResult {
 
 
   /**
+   * Test run description
+   * @return description
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_DESCRIPTION)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public String getDescription() {
+    return description;
+  }
+
+  @JsonProperty(JSON_PROPERTY_DESCRIPTION)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setDescription(@jakarta.annotation.Nullable String description) {
+    this.description = description;
+  }
+
+  /**
+   * Test run launch source
+   * @return launchSource
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_LAUNCH_SOURCE)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public String getLaunchSource() {
+    return launchSource;
+  }
+
+  @JsonProperty(JSON_PROPERTY_LAUNCH_SOURCE)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setLaunchSource(@jakarta.annotation.Nullable String launchSource) {
+    this.launchSource = launchSource;
+  }
+
+
+  /**
    * Return true if this TestRunApiResult object is equal to o.
    */
   @Override
@@ -300,12 +346,14 @@ public class TestRunApiResult {
         Objects.equals(this.status, testRunApiResult.status) &&
         Objects.equals(this.attachments, testRunApiResult.attachments) &&
         Objects.equals(this.links, testRunApiResult.links) &&
-        Objects.equals(this.tags, testRunApiResult.tags);
+        Objects.equals(this.tags, testRunApiResult.tags) &&
+        Objects.equals(this.description, testRunApiResult.description) &&
+        Objects.equals(this.launchSource, testRunApiResult.launchSource);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, stateName, status, attachments, links, tags);
+    return Objects.hash(id, name, stateName, status, attachments, links, tags, description, launchSource);
   }
 
   @Override
@@ -319,6 +367,8 @@ public class TestRunApiResult {
     sb.append("    attachments: ").append(toIndentedString(attachments)).append("\n");
     sb.append("    links: ").append(toIndentedString(links)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    launchSource: ").append(toIndentedString(launchSource)).append("\n");
     sb.append("}");
     return sb.toString();
   }
