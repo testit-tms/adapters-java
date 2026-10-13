@@ -1,0 +1,448 @@
+# Test IT TMS adapter for JUnit 6
+
+![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
+
+## Getting Started
+
+### Installation
+
+#### Maven users
+
+Add this dependency to your project POM:
+
+```xml
+
+<dependency>
+    <groupId>ru.testit</groupId>
+    <artifactId>testit-adapter-junit6</artifactId>
+    <version>2.3.4</version>
+    <scope>compile</scope>
+</dependency>
+```
+
+#### Gradle users
+
+Add this dependency to your project build file:
+
+```groovy
+implementation "ru.testit:testit-adapter-junit6:2.3.4"
+```
+
+## Usage
+
+#### Maven users
+
+1. Add this dependency to your project POM:
+    ````xml
+     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <aspectj.version>1.9.22</aspectj.version>
+        <adapter.version>2.3.4</adapter.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-java-commons</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-adapter-junit6</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>dev.aspectj</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>1.14</version>
+                <configuration>
+                    <complianceLevel>${maven.compiler.source}</complianceLevel>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.source}</target>
+                    <!--Allows the adapter to accept real parameter names-->
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+               <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>  
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <argLine>-noverify</argLine>
+                    <argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar</argLine>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.extensions.autodetection.enabled = true
+                        </configurationParameters>
+                    </properties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    ````
+2. Press the **Reload All Maven Projects** button.
+
+#### Gradle users
+
+1. Add this dependency to your project build file:
+
+```groovy
+plugins {
+    id "java"
+}
+
+configurations {
+    aspectConfig
+}
+
+sourceCompatibility = 17
+
+group "org.example"
+version "1.0-SNAPSHOT"
+
+compileJava.options.encoding = "utf-8"
+tasks.withType(JavaCompile) {
+    options.encoding = "utf-8"
+    // Allows the adapter to accept real parameter names
+    options.compilerArgs.add("-parameters")
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    testImplementation "org.aspectj:aspectjrt:1.9.22"
+    testImplementation "ru.testit:testit-adapter-junit6:2.3.4"
+    testImplementation "ru.testit:testit-java-commons:2.3.4"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:6.0.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:6.0.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:6.0.0"
+    testImplementation "org.junit.platform:junit-platform-launcher:6.0.0"
+    aspectConfig "org.aspectj:aspectjweaver:1.9.22"
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty "junit.jupiter.extensions.autodetection.enabled", true
+    doFirst {
+        def weaver = configurations.aspectConfig.find { it.name.contains("aspectjweaver") }
+        jvmArgs += "-javaagent:$weaver"
+    }
+    systemProperties(System.getProperties())
+    environment(System.getenv())
+}
+```
+
+2. Press the **Reload All Gradle Projects** button.
+
+### Configuration
+
+| Description                                                                                                                                                                                                                                                                                                                                                                                                                      | File property                     | Environment variable                       | System property                      |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|--------------------------------------------|--------------------------------------|
+| Location of the TMS instance                                                                                                                                                                                                                                                                                                                                                                                                     | url                               | TMS_URL                                    | tmsUrl                               |
+| API secret key [How to getting API secret key?](https://github.com/testit-tms/.github/tree/main/configuration#privatetoken)                                                                                                                                                                                                                                                                                                      | privateToken                      | TMS_PRIVATE_TOKEN                          | tmsPrivateToken                      |
+| ID of project in TMS instance [How to getting project ID?](https://github.com/testit-tms/.github/tree/main/configuration#projectid)                                                                                                                                                                                                                                                                                              | projectId                         | TMS_PROJECT_ID                             | tmsProjectId                         |
+| ID of configuration in TMS instance [How to getting configuration ID?](https://github.com/testit-tms/.github/tree/main/configuration#configurationid)                                                                                                                                                                                                                                                                            | configurationId                   | TMS_CONFIGURATION_ID                       | tmsConfigurationId                   |
+| ID of the created test run in TMS instance.<br/>It's necessary for **adapterMode** 0 or 1                                                                                                                                                                                                                                                                                                                                        | testRunId                         | TMS_TEST_RUN_ID                            | tmsTestRunId                         |
+| Parameter for specifying the name of test run in TMS instance (**It's optional**). If it is not provided, it is created automatically                                                                                                                                                                                                                                                                                            | testRunName                       | TMS_TEST_RUN_NAME                          | tmsTestRunName                       |
+| Tags for the test run (**It's optional**). Comma-separated or JSON array of strings                                                                                                                                                                                                                                                                                                                                              | testRunTags                       | TMS_TEST_RUN_TAGS                          | tmsTestRunTags                       |
+| Links for the test run (**It's optional**). JSON array of objects with `url` (required), optional `title`, `description`, `type`. Applied on create or merged at startup (visible while run is In progress).<br/>**Link `type` values:** `Related` (default), `BlockedBy`, `Defect`, `Issue`, `Requirement`, `Repository` | testRunLinks                      | TMS_TEST_RUN_LINKS                         | tmsTestRunLinks                      |
+| Adapter mode. Default value - 0. The adapter supports following modes:<br/>0 - in this mode, the adapter filters tests by test run ID and configuration ID, and sends the results to the test run<br/>1 - in this mode, the adapter sends all results to the test run without filtering or [with filtering CLI](#run-with-filter)<br/>2 - in this mode, the adapter creates a new test run and sends results to the new test run | adapterMode                       | TMS_ADAPTER_MODE                           | tmsAdapterMode                       |
+| It enables/disables certificate validation (**It's optional**). Default value - true                                                                                                                                                                                                                                                                                                                                             | certValidation                    | TMS_CERT_VALIDATION                        | tmsCertValidation                    |
+| It enables/disables TMS integration (**It's optional**). Default value - true                                                                                                                                                                                                                                                                                                                                                    | testIt                            | TMS_TEST_IT                                | tmsTestIt                            |
+| Mode of automatic creation test cases (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will create a test case linked to the created autotest (not to the updated autotest)<br/>false - in this mode, the adapter will not create a test case                                                                                                              | automaticCreationTestCases        | TMS_AUTOMATIC_CREATION_TEST_CASES          | tmsAutomaticCreationTestCases        |
+| Mode of automatic updation links to test cases (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will update links to test cases<br/>false - in this mode, the adapter will not update link to test cases                                                                                                                                                   | automaticUpdationLinksToTestCases | TMS_AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES | tmsAutomaticUpdationLinksToTestCases |
+| Mode of import type selection when launching autotests (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will create/update each autotest in real time<br/>false - in this mode, the adapter will create/update multiple autotests                                                                                                                           | importRealtime                    | TMS_IMPORT_REALTIME                        | tmsImportRealtime                    |
+| Name of the configuration file If it is not provided, it is used default file name (**It's optional**)                                                                                                                                                                                                                                                                                                                           | -                                 | TMS_CONFIG_FILE                            | tmsConfigFile                        |
+| Selected sync-storage port, 49152 by default (**It's optional**)                                                                                                                                                                                                                                                                                                                           | syncStoragePort                                 | SYNC_STORAGE_PORT                            | syncStoragePort                        |
+
+#### File
+
+Create **testit.properties** file in the resource directory of the project:
+``` 
+url=URL
+privateToken=USER_PRIVATE_TOKEN
+projectId=PROJECT_ID
+configurationId=CONFIGURATION_ID
+testRunId=TEST_RUN_ID
+testRunName=TEST_RUN_NAME
+testRunTags=smoke,nightly
+testRunLinks=[{"url":"https://ci.example/job/1","title":"CI Job","type":"Related"}]
+adapterMode=ADAPTER_MODE
+automaticCreationTestCases=AUTOMATIC_CREATION_TEST_CASES
+automaticUpdationLinksToTestCases=AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES
+certValidation=CERT_VALIDATION
+importRealtime=IMPORT_REALTIME
+testIt=TEST_IT
+```
+
+#### Examples
+
+##### Gradle
+```
+gradle test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
+-DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsAutomaticUpdationLinksToTestCases=true 
+-DtmsCertValidation=true -DtmsImportRealtime=true -DtmsTestIt=true
+```
+
+##### Maven
+```
+maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
+-DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsAutomaticUpdationLinksToTestCases=true 
+-DtmsCertValidation=true -DtmsImportRealtime=true -DtmsTestIt=true
+```
+
+If you want to enable debug mode then
+see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+
+If you want to add attachment for a failed test then
+see [How to add an attachment for a failed test?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+
+#### Run with filter
+To create filter by autotests you can use the Test IT CLI (use adapterMode 1 for run with filter):
+
+##### Gradle
+```
+$ export TMS_TOKEN=<YOUR_TOKEN>
+$ testit autotests_filter 
+  --url https://tms.testit.software \
+  --configuration-id 5236eb3f-7c05-46f9-a609-dc0278896464 \
+  --testrun-id 6d4ac4b7-dd67-4805-b879-18da0b89d4a8 \
+  --framework gradle-junit6 \
+  --output tmp/filter.txt
+
+$ gradle test -DtmsTestRunId=6d4ac4b7-dd67-4805-b879-18da0b89d4a8 -DtmsAdapterMode=1 $(cat tmp/filter.txt)
+```
+
+##### Maven
+```
+$ export TMS_TOKEN=<YOUR_TOKEN>
+$ testit autotests_filter 
+  --url https://tms.testit.software \
+  --configuration-id 5236eb3f-7c05-46f9-a609-dc0278896464 \
+  --testrun-id 6d4ac4b7-dd67-4805-b879-18da0b89d4a8 \
+  --framework maven-junit6 \
+  --output tmp/filter.txt
+
+$ maven test -DtmsTestRunId=6d4ac4b7-dd67-4805-b879-18da0b89d4a8 -DtmsAdapterMode=1 $(cat tmp/filter.txt)
+```
+
+### Annotations
+
+Use annotations to specify information about autotest.
+
+Description of annotations:
+
+- `WorkItemId` - a method that links an autotest with a manual test. Receives a single globalId
+- `WorkItemIds` - deprecated, use `WorkItemId` instead
+- `DisplayName` - internal autotest name (used in Test IT)
+- `ExternalId` - unique internal autotest ID (used in Test IT)
+- `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
+- `Description` - autotest description specified in the autotest card
+- `Labels` - labels listed in the autotest card
+- `Layer` - test pyramid layer for the autotest card (e.g. `API`, `E2E`; use `TestLayers` constants or any custom string)
+- `Tags` - tags listed in the autotest card
+- `Links` - links listed in the autotest card
+- `Step` - the designation of the step
+- `Classname` - name of the classname
+- `Namespace` - name of the package
+
+Description of methods:
+
+- `Adapter.addLinks` - add links to the autotest result.
+- `Adapter.addAttachments` - add attachments to the autotest result.
+- `Adapter.addMessage` - add message to the autotest result.
+- `Adapter.addWorkItemId` - a dynamic method that links an autotest with a manual test. Receives a single globalId
+- `Adapter.addWorkItemIds` - deprecated, use `Adapter.addWorkItemId` instead
+- `Adapter.addDisplayName` - a dynamic method for adding internal autotest name (used in Test IT)
+- `Adapter.addExternalId` - a dynamic method for adding unique internal autotest ID (used in Test IT)
+- `Adapter.addTitle` - a dynamic method for adding autotest name specified in the autotest card or the step. If not specified, the name from the displayName method is used
+- `Adapter.addDescription` - a dynamic method for adding autotest description specified in the autotest card or the step
+- `Adapter.addLabels` - a dynamic method for adding labels listed in the autotest card
+- `Adapter.addTags` - a dynamic method for adding tags listed in the autotest card
+- `Adapter.addNameSpace` - a dynamic method for adding directory in the TMS system
+- `Adapter.addClassName` - a dynamic method for adding subdirectory in the TMS system
+- `Adapter.addParameter` - a dynamic method for adding parameter in the autotest result or the step
+- `Adapter.addParameters` - a dynamic method for adding parameters in the autotest result or the step
+
+### Examples
+
+#### Simple test
+
+```java
+package ru.testit.samples;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+import ru.testit.annotations.*;
+import ru.testit.models.LinkItem;
+import ru.testit.tms.client.TMSClient;
+
+public class SimpleTest {
+
+    @Test
+    @ExternalId("Simple_test_1")
+    @DisplayName("Simple test 1")
+    public void simpleTest1() {
+        Assertions.assertTrue(true);
+    }
+
+    @Test
+    @ExternalId("Simple_test_2")
+    @WorkItemId("12345")
+    @DisplayName("Simple test 2")
+    @Title("test №2")
+    @Description("Description")
+    @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),
+            @Link(url = "www.3.ru", title = "thirdLink", description = "thirdLinkDesc", type = LinkType.ISSUE),
+            @Link(url = "www.2.ru", title = "secondLink", description = "secondLinkDesc", type = LinkType.BLOCKED_BY)})
+    public void itsTrueReallyTrue() {
+        stepWithParams("password", 456);
+        Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
+        Assertions.assertTrue(true);
+    }
+
+    @Step
+    @Title("Step 1 with params: {param1}, {param2}")
+    @Description("Step 1 description and params: {param1}, {param2}")
+    private void stepWithParams(String param1, int param2) {
+        stepWithoutParams();
+        Assertions.assertTrue(true);
+        Adapter.addMessage("Message");
+    }
+
+    @Step
+    @Title("Step 2")
+    @Description("Step 2 description")
+    private void stepWithoutParams() {
+        Assertions.assertTrue(true);
+        Adapter.addAttachment("/Users/user/screen.json");
+    }
+}
+```
+
+#### Parameterized test
+
+> [!WARNING]
+> When linking a parameterized autotest to a parameterized test case, please consider the problematic points:
+> - In TMS test cases have a table with parameters, but autotests do not. They are not equal entities, so there may be incompatibility in terms of parameters
+> - Running a parameterized test case, TMS expects the results of all related autotests with all the parameters specified in the test case table
+> - In TMS, the parameters are limited to the string type, so the adapter transmits absolutely all the autotest parameters as a string. This implies the following problematic point for the test case table
+> - TMS expects a complete **textual** match of the name and value of the parameters of the test case table with the autotest parameters
+
+```java
+package ru.testit.samples;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.*;
+import ru.testit.annotations.*;
+import ru.testit.models.LinkType;
+
+import java.util.stream.Stream;
+
+public class ParameterizedTests {
+
+    @ParameterizedTest
+    @ValueSource(shorts = {1, 2, 3})
+    @ExternalId("Parameterized_test_with_one_parameter_{number}")
+    @DisplayName("Test with number = {number} parameter")
+    @WorkItemId("{number}")
+    @Title("Title in the autotest card {number}")
+    @Description("Test with BeforeEach, AfterEach and all annotations {number}")
+    @Tags({"Tag{number}"})
+    void testWithOneParameter(int number) {
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("arguments")
+    @ExternalId("Parameterized_test_with_multiple_parameters_{number}")
+    @DisplayName("Parameterized test with number = {number}, title = {title}, expected = {expected}, url = {url}")
+    @Links(links = {
+            @Link(url = "https://{url}/module/repository", title = "{title} Repository", description = "Example of repository", type = LinkType.REPOSITORY),
+            @Link(url = "https://{url}/module/projects", title = "{title} Projects", type = LinkType.REQUIREMENT),
+            @Link(url = "https://{url}/module/", type = LinkType.BLOCKED_BY),
+            @Link(url = "https://{url}/module/docs", title = "{title} Documentation", type = LinkType.RELATED),
+            @Link(url = "https://{url}/module/JCP-777", title = "{title} JCP-777", type = LinkType.DEFECT),
+            @Link(url = "https://{url}/module/issue/5", title = "{title} Issue-5", type = LinkType.ISSUE),
+    })
+    void testWithMultipleParameters(int number, String title, boolean expected, String url) {
+    }
+
+    static Stream<Arguments> arguments() {
+        return Stream.of(
+                Arguments.of(1, "Test version 1", true, "google.com"),
+                Arguments.of(2, "Test version 2", false, "yandex.ru")
+        );
+    }
+}
+```
+
+# Contributing
+
+You can help to develop the project. Any contributions are **greatly appreciated**.
+
+* If you have suggestions for adding or removing projects, feel free
+  to [open an issue](https://github.com/testit-tms/adapters-java/issues/new) to discuss it, or create a direct pull
+  request after you edit the *README.md* file with necessary changes.
+* Make sure to check your spelling and grammar.
+* Create individual PR for each suggestion.
+* Read the [Code Of Conduct](https://github.com/testit-tms/adapters-java/blob/main/CODE_OF_CONDUCT.md) before posting
+  your first idea as well.
+
+# License
+
+Distributed under the Apache-2.0 License.
+See [LICENSE](https://github.com/testit-tms/adapters-java/blob/main/LICENSE.md) for more information.
