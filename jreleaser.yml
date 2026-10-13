@@ -47,6 +47,7 @@ deploy:
           - "testit-adapter-jbehave/build/staging-deploy"
           - "testit-adapter-junit4/build/staging-deploy"
           - "testit-adapter-junit5/build/staging-deploy"
+          - "testit-adapter-junit6/build/staging-deploy"
           - "testit-adapter-selenide/build/staging-deploy"
           - "testit-adapter-testng/build/staging-deploy"
           - "testit-java-commons/build/staging-deploy"

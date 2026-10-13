@@ -3,22 +3,22 @@ The repository contains new versions of adaptors for JVM-based test frameworks.
 
 ## Compatibility
 
-| Test IT | Cucumber      | JBehave       | JUnit         | TestNG        |
-|---------|---------------|---------------|---------------|---------------|
-| 3.5     | 1.1           | 1.1           | 1.1           | 1.1           |
-| 4.0     | 1.2           | 1.2           | 1.2           | 1.2           |
-| 4.5     | 1.5           | 1.5           | 1.5           | 1.5           |
-| 4.6     | 1.6           | 1.6           | 1.6           | 1.6           |
-| 5.0     | 2.3           | 2.3           | 2.3           | 2.3           |
-| 5.2     | 2.4           | 2.4           | 2.4           | 2.4           |
-| 5.2.2   | 2.5           | 2.5           | 2.5           | 2.5           |
-| 5.3     | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 |
-| 5.4     | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 |
-| 5.5     | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 |
-| 5.6     | 2.9.1-TMS-5.6 | 2.9.1-TMS-5.6 | 2.9.1-TMS-5.6 | 2.9.1-TMS-5.6 |
-| 5.7     | 3.0.0-TMS-5.7 | 3.0.0-TMS-5.7 | 3.0.0-TMS-5.7 | 3.0.0-TMS-5.7 |
-| 5.8     | 3.2.0-TMS-5.8 | 3.2.0-TMS-5.8 | 3.2.0-TMS-5.8 | 3.2.0-TMS-5.8 |
-| Cloud   | 3.0.0  +      | 3.0.0  +      | 3.0.0  +      | 3.0.0  +      |
+| Test IT | Cucumber      | JBehave       | JUnit         | JUnit6        | TestNG        |
+|---------|---------------|---------------|---------------|---------------|---------------|
+| 3.5     | 1.1           | 1.1           | 1.1           | -             | 1.1           |
+| 4.0     | 1.2           | 1.2           | 1.2           | -             | 1.2           |
+| 4.5     | 1.5           | 1.5           | 1.5           | -             | 1.5           |
+| 4.6     | 1.6           | 1.6           | 1.6           | -             | 1.6           |
+| 5.0     | 2.3           | 2.3           | 2.3           | -             | 2.3           |
+| 5.2     | 2.4           | 2.4           | 2.4           | -             | 2.4           |
+| 5.2.2   | 2.5           | 2.5           | 2.5           | -             | 2.5           |
+| 5.3     | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 | 2.6.2-TMS-5.3 | -             | 2.6.2-TMS-5.3 |
+| 5.4     | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 | 2.7.3-TMS-5.4 | -             | 2.7.3-TMS-5.4 |
+| 5.5     | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 | 2.8.1-TMS-5.5 | -             | 2.8.1-TMS-5.5 |
+| 5.6     | 2.9.1-TMS-5.6 | 2.9.1-TMS-5.6 | 2.9.1-TMS-5.6 | -             | 2.9.1-TMS-5.6 |
+| 5.7     | 3.0.0-TMS-5.7 | 3.0.0-TMS-5.7 | 3.0.0-TMS-5.7 | -             | 3.0.0-TMS-5.7 |
+| 5.8     | 3.2.0-TMS-5.8 | 3.2.0-TMS-5.8 | 3.2.0-TMS-5.8 | 4.1.9-TMS-5.8 | 3.2.0-TMS-5.8 |
+| Cloud   | 3.0.0  +      | 3.0.0  +      | 3.0.0  +      | 4.2.2  +      | 3.0.0  +      |
 
 1. For current versions, see the releases tab. 
 2. Starting with 5.2, we have added a TMS postscript, which means that the utility is compatible with a specific enterprise version. 
@@ -29,12 +29,13 @@ Supported test frameworks :
  1. [TestNG](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-testng)
  2. [Junit4](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-junit4)
  3. [Junit5](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-junit5)
- 4. [Cucumber4](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber4)
- 5. [Cucumber5](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber5)
- 6. [Cucumber6](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber6)
- 7. [Cucumber7](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber7)
- 8. [JBehave](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-jbehave)
- 9. [Selenide](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-selenide)
+ 4. [Junit6](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-junit6)
+ 5. [Cucumber4](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber4)
+ 6. [Cucumber5](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber5)
+ 7. [Cucumber6](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber6)
+ 8. [Cucumber7](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-cucumber7)
+ 9. [JBehave](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-jbehave)
+ 10. [Selenide](https://github.com/testit-tms/adapters-java/tree/main/testit-adapter-selenide)
 
 
 ## What's new in 3.0.0?
