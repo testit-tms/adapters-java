@@ -3,7 +3,7 @@ The repository contains new versions of adaptors for JVM-based test frameworks.
 
 ## Compatibility
 
-| Test IT | Cucumber      | JBehave       | JUnit         | JUnit         | TestNG        |
+| Test IT | Cucumber      | JBehave       | JUnit         | JUnit6        | TestNG        |
 |---------|---------------|---------------|---------------|---------------|---------------|
 | 3.5     | 1.1           | 1.1           | 1.1           | -             | 1.1           |
 | 4.0     | 1.2           | 1.2           | 1.2           | -             | 1.2           |
