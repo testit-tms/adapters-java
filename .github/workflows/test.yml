@@ -10,6 +10,7 @@ on:
       - "testit-adapter-jbehave/**"
       - "testit-adapter-junit4/**"
       - "testit-adapter-junit5/**"
+      - "testit-adapter-junit6/**"
       - "testit-adapter-selenide/**"
       - "testit-adapter-testng/**"
       - "testit-java-commons/**"
@@ -67,6 +68,10 @@ jobs:
           - project_name: gradle-junit5
             configuration_id: GRADLE_JUNIT5_CONFIGURATION_ID
             project_id: GRADLE_JUNIT5_PROJECT_ID
+          - project_name: gradle-junit6
+            configuration_id: GRADLE_JUNIT6_CONFIGURATION_ID
+            project_id: GRADLE_JUNIT6_PROJECT_ID
+            java_version: 17
           - project_name: gradle-testng
             configuration_id: GRADLE_TESTNG_CONFIGURATION_ID
             project_id: GRADLE_TESTNG_PROJECT_ID
@@ -154,7 +159,7 @@ jobs:
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: jdk
-          java-version: ${{ env.JAVA_VERSION }}
+          java-version: ${{ matrix.java_version || env.JAVA_VERSION }}
       - name: Setup python
         uses: actions/setup-python@v5
         with:

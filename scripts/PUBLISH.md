@@ -85,13 +85,14 @@ The following modules will be published:
 1. `testit-java-commons` - Core library
 2. `testit-adapter-junit4` - JUnit 4 adapter
 3. `testit-adapter-junit5` - JUnit 5 adapter
-4. `testit-adapter-testng` - TestNG adapter
-5. `testit-adapter-cucumber4` - Cucumber 4 adapter
-6. `testit-adapter-cucumber5` - Cucumber 5 adapter
-7. `testit-adapter-cucumber6` - Cucumber 6 adapter
-8. `testit-adapter-cucumber7` - Cucumber 7 adapter
-9. `testit-adapter-jbehave` - JBehave adapter
-10. `testit-adapter-selenide` - Selenide adapter
+4. `testit-adapter-junit6` - JUnit 6 adapter
+5. `testit-adapter-testng` - TestNG adapter
+6. `testit-adapter-cucumber4` - Cucumber 4 adapter
+7. `testit-adapter-cucumber5` - Cucumber 5 adapter
+8. `testit-adapter-cucumber6` - Cucumber 6 adapter
+9. `testit-adapter-cucumber7` - Cucumber 7 adapter
+10. `testit-adapter-jbehave` - JBehave adapter
+11. `testit-adapter-selenide` - Selenide adapter
 
 ## Troubleshooting
 
