@@ -452,7 +452,7 @@ class AdapterManagerTest {
         Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
         Assertions.assertFalse(container.getBeforeMethods().isEmpty());
         verify(storage, times(1)).put(uuid, result);
-        verify(threadContext, times(1)).clear();
+        verify(threadContext, never()).clear();
         verify(threadContext, times(1)).start(uuid);
     }
 
@@ -479,7 +479,7 @@ class AdapterManagerTest {
         Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
         Assertions.assertFalse(container.getAfterMethods().isEmpty());
         verify(storage, times(1)).put(uuid, result);
-        verify(threadContext, times(1)).clear();
+        verify(threadContext, never()).clear();
         verify(threadContext, times(1)).start(uuid);
     }
 
@@ -506,7 +506,7 @@ class AdapterManagerTest {
         Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
         Assertions.assertFalse(container.getBeforeClassMethods().isEmpty());
         verify(storage, times(1)).put(uuid, result);
-        verify(threadContext, times(1)).clear();
+        verify(threadContext, never()).clear();
         verify(threadContext, times(1)).start(uuid);
     }
 
@@ -533,7 +533,7 @@ class AdapterManagerTest {
         Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
         Assertions.assertFalse(container.getAfterClassMethods().isEmpty());
         verify(storage, times(1)).put(uuid, result);
-        verify(threadContext, times(1)).clear();
+        verify(threadContext, never()).clear();
         verify(threadContext, times(1)).start(uuid);
     }
 
@@ -560,7 +560,7 @@ class AdapterManagerTest {
         Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
         Assertions.assertFalse(container.getBeforeEachTest().isEmpty());
         verify(storage, times(1)).put(uuid, result);
-        verify(threadContext, times(1)).clear();
+        verify(threadContext, never()).clear();
         verify(threadContext, times(1)).start(uuid);
     }
 
@@ -587,7 +587,7 @@ class AdapterManagerTest {
         Assertions.assertEquals(ItemStage.RUNNING, result.getItemStage());
         Assertions.assertFalse(container.getAfterEachTest().isEmpty());
         verify(storage, times(1)).put(uuid, result);
-        verify(threadContext, times(1)).clear();
+        verify(threadContext, never()).clear();
         verify(threadContext, times(1)).start(uuid);
     }
 
@@ -626,7 +626,7 @@ class AdapterManagerTest {
     }
 
     @Test
-    void stopFixture_WithFixture_InvokeClearHandler() {
+    void stopFixture_WithFixture_InvokeStopHandler() {
         // arrange
         FixtureResult result = Helper.generateBeforeEachFixtureResult();
         result.setStop(null);
@@ -642,11 +642,12 @@ class AdapterManagerTest {
         // assert
         Assertions.assertNotNull(result.getStop());
         Assertions.assertEquals(ItemStage.FINISHED, result.getItemStage());
-        verify(threadContext, times(1)).clear();
+        verify(threadContext, times(1)).stop();
+        verify(threadContext, never()).clear();
     }
 
     @Test
-    void stopFixture_WithoutFixture_NoInvokeClearHandler() {
+    void stopFixture_WithoutFixture_NoInvokeStopHandler() {
         // arrange
         FixtureResult result = Helper.generateBeforeEachFixtureResult();
         result.setStop(null);
@@ -662,6 +663,7 @@ class AdapterManagerTest {
         // assert
         Assertions.assertNull(result.getStop());
         Assertions.assertNull(result.getItemStage());
+        verify(threadContext, never()).stop();
         verify(threadContext, never()).clear();
     }
 

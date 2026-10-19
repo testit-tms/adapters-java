@@ -34,7 +34,6 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
     private final ThreadLocal<String> launcherUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
     private final ThreadLocal<String> classUUID = ThreadLocal.withInitial(() -> UUID.randomUUID().toString());
 
-    private final ConcurrentHashMap<String, String> scenarioUuids = new ConcurrentHashMap<>();
     private final ScenarioParser scenarioParser = new ScenarioParser();
 
     private final ThreadLocal<Feature> currentFeature = new InheritableThreadLocal<>();
@@ -343,7 +342,7 @@ public class BaseCucumber7Listener implements ConcurrentEventListener {
     }
 
     public String getTestCaseUuid(final TestCase testCase) {
-        return scenarioUuids.computeIfAbsent(getId(testCase), it -> UUID.randomUUID().toString());
+        return testCase.getId().toString();
     }
 
     public String getTestCaseUri(final TestCase testCase) {

@@ -242,7 +242,7 @@ public class AdapterFixtureHelper {
                 .setStop(System.currentTimeMillis());
 
         storage.remove(uuid);
-        threadContext.clear();
+        threadContext.stop();
 
         if (logger.isDebugEnabled()) {
             logger.debug("Stop fixture {}", fixture);
@@ -260,7 +260,6 @@ public class AdapterFixtureHelper {
                 .setItemStage(ItemStage.RUNNING)
                 .setStart(System.currentTimeMillis());
 
-        threadContext.clear();
         threadContext.start(uuid);
     }
 
