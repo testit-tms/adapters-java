@@ -4,7 +4,9 @@ import io.cucumber.messages.types.Envelope;
 import io.cucumber.messages.types.Examples;
 import io.cucumber.messages.types.Feature;
 import io.cucumber.messages.types.Hook;
+import io.cucumber.messages.types.JavaMethod;
 import io.cucumber.messages.types.Scenario;
+import io.cucumber.messages.types.StepDefinition;
 import io.cucumber.messages.types.TableCell;
 import io.cucumber.messages.types.TableRow;
 import io.cucumber.messages.types.TestRunHookFinished;
@@ -41,6 +43,7 @@ import ru.testit.services.Adapter;
 import ru.testit.services.AdapterManager;
 import ru.testit.services.Utils;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -78,6 +81,8 @@ public class BaseCucumber8Listener implements ConcurrentEventListener {
     /** Shared main UUID for the Cucumber run (BeforeAll/AfterAll attach here). */
     private volatile String runMainUuid;
     private final Map<String, Hook> hooksById = new ConcurrentHashMap<>();
+    /** Glue methods by Cucumber code location ({@code Class.method(argTypes)}). */
+    private final Map<String, Method> stepMethodsByLocation = new ConcurrentHashMap<>();
 
     private final EventHandler<TestRunStarted> testRunStartedEventHandler = this::handleTestRunStartedHandler;
     private final EventHandler<TestRunFinished> testRunFinishedEventHandler = this::handleTestRunFinishedHandler;
@@ -121,6 +126,7 @@ public class BaseCucumber8Listener implements ConcurrentEventListener {
     public void handleTestRunStartedHandler(TestRunStarted event) {
         MAIN_UUIDS_PENDING_FINALIZE.clear();
         hooksById.clear();
+        // Keep stepMethodsByLocation: StepDefinition envelopes may arrive before TestRunStarted.
         adapterManager.startTests();
 
         runMainUuid = launcherUUID.get();
@@ -135,6 +141,7 @@ public class BaseCucumber8Listener implements ConcurrentEventListener {
         }
         MAIN_UUIDS_PENDING_FINALIZE.clear();
         hooksById.clear();
+        stepMethodsByLocation.clear();
         runMainUuid = null;
     }
 
@@ -144,8 +151,70 @@ public class BaseCucumber8Listener implements ConcurrentEventListener {
 
     public void handleEnvelope(final Envelope envelope) {
         envelope.getHook().ifPresent(hook -> hooksById.put(hook.getId(), hook));
+        envelope.getStepDefinition().ifPresent(this::cacheStepDefinition);
         envelope.getTestRunHookStarted().ifPresent(this::handleTestRunHookStarted);
         envelope.getTestRunHookFinished().ifPresent(this::handleTestRunHookFinished);
+    }
+
+    private void cacheStepDefinition(final StepDefinition stepDefinition) {
+        final Optional<JavaMethod> javaMethod = stepDefinition.getSourceReference().getJavaMethod();
+        if (!javaMethod.isPresent()) {
+            return;
+        }
+        final Method method = resolveJavaMethod(javaMethod.get());
+        if (method == null) {
+            return;
+        }
+        stepMethodsByLocation.put(toCodeLocation(javaMethod.get()), method);
+    }
+
+    private static Method resolveJavaMethod(final JavaMethod javaMethod) {
+        try {
+            final Class<?> clazz = Class.forName(javaMethod.getClassName());
+            final List<String> parameterTypes = javaMethod.getMethodParameterTypes();
+            final Class<?>[] types = new Class<?>[parameterTypes.size()];
+            for (int i = 0; i < parameterTypes.size(); i++) {
+                types[i] = resolveType(parameterTypes.get(i));
+            }
+            return clazz.getDeclaredMethod(javaMethod.getMethodName(), types);
+        } catch (ClassNotFoundException | NoSuchMethodException | LinkageError e) {
+            log.debug("Could not resolve step method {}: {}", javaMethod, e.toString());
+            return null;
+        }
+    }
+
+    private static Class<?> resolveType(final String typeName) throws ClassNotFoundException {
+        switch (typeName) {
+            case "boolean":
+                return boolean.class;
+            case "byte":
+                return byte.class;
+            case "char":
+                return char.class;
+            case "short":
+                return short.class;
+            case "int":
+                return int.class;
+            case "long":
+                return long.class;
+            case "float":
+                return float.class;
+            case "double":
+                return double.class;
+            case "void":
+                return void.class;
+            default:
+                return Class.forName(typeName);
+        }
+    }
+
+    private static String toCodeLocation(final JavaMethod javaMethod) {
+        return javaMethod.getClassName()
+                + "."
+                + javaMethod.getMethodName()
+                + "("
+                + String.join(",", javaMethod.getMethodParameterTypes())
+                + ")";
     }
 
     private void handleTestRunHookStarted(final TestRunHookStarted started) {
@@ -382,8 +451,19 @@ public class BaseCucumber8Listener implements ConcurrentEventListener {
                     parameters
             );
 
+            String title = String.format("%s %s", stepKeyword, pickleStep.getStep().getText());
+            String description = "";
+            final Method glueMethod = stepMethodsByLocation.get(pickleStep.getCodeLocation());
+            if (glueMethod != null) {
+                description = Utils.extractDescription(glueMethod, parameters);
+                if (glueMethod.getAnnotation(ru.testit.annotations.Title.class) != null) {
+                    title = Utils.extractTitle(glueMethod, parameters, false);
+                }
+            }
+
             final StepResult stepResult = new StepResult()
-                    .setTitle(String.format("%s %s", stepKeyword, pickleStep.getStep().getText()))
+                    .setTitle(title)
+                    .setDescription(description)
                     .setStart(System.currentTimeMillis())
                     .setParameters(parameters);
 

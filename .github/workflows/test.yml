@@ -7,6 +7,7 @@ on:
       - "testit-adapter-cucumber5/**"
       - "testit-adapter-cucumber6/**"
       - "testit-adapter-cucumber7/**"
+      - "testit-adapter-cucumber8/**"
       - "testit-adapter-jbehave/**"
       - "testit-adapter-junit4/**"
       - "testit-adapter-junit5/**"
@@ -95,6 +96,19 @@ jobs:
           - project_name: cucumber7-gradle-junit5
             configuration_id: CUCUMBER7_GRADLE_JUNIT5_CONFIGURATION_ID
             project_id: CUCUMBER7_GRADLE_JUNIT5_PROJECT_ID
+
+          - project_name: cucumber8-gradle-testng
+            configuration_id: CUCUMBER8_GRADLE_TESTNG_CONFIGURATION_ID
+            project_id: CUCUMBER8_GRADLE_TESTNG_PROJECT_ID
+            java_version: 17
+          - project_name: cucumber8-gradle-junit4
+            configuration_id: CUCUMBER8_GRADLE_JUNIT4_CONFIGURATION_ID
+            project_id: CUCUMBER8_GRADLE_JUNIT4_PROJECT_ID
+            java_version: 17
+          - project_name: cucumber8-gradle-junit5
+            configuration_id: CUCUMBER8_GRADLE_JUNIT5_CONFIGURATION_ID
+            project_id: CUCUMBER8_GRADLE_JUNIT5_PROJECT_ID
+            java_version: 17
 
           - project_name: cucumber6-gradle-junit5
             configuration_id: CUCUMBER6_GRADLE_JUNIT5_CONFIGURATION_ID
