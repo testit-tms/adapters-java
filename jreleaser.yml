@@ -44,6 +44,7 @@ deploy:
           - "testit-adapter-cucumber5/build/staging-deploy"
           - "testit-adapter-cucumber6/build/staging-deploy"
           - "testit-adapter-cucumber7/build/staging-deploy"
+          - "testit-adapter-cucumber8/build/staging-deploy"
           - "testit-adapter-jbehave/build/staging-deploy"
           - "testit-adapter-junit4/build/staging-deploy"
           - "testit-adapter-junit5/build/staging-deploy"

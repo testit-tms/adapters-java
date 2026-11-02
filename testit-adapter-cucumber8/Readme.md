@@ -1,0 +1,632 @@
+# Test IT TMS Adapter for cucumber8
+![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
+
+## Getting Started
+
+### Installation
+
+#### Maven Users
+
+Add this dependency to your project POM:
+
+```xml
+<dependency>
+    <groupId>ru.testit</groupId>
+    <artifactId>testit-adapter-cucumber8</artifactId>
+    <version>2.3.4</version>
+    <scope>compile</scope>
+</dependency>
+```
+
+#### Gradle Users
+
+Add this dependency to your project build file:
+
+```groovy
+implementation "ru.testit:testit-adapter-cucumber8:2.3.4"
+```
+
+## Usage
+
+
+You should add plugin ru.testit.listener.BaseCucumber8Listener to your Cucumber parameters:
+
+examples:
+
+[junit4](https://github.com/testit-tms/java-examples/blob/main/cucumber8-gradle-junit4/src/test/java/examples/CucumberTest.java)
+[junit5](https://github.com/testit-tms/java-examples/blob/main/cucumber8-gradle-junit5/src/test/resources/junit-platform.properties)
+[testng](https://github.com/testit-tms/java-examples/blob/main/cucumber8-gradle-testng/src/test/java/examples/CucumberTest.java)
+
+### Gradle + TestNG compatibility
+
+`cucumber-testng:8.0.4` depends on **TestNG 7.12.0**. TestNG **7.10.0+** adds `ITestNGListener.isEnabled()`. With **Gradle 7.4** (this repository's wrapper) that leads to:
+
+`NoSuchMethodException: Could not find method isEnabled() on TestNGTestResultProcessorAdapter`
+
+| Environment | TestNG | Notes |
+|-------------|--------|--------|
+| Gradle 7.4 | **≤ 7.9.0** | Pin / `resolutionStrategy.force` required |
+| Gradle 7.4 | **≥ 7.10.0** | Fails with `isEnabled()` |
+| Maven Surefire | 7.12.0 | Works with the version from `cucumber-testng` |
+
+This is a Gradle TestNG runner limitation, not a TestIT adapter or Cucumber limitation. On Gradle without a TestNG pin, prefer `cucumber-junit-platform-engine`. Details: [docs/cucumber8-gradle-testng.md](../docs/cucumber8-gradle-testng.md).
+
+#### Maven Users
+
+##### TestNG
+
+1. Add this dependency to your project POM:
+    ````xml
+     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <adapter.version>2.3.4</adapter.version>
+        <gherkin.version>42.0.1</gherkin.version>
+        <cucumber.version>8.0.4</cucumber.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-java-commons</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-adapter-cucumber8</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>gherkin</artifactId>
+            <version>${gherkin.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-core</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-testng</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    ````
+2. Press the **Reload All Maven Projects** button.
+
+##### Junit5
+
+1. Add this dependency to your project POM:
+    ````xml
+      <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <adapter.version>2.3.4</adapter.version>
+        <gherkin.version>42.0.1</gherkin.version>
+        <cucumber.version>8.0.4</cucumber.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-java-commons</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-adapter-cucumber8</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>gherkin</artifactId>
+            <version>${gherkin.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-core</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    ````
+2. Press the **Reload All Maven Projects** button.
+
+##### Junit4
+
+1. Add this dependency to your project POM:
+    ````xml
+     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <adapter.version>2.3.4</adapter.version>
+        <gherkin.version>42.0.1</gherkin.version>
+        <cucumber.version>8.0.4</cucumber.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <version>1.6.3</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-java-commons</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.testit</groupId>
+            <artifactId>testit-adapter-cucumber8</artifactId>
+            <version>${adapter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>gherkin</artifactId>
+            <version>${gherkin.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-core</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    ````
+2. Press the **Reload All Maven Projects** button.
+
+#### Gradle Users
+
+##### TestNG
+
+1. Add this dependency to your project build file:
+```groovy
+plugins {
+    id "java"
+}
+
+group "org.example"
+version "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+def cucumberVersion = "8.0.4"
+def cucumberGherkinVersion = "42.0.1"
+// Gradle 7.4: pin ≤ 7.9.0 (see "Gradle + TestNG compatibility" above)
+def testngVersion = "7.9.0"
+
+configurations.all {
+    resolutionStrategy.force "org.testng:testng:$testngVersion"
+}
+
+dependencies {
+    testImplementation "ru.testit:testit-adapter-cucumber8:2.3.4"
+    testImplementation "ru.testit:testit-java-commons:2.3.4"
+    testImplementation "org.testng:testng:$testngVersion"
+    testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
+    testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
+    testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
+    testImplementation("io.cucumber:cucumber-testng:$cucumberVersion")
+}
+
+test {
+    useTestNG()
+    systemProperties(System.getProperties())
+    environment(System.getenv())
+}
+```
+2. Press the **Reload All Gradle Projects** button.
+
+##### Junit5
+
+1. Add this dependency to your project build file:
+```groovy
+plugins {
+    id "java"
+}
+
+group "org.example"
+version "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+def cucumberVersion = "8.0.4"
+def cucumberGherkinVersion = "42.0.1"
+
+dependencies {
+    testImplementation "ru.testit:testit-adapter-cucumber8:2.3.4"
+    testImplementation "ru.testit:testit-java-commons:2.3.4"
+    testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
+    testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
+    testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
+    testImplementation("io.cucumber:cucumber-junit:$cucumberVersion")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine:$cucumberVersion")
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.1"
+    testImplementation "org.junit.platform:junit-platform-suite-engine:1.8.1"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.1"
+}
+
+test {
+    useJUnitPlatform()
+    systemProperties(System.getProperties())
+    environment(System.getenv())
+}
+```
+2. Press the **Reload All Gradle Projects** button.
+
+##### Junit4
+
+1. Add this dependency to your project build file:
+```groovy
+plugins {
+    id "java"
+}
+
+group "org.example"
+version "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+def cucumberVersion = "8.0.4"
+def cucumberGherkinVersion = "42.0.1"
+def junit4Version = "4.12"
+
+dependencies {
+    testImplementation "ru.testit:testit-adapter-cucumber8:2.3.4"
+    testImplementation "ru.testit:testit-java-commons:2.3.4"
+    testImplementation("io.cucumber:gherkin:$cucumberGherkinVersion")
+    testImplementation("io.cucumber:cucumber-core:$cucumberVersion")
+    testImplementation("io.cucumber:cucumber-java:$cucumberVersion")
+    testImplementation("io.cucumber:cucumber-junit:$cucumberVersion")
+    testImplementation "junit:junit:$junit4Version"
+}
+
+test {
+    useJUnit()
+    systemProperties(System.getProperties())
+    environment(System.getenv())
+}
+```
+2. Press the **Reload All Gradle Projects** button.
+
+### Configuration
+
+| Description                                                                                                                                                                                                                                                                                                         | File property                     | Environment variable                       | System property                      |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|--------------------------------------------|--------------------------------------|
+| Location of the TMS instance                                                                                                                                                                                                                                                                                        | url                               | TMS_URL                                    | tmsUrl                               |
+| API secret key [How to getting API secret key?](https://github.com/testit-tms/.github/tree/main/configuration#privatetoken)                                                                                                                                                                                         | privateToken                      | TMS_PRIVATE_TOKEN                          | tmsPrivateToken                      |
+| ID of project in TMS instance [How to getting project ID?](https://github.com/testit-tms/.github/tree/main/configuration#projectid)                                                                                                                                                                                 | projectId                         | TMS_PROJECT_ID                             | tmsProjectId                         |
+| ID of configuration in TMS instance [How to getting configuration ID?](https://github.com/testit-tms/.github/tree/main/configuration#configurationid)                                                                                                                                                               | configurationId                   | TMS_CONFIGURATION_ID                       | tmsConfigurationId                   |
+| ID of the created test run in TMS instance.<br/>It's necessary for **adapterMode** 1                                                                                                                                                                                                                                | testRunId                         | TMS_TEST_RUN_ID                            | tmsTestRunId                         |
+| Parameter for specifying the name of test run in TMS instance (**It's optional**). If it is not provided, it is created automatically                                                                                                                                                                               | testRunName                       | TMS_TEST_RUN_NAME                          | tmsTestRunName                       |
+| Tags for the test run (**It's optional**). Comma-separated or JSON array | testRunTags | TMS_TEST_RUN_TAGS | tmsTestRunTags |
+| Links for the test run (**It's optional**). JSON array (`url` required; optional `title`, `description`, `type`). Applied on create / early merge at startup.<br/>**Link `type` values:** `Related` (default), `BlockedBy`, `Defect`, `Issue`, `Requirement`, `Repository` | testRunLinks | TMS_TEST_RUN_LINKS | tmsTestRunLinks |
+| Adapter mode. Default value - 1. The adapter supports following modes:<br/>1 - in this mode, the adapter sends all results to the test run without filtering or [with filtering CLI](#run-with-filter)<br/>2 - in this mode, the adapter creates a new test run and sends results to the new test run               | adapterMode                       | TMS_ADAPTER_MODE                           | tmsAdapterMode                       |
+| It enables/disables certificate validation (**It's optional**). Default value - true                                                                                                                                                                                                                                | certValidation                    | TMS_CERT_VALIDATION                        | tmsCertValidation                    |
+| It enables/disables TMS integration (**It's optional**). Default value - true                                                                                                                                                                                                                                       | testIt                            | TMS_TEST_IT                                | tmsTestIt                            |
+| Mode of automatic creation test cases (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will create a test case linked to the created autotest (not to the updated autotest)<br/>false - in this mode, the adapter will not create a test case | automaticCreationTestCases        | TMS_AUTOMATIC_CREATION_TEST_CASES          | tmsAutomaticCreationTestCases        |
+| Mode of automatic updation links to test cases (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will update links to test cases<br/>false - in this mode, the adapter will not update link to test cases                                      | automaticUpdationLinksToTestCases | TMS_AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES | tmsAutomaticUpdationLinksToTestCases |
+| Mode of import type selection when launching autotests (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will create/update each autotest in real time<br/>false - in this mode, the adapter will create/update multiple autotests              | importRealtime                    | TMS_IMPORT_REALTIME                        | tmsImportRealtime                    |
+| Name of the configuration file If it is not provided, it is used default file name (**It's optional**)                                                                                                                                                                                                              | -                                 | TMS_CONFIG_FILE                            | tmsConfigFile                        |
+| Selected sync-storage port, 49152 by default (**It's optional**)                                                                                                                                                                                                                                                                                                                           | syncStoragePort                                 | SYNC_STORAGE_PORT                            | syncStoragePort                        |
+
+#### File
+
+Create **testit.properties** file in the resource directory of the project:
+``` 
+url=URL
+privateToken=USER_PRIVATE_TOKEN
+projectId=PROJECT_ID
+configurationId=CONFIGURATION_ID
+testRunId=TEST_RUN_ID
+testRunName=TEST_RUN_NAME
+adapterMode=ADAPTER_MODE
+automaticCreationTestCases=AUTOMATIC_CREATION_TEST_CASES
+automaticUpdationLinksToTestCases=AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES
+certValidation=CERT_VALIDATION
+importRealtime=IMPORT_REALTIME
+testIt=TEST_IT
+```
+
+#### Examples
+
+##### Gradle
+```
+gradle test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
+-DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsAutomaticUpdationLinksToTestCases=true 
+-DtmsCertValidation=true -DtmsImportRealtime=true -DtmsTestIt=true
+```
+
+##### Maven
+```
+maven test -DtmsUrl=http://localhost:8080 -DtmsPrivateToken=Token -DtmsProjectId=f5da5bab-380a-4382-b36f-600083fdd795 -DtmsConfigurationId=3a14fa45-b54e-4859-9998-cc502d4cc8c6
+-DtmsAdapterMode=0 -DtmsTestRunId=a17269da-bc65-4671-90dd-d3e3da92af80 -DtmsTestRunName=Regress -DtmsAutomaticCreationTestCases=true -DtmsAutomaticUpdationLinksToTestCases=true 
+-DtmsCertValidation=true -DtmsImportRealtime=true -DtmsTestIt=true
+```
+
+If you want to enable debug mode then see [How to enable debug logging?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+
+If you want to add attachment for a failed test then see [How to add an attachment for a failed test?](https://github.com/testit-tms/adapters-java/tree/main/testit-java-commons)
+
+#### Run with filter
+To create filter by autotests you can use the Test IT CLI (use adapterMode 1 for run with filter):
+
+##### Gradle
+```
+$ export TMS_TOKEN=<YOUR_TOKEN>
+$ testit autotests_filter 
+  --url https://tms.testit.software \
+  --configuration-id 5236eb3f-7c05-46f9-a609-dc0278896464 \
+  --testrun-id 6d4ac4b7-dd67-4805-b879-18da0b89d4a8 \
+  --framework gradle-cucumber \
+  --output tmp/filter.txt
+
+$ gradle test -DtmsTestRunId=6d4ac4b7-dd67-4805-b879-18da0b89d4a8 -DtmsAdapterMode=1 -Dcucumber.filter.name="$(cat tmp/filter.txt)"
+```
+
+##### Maven
+```
+$ export TMS_TOKEN=<YOUR_TOKEN>
+$ testit autotests_filter 
+  --url https://tms.testit.software \
+  --configuration-id 5236eb3f-7c05-46f9-a609-dc0278896464 \
+  --testrun-id 6d4ac4b7-dd67-4805-b879-18da0b89d4a8 \
+  --framework maven-cucumber \
+  --output tmp/filter.txt
+
+$ maven test -DtmsTestRunId=6d4ac4b7-dd67-4805-b879-18da0b89d4a8 -DtmsAdapterMode=1 -Dcucumber.filter.name="$(cat tmp/filter.txt)"
+```
+
+### Tags
+
+Use tags to specify information about autotest.
+
+Description of tags:
+- `WorkItemId` - a method that links an autotest with a manual test. Receives a single globalId
+- `WorkItemIds` - deprecated, use `WorkItemId` instead
+- `DisplayName` - internal autotest name (used in Test IT)
+- `ExternalId` - unique internal autotest ID (used in Test IT)
+- `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
+- `Description` - autotest description specified in the autotest card
+- `Labels` - labels listed in the autotest card
+- `Layer` - test pyramid layer for the autotest card (scenario tag `@Layer=API`)
+- `Tags` - tags listed in the autotest card
+- `Links` - links listed in the autotest card
+
+If you want to insert a space in the tags, use the "\\_" character combination.
+
+Description of methods:
+
+- `Adapter.addLinks` - add links to the autotest result.
+- `Adapter.addAttachments` - add attachments to the autotest result.
+- `Adapter.addMessage` - add message to the autotest result.
+- `Adapter.addWorkItemId` - a dynamic method that links an autotest with a manual test. Receives a single globalId
+- `Adapter.addWorkItemIds` - deprecated, use `Adapter.addWorkItemId` instead
+- `Adapter.addDisplayName` - a dynamic method for adding internal autotest name (used in Test IT)
+- `Adapter.addExternalId` - a dynamic method for adding unique internal autotest ID (used in Test IT)
+- `Adapter.addTitle` - a dynamic method for adding autotest name specified in the autotest card or the step. If not specified, the name from the displayName method is used
+- `Adapter.addDescription` - a dynamic method for adding autotest description specified in the autotest card or the step
+- `Adapter.addLabels` - a dynamic method for adding labels listed in the autotest card
+- `Adapter.addTags` - a dynamic method for adding tags listed in the autotest card
+- `Adapter.addNameSpace` - a dynamic method for adding directory in the TMS system
+- `Adapter.addClassName` - a dynamic method for adding subdirectory in the TMS system
+- `Adapter.addParameter` - a dynamic method for adding parameter in the autotest result or the step
+- `Adapter.addParameters` - a dynamic method for adding parameters in the autotest result or the step
+
+### Examples
+
+#### Simple test
+
+```java
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import org.testng.Assert;
+import ru.testit.models.LinkType;
+import ru.testit.services.Adapter;
+
+
+public class SampleTests {
+    @Given("I authorize on the portal")
+    public void authorization() {
+        Assert.assertTrue(setLogin("User_1"));
+        Assert.assertTrue(setPassword("Pass123"));
+    }
+
+    private boolean setLogin(String login) {
+        return login.equals("User_1");
+    }
+
+    private boolean setPassword(String password) {
+        return password.equals("Pass123");
+    }
+
+    @When("I create a project")
+    public void createProject() {
+        Assert.assertTrue(true);
+    }
+
+    @And("I open the project")
+    public void enterProject() {
+        Assert.assertTrue(true);
+    }
+
+    @And("I create a section")
+    public void createSection() {
+        Assert.assertTrue(true);
+    }
+
+    @And("I create a section - failed")
+    public void createFailedSection() {
+        Assert.fail();
+    }
+
+    @Then("I create a test case")
+    public void createTestCase() {
+        Adapter.addLinks("https://testit.ru/", "Test 1", "Desc 1", LinkType.ISSUE);
+        Assert.assertTrue(true);
+    }
+
+    @Then("I check something")
+    public void requiredAnnotationsTest() {
+        Assert.assertTrue(true);
+    }
+
+    @Then("I check something - failed")
+    public void requiredAnnotationsFailedTest() {
+        Assert.fail();
+    }
+}
+```
+
+```gherkin
+Feature: Sample
+
+  Background:
+    Given I authorize on the portal
+
+  @ExternalId=with_all_annotations
+  @DisplayName=Test_with_all_annotations
+  @WorkItemId=123
+  @Title=Title_in_the_autotest_card
+  @Description=Test_with_all_annotations
+  @Tags=Tag1,Tag2
+  @NameSpace=Space1
+  @ClassName=Class1
+  @Links={"url":"https://dumps.example.com/module/repository","title":"Repository","description":"Example_of_repository","type":"Repository"}
+  Scenario: Create new project, section and test case
+    When I create a project
+    And I open the project
+    And I create a section
+    Then I create a test case
+```
+
+#### Parameterized test
+
+> [!WARNING]
+> When linking a parameterized autotest to a parameterized test case, please consider the problematic points:
+> - In TMS test cases have a table with parameters, but autotests do not. They are not equal entities, so there may be incompatibility in terms of parameters
+> - Running a parameterized test case, TMS expects the results of all related autotests with all the parameters specified in the test case table
+> - In TMS, the parameters are limited to the string type, so the adapter transmits absolutely all the autotest parameters as a string. This implies the following problematic point for the test case table
+> - TMS expects a complete **textual** match of the name and value of the parameters of the test case table with the autotest parameters
+
+```java
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import org.testng.Assert;
+
+public class ParameterizedTest {
+    private int result;
+
+    @When("Summing {int}+{int}")
+    public void sum(int left, int right){
+        this.result = left + right;
+    }
+
+    @Then("Result is {int}")
+    public void result(int result){
+        Assert.assertEquals(this.result, result);
+    }
+}
+```
+
+```gherkin
+Feature: Rule
+  Tests that use Rule
+
+  @DisplayName=sum:{left}+{right}={result}
+  @ExternalId={result}
+  Scenario Outline: Summing
+    When Summing <left>+<right>
+    Then Result is <result>
+
+    Examples:
+      | left | right | result |
+      | 1    | 1     | 3      |
+      | 9    | 9     | 18     |
+```
+
+# Contributing
+
+You can help to develop the project. Any contributions are **greatly appreciated**.
+
+* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/testit-tms/adapters-java/issues/new) to discuss it, or create a direct pull request after you edit the *README.md* file with necessary changes.
+* Make sure to check your spelling and grammar.
+* Create individual PR for each suggestion.
+* Read the [Code Of Conduct](https://github.com/testit-tms/adapters-java/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
+
+# License
+
+Distributed under the Apache-2.0 License. See [LICENSE](https://github.com/testit-tms/adapters-java/blob/main/LICENSE.md) for more information.
