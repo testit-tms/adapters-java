@@ -169,7 +169,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Setup java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: jdk
