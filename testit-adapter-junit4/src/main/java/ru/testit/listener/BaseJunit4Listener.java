@@ -266,6 +266,7 @@ public class BaseJunit4Listener extends RunListener {
             .setMainContainerUuid(launcherUUID.get())
             .setLabels(Utils.extractLabels(method))
             .setTags(Utils.extractTags(method))
+            .setLayer(Utils.extractLayer(method))
             .setExternalId(Utils.extractExternalID(method))
             .setWorkItemIds(Utils.extractWorkItemIds(method))
             .setTitle(Utils.extractTitle(method))

@@ -269,12 +269,14 @@ Use annotations to specify information about autotest.
 Description of annotations (\* - required):
 
 - \*`RunWith(BaseJunit4Runner.class)` - connect the adapter package to run tests
-- `WorkItemIds` - a method that links autotests with manual tests. Receives the array of manual tests' IDs
+- `WorkItemId` - a method that links an autotest with a manual test. Receives a single globalId
+- `WorkItemIds` - deprecated, use `WorkItemId` instead
 - `DisplayName` - internal autotest name (used in Test IT)
 - `ExternalId` - unique internal autotest ID (used in Test IT)
 - `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
 - `Description` - autotest description specified in the autotest card
 - `Labels` - labels listed in the autotest card
+- `Layer` - test pyramid layer for the autotest card (e.g. `API`, `E2E`; use `TestLayers` constants or any custom string)
 - `Tags` - tags listed in the autotest card
 - `Links` - links listed in the autotest card
 - `Step` - the designation of the step
@@ -286,7 +288,8 @@ Description of methods:
 - `Adapter.addLinks` - add links to the autotest result.
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
-- `Adapter.addWorkItemIds` - a dynamic method that links autotests with manual tests. Receives the array of manual tests' IDs
+- `Adapter.addWorkItemId` - a dynamic method that links an autotest with a manual test. Receives a single globalId
+- `Adapter.addWorkItemIds` - deprecated, use `Adapter.addWorkItemId` instead
 - `Adapter.addDisplayName` - a dynamic method for adding internal autotest name (used in Test IT)
 - `Adapter.addExternalId` - a dynamic method for adding unique internal autotest ID (used in Test IT)
 - `Adapter.addTitle` - a dynamic method for adding autotest name specified in the autotest card or the step. If not specified, the name from the displayName method is used
@@ -323,7 +326,7 @@ public class SampleTest {
 
     @Test
     @ExternalId("Simple_test_2")
-    @WorkItemIds({"12345", "54321"})
+    @WorkItemId("12345")
     @DisplayName("Simple test 2")
     @Title("test â„–2")
     @Links(links = {@Link(url = "www.1.ru", title = "firstLink", description = "firstLinkDesc", type = LinkType.RELATED),

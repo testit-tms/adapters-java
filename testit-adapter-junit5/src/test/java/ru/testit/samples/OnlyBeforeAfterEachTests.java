@@ -77,7 +77,7 @@ class OnlyBeforeAfterEachTests {
     @Test
     @ExternalId("BeforeEach_AfterEach_with_all_annotations")
     @DisplayName("Test with all annotations")
-    @WorkItemIds("456")
+    @WorkItemId("456")
     @Title("Title in the autotest card")
     @Description("Test with BeforeEach, AfterEach and all annotations")
     @Labels({"Tag1","Tag2"})

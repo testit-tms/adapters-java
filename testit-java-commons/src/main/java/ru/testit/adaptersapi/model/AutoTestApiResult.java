@@ -28,6 +28,7 @@ import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
 import ru.testit.adaptersapi.model.AutoTestStepApiResult;
 import ru.testit.adaptersapi.model.LabelApiResult;
+import ru.testit.adaptersapi.model.LayerApiResult;
 import ru.testit.adaptersapi.model.LinkApiResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -54,6 +55,7 @@ import ru.testit.adaptersapi.invoker.JSON;
   AutoTestApiResult.JSON_PROPERTY_TITLE,
   AutoTestApiResult.JSON_PROPERTY_DESCRIPTION,
   AutoTestApiResult.JSON_PROPERTY_EXTERNAL_KEY,
+  AutoTestApiResult.JSON_PROPERTY_LAYER,
   AutoTestApiResult.JSON_PROPERTY_LINKS,
   AutoTestApiResult.JSON_PROPERTY_LABELS,
   AutoTestApiResult.JSON_PROPERTY_TAGS
@@ -106,6 +108,9 @@ public class AutoTestApiResult {
 
   public static final String JSON_PROPERTY_EXTERNAL_KEY = "externalKey";
   private JsonNullable<String> externalKey = JsonNullable.<String>undefined();
+
+  public static final String JSON_PROPERTY_LAYER = "layer";
+  private JsonNullable<LayerApiResult> layer = JsonNullable.<LayerApiResult>undefined();
 
   public static final String JSON_PROPERTY_LINKS = "links";
   private JsonNullable<List<LinkApiResult>> links = JsonNullable.<List<LinkApiResult>>undefined();
@@ -577,6 +582,39 @@ public class AutoTestApiResult {
   }
 
 
+  public AutoTestApiResult layer(@jakarta.annotation.Nullable LayerApiResult layer) {
+    this.layer = JsonNullable.<LayerApiResult>of(layer);
+    return this;
+  }
+
+  /**
+   * Model of auto test layer for use in responses.
+   * @return layer
+   */
+  @jakarta.annotation.Nullable
+  @JsonIgnore
+
+  public LayerApiResult getLayer() {
+        return layer.orElse(null);
+  }
+
+  @JsonProperty(JSON_PROPERTY_LAYER)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public JsonNullable<LayerApiResult> getLayer_JsonNullable() {
+    return layer;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_LAYER)
+  public void setLayer_JsonNullable(JsonNullable<LayerApiResult> layer) {
+    this.layer = layer;
+  }
+
+  public void setLayer(@jakarta.annotation.Nullable LayerApiResult layer) {
+    this.layer = JsonNullable.<LayerApiResult>of(layer);
+  }
+
+
   public AutoTestApiResult links(@jakarta.annotation.Nullable List<LinkApiResult> links) {
     this.links = JsonNullable.<List<LinkApiResult>>of(links);
     return this;
@@ -738,6 +776,7 @@ public class AutoTestApiResult {
         equalsNullable(this.title, autoTestApiResult.title) &&
         equalsNullable(this.description, autoTestApiResult.description) &&
         equalsNullable(this.externalKey, autoTestApiResult.externalKey) &&
+        equalsNullable(this.layer, autoTestApiResult.layer) &&
         equalsNullable(this.links, autoTestApiResult.links) &&
         equalsNullable(this.labels, autoTestApiResult.labels) &&
         equalsNullable(this.tags, autoTestApiResult.tags);
@@ -749,7 +788,7 @@ public class AutoTestApiResult {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, projectId, name, isFlaky, globalId, hashCodeNullable(externalId), hashCodeNullable(namespace), hashCodeNullable(classname), hashCodeNullable(steps), hashCodeNullable(setup), hashCodeNullable(teardown), hashCodeNullable(title), hashCodeNullable(description), hashCodeNullable(externalKey), hashCodeNullable(links), hashCodeNullable(labels), hashCodeNullable(tags));
+    return Objects.hash(id, projectId, name, isFlaky, globalId, hashCodeNullable(externalId), hashCodeNullable(namespace), hashCodeNullable(classname), hashCodeNullable(steps), hashCodeNullable(setup), hashCodeNullable(teardown), hashCodeNullable(title), hashCodeNullable(description), hashCodeNullable(externalKey), hashCodeNullable(layer), hashCodeNullable(links), hashCodeNullable(labels), hashCodeNullable(tags));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -777,6 +816,7 @@ public class AutoTestApiResult {
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    externalKey: ").append(toIndentedString(externalKey)).append("\n");
+    sb.append("    layer: ").append(toIndentedString(layer)).append("\n");
     sb.append("    links: ").append(toIndentedString(links)).append("\n");
     sb.append("    labels: ").append(toIndentedString(labels)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");

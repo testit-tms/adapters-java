@@ -105,7 +105,7 @@ public class ParametersApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<ParameterApiResult> localVarReturnType = new GenericType<ParameterApiResult>() {};
     return apiClient.invokeAPI("ParametersApi.adaptersParametersIdGet", localVarPath, "GET", new ArrayList<>(), null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -156,7 +156,7 @@ public class ParametersApi {
   public ApiResponse<ParameterApiResult> adaptersParametersPostWithHttpInfo(CreateParameterApiModel createParameterApiModel) throws ApiException {
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<ParameterApiResult> localVarReturnType = new GenericType<ParameterApiResult>() {};
     return apiClient.invokeAPI("ParametersApi.adaptersParametersPost", "/adapters/parameters", "POST", new ArrayList<>(), createParameterApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -226,7 +226,7 @@ public class ParametersApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<ParameterApiResult>> localVarReturnType = new GenericType<List<ParameterApiResult>>() {};
     return apiClient.invokeAPI("ParametersApi.adaptersParametersSearchPost", "/adapters/parameters/search", "POST", localVarQueryParams, parametersFilterApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,

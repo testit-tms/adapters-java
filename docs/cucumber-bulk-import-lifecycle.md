@@ -1,6 +1,6 @@
 # Cucumber: main container lifecycle and bulk import performance
 
-Technical notes on why Cucumber runs could be slow with `importRealtime=false` and what was changed in the **Cucumber 4–7** listeners and **container helper**.
+Technical notes on why Cucumber runs could be slow with `importRealtime=false` and what was changed in the **Cucumber 4–8** listeners and **container helper**.
 
 ## Problem (before)
 
@@ -35,7 +35,7 @@ When registering a class under a main container, the class UUID is appended **on
 
 | Area | Files |
 |------|--------|
-| Cucumber listeners | `testit-adapter-cucumber4` … `testit-adapter-cucumber7`: `BaseCucumber*Listener.java` |
+| Cucumber listeners | `testit-adapter-cucumber4` … `testit-adapter-cucumber8`: `BaseCucumber*Listener.java` |
 | Container registration | `testit-java-commons`: `services/core/AdapterContainerHelper.java` |
 | Bulk writer | `testit-java-commons`: `writers/HttpWriter.java` |
 

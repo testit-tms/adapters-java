@@ -26,6 +26,8 @@ public class TagParser {
     private static final String TAGS = "Tags";
     private static final String LINKS = "Links";
     private static final String WORK_ITEM_IDS = "WorkItemIds";
+    private static final String WORK_ITEM_ID = "WorkItemId";
+    private static final String LAYER = "Layer";
 
     private final List<Label> labelList = new ArrayList<>();
     private final List<String> tagList = new ArrayList<>();
@@ -35,6 +37,7 @@ public class TagParser {
     private String displayNameValue;
     private final String titleValue;
     private final String descriptionValue;
+    private final String layerValue;
 
     TagParser(final Story story, final Scenario scenario) {
         this(story, scenario, null);
@@ -100,9 +103,25 @@ public class TagParser {
         );
 
         if (!workItemIdsValue.isEmpty()) {
+            Utils.warnDeprecated("WorkItemIds", "WorkItemId");
             Arrays.stream(workItemIdsValue.split(TAG_VALUE_DELIMITER))
                     .forEach(id -> getWorkItemIdList().add(id));
         }
+
+        String workItemIdValue = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, WORK_ITEM_ID),
+                exampleParameters
+        );
+
+        if (!workItemIdValue.isEmpty()) {
+            workItemIdList.clear();
+            workItemIdList.add(workItemIdValue);
+        }
+
+        layerValue = substituteExampleParameters(
+                getMetaValue(storyMeta, scenarioMeta, LAYER),
+                exampleParameters
+        );
 
         final String name = scenario.getTitle();
 
@@ -214,6 +233,10 @@ public class TagParser {
 
     public String getDescriptionValue() {
         return descriptionValue;
+    }
+
+    public String getLayerValue() {
+        return (layerValue == null || layerValue.trim().isEmpty()) ? null : layerValue;
     }
 
     private Label getTagLabel(final String tag) {

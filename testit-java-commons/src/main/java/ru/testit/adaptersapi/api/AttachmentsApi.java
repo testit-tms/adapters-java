@@ -102,7 +102,7 @@ public class AttachmentsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("multipart/form-data");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<AttachmentModel>> localVarReturnType = new GenericType<List<AttachmentModel>>() {};
     return apiClient.invokeAPI("AttachmentsApi.adaptersAttachmentsBulkPost", "/adapters/attachments/bulk", "POST", new ArrayList<>(), null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), localVarFormParams, localVarAccept, localVarContentType,
@@ -180,14 +180,14 @@ public class AttachmentsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     return apiClient.invokeAPI("AttachmentsApi.adaptersAttachmentsIdGet", localVarPath, "GET", localVarQueryParams, null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                localVarAuthNames, null, false);
   }
   /**
    * Upload new attachment file
-   * File size is restricted to 1 GB (1 073 741 824 bytes)
+   * File size is restricted to 50 MB (52 428 800 bytes)
    * @param _file  (optional)
    * @return AttachmentModel
    * @throws ApiException if fails to make API call
@@ -196,7 +196,7 @@ public class AttachmentsApi {
        <caption>Response Details</caption>
        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
        <tr><td> 201 </td><td> Created </td><td>  -  </td></tr>
-       <tr><td> 400 </td><td>   - Invalid file contents    - Invalid HTTP headers </td><td>  -  </td></tr>
+       <tr><td> 400 </td><td>  - Invalid file contents  - Invalid HTTP headers </td><td>  -  </td></tr>
        <tr><td> 401 </td><td> Unauthorized </td><td>  -  </td></tr>
        <tr><td> 403 </td><td> Forbidden </td><td>  -  </td></tr>
        <tr><td> 404 </td><td> Not Found </td><td>  -  </td></tr>
@@ -210,7 +210,7 @@ public class AttachmentsApi {
 
   /**
    * Upload new attachment file
-   * File size is restricted to 1 GB (1 073 741 824 bytes)
+   * File size is restricted to 50 MB (52 428 800 bytes)
    * @param _file  (optional)
    * @return ApiResponse&lt;AttachmentModel&gt;
    * @throws ApiException if fails to make API call
@@ -219,7 +219,7 @@ public class AttachmentsApi {
        <caption>Response Details</caption>
        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
        <tr><td> 201 </td><td> Created </td><td>  -  </td></tr>
-       <tr><td> 400 </td><td>   - Invalid file contents    - Invalid HTTP headers </td><td>  -  </td></tr>
+       <tr><td> 400 </td><td>  - Invalid file contents  - Invalid HTTP headers </td><td>  -  </td></tr>
        <tr><td> 401 </td><td> Unauthorized </td><td>  -  </td></tr>
        <tr><td> 403 </td><td> Forbidden </td><td>  -  </td></tr>
        <tr><td> 404 </td><td> Not Found </td><td>  -  </td></tr>
@@ -236,7 +236,7 @@ public class AttachmentsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("multipart/form-data");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<AttachmentModel> localVarReturnType = new GenericType<AttachmentModel>() {};
     return apiClient.invokeAPI("AttachmentsApi.adaptersAttachmentsPost", "/adapters/attachments", "POST", new ArrayList<>(), null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), localVarFormParams, localVarAccept, localVarContentType,

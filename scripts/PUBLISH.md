@@ -91,8 +91,9 @@ The following modules will be published:
 7. `testit-adapter-cucumber5` - Cucumber 5 adapter
 8. `testit-adapter-cucumber6` - Cucumber 6 adapter
 9. `testit-adapter-cucumber7` - Cucumber 7 adapter
-10. `testit-adapter-jbehave` - JBehave adapter
-11. `testit-adapter-selenide` - Selenide adapter
+10. `testit-adapter-cucumber8` - Cucumber 8 adapter
+11. `testit-adapter-jbehave` - JBehave adapter
+12. `testit-adapter-selenide` - Selenide adapter
 
 ## Troubleshooting
 

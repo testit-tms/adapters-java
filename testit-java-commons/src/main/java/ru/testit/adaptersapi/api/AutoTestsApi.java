@@ -101,7 +101,7 @@ public class AutoTestsApi {
   public ApiResponse<List<AutoTestApiResult>> adaptersAutoTestsBulkPostWithHttpInfo(List<AutoTestCreateApiModel> autoTestCreateApiModel) throws ApiException {
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<AutoTestApiResult>> localVarReturnType = new GenericType<List<AutoTestApiResult>>() {};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsBulkPost", "/adapters/autoTests/bulk", "POST", new ArrayList<>(), autoTestCreateApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -151,7 +151,7 @@ public class AutoTestsApi {
   public ApiResponse<Void> adaptersAutoTestsBulkPutWithHttpInfo(List<AutoTestUpdateApiModel> autoTestUpdateApiModel) throws ApiException {
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsBulkPut", "/adapters/autoTests/bulk", "PUT", new ArrayList<>(), autoTestUpdateApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                localVarAuthNames, null, false);
@@ -285,7 +285,7 @@ public class AutoTestsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<AutoTestModel>> localVarReturnType = new GenericType<List<AutoTestModel>>() {};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsGet", "/adapters/autoTests", "GET", localVarQueryParams, null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -345,7 +345,7 @@ public class AutoTestsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<AutoTestApiResult> localVarReturnType = new GenericType<AutoTestApiResult>() {};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsIdGet", localVarPath, "GET", new ArrayList<>(), null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -406,7 +406,7 @@ public class AutoTestsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsIdPatch", localVarPath, "PATCH", new ArrayList<>(), operation,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                localVarAuthNames, null, false);
@@ -471,7 +471,7 @@ public class AutoTestsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsIdWorkItemsDelete", localVarPath, "DELETE", localVarQueryParams, null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                localVarAuthNames, null, false);
@@ -540,7 +540,7 @@ public class AutoTestsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<AutoTestWorkItemIdentifierApiResult>> localVarReturnType = new GenericType<List<AutoTestWorkItemIdentifierApiResult>>() {};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsIdWorkItemsGet", localVarPath, "GET", localVarQueryParams, null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -601,7 +601,7 @@ public class AutoTestsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsIdWorkItemsPost", localVarPath, "POST", new ArrayList<>(), workItemIdApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                localVarAuthNames, null, false);
@@ -651,7 +651,7 @@ public class AutoTestsApi {
   public ApiResponse<AutoTestApiResult> adaptersAutoTestsPostWithHttpInfo(AutoTestCreateApiModel autoTestCreateApiModel) throws ApiException {
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<AutoTestApiResult> localVarReturnType = new GenericType<AutoTestApiResult>() {};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsPost", "/adapters/autoTests", "POST", new ArrayList<>(), autoTestCreateApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -701,7 +701,7 @@ public class AutoTestsApi {
   public ApiResponse<Void> adaptersAutoTestsPutWithHttpInfo(AutoTestUpdateApiModel autoTestUpdateApiModel) throws ApiException {
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsPut", "/adapters/autoTests", "PUT", new ArrayList<>(), autoTestUpdateApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                localVarAuthNames, null, false);
@@ -770,7 +770,7 @@ public class AutoTestsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
     GenericType<List<AutoTestApiResult>> localVarReturnType = new GenericType<List<AutoTestApiResult>>() {};
     return apiClient.invokeAPI("AutoTestsApi.adaptersAutoTestsSearchPost", "/adapters/autoTests/search", "POST", localVarQueryParams, autoTestSearchApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,

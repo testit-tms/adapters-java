@@ -262,6 +262,7 @@ public class BaseJunit5Listener implements Extension, BeforeAllCallback, AfterAl
                 .setMainContainerUuid(launcherUuid(extensionContext))
                 .setLabels(Utils.extractLabels(method, parameters))
                 .setTags(Utils.extractTags(method, parameters))
+                .setLayer(Utils.extractLayer(method, parameters))
                 .setExternalId(Utils.extractExternalID(method, parameters))
                 .setWorkItemIds(Utils.extractWorkItemIds(method, parameters))
                 .setTitle(Utils.extractTitle(method, parameters, true))

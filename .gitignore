@@ -11,3 +11,4 @@ keys/
 .env
 env.example
 out
+.user/

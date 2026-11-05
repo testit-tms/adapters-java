@@ -25,10 +25,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.openapitools.jackson.nullable.JsonNullable;
 import ru.testit.adaptersapi.model.AttachmentApiResult;
 import ru.testit.adaptersapi.model.LinkApiResult;
 import ru.testit.adaptersapi.model.TestRunState;
 import ru.testit.adaptersapi.model.TestStatusApiResult;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.util.NoSuchElementException;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import ru.testit.adaptersapi.invoker.JSON;
 
@@ -39,6 +43,7 @@ import ru.testit.adaptersapi.invoker.JSON;
 @JsonPropertyOrder({
   TestRunApiResult.JSON_PROPERTY_ID,
   TestRunApiResult.JSON_PROPERTY_NAME,
+  TestRunApiResult.JSON_PROPERTY_PROJECT_ID,
   TestRunApiResult.JSON_PROPERTY_STATE_NAME,
   TestRunApiResult.JSON_PROPERTY_STATUS,
   TestRunApiResult.JSON_PROPERTY_ATTACHMENTS,
@@ -56,6 +61,10 @@ public class TestRunApiResult {
   public static final String JSON_PROPERTY_NAME = "name";
   @jakarta.annotation.Nonnull
   private String name;
+
+  public static final String JSON_PROPERTY_PROJECT_ID = "projectId";
+  @jakarta.annotation.Nonnull
+  private UUID projectId;
 
   public static final String JSON_PROPERTY_STATE_NAME = "stateName";
   @Deprecated
@@ -78,14 +87,11 @@ public class TestRunApiResult {
   @jakarta.annotation.Nonnull
   private List<String> tags = new ArrayList<>();
 
-  // Keep on OpenAPI regen: required so merge-on-update does not wipe these fields.
   public static final String JSON_PROPERTY_DESCRIPTION = "description";
-  @jakarta.annotation.Nullable
-  private String description;
+  private JsonNullable<String> description = JsonNullable.<String>undefined();
 
   public static final String JSON_PROPERTY_LAUNCH_SOURCE = "launchSource";
-  @jakarta.annotation.Nullable
-  private String launchSource;
+  private JsonNullable<String> launchSource = JsonNullable.<String>undefined();
 
   public TestRunApiResult() { 
   }
@@ -137,6 +143,31 @@ public class TestRunApiResult {
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setName(@jakarta.annotation.Nonnull String name) {
     this.name = name;
+  }
+
+
+  public TestRunApiResult projectId(@jakarta.annotation.Nonnull UUID projectId) {
+    this.projectId = projectId;
+    return this;
+  }
+
+  /**
+   * Project unique identifier              This property is used to link test run with project.
+   * @return projectId
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_PROJECT_ID)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public UUID getProjectId() {
+    return projectId;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_PROJECT_ID)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setProjectId(@jakarta.annotation.Nonnull UUID projectId) {
+    this.projectId = projectId;
   }
 
 
@@ -293,38 +324,69 @@ public class TestRunApiResult {
   }
 
 
+  public TestRunApiResult description(@jakarta.annotation.Nullable String description) {
+    this.description = JsonNullable.<String>of(description);
+    return this;
+  }
+
   /**
    * Test run description
    * @return description
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_DESCRIPTION)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  @JsonIgnore
+
   public String getDescription() {
-    return description;
+        return description.orElse(null);
   }
 
   @JsonProperty(JSON_PROPERTY_DESCRIPTION)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDescription(@jakarta.annotation.Nullable String description) {
+
+  public JsonNullable<String> getDescription_JsonNullable() {
+    return description;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_DESCRIPTION)
+  public void setDescription_JsonNullable(JsonNullable<String> description) {
     this.description = description;
   }
 
+  public void setDescription(@jakarta.annotation.Nullable String description) {
+    this.description = JsonNullable.<String>of(description);
+  }
+
+
+  public TestRunApiResult launchSource(@jakarta.annotation.Nullable String launchSource) {
+    this.launchSource = JsonNullable.<String>of(launchSource);
+    return this;
+  }
+
   /**
-   * Test run launch source
+   * Test run launch source              Once launch source is specified it cannot be updated.
    * @return launchSource
    */
   @jakarta.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_LAUNCH_SOURCE)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  @JsonIgnore
+
   public String getLaunchSource() {
-    return launchSource;
+        return launchSource.orElse(null);
   }
 
   @JsonProperty(JSON_PROPERTY_LAUNCH_SOURCE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setLaunchSource(@jakarta.annotation.Nullable String launchSource) {
+
+  public JsonNullable<String> getLaunchSource_JsonNullable() {
+    return launchSource;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_LAUNCH_SOURCE)
+  public void setLaunchSource_JsonNullable(JsonNullable<String> launchSource) {
     this.launchSource = launchSource;
+  }
+
+  public void setLaunchSource(@jakarta.annotation.Nullable String launchSource) {
+    this.launchSource = JsonNullable.<String>of(launchSource);
   }
 
 
@@ -342,18 +404,30 @@ public class TestRunApiResult {
     TestRunApiResult testRunApiResult = (TestRunApiResult) o;
     return Objects.equals(this.id, testRunApiResult.id) &&
         Objects.equals(this.name, testRunApiResult.name) &&
+        Objects.equals(this.projectId, testRunApiResult.projectId) &&
         Objects.equals(this.stateName, testRunApiResult.stateName) &&
         Objects.equals(this.status, testRunApiResult.status) &&
         Objects.equals(this.attachments, testRunApiResult.attachments) &&
         Objects.equals(this.links, testRunApiResult.links) &&
         Objects.equals(this.tags, testRunApiResult.tags) &&
-        Objects.equals(this.description, testRunApiResult.description) &&
-        Objects.equals(this.launchSource, testRunApiResult.launchSource);
+        equalsNullable(this.description, testRunApiResult.description) &&
+        equalsNullable(this.launchSource, testRunApiResult.launchSource);
+  }
+
+  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
+    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, stateName, status, attachments, links, tags, description, launchSource);
+    return Objects.hash(id, name, projectId, stateName, status, attachments, links, tags, hashCodeNullable(description), hashCodeNullable(launchSource));
+  }
+
+  private static <T> int hashCodeNullable(JsonNullable<T> a) {
+    if (a == null) {
+      return 1;
+    }
+    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
   }
 
   @Override
@@ -362,6 +436,7 @@ public class TestRunApiResult {
     sb.append("class TestRunApiResult {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
     sb.append("    stateName: ").append(toIndentedString(stateName)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    attachments: ").append(toIndentedString(attachments)).append("\n");

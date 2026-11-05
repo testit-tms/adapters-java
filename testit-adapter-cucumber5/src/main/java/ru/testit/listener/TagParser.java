@@ -23,15 +23,19 @@ public class TagParser {
     private static final String TAGS = "@TAGS";
     private static final String LINKS = "@LINKS";
     private static final String WORK_ITEM_IDS = "@WORKITEMIDS";
+    private static final String WORK_ITEM_ID = "@WORKITEMID";
+    private static final String LAYER = "@LAYER";
 
     private final List<Label> labelList = new ArrayList<>();
     private final List<String> tagList = new ArrayList<>();
     private final List<LinkItem> linkItemList = new ArrayList<>();
     private final List<String> workItemIdList = new ArrayList<>();
+    private String workItemIdValue;
     private String externalIdValue = "";
     private String titleValue = "";
     private String displayNameValue = "";
     private String descriptionValue = "";
+    private String layerValue;
 
     TagParser(final Feature feature, final TestCase scenario, final Deque<String> tags, Map<String, String> parameters) {
 
@@ -76,14 +80,26 @@ public class TagParser {
                             getScenarioLinks().addAll(getLinkItems(tagValue));
                         }
                         break;
+                    case WORK_ITEM_ID:
+                        workItemIdValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
+                        break;
                     case WORK_ITEM_IDS:
+                        Utils.warnDeprecated("WorkItemIds", "WorkItemId");
                         Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(id -> getWorkItemIdList().add(id));
+                        break;
+                    case LAYER:
+                        layerValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     default:
                         break;
                 }
             }
+        }
+
+        if (workItemIdValue != null && !workItemIdValue.isEmpty()) {
+            workItemIdList.clear();
+            workItemIdList.add(workItemIdValue);
         }
 
         final String featureName = feature.getName();
@@ -128,6 +144,10 @@ public class TagParser {
 
     public String getDescriptionValue() {
         return descriptionValue;
+    }
+
+    public String getLayerValue() {
+        return (layerValue == null || layerValue.trim().isEmpty()) ? null : layerValue;
     }
 
     private Label getTagLabel(final String tag) {

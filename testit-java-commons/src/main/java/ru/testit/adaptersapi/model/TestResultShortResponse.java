@@ -43,6 +43,7 @@ import ru.testit.adaptersapi.invoker.JSON;
 @JsonPropertyOrder({
   TestResultShortResponse.JSON_PROPERTY_ID,
   TestResultShortResponse.JSON_PROPERTY_NAME,
+  TestResultShortResponse.JSON_PROPERTY_AUTOTEST_GLOBAL_ID,
   TestResultShortResponse.JSON_PROPERTY_AUTO_TEST_TAGS,
   TestResultShortResponse.JSON_PROPERTY_TEST_RUN_ID,
   TestResultShortResponse.JSON_PROPERTY_CONFIGURATION_ID,
@@ -66,6 +67,10 @@ public class TestResultShortResponse {
   public static final String JSON_PROPERTY_NAME = "name";
   @jakarta.annotation.Nonnull
   private String name;
+
+  public static final String JSON_PROPERTY_AUTOTEST_GLOBAL_ID = "autotestGlobalId";
+  @jakarta.annotation.Nonnull
+  private Long autotestGlobalId;
 
   public static final String JSON_PROPERTY_AUTO_TEST_TAGS = "autoTestTags";
   @jakarta.annotation.Nonnull
@@ -166,6 +171,31 @@ public class TestResultShortResponse {
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setName(@jakarta.annotation.Nonnull String name) {
     this.name = name;
+  }
+
+
+  public TestResultShortResponse autotestGlobalId(@jakarta.annotation.Nonnull Long autotestGlobalId) {
+    this.autotestGlobalId = autotestGlobalId;
+    return this;
+  }
+
+  /**
+   * Global ID of autotest represented by the test result
+   * @return autotestGlobalId
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_AUTOTEST_GLOBAL_ID)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public Long getAutotestGlobalId() {
+    return autotestGlobalId;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_AUTOTEST_GLOBAL_ID)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setAutotestGlobalId(@jakarta.annotation.Nonnull Long autotestGlobalId) {
+    this.autotestGlobalId = autotestGlobalId;
   }
 
 
@@ -576,6 +606,7 @@ public class TestResultShortResponse {
     TestResultShortResponse testResultShortResponse = (TestResultShortResponse) o;
     return Objects.equals(this.id, testResultShortResponse.id) &&
         Objects.equals(this.name, testResultShortResponse.name) &&
+        Objects.equals(this.autotestGlobalId, testResultShortResponse.autotestGlobalId) &&
         Objects.equals(this.autoTestTags, testResultShortResponse.autoTestTags) &&
         Objects.equals(this.testRunId, testResultShortResponse.testRunId) &&
         Objects.equals(this.configurationId, testResultShortResponse.configurationId) &&
@@ -597,7 +628,7 @@ public class TestResultShortResponse {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, autoTestTags, testRunId, configurationId, configurationName, status, resultReasons, links, attachments, rerunCompletedCount, hashCodeNullable(autotestExternalId), hashCodeNullable(outcome), hashCodeNullable(comment), hashCodeNullable(duration));
+    return Objects.hash(id, name, autotestGlobalId, autoTestTags, testRunId, configurationId, configurationName, status, resultReasons, links, attachments, rerunCompletedCount, hashCodeNullable(autotestExternalId), hashCodeNullable(outcome), hashCodeNullable(comment), hashCodeNullable(duration));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -613,6 +644,7 @@ public class TestResultShortResponse {
     sb.append("class TestResultShortResponse {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    autotestGlobalId: ").append(toIndentedString(autotestGlobalId)).append("\n");
     sb.append("    autoTestTags: ").append(toIndentedString(autoTestTags)).append("\n");
     sb.append("    testRunId: ").append(toIndentedString(testRunId)).append("\n");
     sb.append("    configurationId: ").append(toIndentedString(configurationId)).append("\n");

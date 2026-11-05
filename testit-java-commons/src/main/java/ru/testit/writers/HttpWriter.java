@@ -171,6 +171,7 @@ public class HttpWriter implements Writer {
                     autoTestUpdateApiModel.setTeardown(afterClass);
 
                     autoTestUpdateApiModel.setIsFlaky(autoTestApiResult.getIsFlaky());
+                    Converter.applyLayerOnUpdate(test, autoTestUpdateApiModel);
 
                     apiClient.updateAutoTest(autoTestUpdateApiModel);
                     if (LOGGER.isDebugEnabled()) {
@@ -228,6 +229,7 @@ public class HttpWriter implements Writer {
                             autoTestUpdateApiModel.setTeardown(afterFinish);
 
                             autoTestUpdateApiModel.setIsFlaky(autoTestApiResult.getIsFlaky());
+                            Converter.applyLayerOnUpdate(test, autoTestUpdateApiModel);
 
                             apiClient.updateAutoTest(autoTestUpdateApiModel);
 

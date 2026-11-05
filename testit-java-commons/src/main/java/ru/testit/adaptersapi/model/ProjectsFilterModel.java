@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
 import ru.testit.adaptersapi.model.DateTimeRangeSelectorModel;
-import ru.testit.adaptersapi.model.Int32RangeSelectorModel;
+import ru.testit.adaptersapi.model.Int64RangeSelectorModel;
 import ru.testit.adaptersapi.model.ProjectTypeModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -64,16 +64,16 @@ public class ProjectsFilterModel {
   private JsonNullable<Boolean> isDeleted = JsonNullable.<Boolean>undefined();
 
   public static final String JSON_PROPERTY_TEST_CASES_COUNT = "testCasesCount";
-  private JsonNullable<Int32RangeSelectorModel> testCasesCount = JsonNullable.<Int32RangeSelectorModel>undefined();
+  private JsonNullable<Int64RangeSelectorModel> testCasesCount = JsonNullable.<Int64RangeSelectorModel>undefined();
 
   public static final String JSON_PROPERTY_CHECKLISTS_COUNT = "checklistsCount";
-  private JsonNullable<Int32RangeSelectorModel> checklistsCount = JsonNullable.<Int32RangeSelectorModel>undefined();
+  private JsonNullable<Int64RangeSelectorModel> checklistsCount = JsonNullable.<Int64RangeSelectorModel>undefined();
 
   public static final String JSON_PROPERTY_SHARED_STEPS_COUNT = "sharedStepsCount";
-  private JsonNullable<Int32RangeSelectorModel> sharedStepsCount = JsonNullable.<Int32RangeSelectorModel>undefined();
+  private JsonNullable<Int64RangeSelectorModel> sharedStepsCount = JsonNullable.<Int64RangeSelectorModel>undefined();
 
   public static final String JSON_PROPERTY_AUTOTESTS_COUNT = "autotestsCount";
-  private JsonNullable<Int32RangeSelectorModel> autotestsCount = JsonNullable.<Int32RangeSelectorModel>undefined();
+  private JsonNullable<Int64RangeSelectorModel> autotestsCount = JsonNullable.<Int64RangeSelectorModel>undefined();
 
   public static final String JSON_PROPERTY_GLOBAL_IDS = "globalIds";
   private JsonNullable<Set<Long>> globalIds = JsonNullable.<Set<Long>>undefined();
@@ -189,8 +189,8 @@ public class ProjectsFilterModel {
   }
 
 
-  public ProjectsFilterModel testCasesCount(@jakarta.annotation.Nullable Int32RangeSelectorModel testCasesCount) {
-    this.testCasesCount = JsonNullable.<Int32RangeSelectorModel>of(testCasesCount);
+  public ProjectsFilterModel testCasesCount(@jakarta.annotation.Nullable Int64RangeSelectorModel testCasesCount) {
+    this.testCasesCount = JsonNullable.<Int64RangeSelectorModel>of(testCasesCount);
     return this;
   }
 
@@ -201,29 +201,29 @@ public class ProjectsFilterModel {
   @jakarta.annotation.Nullable
   @JsonIgnore
 
-  public Int32RangeSelectorModel getTestCasesCount() {
+  public Int64RangeSelectorModel getTestCasesCount() {
         return testCasesCount.orElse(null);
   }
 
   @JsonProperty(JSON_PROPERTY_TEST_CASES_COUNT)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public JsonNullable<Int32RangeSelectorModel> getTestCasesCount_JsonNullable() {
+  public JsonNullable<Int64RangeSelectorModel> getTestCasesCount_JsonNullable() {
     return testCasesCount;
   }
   
   @JsonProperty(JSON_PROPERTY_TEST_CASES_COUNT)
-  public void setTestCasesCount_JsonNullable(JsonNullable<Int32RangeSelectorModel> testCasesCount) {
+  public void setTestCasesCount_JsonNullable(JsonNullable<Int64RangeSelectorModel> testCasesCount) {
     this.testCasesCount = testCasesCount;
   }
 
-  public void setTestCasesCount(@jakarta.annotation.Nullable Int32RangeSelectorModel testCasesCount) {
-    this.testCasesCount = JsonNullable.<Int32RangeSelectorModel>of(testCasesCount);
+  public void setTestCasesCount(@jakarta.annotation.Nullable Int64RangeSelectorModel testCasesCount) {
+    this.testCasesCount = JsonNullable.<Int64RangeSelectorModel>of(testCasesCount);
   }
 
 
-  public ProjectsFilterModel checklistsCount(@jakarta.annotation.Nullable Int32RangeSelectorModel checklistsCount) {
-    this.checklistsCount = JsonNullable.<Int32RangeSelectorModel>of(checklistsCount);
+  public ProjectsFilterModel checklistsCount(@jakarta.annotation.Nullable Int64RangeSelectorModel checklistsCount) {
+    this.checklistsCount = JsonNullable.<Int64RangeSelectorModel>of(checklistsCount);
     return this;
   }
 
@@ -234,29 +234,29 @@ public class ProjectsFilterModel {
   @jakarta.annotation.Nullable
   @JsonIgnore
 
-  public Int32RangeSelectorModel getChecklistsCount() {
+  public Int64RangeSelectorModel getChecklistsCount() {
         return checklistsCount.orElse(null);
   }
 
   @JsonProperty(JSON_PROPERTY_CHECKLISTS_COUNT)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public JsonNullable<Int32RangeSelectorModel> getChecklistsCount_JsonNullable() {
+  public JsonNullable<Int64RangeSelectorModel> getChecklistsCount_JsonNullable() {
     return checklistsCount;
   }
   
   @JsonProperty(JSON_PROPERTY_CHECKLISTS_COUNT)
-  public void setChecklistsCount_JsonNullable(JsonNullable<Int32RangeSelectorModel> checklistsCount) {
+  public void setChecklistsCount_JsonNullable(JsonNullable<Int64RangeSelectorModel> checklistsCount) {
     this.checklistsCount = checklistsCount;
   }
 
-  public void setChecklistsCount(@jakarta.annotation.Nullable Int32RangeSelectorModel checklistsCount) {
-    this.checklistsCount = JsonNullable.<Int32RangeSelectorModel>of(checklistsCount);
+  public void setChecklistsCount(@jakarta.annotation.Nullable Int64RangeSelectorModel checklistsCount) {
+    this.checklistsCount = JsonNullable.<Int64RangeSelectorModel>of(checklistsCount);
   }
 
 
-  public ProjectsFilterModel sharedStepsCount(@jakarta.annotation.Nullable Int32RangeSelectorModel sharedStepsCount) {
-    this.sharedStepsCount = JsonNullable.<Int32RangeSelectorModel>of(sharedStepsCount);
+  public ProjectsFilterModel sharedStepsCount(@jakarta.annotation.Nullable Int64RangeSelectorModel sharedStepsCount) {
+    this.sharedStepsCount = JsonNullable.<Int64RangeSelectorModel>of(sharedStepsCount);
     return this;
   }
 
@@ -267,29 +267,29 @@ public class ProjectsFilterModel {
   @jakarta.annotation.Nullable
   @JsonIgnore
 
-  public Int32RangeSelectorModel getSharedStepsCount() {
+  public Int64RangeSelectorModel getSharedStepsCount() {
         return sharedStepsCount.orElse(null);
   }
 
   @JsonProperty(JSON_PROPERTY_SHARED_STEPS_COUNT)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public JsonNullable<Int32RangeSelectorModel> getSharedStepsCount_JsonNullable() {
+  public JsonNullable<Int64RangeSelectorModel> getSharedStepsCount_JsonNullable() {
     return sharedStepsCount;
   }
   
   @JsonProperty(JSON_PROPERTY_SHARED_STEPS_COUNT)
-  public void setSharedStepsCount_JsonNullable(JsonNullable<Int32RangeSelectorModel> sharedStepsCount) {
+  public void setSharedStepsCount_JsonNullable(JsonNullable<Int64RangeSelectorModel> sharedStepsCount) {
     this.sharedStepsCount = sharedStepsCount;
   }
 
-  public void setSharedStepsCount(@jakarta.annotation.Nullable Int32RangeSelectorModel sharedStepsCount) {
-    this.sharedStepsCount = JsonNullable.<Int32RangeSelectorModel>of(sharedStepsCount);
+  public void setSharedStepsCount(@jakarta.annotation.Nullable Int64RangeSelectorModel sharedStepsCount) {
+    this.sharedStepsCount = JsonNullable.<Int64RangeSelectorModel>of(sharedStepsCount);
   }
 
 
-  public ProjectsFilterModel autotestsCount(@jakarta.annotation.Nullable Int32RangeSelectorModel autotestsCount) {
-    this.autotestsCount = JsonNullable.<Int32RangeSelectorModel>of(autotestsCount);
+  public ProjectsFilterModel autotestsCount(@jakarta.annotation.Nullable Int64RangeSelectorModel autotestsCount) {
+    this.autotestsCount = JsonNullable.<Int64RangeSelectorModel>of(autotestsCount);
     return this;
   }
 
@@ -300,24 +300,24 @@ public class ProjectsFilterModel {
   @jakarta.annotation.Nullable
   @JsonIgnore
 
-  public Int32RangeSelectorModel getAutotestsCount() {
+  public Int64RangeSelectorModel getAutotestsCount() {
         return autotestsCount.orElse(null);
   }
 
   @JsonProperty(JSON_PROPERTY_AUTOTESTS_COUNT)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public JsonNullable<Int32RangeSelectorModel> getAutotestsCount_JsonNullable() {
+  public JsonNullable<Int64RangeSelectorModel> getAutotestsCount_JsonNullable() {
     return autotestsCount;
   }
   
   @JsonProperty(JSON_PROPERTY_AUTOTESTS_COUNT)
-  public void setAutotestsCount_JsonNullable(JsonNullable<Int32RangeSelectorModel> autotestsCount) {
+  public void setAutotestsCount_JsonNullable(JsonNullable<Int64RangeSelectorModel> autotestsCount) {
     this.autotestsCount = autotestsCount;
   }
 
-  public void setAutotestsCount(@jakarta.annotation.Nullable Int32RangeSelectorModel autotestsCount) {
-    this.autotestsCount = JsonNullable.<Int32RangeSelectorModel>of(autotestsCount);
+  public void setAutotestsCount(@jakarta.annotation.Nullable Int64RangeSelectorModel autotestsCount) {
+    this.autotestsCount = JsonNullable.<Int64RangeSelectorModel>of(autotestsCount);
   }
 
 

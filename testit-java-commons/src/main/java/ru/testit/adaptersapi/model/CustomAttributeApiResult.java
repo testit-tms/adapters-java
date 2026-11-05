@@ -25,8 +25,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.openapitools.jackson.nullable.JsonNullable;
 import ru.testit.adaptersapi.model.CustomAttributeOptionApiResult;
 import ru.testit.adaptersapi.model.CustomAttributeType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.util.NoSuchElementException;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import ru.testit.adaptersapi.invoker.JSON;
 
@@ -42,7 +46,11 @@ import ru.testit.adaptersapi.invoker.JSON;
   CustomAttributeApiResult.JSON_PROPERTY_NAME,
   CustomAttributeApiResult.JSON_PROPERTY_IS_ENABLED,
   CustomAttributeApiResult.JSON_PROPERTY_IS_REQUIRED,
-  CustomAttributeApiResult.JSON_PROPERTY_IS_GLOBAL
+  CustomAttributeApiResult.JSON_PROPERTY_IS_GLOBAL,
+  CustomAttributeApiResult.JSON_PROPERTY_IS_READ_ONLY,
+  CustomAttributeApiResult.JSON_PROPERTY_IS_SYSTEM,
+  CustomAttributeApiResult.JSON_PROPERTY_TARGETS,
+  CustomAttributeApiResult.JSON_PROPERTY_CODE
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class CustomAttributeApiResult {
@@ -77,6 +85,21 @@ public class CustomAttributeApiResult {
   public static final String JSON_PROPERTY_IS_GLOBAL = "isGlobal";
   @jakarta.annotation.Nonnull
   private Boolean isGlobal;
+
+  public static final String JSON_PROPERTY_IS_READ_ONLY = "isReadOnly";
+  @jakarta.annotation.Nonnull
+  private Boolean isReadOnly;
+
+  public static final String JSON_PROPERTY_IS_SYSTEM = "isSystem";
+  @jakarta.annotation.Nonnull
+  private Boolean isSystem;
+
+  public static final String JSON_PROPERTY_TARGETS = "targets";
+  @jakarta.annotation.Nonnull
+  private List<String> targets = new ArrayList<>();
+
+  public static final String JSON_PROPERTY_CODE = "code";
+  private JsonNullable<String> code = JsonNullable.<String>undefined();
 
   public CustomAttributeApiResult() { 
   }
@@ -120,7 +143,7 @@ public class CustomAttributeApiResult {
   }
 
   /**
-   * Collection of the attribute options      Available for attributes of type &#x60;options&#x60; and &#x60;multiple options&#x60; only
+   * Collection of the attribute options   Available for attributes of type &#x60;options&#x60; and &#x60;multiple options&#x60; only
    * @return options
    */
   @jakarta.annotation.Nonnull
@@ -289,6 +312,122 @@ public class CustomAttributeApiResult {
   }
 
 
+  public CustomAttributeApiResult isReadOnly(@jakarta.annotation.Nonnull Boolean isReadOnly) {
+    this.isReadOnly = isReadOnly;
+    return this;
+  }
+
+  /**
+   * Indicates if the attribute is read-only
+   * @return isReadOnly
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_IS_READ_ONLY)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public Boolean getIsReadOnly() {
+    return isReadOnly;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_IS_READ_ONLY)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setIsReadOnly(@jakarta.annotation.Nonnull Boolean isReadOnly) {
+    this.isReadOnly = isReadOnly;
+  }
+
+
+  public CustomAttributeApiResult isSystem(@jakarta.annotation.Nonnull Boolean isSystem) {
+    this.isSystem = isSystem;
+    return this;
+  }
+
+  /**
+   * Indicates if the attribute is system
+   * @return isSystem
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_IS_SYSTEM)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public Boolean getIsSystem() {
+    return isSystem;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_IS_SYSTEM)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setIsSystem(@jakarta.annotation.Nonnull Boolean isSystem) {
+    this.isSystem = isSystem;
+  }
+
+
+  public CustomAttributeApiResult targets(@jakarta.annotation.Nonnull List<String> targets) {
+    this.targets = targets;
+    return this;
+  }
+
+  public CustomAttributeApiResult addTargetsItem(String targetsItem) {
+    if (this.targets == null) {
+      this.targets = new ArrayList<>();
+    }
+    this.targets.add(targetsItem);
+    return this;
+  }
+
+  /**
+   * Collection of the attribute targets   Defines where the attribute can be used (e.g., TestCases, AutoTestCases, TestPlans)
+   * @return targets
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_TARGETS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public List<String> getTargets() {
+    return targets;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_TARGETS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setTargets(@jakarta.annotation.Nonnull List<String> targets) {
+    this.targets = targets;
+  }
+
+
+  public CustomAttributeApiResult code(@jakarta.annotation.Nullable String code) {
+    this.code = JsonNullable.<String>of(code);
+    return this;
+  }
+
+  /**
+   * Optional code identifier for the attribute
+   * @return code
+   */
+  @jakarta.annotation.Nullable
+  @JsonIgnore
+
+  public String getCode() {
+        return code.orElse(null);
+  }
+
+  @JsonProperty(JSON_PROPERTY_CODE)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public JsonNullable<String> getCode_JsonNullable() {
+    return code;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_CODE)
+  public void setCode_JsonNullable(JsonNullable<String> code) {
+    this.code = code;
+  }
+
+  public void setCode(@jakarta.annotation.Nullable String code) {
+    this.code = JsonNullable.<String>of(code);
+  }
+
+
   /**
    * Return true if this CustomAttributeApiResult object is equal to o.
    */
@@ -308,12 +447,27 @@ public class CustomAttributeApiResult {
         Objects.equals(this.name, customAttributeApiResult.name) &&
         Objects.equals(this.isEnabled, customAttributeApiResult.isEnabled) &&
         Objects.equals(this.isRequired, customAttributeApiResult.isRequired) &&
-        Objects.equals(this.isGlobal, customAttributeApiResult.isGlobal);
+        Objects.equals(this.isGlobal, customAttributeApiResult.isGlobal) &&
+        Objects.equals(this.isReadOnly, customAttributeApiResult.isReadOnly) &&
+        Objects.equals(this.isSystem, customAttributeApiResult.isSystem) &&
+        Objects.equals(this.targets, customAttributeApiResult.targets) &&
+        equalsNullable(this.code, customAttributeApiResult.code);
+  }
+
+  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
+    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, options, type, isDeleted, name, isEnabled, isRequired, isGlobal);
+    return Objects.hash(id, options, type, isDeleted, name, isEnabled, isRequired, isGlobal, isReadOnly, isSystem, targets, hashCodeNullable(code));
+  }
+
+  private static <T> int hashCodeNullable(JsonNullable<T> a) {
+    if (a == null) {
+      return 1;
+    }
+    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
   }
 
   @Override
@@ -328,6 +482,10 @@ public class CustomAttributeApiResult {
     sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
     sb.append("    isRequired: ").append(toIndentedString(isRequired)).append("\n");
     sb.append("    isGlobal: ").append(toIndentedString(isGlobal)).append("\n");
+    sb.append("    isReadOnly: ").append(toIndentedString(isReadOnly)).append("\n");
+    sb.append("    isSystem: ").append(toIndentedString(isSystem)).append("\n");
+    sb.append("    targets: ").append(toIndentedString(targets)).append("\n");
+    sb.append("    code: ").append(toIndentedString(code)).append("\n");
     sb.append("}");
     return sb.toString();
   }

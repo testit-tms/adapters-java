@@ -2,7 +2,7 @@ Scenario: First
 Meta:
 @ExternalId first_scenario
 @DisplayName First scenario
-@WorkItemIds 123
+@WorkItemId 123
 @Title Title_in_the_autotest_card
 @Description Test_with_all_annotations
 @Labels Tag1,Tag2

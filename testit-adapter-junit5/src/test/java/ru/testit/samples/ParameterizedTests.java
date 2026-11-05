@@ -15,7 +15,7 @@ class ParameterizedTests {
     @ValueSource(shorts = {1, 2, 3})
     @ExternalId("Parameterized_test_with_one_parameter_{number}")
     @DisplayName("Test with number = {number} parameter")
-    @WorkItemIds("{number}")
+    @WorkItemId("{number}")
     @Title("Title in the autotest card {number}")
     @Description("Test with BeforeEach, AfterEach and all annotations {number}")
     @Labels({"Tag{number}"})
