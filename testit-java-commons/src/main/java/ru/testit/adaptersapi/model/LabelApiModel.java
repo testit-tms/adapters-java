@@ -30,18 +30,13 @@ import ru.testit.adaptersapi.invoker.JSON;
  * LabelApiModel
  */
 @JsonPropertyOrder({
-  LabelApiModel.JSON_PROPERTY_NAME,
-  LabelApiModel.JSON_PROPERTY_GLOBAL_ID
+  LabelApiModel.JSON_PROPERTY_NAME
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class LabelApiModel {
   public static final String JSON_PROPERTY_NAME = "name";
   @jakarta.annotation.Nonnull
   private String name;
-
-  public static final String JSON_PROPERTY_GLOBAL_ID = "globalId";
-  @jakarta.annotation.Nonnull
-  private Long globalId;
 
   public LabelApiModel() { 
   }
@@ -71,31 +66,6 @@ public class LabelApiModel {
   }
 
 
-  public LabelApiModel globalId(@jakarta.annotation.Nonnull Long globalId) {
-    this.globalId = globalId;
-    return this;
-  }
-
-  /**
-   * Global ID of the label
-   * @return globalId
-   */
-  @jakarta.annotation.Nonnull
-  @JsonProperty(JSON_PROPERTY_GLOBAL_ID)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
-  public Long getGlobalId() {
-    return globalId;
-  }
-
-
-  @JsonProperty(JSON_PROPERTY_GLOBAL_ID)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-  public void setGlobalId(@jakarta.annotation.Nonnull Long globalId) {
-    this.globalId = globalId;
-  }
-
-
   /**
    * Return true if this LabelApiModel object is equal to o.
    */
@@ -108,13 +78,12 @@ public class LabelApiModel {
       return false;
     }
     LabelApiModel labelApiModel = (LabelApiModel) o;
-    return Objects.equals(this.name, labelApiModel.name) &&
-        Objects.equals(this.globalId, labelApiModel.globalId);
+    return Objects.equals(this.name, labelApiModel.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, globalId);
+    return Objects.hash(name);
   }
 
   @Override
@@ -122,7 +91,6 @@ public class LabelApiModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class LabelApiModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    globalId: ").append(toIndentedString(globalId)).append("\n");
     sb.append("}");
     return sb.toString();
   }

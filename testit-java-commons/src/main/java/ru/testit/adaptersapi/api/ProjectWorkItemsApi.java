@@ -124,7 +124,7 @@ public class ProjectWorkItemsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     GenericType<List<WorkItemShortApiResult>> localVarReturnType = new GenericType<List<WorkItemShortApiResult>>() {};
     return apiClient.invokeAPI("ProjectWorkItemsApi.adaptersProjectsProjectIdWorkItemsSearchPost", localVarPath, "POST", localVarQueryParams, workItemSelectApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,

@@ -34,6 +34,8 @@ public enum WorkItemTypeModel {
   
   SHARED_STEPS("SharedSteps"),
   
+  AUTO_TEST_CASES("AutoTestCases"),
+  
   UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api");
 
   private String value;

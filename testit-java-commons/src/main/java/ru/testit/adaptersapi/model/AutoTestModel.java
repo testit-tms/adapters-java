@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
+import ru.testit.adaptersapi.model.AutoTestCaseModel;
 import ru.testit.adaptersapi.model.AutoTestStepModel;
 import ru.testit.adaptersapi.model.ConfigurationShortModel;
 import ru.testit.adaptersapi.model.LabelShortModel;
@@ -61,6 +62,7 @@ import ru.testit.adaptersapi.invoker.JSON;
   AutoTestModel.JSON_PROPERTY_LAST_TEST_RESULT_OUTCOME,
   AutoTestModel.JSON_PROPERTY_LAST_TEST_RESULT_STATUS,
   AutoTestModel.JSON_PROPERTY_STABILITY_PERCENTAGE,
+  AutoTestModel.JSON_PROPERTY_AUTO_TEST_CASE,
   AutoTestModel.JSON_PROPERTY_LINKS,
   AutoTestModel.JSON_PROPERTY_NAMESPACE,
   AutoTestModel.JSON_PROPERTY_CLASSNAME,
@@ -138,6 +140,9 @@ public class AutoTestModel {
 
   public static final String JSON_PROPERTY_STABILITY_PERCENTAGE = "stabilityPercentage";
   private JsonNullable<Integer> stabilityPercentage = JsonNullable.<Integer>undefined();
+
+  public static final String JSON_PROPERTY_AUTO_TEST_CASE = "autoTestCase";
+  private JsonNullable<AutoTestCaseModel> autoTestCase = JsonNullable.<AutoTestCaseModel>undefined();
 
   public static final String JSON_PROPERTY_LINKS = "links";
   private JsonNullable<List<LinkPutModel>> links = JsonNullable.<List<LinkPutModel>>undefined();
@@ -701,6 +706,39 @@ public class AutoTestModel {
   }
 
 
+  public AutoTestModel autoTestCase(@jakarta.annotation.Nullable AutoTestCaseModel autoTestCase) {
+    this.autoTestCase = JsonNullable.<AutoTestCaseModel>of(autoTestCase);
+    return this;
+  }
+
+  /**
+   * Auto test case linked with the autotest
+   * @return autoTestCase
+   */
+  @jakarta.annotation.Nullable
+  @JsonIgnore
+
+  public AutoTestCaseModel getAutoTestCase() {
+        return autoTestCase.orElse(null);
+  }
+
+  @JsonProperty(JSON_PROPERTY_AUTO_TEST_CASE)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public JsonNullable<AutoTestCaseModel> getAutoTestCase_JsonNullable() {
+    return autoTestCase;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_AUTO_TEST_CASE)
+  public void setAutoTestCase_JsonNullable(JsonNullable<AutoTestCaseModel> autoTestCase) {
+    this.autoTestCase = autoTestCase;
+  }
+
+  public void setAutoTestCase(@jakarta.annotation.Nullable AutoTestCaseModel autoTestCase) {
+    this.autoTestCase = JsonNullable.<AutoTestCaseModel>of(autoTestCase);
+  }
+
+
   public AutoTestModel links(@jakarta.annotation.Nullable List<LinkPutModel> links) {
     this.links = JsonNullable.<List<LinkPutModel>>of(links);
     return this;
@@ -1154,6 +1192,7 @@ public class AutoTestModel {
         equalsNullable(this.lastTestResultOutcome, autoTestModel.lastTestResultOutcome) &&
         equalsNullable(this.lastTestResultStatus, autoTestModel.lastTestResultStatus) &&
         equalsNullable(this.stabilityPercentage, autoTestModel.stabilityPercentage) &&
+        equalsNullable(this.autoTestCase, autoTestModel.autoTestCase) &&
         equalsNullable(this.links, autoTestModel.links) &&
         equalsNullable(this.namespace, autoTestModel.namespace) &&
         equalsNullable(this.classname, autoTestModel.classname) &&
@@ -1173,7 +1212,7 @@ public class AutoTestModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(globalId, isDeleted, mustBeApproved, id, createdDate, createdById, externalId, projectId, name, hashCodeNullable(modifiedDate), hashCodeNullable(modifiedById), hashCodeNullable(lastTestRunId), hashCodeNullable(lastTestRunName), hashCodeNullable(lastTestResultId), hashCodeNullable(lastTestResultConfiguration), hashCodeNullable(lastTestResultOutcome), hashCodeNullable(lastTestResultStatus), hashCodeNullable(stabilityPercentage), hashCodeNullable(links), hashCodeNullable(namespace), hashCodeNullable(classname), hashCodeNullable(steps), hashCodeNullable(setup), hashCodeNullable(teardown), hashCodeNullable(title), hashCodeNullable(description), hashCodeNullable(labels), hashCodeNullable(isFlaky), hashCodeNullable(externalKey));
+    return Objects.hash(globalId, isDeleted, mustBeApproved, id, createdDate, createdById, externalId, projectId, name, hashCodeNullable(modifiedDate), hashCodeNullable(modifiedById), hashCodeNullable(lastTestRunId), hashCodeNullable(lastTestRunName), hashCodeNullable(lastTestResultId), hashCodeNullable(lastTestResultConfiguration), hashCodeNullable(lastTestResultOutcome), hashCodeNullable(lastTestResultStatus), hashCodeNullable(stabilityPercentage), hashCodeNullable(autoTestCase), hashCodeNullable(links), hashCodeNullable(namespace), hashCodeNullable(classname), hashCodeNullable(steps), hashCodeNullable(setup), hashCodeNullable(teardown), hashCodeNullable(title), hashCodeNullable(description), hashCodeNullable(labels), hashCodeNullable(isFlaky), hashCodeNullable(externalKey));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -1205,6 +1244,7 @@ public class AutoTestModel {
     sb.append("    lastTestResultOutcome: ").append(toIndentedString(lastTestResultOutcome)).append("\n");
     sb.append("    lastTestResultStatus: ").append(toIndentedString(lastTestResultStatus)).append("\n");
     sb.append("    stabilityPercentage: ").append(toIndentedString(stabilityPercentage)).append("\n");
+    sb.append("    autoTestCase: ").append(toIndentedString(autoTestCase)).append("\n");
     sb.append("    links: ").append(toIndentedString(links)).append("\n");
     sb.append("    namespace: ").append(toIndentedString(namespace)).append("\n");
     sb.append("    classname: ").append(toIndentedString(classname)).append("\n");

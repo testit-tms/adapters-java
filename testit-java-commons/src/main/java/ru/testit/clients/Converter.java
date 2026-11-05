@@ -326,7 +326,6 @@ public class Converter {
             LabelApiModel model = new LabelApiModel();
 
             model.setName(label.getName());
-            model.setGlobalId(0L);
 
             return model;
         }).collect(Collectors.toList());
@@ -337,7 +336,6 @@ public class Converter {
             LabelApiModel model = new LabelApiModel();
 
             model.setName(label.getName());
-            model.setGlobalId(0L);
 
             return model;
         }).collect(Collectors.toList());
@@ -501,6 +499,8 @@ public class Converter {
 
         model.setId(testRun.getId());
         model.setName(testRun.getName());
+        model.setDescription_JsonNullable(testRun.getDescription_JsonNullable());
+        model.setLaunchSource_JsonNullable(testRun.getLaunchSource_JsonNullable());
         model.setAttachments(Converter.buildAssignAttachmentApiModels(testRun.getAttachments()));
         model.setLinks(Converter.buildUpdateLinkApiModels(testRun.getLinks()));
         model.setTags(testRun.getTags());

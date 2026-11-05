@@ -106,7 +106,7 @@ public class TestResultsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     GenericType<TestResultResponse> localVarReturnType = new GenericType<TestResultResponse>() {};
     return apiClient.invokeAPI("TestResultsApi.adaptersTestResultsIdGet", localVarPath, "GET", new ArrayList<>(), null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -167,7 +167,7 @@ public class TestResultsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     return apiClient.invokeAPI("TestResultsApi.adaptersTestResultsIdPut", localVarPath, "PUT", new ArrayList<>(), testResultUpdateRequest,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                localVarAuthNames, null, false);
@@ -236,7 +236,7 @@ public class TestResultsApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     GenericType<List<TestResultShortResponse>> localVarReturnType = new GenericType<List<TestResultShortResponse>>() {};
     return apiClient.invokeAPI("TestResultsApi.adaptersTestResultsSearchPost", "/adapters/testResults/search", "POST", localVarQueryParams, testResultsFilterApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
