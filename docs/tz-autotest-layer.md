@@ -160,4 +160,4 @@ Implemented in `testit-java-commons` (shared by all Java adapters):
 - `TestLayers` constants (`ru.testit.models.TestLayers`)
 - `TestResult.layer`, `Utils.extractLayer`
 - `Converter`: `resetLayer: false` on every update; `layer` + `LayerSource.RUN` only when set in test code
-- Framework listeners: JUnit 4/5, TestNG, Cucumber 4–7 (`@Layer=`), JBehave (meta `Layer`)
+- Framework listeners: JUnit 4/5/6, TestNG, Cucumber 4–8 (`@Layer=`), JBehave (meta `Layer`)

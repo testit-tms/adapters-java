@@ -111,7 +111,7 @@ Documented in detail: [cucumber-bulk-import-lifecycle.md](./cucumber-bulk-import
 - `startClassContainer` replaced storage entry each scenario → **lost** accumulated `children`.
 - Duplicate class UUIDs in `MainContainer.children` → duplicate bulk processing.
 
-### 5.2 After (Cucumber 4–7)
+### 5.2 After (Cucumber 4–8)
 
 | Event | Action |
 |-------|--------|
