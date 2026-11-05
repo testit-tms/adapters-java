@@ -1,4 +1,4 @@
-﻿# Test IT TMS Adapter for Cucumber6
+# Test IT TMS Adapter for Cucumber6
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
 ## Getting Started
@@ -424,7 +424,7 @@ Use tags to specify information about autotest.
 
 Description of tags:
 - `WorkItemId` - a method that links an autotest with a manual test. Receives a single globalId
-- `WorkItemIds` - deprecated, use `WorkItemId` instead
+- `WorkItemIds` - a method that links an autotest with manual tests. Receives one or more globalIds
 - `DisplayName` - internal autotest name (used in Test IT)
 - `ExternalId` - unique internal autotest ID (used in Test IT)
 - `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
@@ -442,7 +442,7 @@ Description of methods:
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
 - `Adapter.addWorkItemId` - a dynamic method that links an autotest with a manual test. Receives a single globalId
-- `Adapter.addWorkItemIds` - deprecated, use `Adapter.addWorkItemId` instead
+- `Adapter.addWorkItemIds` - a dynamic method that links an autotest with manual tests. Receives one or more globalIds
 - `Adapter.addDisplayName` - a dynamic method for adding internal autotest name (used in Test IT)
 - `Adapter.addExternalId` - a dynamic method for adding unique internal autotest ID (used in Test IT)
 - `Adapter.addTitle` - a dynamic method for adding autotest name specified in the autotest card or the step. If not specified, the name from the displayName method is used

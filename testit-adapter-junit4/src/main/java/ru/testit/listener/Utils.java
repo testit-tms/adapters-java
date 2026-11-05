@@ -33,10 +33,6 @@ public class Utils {
         final WorkItemId workItem = method.getAnnotation(WorkItemId.class);
         final WorkItemIds workItems = method.getAnnotation(WorkItemIds.class);
 
-        if (workItems != null) {
-            ru.testit.services.Utils.warnDeprecated("WorkItemIds", "WorkItemId");
-        }
-
         if (workItem != null) {
             workItemIds.add(workItem.value());
             return workItemIds;

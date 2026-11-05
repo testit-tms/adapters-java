@@ -177,12 +177,7 @@ public final class Adapter {
                 testResult.setWorkItemIds(Collections.singletonList(globalId)));
     }
 
-    /**
-     * @deprecated Use {@link #addWorkItemId(String)} with a single globalId instead.
-     */
-    @Deprecated
     public static void addWorkItemIds(String[] workItemIds) {
-        Utils.warnDeprecated("addWorkItemIds", "addWorkItemId");
         getAdapterManager().updateTestCase(testResult -> testResult.setWorkItemIds(Arrays.asList(workItemIds)));
     }
 

@@ -1,7 +1,5 @@
 package ru.testit.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.testit.annotations.*;
 import ru.testit.models.Label;
 import ru.testit.models.LinkItem;
@@ -22,13 +20,7 @@ import static java.util.Objects.isNull;
 
 public class Utils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
-
     private Utils() {}
-
-    public static void warnDeprecated(String oldName, String newName) {
-        LOGGER.warn("{} is deprecated. Use {} with a single globalId instead.", oldName, newName);
-    }
 
     public static String extractExternalID(final Method atomicTest, Map<String, String> parameters) {
         final ExternalId annotation = atomicTest.getAnnotation(ExternalId.class);
@@ -44,10 +36,6 @@ public class Utils {
         final List<String> workItemIds = new ArrayList<>();
         final WorkItemId workItem = atomicTest.getAnnotation(WorkItemId.class);
         final WorkItemIds workItems = atomicTest.getAnnotation(WorkItemIds.class);
-
-        if (workItems != null) {
-            warnDeprecated("WorkItemIds", "WorkItemId");
-        }
 
         if (workItem != null) {
             workItemIds.add(setParameters(workItem.value(), parameters));
