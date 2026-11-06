@@ -499,11 +499,11 @@ public class Converter {
 
         model.setId(testRun.getId());
         model.setName(testRun.getName());
+        // Copy JsonNullable as-is so undefined vs null is preserved on merge-update.
         model.setDescription_JsonNullable(testRun.getDescription_JsonNullable());
         model.setLaunchSource_JsonNullable(testRun.getLaunchSource_JsonNullable());
-        model.setAttachments(Converter.buildAssignAttachmentApiModels(testRun.getAttachments()));
-        model.setLinks(Converter.buildUpdateLinkApiModels(testRun.getLinks()));
-        model.setTags(testRun.getTags());
+        // Leave tags/links/attachments JsonNullable.undefined() unless the caller merges them.
+        // Always copying GET lists (often empty) would serialize [] and wipe server-side values.
 
         return model;
     }
