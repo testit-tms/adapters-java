@@ -2,6 +2,9 @@ package ru.testit.clients;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.GenericType;
 import ru.testit.adaptersapi.api.*;
 import ru.testit.adaptersapi.invoker.ApiClient;
 import ru.testit.adaptersapi.invoker.ApiException;
@@ -9,6 +12,9 @@ import ru.testit.adaptersapi.model.*;
 import ru.testit.services.HtmlEscapeUtils;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,8 +29,9 @@ public class TmsApiClient implements ITmsApiClient {
     private static final int MAX_TRIES = 4;
     private static final int WAITING_TIME = 100;
     private static final int TESTS_LIMIT = 100;
-    private static final UUID EMPTY_TEST_POINT_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    private static final ObjectMapper V2_JSON = new ObjectMapper();
 
+    private final ApiClient apiClient;
     private final TestRunsApi testRunsApi;
     private final AutoTestsApi autoTestsApi;
     private final AttachmentsApi attachmentsApi;
@@ -41,6 +48,7 @@ public class TmsApiClient implements ITmsApiClient {
         apiClient.setApiKey(config.getPrivateToken());
 
         clientConfiguration = config;
+        this.apiClient = apiClient;
         testRunsApi = new TestRunsApi(apiClient);
         autoTestsApi = new AutoTestsApi(apiClient);
         attachmentsApi = new AttachmentsApi(apiClient);
@@ -83,7 +91,33 @@ public class TmsApiClient implements ITmsApiClient {
 
     @Override
     public TestRunApiResult getTestRun(String uuid) throws ApiException {
-        return testRunsApi.adaptersTestRunsIdGet(UUID.fromString(uuid));
+        // TMS 5.8: GET /adapters/testRuns/{id} omits description/launchSource and returns
+        // empty links/attachments. Read via v2; TestRunApiResult keeps only merge fields
+        // (id/name/description/launchSource/tags/links/attachments) — testResults ignored.
+        return getTestRunByIdV2(UUID.fromString(uuid));
+    }
+
+    private TestRunApiResult getTestRunByIdV2(UUID id) throws ApiException {
+        String path = "/api/v2/testRuns/" + apiClient.escapeString(id.toString());
+        String accept = apiClient.selectHeaderAccept("application/json");
+        String contentType = apiClient.selectHeaderContentType();
+        String[] authNames = new String[]{"PrivateToken", "Identity.Application"};
+        GenericType<TestRunApiResult> returnType = new GenericType<TestRunApiResult>() {};
+        return apiClient.invokeAPI(
+                "TmsApiClient.getTestRunByIdV2",
+                path,
+                "GET",
+                new ArrayList<>(),
+                null,
+                new LinkedHashMap<>(),
+                new LinkedHashMap<>(),
+                new LinkedHashMap<>(),
+                accept,
+                contentType,
+                authNames,
+                returnType,
+                false
+        ).getData();
     }
 
     @Override
@@ -352,7 +386,8 @@ public class TmsApiClient implements ITmsApiClient {
             if (id == null) {
                 continue;
             }
-            if (hasValidTestPointId(id)) {
+            // adapters DTO has no testPointId — resolve via raw v2 GET
+            if (hasValidTestPointIdV2(id)) {
                 return id;
             }
             if (orphanId == null) {
@@ -362,13 +397,45 @@ public class TmsApiClient implements ITmsApiClient {
         return orphanId;
     }
 
-    private boolean hasValidTestPointId(UUID testResultId) {
+    /**
+     * Hack: adapters OpenAPI for 5.8 omits testPointId. Read it from GET /api/v2/testResults/{id}.
+     */
+    private boolean hasValidTestPointIdV2(UUID testResultId) {
         try {
-            TestResultResponse result = testResultsApi.adaptersTestResultsIdGet(testResultId);
-            UUID testPointId = result.getTestPointId();
-            return testPointId != null && !EMPTY_TEST_POINT_ID.equals(testPointId);
-        } catch (ApiException e) {
-            LOGGER.debug("getTestResult {} failed: {}", testResultId, e.getMessage());
+            String base = clientConfiguration.getUrl();
+            if (base.endsWith("/")) {
+                base = base.substring(0, base.length() - 1);
+            }
+            URL url = new URL(base + "/api/v2/testResults/" + testResultId);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty(
+                    "Authorization",
+                    AUTH_PREFIX + " " + clientConfiguration.getPrivateToken()
+            );
+
+            int code = connection.getResponseCode();
+            if (code < 200 || code >= 300) {
+                LOGGER.debug("v2 getTestResult {} HTTP {}", testResultId, code);
+                return false;
+            }
+
+            try (InputStream in = connection.getInputStream()) {
+                JsonNode root = V2_JSON.readTree(in);
+                JsonNode tp = root.get("testPointId");
+                if (tp == null || tp.isNull()) {
+                    return false;
+                }
+                String value = tp.asText();
+                return value != null
+                        && !value.isEmpty()
+                        && !"00000000-0000-0000-0000-000000000000".equals(value);
+            }
+        } catch (Exception e) {
+            LOGGER.debug("v2 getTestResult {} failed: {}", testResultId, e.getMessage());
             return false;
         }
     }

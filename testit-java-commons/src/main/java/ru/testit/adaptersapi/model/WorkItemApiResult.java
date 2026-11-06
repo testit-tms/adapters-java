@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
 import ru.testit.adaptersapi.model.AttachmentModel;
+import ru.testit.adaptersapi.model.AutoTestCaseApiModel;
 import ru.testit.adaptersapi.model.AutoTestModel;
 import ru.testit.adaptersapi.model.IterationModel;
 import ru.testit.adaptersapi.model.LinkModel;
@@ -68,6 +69,7 @@ import ru.testit.adaptersapi.invoker.JSON;
   WorkItemApiResult.JSON_PROPERTY_POSTCONDITION_STEPS,
   WorkItemApiResult.JSON_PROPERTY_ITERATIONS,
   WorkItemApiResult.JSON_PROPERTY_AUTO_TESTS,
+  WorkItemApiResult.JSON_PROPERTY_AUTO_TEST_CASES,
   WorkItemApiResult.JSON_PROPERTY_ATTACHMENTS,
   WorkItemApiResult.JSON_PROPERTY_LINKS,
   WorkItemApiResult.JSON_PROPERTY_PARAMETERS,
@@ -151,6 +153,10 @@ public class WorkItemApiResult {
   public static final String JSON_PROPERTY_AUTO_TESTS = "autoTests";
   @jakarta.annotation.Nonnull
   private List<AutoTestModel> autoTests = new ArrayList<>();
+
+  public static final String JSON_PROPERTY_AUTO_TEST_CASES = "autoTestCases";
+  @jakarta.annotation.Nonnull
+  private List<AutoTestCaseApiModel> autoTestCases = new ArrayList<>();
 
   public static final String JSON_PROPERTY_ATTACHMENTS = "attachments";
   @jakarta.annotation.Nonnull
@@ -721,6 +727,39 @@ public class WorkItemApiResult {
   }
 
 
+  public WorkItemApiResult autoTestCases(@jakarta.annotation.Nonnull List<AutoTestCaseApiModel> autoTestCases) {
+    this.autoTestCases = autoTestCases;
+    return this;
+  }
+
+  public WorkItemApiResult addAutoTestCasesItem(AutoTestCaseApiModel autoTestCasesItem) {
+    if (this.autoTestCases == null) {
+      this.autoTestCases = new ArrayList<>();
+    }
+    this.autoTestCases.add(autoTestCasesItem);
+    return this;
+  }
+
+  /**
+   * Set of automated test cases linked to the work item
+   * @return autoTestCases
+   */
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_AUTO_TEST_CASES)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public List<AutoTestCaseApiModel> getAutoTestCases() {
+    return autoTestCases;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_AUTO_TEST_CASES)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setAutoTestCases(@jakarta.annotation.Nonnull List<AutoTestCaseApiModel> autoTestCases) {
+    this.autoTestCases = autoTestCases;
+  }
+
+
   public WorkItemApiResult attachments(@jakarta.annotation.Nonnull List<AttachmentModel> attachments) {
     this.attachments = attachments;
     return this;
@@ -909,6 +948,7 @@ public class WorkItemApiResult {
         Objects.equals(this.postconditionSteps, workItemApiResult.postconditionSteps) &&
         Objects.equals(this.iterations, workItemApiResult.iterations) &&
         Objects.equals(this.autoTests, workItemApiResult.autoTests) &&
+        Objects.equals(this.autoTestCases, workItemApiResult.autoTestCases) &&
         Objects.equals(this.attachments, workItemApiResult.attachments) &&
         Objects.equals(this.links, workItemApiResult.links) &&
         Objects.equals(this.parameters, workItemApiResult.parameters) &&
@@ -922,7 +962,7 @@ public class WorkItemApiResult {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, globalId, projectId, sectionId, name, entityTypeName, duration, state, priority, isAutomated, attributes, tags, sectionPreconditionSteps, sectionPostconditionSteps, preconditionSteps, steps, postconditionSteps, iterations, autoTests, attachments, links, parameters, isDeleted, hashCodeNullable(description));
+    return Objects.hash(id, globalId, projectId, sectionId, name, entityTypeName, duration, state, priority, isAutomated, attributes, tags, sectionPreconditionSteps, sectionPostconditionSteps, preconditionSteps, steps, postconditionSteps, iterations, autoTests, autoTestCases, attachments, links, parameters, isDeleted, hashCodeNullable(description));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -955,6 +995,7 @@ public class WorkItemApiResult {
     sb.append("    postconditionSteps: ").append(toIndentedString(postconditionSteps)).append("\n");
     sb.append("    iterations: ").append(toIndentedString(iterations)).append("\n");
     sb.append("    autoTests: ").append(toIndentedString(autoTests)).append("\n");
+    sb.append("    autoTestCases: ").append(toIndentedString(autoTestCases)).append("\n");
     sb.append("    attachments: ").append(toIndentedString(attachments)).append("\n");
     sb.append("    links: ").append(toIndentedString(links)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");

@@ -95,6 +95,7 @@ public class AdapterStartupHelper {
         }
 
         TestRunApiResult testRun = this.client.getTestRun(this.clientConfiguration.getTestRunId());
+        // getTestRun is GET /api/v2/testRuns/{id} (adapters GET is incomplete on TMS 5.8).
         UpdateEmptyTestRunApiModel model = Converter.buildUpdateEmptyTestRunApiModel(testRun);
         boolean changed = false;
 

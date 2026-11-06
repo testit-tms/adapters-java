@@ -86,7 +86,6 @@ public class TagParser {
                         workItemIdValue = Utils.setParameters(parseSpaceInTag(tagValue), parameters);
                         break;
                     case WORK_ITEM_IDS:
-                        Utils.warnDeprecated("WorkItemIds", "WorkItemId");
                         Arrays.stream(Utils.setParameters(parseSpaceInTag(tagValue), parameters).split(TAG_VALUE_DELIMITER))
                                 .forEach(id -> getWorkItemIdList().add(id));
                         break;

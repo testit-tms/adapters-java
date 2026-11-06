@@ -109,7 +109,7 @@ public class CustomAttributesApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     GenericType<CustomAttributeApiResult> localVarReturnType = new GenericType<CustomAttributeApiResult>() {};
     return apiClient.invokeAPI("CustomAttributesApi.adaptersCustomAttributesGlobalIdPut", localVarPath, "PUT", new ArrayList<>(), globalCustomAttributeUpdateApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -160,7 +160,7 @@ public class CustomAttributesApi {
   public ApiResponse<CustomAttributeApiResult> adaptersCustomAttributesGlobalPostWithHttpInfo(GlobalCustomAttributePostApiModel globalCustomAttributePostApiModel) throws ApiException {
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     GenericType<CustomAttributeApiResult> localVarReturnType = new GenericType<CustomAttributeApiResult>() {};
     return apiClient.invokeAPI("CustomAttributesApi.adaptersCustomAttributesGlobalPost", "/adapters/customAttributes/global", "POST", new ArrayList<>(), globalCustomAttributePostApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -220,7 +220,7 @@ public class CustomAttributesApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType();
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     GenericType<CustomAttributeApiResult> localVarReturnType = new GenericType<CustomAttributeApiResult>() {};
     return apiClient.invokeAPI("CustomAttributesApi.adaptersCustomAttributesIdGet", localVarPath, "GET", new ArrayList<>(), null,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
@@ -290,7 +290,7 @@ public class CustomAttributesApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     GenericType<List<CustomAttributeSearchApiResult>> localVarReturnType = new GenericType<List<CustomAttributeSearchApiResult>>() {};
     return apiClient.invokeAPI("CustomAttributesApi.adaptersCustomAttributesSearchPost", "/adapters/customAttributes/search", "POST", localVarQueryParams, customAttributeSearchApiModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,

@@ -106,7 +106,7 @@ public class ProjectAttributesApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     return apiClient.invokeAPI("ProjectAttributesApi.adaptersProjectsProjectIdAttributesPut", localVarPath, "PUT", new ArrayList<>(), customAttributePutModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,
                                localVarAuthNames, null, false);
@@ -186,7 +186,7 @@ public class ProjectAttributesApi {
 
     String localVarAccept = apiClient.selectHeaderAccept("application/json");
     String localVarContentType = apiClient.selectHeaderContentType("application/json");
-    String[] localVarAuthNames = new String[] {"PrivateToken", "Identity.Application"};
+    String[] localVarAuthNames = new String[] {"PrivateToken", "Cookies"};
     GenericType<List<CustomAttributeModel>> localVarReturnType = new GenericType<List<CustomAttributeModel>>() {};
     return apiClient.invokeAPI("ProjectAttributesApi.adaptersProjectsProjectIdAttributesSearchPost", localVarPath, "POST", localVarQueryParams, projectAttributesFilterModel,
                                new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), localVarAccept, localVarContentType,

@@ -172,3 +172,9 @@ Implemented in `testit-java-commons` (all Java adapters share this):
 - Config: `testRunTags` / `TMS_TEST_RUN_TAGS` / `tmsTestRunTags`, `testRunLinks` / `TMS_TEST_RUN_LINKS` / `tmsTestRunLinks`
 - Create path: tags/links on `createTestRun`
 - Existing run: early merge in `AdapterStartupHelper` at startup
+- **TMS 5.8:** `getTestRun` uses `GET /api/v2/testRuns/{id}` (not adapters GET).
+  Adapters GET omits `description`/`launchSource` and returns empty `links`/`attachments`;
+  adapters `PUT` then replaces those collections and would wipe existing data.
+  `testResults` and other v2-only fields are ignored by `TestRunApiResult`.
+- Early update copies `description` and `launchSource` into the PUT body
+  (`Converter.buildUpdateEmptyTestRunApiModel`).

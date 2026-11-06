@@ -1,4 +1,4 @@
-﻿# Test IT TMS adapter for Selenide
+# Test IT TMS adapter for Selenide
 
 ![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-python/master/images/banner.png)
 
@@ -290,7 +290,7 @@ Use annotations to specify information about autotest.
 Description of annotations:
 
 - `WorkItemId` - a method that links an autotest with a manual test. Receives a single globalId
-- `WorkItemIds` - deprecated, use `WorkItemId` instead
+- `WorkItemIds` - a method that links an autotest with manual tests. Receives one or more globalIds
 - `DisplayName` - internal autotest name (used in Test IT)
 - `ExternalId` - unique internal autotest ID (used in Test IT)
 - `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
@@ -306,7 +306,7 @@ Description of methods:
 - `Adapter.addAttachments` - add attachments to the autotest result.
 - `Adapter.addMessage` - add message to the autotest result.
 - `Adapter.addWorkItemId` - a dynamic method that links an autotest with a manual test. Receives a single globalId
-- `Adapter.addWorkItemIds` - deprecated, use `Adapter.addWorkItemId` instead
+- `Adapter.addWorkItemIds` - a dynamic method that links an autotest with manual tests. Receives one or more globalIds
 - `Adapter.addDisplayName` - a dynamic method for adding internal autotest name (used in Test IT)
 - `Adapter.addExternalId` - a dynamic method for adding unique internal autotest ID (used in Test IT)
 - `Adapter.addTitle` - a dynamic method for adding autotest name specified in the autotest card or the step. If not specified, the name from the displayName method is used
@@ -369,7 +369,7 @@ public class ExampleTests {
 
         SelenideElement searchField = getElementByXpath("//h1[contains(@class,\"title\")]");
 
-        searchField.shouldHave(text("Ð¡Ð¸ÑÑ‚ÐµÐ¼Ð° Ð´Ð»Ñ ÑƒÐ¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ñ‚ÐµÑÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸ÐµÐ¼"));
+        searchField.shouldHave(text("????N?N�?�???� ???�N? N???N�?�???�?�????N? N�?�N?N�??N�?????�?????�??"));
     }
 
     @Test
@@ -378,7 +378,7 @@ public class ExampleTests {
 
         SelenideElement searchField = getElementByXpath("//h1[contains(@class,\"title\")]");
 
-        searchField.shouldHave(text("Ð¡Ð¸ÑÑ‚ÐµÐ¼Ð° ÑƒÐ¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ñ‚ÐµÑÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸ÐµÐ¼"));
+        searchField.shouldHave(text("????N?N�?�???� N???N�?�???�?�????N? N�?�N?N�??N�?????�?????�??"));
     }
 
     @Step

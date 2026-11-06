@@ -44,7 +44,6 @@ import ru.testit.adaptersapi.invoker.JSON;
   AutoTestUpdateApiModel.JSON_PROPERTY_PROJECT_ID,
   AutoTestUpdateApiModel.JSON_PROPERTY_EXTERNAL_ID,
   AutoTestUpdateApiModel.JSON_PROPERTY_NAME,
-  AutoTestUpdateApiModel.JSON_PROPERTY_RESET_LAYER,
   AutoTestUpdateApiModel.JSON_PROPERTY_ID,
   AutoTestUpdateApiModel.JSON_PROPERTY_EXTERNAL_KEY,
   AutoTestUpdateApiModel.JSON_PROPERTY_NAMESPACE,
@@ -53,6 +52,7 @@ import ru.testit.adaptersapi.invoker.JSON;
   AutoTestUpdateApiModel.JSON_PROPERTY_DESCRIPTION,
   AutoTestUpdateApiModel.JSON_PROPERTY_IS_FLAKY,
   AutoTestUpdateApiModel.JSON_PROPERTY_LAYER,
+  AutoTestUpdateApiModel.JSON_PROPERTY_RESET_LAYER,
   AutoTestUpdateApiModel.JSON_PROPERTY_STEPS,
   AutoTestUpdateApiModel.JSON_PROPERTY_SETUP,
   AutoTestUpdateApiModel.JSON_PROPERTY_TEARDOWN,
@@ -73,10 +73,6 @@ public class AutoTestUpdateApiModel {
   public static final String JSON_PROPERTY_NAME = "name";
   @jakarta.annotation.Nonnull
   private String name;
-
-  public static final String JSON_PROPERTY_RESET_LAYER = "resetLayer";
-  @jakarta.annotation.Nonnull
-  private Boolean resetLayer;
 
   public static final String JSON_PROPERTY_ID = "id";
   private JsonNullable<UUID> id = JsonNullable.<UUID>undefined();
@@ -101,6 +97,9 @@ public class AutoTestUpdateApiModel {
 
   public static final String JSON_PROPERTY_LAYER = "layer";
   private JsonNullable<LayerApiModel> layer = JsonNullable.<LayerApiModel>undefined();
+
+  public static final String JSON_PROPERTY_RESET_LAYER = "resetLayer";
+  private JsonNullable<Boolean> resetLayer = JsonNullable.<Boolean>undefined();
 
   public static final String JSON_PROPERTY_STEPS = "steps";
   private JsonNullable<List<AutoTestStepApiModel>> steps = JsonNullable.<List<AutoTestStepApiModel>>undefined();
@@ -195,31 +194,6 @@ public class AutoTestUpdateApiModel {
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setName(@jakarta.annotation.Nonnull String name) {
     this.name = name;
-  }
-
-
-  public AutoTestUpdateApiModel resetLayer(@jakarta.annotation.Nonnull Boolean resetLayer) {
-    this.resetLayer = resetLayer;
-    return this;
-  }
-
-  /**
-   * Indicates if the autotest layer should be reset.
-   * @return resetLayer
-   */
-  @jakarta.annotation.Nonnull
-  @JsonProperty(JSON_PROPERTY_RESET_LAYER)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
-  public Boolean getResetLayer() {
-    return resetLayer;
-  }
-
-
-  @JsonProperty(JSON_PROPERTY_RESET_LAYER)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-  public void setResetLayer(@jakarta.annotation.Nonnull Boolean resetLayer) {
-    this.resetLayer = resetLayer;
   }
 
 
@@ -484,6 +458,39 @@ public class AutoTestUpdateApiModel {
 
   public void setLayer(@jakarta.annotation.Nullable LayerApiModel layer) {
     this.layer = JsonNullable.<LayerApiModel>of(layer);
+  }
+
+
+  public AutoTestUpdateApiModel resetLayer(@jakarta.annotation.Nullable Boolean resetLayer) {
+    this.resetLayer = JsonNullable.<Boolean>of(resetLayer);
+    return this;
+  }
+
+  /**
+   * Indicates if the autotest layer should be reset.
+   * @return resetLayer
+   */
+  @jakarta.annotation.Nullable
+  @JsonIgnore
+
+  public Boolean getResetLayer() {
+        return resetLayer.orElse(null);
+  }
+
+  @JsonProperty(JSON_PROPERTY_RESET_LAYER)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public JsonNullable<Boolean> getResetLayer_JsonNullable() {
+    return resetLayer;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_RESET_LAYER)
+  public void setResetLayer_JsonNullable(JsonNullable<Boolean> resetLayer) {
+    this.resetLayer = resetLayer;
+  }
+
+  public void setResetLayer(@jakarta.annotation.Nullable Boolean resetLayer) {
+    this.resetLayer = JsonNullable.<Boolean>of(resetLayer);
   }
 
 
@@ -772,7 +779,6 @@ public class AutoTestUpdateApiModel {
     return Objects.equals(this.projectId, autoTestUpdateApiModel.projectId) &&
         Objects.equals(this.externalId, autoTestUpdateApiModel.externalId) &&
         Objects.equals(this.name, autoTestUpdateApiModel.name) &&
-        Objects.equals(this.resetLayer, autoTestUpdateApiModel.resetLayer) &&
         equalsNullable(this.id, autoTestUpdateApiModel.id) &&
         equalsNullable(this.externalKey, autoTestUpdateApiModel.externalKey) &&
         equalsNullable(this.namespace, autoTestUpdateApiModel.namespace) &&
@@ -781,6 +787,7 @@ public class AutoTestUpdateApiModel {
         equalsNullable(this.description, autoTestUpdateApiModel.description) &&
         equalsNullable(this.isFlaky, autoTestUpdateApiModel.isFlaky) &&
         equalsNullable(this.layer, autoTestUpdateApiModel.layer) &&
+        equalsNullable(this.resetLayer, autoTestUpdateApiModel.resetLayer) &&
         equalsNullable(this.steps, autoTestUpdateApiModel.steps) &&
         equalsNullable(this.setup, autoTestUpdateApiModel.setup) &&
         equalsNullable(this.teardown, autoTestUpdateApiModel.teardown) &&
@@ -795,7 +802,7 @@ public class AutoTestUpdateApiModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(projectId, externalId, name, resetLayer, hashCodeNullable(id), hashCodeNullable(externalKey), hashCodeNullable(namespace), hashCodeNullable(classname), hashCodeNullable(title), hashCodeNullable(description), hashCodeNullable(isFlaky), hashCodeNullable(layer), hashCodeNullable(steps), hashCodeNullable(setup), hashCodeNullable(teardown), hashCodeNullable(labels), hashCodeNullable(links), hashCodeNullable(tags));
+    return Objects.hash(projectId, externalId, name, hashCodeNullable(id), hashCodeNullable(externalKey), hashCodeNullable(namespace), hashCodeNullable(classname), hashCodeNullable(title), hashCodeNullable(description), hashCodeNullable(isFlaky), hashCodeNullable(layer), hashCodeNullable(resetLayer), hashCodeNullable(steps), hashCodeNullable(setup), hashCodeNullable(teardown), hashCodeNullable(labels), hashCodeNullable(links), hashCodeNullable(tags));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -812,7 +819,6 @@ public class AutoTestUpdateApiModel {
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
     sb.append("    externalId: ").append(toIndentedString(externalId)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    resetLayer: ").append(toIndentedString(resetLayer)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    externalKey: ").append(toIndentedString(externalKey)).append("\n");
     sb.append("    namespace: ").append(toIndentedString(namespace)).append("\n");
@@ -821,6 +827,7 @@ public class AutoTestUpdateApiModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    isFlaky: ").append(toIndentedString(isFlaky)).append("\n");
     sb.append("    layer: ").append(toIndentedString(layer)).append("\n");
+    sb.append("    resetLayer: ").append(toIndentedString(resetLayer)).append("\n");
     sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
     sb.append("    setup: ").append(toIndentedString(setup)).append("\n");
     sb.append("    teardown: ").append(toIndentedString(teardown)).append("\n");

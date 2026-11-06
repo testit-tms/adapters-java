@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
 import ru.testit.adaptersapi.model.Int32RangeSelectorModel;
+import ru.testit.adaptersapi.model.LayerSource;
 import ru.testit.adaptersapi.model.WorkItemPriorityModel;
 import ru.testit.adaptersapi.model.WorkItemSourceTypeModel;
 import ru.testit.adaptersapi.model.WorkItemStates;
@@ -62,7 +63,10 @@ import ru.testit.adaptersapi.invoker.JSON;
   WorkItemFilterApiModel.JSON_PROPERTY_IS_AUTOMATED,
   WorkItemFilterApiModel.JSON_PROPERTY_TAGS,
   WorkItemFilterApiModel.JSON_PROPERTY_EXCLUDE_TAGS,
-  WorkItemFilterApiModel.JSON_PROPERTY_AUTO_TEST_IDS
+  WorkItemFilterApiModel.JSON_PROPERTY_AUTO_TEST_IDS,
+  WorkItemFilterApiModel.JSON_PROPERTY_LAYERS,
+  WorkItemFilterApiModel.JSON_PROPERTY_LAYER_SOURCES,
+  WorkItemFilterApiModel.JSON_PROPERTY_EXTERNAL_ID
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class WorkItemFilterApiModel {
@@ -122,6 +126,15 @@ public class WorkItemFilterApiModel {
 
   public static final String JSON_PROPERTY_AUTO_TEST_IDS = "autoTestIds";
   private JsonNullable<Set<UUID>> autoTestIds = JsonNullable.<Set<UUID>>undefined();
+
+  public static final String JSON_PROPERTY_LAYERS = "layers";
+  private JsonNullable<Set<String>> layers = JsonNullable.<Set<String>>undefined();
+
+  public static final String JSON_PROPERTY_LAYER_SOURCES = "layerSources";
+  private JsonNullable<Set<LayerSource>> layerSources = JsonNullable.<Set<LayerSource>>undefined();
+
+  public static final String JSON_PROPERTY_EXTERNAL_ID = "externalId";
+  private JsonNullable<String> externalId = JsonNullable.<String>undefined();
 
   public WorkItemFilterApiModel() { 
   }
@@ -921,6 +934,129 @@ public class WorkItemFilterApiModel {
   }
 
 
+  public WorkItemFilterApiModel layers(@jakarta.annotation.Nullable Set<String> layers) {
+    this.layers = JsonNullable.<Set<String>>of(layers);
+    return this;
+  }
+
+  public WorkItemFilterApiModel addLayersItem(String layersItem) {
+    if (this.layers == null || !this.layers.isPresent()) {
+      this.layers = JsonNullable.<Set<String>>of(new LinkedHashSet<>());
+    }
+    try {
+      this.layers.get().add(layersItem);
+    } catch (java.util.NoSuchElementException e) {
+      // this can never happen, as we make sure above that the value is present
+    }
+    return this;
+  }
+
+  /**
+   * Specifies auto test case layers to search for
+   * @return layers
+   */
+  @jakarta.annotation.Nullable
+  @JsonIgnore
+
+  public Set<String> getLayers() {
+        return layers.orElse(null);
+  }
+
+  @JsonProperty(JSON_PROPERTY_LAYERS)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public JsonNullable<Set<String>> getLayers_JsonNullable() {
+    return layers;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_LAYERS)
+  public void setLayers_JsonNullable(JsonNullable<Set<String>> layers) {
+    this.layers = layers;
+  }
+
+  public void setLayers(@jakarta.annotation.Nullable Set<String> layers) {
+    this.layers = JsonNullable.<Set<String>>of(layers);
+  }
+
+
+  public WorkItemFilterApiModel layerSources(@jakarta.annotation.Nullable Set<LayerSource> layerSources) {
+    this.layerSources = JsonNullable.<Set<LayerSource>>of(layerSources);
+    return this;
+  }
+
+  public WorkItemFilterApiModel addLayerSourcesItem(LayerSource layerSourcesItem) {
+    if (this.layerSources == null || !this.layerSources.isPresent()) {
+      this.layerSources = JsonNullable.<Set<LayerSource>>of(new LinkedHashSet<>());
+    }
+    try {
+      this.layerSources.get().add(layerSourcesItem);
+    } catch (java.util.NoSuchElementException e) {
+      // this can never happen, as we make sure above that the value is present
+    }
+    return this;
+  }
+
+  /**
+   * Specifies list of auto test case layer sources to search for
+   * @return layerSources
+   */
+  @jakarta.annotation.Nullable
+  @JsonIgnore
+
+  public Set<LayerSource> getLayerSources() {
+        return layerSources.orElse(null);
+  }
+
+  @JsonProperty(JSON_PROPERTY_LAYER_SOURCES)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public JsonNullable<Set<LayerSource>> getLayerSources_JsonNullable() {
+    return layerSources;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_LAYER_SOURCES)
+  public void setLayerSources_JsonNullable(JsonNullable<Set<LayerSource>> layerSources) {
+    this.layerSources = layerSources;
+  }
+
+  public void setLayerSources(@jakarta.annotation.Nullable Set<LayerSource> layerSources) {
+    this.layerSources = JsonNullable.<Set<LayerSource>>of(layerSources);
+  }
+
+
+  public WorkItemFilterApiModel externalId(@jakarta.annotation.Nullable String externalId) {
+    this.externalId = JsonNullable.<String>of(externalId);
+    return this;
+  }
+
+  /**
+   * External identifier of the work item
+   * @return externalId
+   */
+  @jakarta.annotation.Nullable
+  @JsonIgnore
+
+  public String getExternalId() {
+        return externalId.orElse(null);
+  }
+
+  @JsonProperty(JSON_PROPERTY_EXTERNAL_ID)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public JsonNullable<String> getExternalId_JsonNullable() {
+    return externalId;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_EXTERNAL_ID)
+  public void setExternalId_JsonNullable(JsonNullable<String> externalId) {
+    this.externalId = externalId;
+  }
+
+  public void setExternalId(@jakarta.annotation.Nullable String externalId) {
+    this.externalId = JsonNullable.<String>of(externalId);
+  }
+
+
   /**
    * Return true if this WorkItemFilterApiModel object is equal to o.
    */
@@ -951,7 +1087,10 @@ public class WorkItemFilterApiModel {
         equalsNullable(this.isAutomated, workItemFilterApiModel.isAutomated) &&
         equalsNullable(this.tags, workItemFilterApiModel.tags) &&
         equalsNullable(this.excludeTags, workItemFilterApiModel.excludeTags) &&
-        equalsNullable(this.autoTestIds, workItemFilterApiModel.autoTestIds);
+        equalsNullable(this.autoTestIds, workItemFilterApiModel.autoTestIds) &&
+        equalsNullable(this.layers, workItemFilterApiModel.layers) &&
+        equalsNullable(this.layerSources, workItemFilterApiModel.layerSources) &&
+        equalsNullable(this.externalId, workItemFilterApiModel.externalId);
   }
 
   private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
@@ -960,7 +1099,7 @@ public class WorkItemFilterApiModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(hashCodeNullable(nameOrId), hashCodeNullable(includeIds), hashCodeNullable(excludeIds), hashCodeNullable(projectIds), hashCodeNullable(name), hashCodeNullable(ids), hashCodeNullable(globalIds), hashCodeNullable(attributes), hashCodeNullable(isDeleted), hashCodeNullable(sectionIds), hashCodeNullable(states), hashCodeNullable(priorities), hashCodeNullable(sourceTypes), hashCodeNullable(types), hashCodeNullable(duration), hashCodeNullable(isAutomated), hashCodeNullable(tags), hashCodeNullable(excludeTags), hashCodeNullable(autoTestIds));
+    return Objects.hash(hashCodeNullable(nameOrId), hashCodeNullable(includeIds), hashCodeNullable(excludeIds), hashCodeNullable(projectIds), hashCodeNullable(name), hashCodeNullable(ids), hashCodeNullable(globalIds), hashCodeNullable(attributes), hashCodeNullable(isDeleted), hashCodeNullable(sectionIds), hashCodeNullable(states), hashCodeNullable(priorities), hashCodeNullable(sourceTypes), hashCodeNullable(types), hashCodeNullable(duration), hashCodeNullable(isAutomated), hashCodeNullable(tags), hashCodeNullable(excludeTags), hashCodeNullable(autoTestIds), hashCodeNullable(layers), hashCodeNullable(layerSources), hashCodeNullable(externalId));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -993,6 +1132,9 @@ public class WorkItemFilterApiModel {
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    excludeTags: ").append(toIndentedString(excludeTags)).append("\n");
     sb.append("    autoTestIds: ").append(toIndentedString(autoTestIds)).append("\n");
+    sb.append("    layers: ").append(toIndentedString(layers)).append("\n");
+    sb.append("    layerSources: ").append(toIndentedString(layerSources)).append("\n");
+    sb.append("    externalId: ").append(toIndentedString(externalId)).append("\n");
     sb.append("}");
     return sb.toString();
   }

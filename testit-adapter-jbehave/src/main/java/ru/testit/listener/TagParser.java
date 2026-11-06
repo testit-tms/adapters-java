@@ -103,7 +103,6 @@ public class TagParser {
         );
 
         if (!workItemIdsValue.isEmpty()) {
-            Utils.warnDeprecated("WorkItemIds", "WorkItemId");
             Arrays.stream(workItemIdsValue.split(TAG_VALUE_DELIMITER))
                     .forEach(id -> getWorkItemIdList().add(id));
         }

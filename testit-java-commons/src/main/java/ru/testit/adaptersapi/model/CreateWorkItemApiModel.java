@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
 import ru.testit.adaptersapi.model.AssignAttachmentApiModel;
+import ru.testit.adaptersapi.model.AssignAutoTestCaseIdApiModel;
 import ru.testit.adaptersapi.model.AssignIterationApiModel;
 import ru.testit.adaptersapi.model.AutoTestIdModel;
 import ru.testit.adaptersapi.model.CreateLinkApiModel;
@@ -64,6 +65,7 @@ import ru.testit.adaptersapi.invoker.JSON;
   CreateWorkItemApiModel.JSON_PROPERTY_POSTCONDITION_STEPS,
   CreateWorkItemApiModel.JSON_PROPERTY_ITERATIONS,
   CreateWorkItemApiModel.JSON_PROPERTY_AUTO_TESTS,
+  CreateWorkItemApiModel.JSON_PROPERTY_AUTO_TEST_CASES,
   CreateWorkItemApiModel.JSON_PROPERTY_ATTACHMENTS,
   CreateWorkItemApiModel.JSON_PROPERTY_LINKS,
   CreateWorkItemApiModel.JSON_PROPERTY_PARAMETERS
@@ -120,6 +122,9 @@ public class CreateWorkItemApiModel {
 
   public static final String JSON_PROPERTY_AUTO_TESTS = "autoTests";
   private JsonNullable<List<AutoTestIdModel>> autoTests = JsonNullable.<List<AutoTestIdModel>>undefined();
+
+  public static final String JSON_PROPERTY_AUTO_TEST_CASES = "autoTestCases";
+  private JsonNullable<List<AssignAutoTestCaseIdApiModel>> autoTestCases = JsonNullable.<List<AssignAutoTestCaseIdApiModel>>undefined();
 
   public static final String JSON_PROPERTY_ATTACHMENTS = "attachments";
   private JsonNullable<List<AssignAttachmentApiModel>> attachments = JsonNullable.<List<AssignAttachmentApiModel>>undefined();
@@ -666,6 +671,51 @@ public class CreateWorkItemApiModel {
   }
 
 
+  public CreateWorkItemApiModel autoTestCases(@jakarta.annotation.Nullable List<AssignAutoTestCaseIdApiModel> autoTestCases) {
+    this.autoTestCases = JsonNullable.<List<AssignAutoTestCaseIdApiModel>>of(autoTestCases);
+    return this;
+  }
+
+  public CreateWorkItemApiModel addAutoTestCasesItem(AssignAutoTestCaseIdApiModel autoTestCasesItem) {
+    if (this.autoTestCases == null || !this.autoTestCases.isPresent()) {
+      this.autoTestCases = JsonNullable.<List<AssignAutoTestCaseIdApiModel>>of(new ArrayList<>());
+    }
+    try {
+      this.autoTestCases.get().add(autoTestCasesItem);
+    } catch (java.util.NoSuchElementException e) {
+      // this can never happen, as we make sure above that the value is present
+    }
+    return this;
+  }
+
+  /**
+   * Set of automated test cases linked to the work item
+   * @return autoTestCases
+   */
+  @jakarta.annotation.Nullable
+  @JsonIgnore
+
+  public List<AssignAutoTestCaseIdApiModel> getAutoTestCases() {
+        return autoTestCases.orElse(null);
+  }
+
+  @JsonProperty(JSON_PROPERTY_AUTO_TEST_CASES)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public JsonNullable<List<AssignAutoTestCaseIdApiModel>> getAutoTestCases_JsonNullable() {
+    return autoTestCases;
+  }
+  
+  @JsonProperty(JSON_PROPERTY_AUTO_TEST_CASES)
+  public void setAutoTestCases_JsonNullable(JsonNullable<List<AssignAutoTestCaseIdApiModel>> autoTestCases) {
+    this.autoTestCases = autoTestCases;
+  }
+
+  public void setAutoTestCases(@jakarta.annotation.Nullable List<AssignAutoTestCaseIdApiModel> autoTestCases) {
+    this.autoTestCases = JsonNullable.<List<AssignAutoTestCaseIdApiModel>>of(autoTestCases);
+  }
+
+
   public CreateWorkItemApiModel attachments(@jakarta.annotation.Nullable List<AssignAttachmentApiModel> attachments) {
     this.attachments = JsonNullable.<List<AssignAttachmentApiModel>>of(attachments);
     return this;
@@ -828,6 +878,7 @@ public class CreateWorkItemApiModel {
         equalsNullable(this.postconditionSteps, createWorkItemApiModel.postconditionSteps) &&
         equalsNullable(this.iterations, createWorkItemApiModel.iterations) &&
         equalsNullable(this.autoTests, createWorkItemApiModel.autoTests) &&
+        equalsNullable(this.autoTestCases, createWorkItemApiModel.autoTestCases) &&
         equalsNullable(this.attachments, createWorkItemApiModel.attachments) &&
         equalsNullable(this.links, createWorkItemApiModel.links) &&
         equalsNullable(this.parameters, createWorkItemApiModel.parameters);
@@ -839,7 +890,7 @@ public class CreateWorkItemApiModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(projectId, name, entityTypeName, duration, state, priority, hashCodeNullable(sectionId), hashCodeNullable(description), hashCodeNullable(attributes), hashCodeNullable(tags), hashCodeNullable(preconditionSteps), hashCodeNullable(steps), hashCodeNullable(postconditionSteps), hashCodeNullable(iterations), hashCodeNullable(autoTests), hashCodeNullable(attachments), hashCodeNullable(links), hashCodeNullable(parameters));
+    return Objects.hash(projectId, name, entityTypeName, duration, state, priority, hashCodeNullable(sectionId), hashCodeNullable(description), hashCodeNullable(attributes), hashCodeNullable(tags), hashCodeNullable(preconditionSteps), hashCodeNullable(steps), hashCodeNullable(postconditionSteps), hashCodeNullable(iterations), hashCodeNullable(autoTests), hashCodeNullable(autoTestCases), hashCodeNullable(attachments), hashCodeNullable(links), hashCodeNullable(parameters));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -868,6 +919,7 @@ public class CreateWorkItemApiModel {
     sb.append("    postconditionSteps: ").append(toIndentedString(postconditionSteps)).append("\n");
     sb.append("    iterations: ").append(toIndentedString(iterations)).append("\n");
     sb.append("    autoTests: ").append(toIndentedString(autoTests)).append("\n");
+    sb.append("    autoTestCases: ").append(toIndentedString(autoTestCases)).append("\n");
     sb.append("    attachments: ").append(toIndentedString(attachments)).append("\n");
     sb.append("    links: ").append(toIndentedString(links)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");

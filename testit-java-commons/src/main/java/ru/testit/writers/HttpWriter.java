@@ -377,7 +377,11 @@ public class HttpWriter implements Writer {
 
                         model.setSetup(beforeFinish);
                         model.setTeardown(afterFinish);
-                        bulkHelper.addForCreate(model, autoTestResultsForTestRunModel);
+                        bulkHelper.addForCreate(
+                                model,
+                                autoTestResultsForTestRunModel,
+                                test.getWorkItemIds()
+                        );
                     } else {
                         AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
                                 test,
@@ -388,11 +392,13 @@ public class HttpWriter implements Writer {
                         model.setSetup(beforeFinish);
                         model.setTeardown(afterFinish);
 
-                        String id = autoTestApiResult.getGlobalId().toString();
+                        String autoTestUuid = autoTestApiResult.getId().toString();
                         List<String> wi = test.getWorkItemIds();
 
                         Map<String, List<String>> autotestLinksToWIForUpdate = new HashMap<>();
-                        autotestLinksToWIForUpdate.put(id, wi);
+                        if (wi != null && !wi.isEmpty()) {
+                            autotestLinksToWIForUpdate.put(autoTestUuid, wi);
+                        }
 
                         if (hasAutoTestChanged(autoTestApiResult, model)) {
                             bulkHelper.addForUpdate(
@@ -405,6 +411,12 @@ public class HttpWriter implements Writer {
                                 LOGGER.debug("Bulk import: autotest unchanged, skip PUT for {}", test.getExternalId());
                             }
                             bulkHelper.addTestRunResultOnly(autoTestResultsForTestRunModel);
+                            if (!autotestLinksToWIForUpdate.isEmpty()) {
+                                bulkHelper.queueWorkItemLinks(
+                                        autoTestUuid,
+                                        autotestLinksToWIForUpdate.get(autoTestUuid)
+                                );
+                            }
                         }
                     }
                 } catch (ApiException e) {

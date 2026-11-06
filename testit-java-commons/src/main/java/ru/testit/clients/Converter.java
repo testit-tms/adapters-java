@@ -499,9 +499,11 @@ public class Converter {
 
         model.setId(testRun.getId());
         model.setName(testRun.getName());
-        model.setAttachments(Converter.buildAssignAttachmentApiModels(testRun.getAttachments()));
-        model.setLinks(Converter.buildUpdateLinkApiModels(testRun.getLinks()));
-        model.setTags(testRun.getTags());
+        // Copy JsonNullable as-is so undefined vs null is preserved on merge-update.
+        model.setDescription_JsonNullable(testRun.getDescription_JsonNullable());
+        model.setLaunchSource_JsonNullable(testRun.getLaunchSource_JsonNullable());
+        // Leave tags/links/attachments JsonNullable.undefined() unless the caller merges them.
+        // Always copying GET lists (often empty) would serialize [] and wipe server-side values.
 
         return model;
     }
@@ -537,6 +539,9 @@ public class Converter {
     }
 
     public static List<AssignAttachmentApiModel> buildAssignAttachmentApiModels(List<AttachmentApiResult> attachments) {
+        if (attachments == null || attachments.isEmpty()) {
+            return Collections.emptyList();
+        }
         return attachments.stream().map(
                 attachment -> {
                     AssignAttachmentApiModel model = new AssignAttachmentApiModel();
@@ -549,6 +554,9 @@ public class Converter {
     }
 
     public static List<UpdateLinkApiModel> buildUpdateLinkApiModels(List<LinkApiResult> links) {
+        if (links == null || links.isEmpty()) {
+            return Collections.emptyList();
+        }
         return links.stream().map(
                 link -> {
                     UpdateLinkApiModel model = new UpdateLinkApiModel();
