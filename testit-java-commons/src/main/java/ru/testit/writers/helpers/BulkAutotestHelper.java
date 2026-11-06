@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,6 +29,9 @@ public class BulkAutotestHelper {
     private static final int MAX_PARALLEL_AUTO_TEST_OPS = 16;
     private final List<AutoTestCreateApiModel> autotestsForCreate;
     private final List<AutoTestUpdateApiModel> autotestsForUpdate;
+    /** externalId -> work item globalIds to link after create. */
+    private final Map<String, List<String>> autotestLinksToWIForCreate;
+    /** autoTest UUID -> work item globalIds to link after update / result-only flush. */
     private final Map<String, List<String>> autotestLinksToWIForUpdate;
     private final List<AutoTestResultsForTestRunModel> resultsForAutotestsBeingCreated;
     private final List<AutoTestResultsForTestRunModel> resultsForAutotestsBeingUpdated;
@@ -37,6 +41,7 @@ public class BulkAutotestHelper {
         apiClient = client;
         autotestsForCreate = new ArrayList<>();
         autotestsForUpdate = new ArrayList<>();
+        autotestLinksToWIForCreate = new HashMap<>();
         autotestLinksToWIForUpdate = new HashMap<>();
         resultsForAutotestsBeingCreated = new ArrayList<>();
         resultsForAutotestsBeingUpdated = new ArrayList<>();
@@ -44,10 +49,17 @@ public class BulkAutotestHelper {
 
     public void addForCreate(
             AutoTestCreateApiModel createModel,
-            AutoTestResultsForTestRunModel resultModel
+            AutoTestResultsForTestRunModel resultModel,
+            List<String> workItemIds
     ) throws ApiException {
         autotestsForCreate.add(createModel);
         resultsForAutotestsBeingCreated.add(resultModel);
+        if (workItemIds != null && !workItemIds.isEmpty()) {
+            autotestLinksToWIForCreate.put(
+                    externalIdKey(createModel.getExternalId()),
+                    new ArrayList<>(workItemIds)
+            );
+        }
 
         if (autotestsForCreate.size() >= MAX_TESTS_FOR_IMPORT)
         {
@@ -61,7 +73,7 @@ public class BulkAutotestHelper {
             Map<String, List<String>> wiForUpdate) throws ApiException {
         autotestsForUpdate.add(updateModel);
         resultsForAutotestsBeingUpdated.add(resultModel);
-        autotestLinksToWIForUpdate.putAll(wiForUpdate);
+        queueWorkItemLinks(wiForUpdate);
 
         if (autotestsForUpdate.size() >= MAX_TESTS_FOR_IMPORT)
         {
@@ -79,6 +91,25 @@ public class BulkAutotestHelper {
         }
     }
 
+    /**
+     * Queue WI links by autotest UUID (e.g. when metadata PUT is skipped but links still need reconcile).
+     */
+    public void queueWorkItemLinks(String autoTestUuid, List<String> workItemIds) {
+        if (autoTestUuid == null || workItemIds == null || workItemIds.isEmpty()) {
+            return;
+        }
+        autotestLinksToWIForUpdate.put(autoTestUuid, new ArrayList<>(workItemIds));
+    }
+
+    private void queueWorkItemLinks(Map<String, List<String>> wiForUpdate) {
+        if (wiForUpdate == null || wiForUpdate.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, List<String>> e : wiForUpdate.entrySet()) {
+            queueWorkItemLinks(e.getKey(), e.getValue());
+        }
+    }
+
     public void teardown() throws ApiException {
         if (!autotestsForCreate.isEmpty())
         {
@@ -93,6 +124,8 @@ public class BulkAutotestHelper {
         if (!resultsForAutotestsBeingUpdated.isEmpty()) {
             flushPendingResultsOnly();
         }
+
+        flushWorkItemLinks();
     }
 
     private void flushPendingResultsOnly() throws ApiException {
@@ -108,6 +141,17 @@ public class BulkAutotestHelper {
         resultsForAutotestsBeingUpdated.clear();
     }
 
+    private void flushWorkItemLinks() throws ApiException {
+        if (autotestLinksToWIForUpdate.isEmpty()) {
+            return;
+        }
+        Map<String, List<String>> wiBatch = new HashMap<>(autotestLinksToWIForUpdate);
+        autotestLinksToWIForUpdate.clear();
+        for (Map.Entry<String, List<String>> e : wiBatch.entrySet()) {
+            retryApi(() -> updateTestLinkToWorkItems(e.getKey(), e.getValue()));
+        }
+    }
+
     private void bulkCreate() throws ApiException {
         int n = autotestsForCreate.size();
         List<AutoTestCreateApiModel> unique = dedupeCreatesLastWins(autotestsForCreate);
@@ -116,11 +160,27 @@ public class BulkAutotestHelper {
                 unique.size(),
                 n
         );
-        parallelAutoTestOps(unique, m -> () -> apiClient.createAutoTest(m));
+        Map<String, String> createdIdsByExternalId = new ConcurrentHashMap<>();
+        parallelAutoTestOps(unique, m -> () -> {
+            String id = apiClient.createAutoTest(m);
+            if (id != null && !id.isEmpty()) {
+                createdIdsByExternalId.put(externalIdKey(m.getExternalId()), id);
+            }
+        });
         List<List<AutoTestResultsForTestRunModel>> batches = partitionResultsUniqueAutotestPerBatch(resultsForAutotestsBeingCreated);
         LOGGER.info("sendTestResults: {} batch(es), {} result row(s)", batches.size(), n);
         for (List<AutoTestResultsForTestRunModel> batch : batches) {
             retrySend(batch);
+        }
+
+        Map<String, List<String>> wiForCreate = new HashMap<>(autotestLinksToWIForCreate);
+        autotestLinksToWIForCreate.clear();
+        for (Map.Entry<String, List<String>> e : wiForCreate.entrySet()) {
+            String uuid = createdIdsByExternalId.get(e.getKey());
+            if (uuid == null || e.getValue() == null || e.getValue().isEmpty()) {
+                continue;
+            }
+            retryApi(() -> updateTestLinkToWorkItems(uuid, e.getValue()));
         }
 
         autotestsForCreate.clear();
@@ -141,19 +201,6 @@ public class BulkAutotestHelper {
         for (List<AutoTestResultsForTestRunModel> batch : batches) {
             retrySend(batch);
         }
-
-        Map<String, List<String>> wiBatch = new HashMap<>(autotestLinksToWIForUpdate);
-        autotestLinksToWIForUpdate.clear();
-
-        wiBatch.forEach((autotestId, workItemIds) ->
-                {
-                    try {
-                        retryApi(() -> updateTestLinkToWorkItems(autotestId, workItemIds));
-                    } catch (ApiException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
 
         autotestsForUpdate.clear();
         resultsForAutotestsBeingUpdated.clear();

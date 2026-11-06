@@ -12,7 +12,7 @@ Technical notes on how the HTTP writer sends autotests and test run results when
 When `importRealtime=false`, `HttpWriter.writeTests(MainContainer)` calls `writeTestsAfterAll`, which walks the container tree (main → class → tests), loads each `TestResult` from storage, and for each test:
 
 1. Resolves the autotest on TMS (`getAutoTestByExternalId`).
-2. Either queues **create** or **update** (plus work-item link updates after updates), and queues **test run result** rows for `sendTestResults`.
+2. Either queues **create** or **update**, queues **test run result** rows for `sendTestResults`, and reconciles **work-item links** after create and update (including when metadata PUT is skipped).
 
 ## TMS constraints
 
@@ -38,7 +38,10 @@ For existing autotests, `HttpWriter` compares the server model with the prepared
 - **No** `updateAutoTest` is queued for that test.
 - The test run result is still sent via **`BulkAutotestHelper.addTestRunResultOnly`**, which only enqueues `sendTestResults` rows (no PUT autotest).
 
-Work-item link reconciliation runs only after **`bulkUpdate`**; if metadata is skipped as unchanged, WI links are not adjusted in that pass (same trade-off as skipping PUT when metadata is identical).
+Work-item link reconciliation:
+
+- After **`bulkCreate`**: for each created autotest, links from `@WorkItemIds` / `@WorkItemId` are applied using the UUID returned by `createAutoTest`.
+- After **`bulkUpdate`** and when metadata is skipped (`addTestRunResultOnly`): pending WI links (keyed by autotest UUID) are flushed in `teardown`, so unchanged autotest metadata does not skip link reconcile.
 
 ## Class containers in the main tree
 
