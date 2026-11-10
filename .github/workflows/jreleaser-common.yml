@@ -56,21 +56,25 @@ jobs:
 
     - name: Install JReleaser CLI (manual setup)
       run: |
-        # Try to install a working version manually
+        set -euo pipefail
         JRELEASER_VERSION="1.18.0"
         mkdir -p ~/.jreleaser/bin
 
-        # Download the tar.gz version which usually contains all dependencies
-        curl -sL "https://github.com/jreleaser/jreleaser/releases/download/v${JRELEASER_VERSION}/jreleaser-tool-provider-${JRELEASER_VERSION}.jar" -o ~/.jreleaser/bin/jreleaser.jar
+        # Download via official get_jreleaser (Maven Central) — more reliable than GitHub Releases blobs.
+        curl -fsSL "https://git.io/get-jreleaser" -o get_jreleaser.java
+        java get_jreleaser.java "$JRELEASER_VERSION"
+        mv jreleaser-cli.jar ~/.jreleaser/bin/jreleaser.jar
 
-        # Create a wrapper script
+        # Fail fast if the file is not a valid jar (avoids "Invalid or corrupt jarfile" later).
+        jar tf ~/.jreleaser/bin/jreleaser.jar >/dev/null
+
         cat > ~/.jreleaser/bin/jreleaser << 'EOF'
         #!/bin/bash
-        java -jar ~/.jreleaser/bin/jreleaser.jar "$@"
+        exec java -jar "$HOME/.jreleaser/bin/jreleaser.jar" "$@"
         EOF
         chmod +x ~/.jreleaser/bin/jreleaser
 
-        echo "$HOME/.jreleaser/bin" >> $GITHUB_PATH
+        echo "$HOME/.jreleaser/bin" >> "$GITHUB_PATH"
 
     - name: Print JReleaser version and check Java
       run: |
