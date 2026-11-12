@@ -4,6 +4,7 @@ Supplementary documentation for behaviour and performance changes that are not f
 
 | Document | Topic |
 |----------|--------|
+| [testit-false-filtered-mode.md](./testit-false-filtered-mode.md) | **`testIt=false` + mode 0**: do not exclude all tests; `isFilteredMode` gated on TMS integration |
 | [mode0-orphan-testpoint-inprogress.md](./mode0-orphan-testpoint-inprogress.md) | **mode=0 orphan InProgress** (no testPoint): problem, Java/sync-storage fix, cross-adapter checklist |
 | [mode0-duplicate-results-bulk-after-realtime.md](./mode0-duplicate-results-bulk-after-realtime.md) | **mode=0 duplicate Passed** (TP + orphan): avoid second bulk `sendTestResults`; finalize via create at test finish |
 | [tz-testrun-tags-and-links.md](./tz-testrun-tags-and-links.md) | TZ: test run tags & links (create/early merge); Java status at end |
