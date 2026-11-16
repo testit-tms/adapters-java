@@ -399,7 +399,8 @@ public class AdapterManager {
     }
 
     public boolean isFilteredMode() {
-        return adapterConfig.getMode() == AdapterMode.USE_FILTER;
+        return adapterConfig.shouldEnableTmsIntegration()
+                && adapterConfig.getMode() == AdapterMode.USE_FILTER;
     }
 
     public List<String> getTestFromTestRun() {
