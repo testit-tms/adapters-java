@@ -899,6 +899,7 @@ class AdapterManagerTest {
     @Test
     void isFilteredMode_FilteredMode_ReturnsTrue() {
         // arrange
+        when(adapterConfig.shouldEnableTmsIntegration()).thenReturn(true);
         when(adapterConfig.getMode()).thenReturn(AdapterMode.USE_FILTER);
 
         AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
@@ -913,7 +914,23 @@ class AdapterManagerTest {
     @Test
     void isFilteredMode_NoFilteredMode_ReturnsFalse() {
         // arrange
+        when(adapterConfig.shouldEnableTmsIntegration()).thenReturn(true);
         when(adapterConfig.getMode()).thenReturn(AdapterMode.RUN_ALL_TESTS);
+
+        AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
+
+        // act
+        boolean result = manager.isFilteredMode();
+
+        // assert
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    void isFilteredMode_TmsIntegrationDisabled_ReturnsFalse() {
+        // arrange
+        when(adapterConfig.shouldEnableTmsIntegration()).thenReturn(false);
+        when(adapterConfig.getMode()).thenReturn(AdapterMode.USE_FILTER);
 
         AdapterManager manager = new AdapterManager(clientConfiguration, adapterConfig, threadContext, storage, writer, client, listenerManager);
 
