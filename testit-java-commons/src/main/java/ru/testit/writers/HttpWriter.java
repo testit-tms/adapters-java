@@ -523,7 +523,7 @@ public class HttpWriter implements Writer {
      * @param updateModel модель для обновления
      * @return true, если модели отличаются и нужно выполнить обновление
      */
-    private boolean hasAutoTestChanged(AutoTestApiResult serverModel, AutoTestUpdateApiModel updateModel) {
+    boolean hasAutoTestChanged(AutoTestApiResult serverModel, AutoTestUpdateApiModel updateModel) {
         if (serverModel == null || updateModel == null) {
             return true;
         }
@@ -547,11 +547,11 @@ public class HttpWriter implements Writer {
             return true;
         }
         // Сравниваем setup методы
-        if (!areStepListsEqual(serverModel.getSetup(), updateModel.getSetup())) {
+        if (areStepListsDifferent(serverModel.getSetup(), updateModel.getSetup())) {
             return true;
         }
         // Сравниваем teardown методы
-        if (!areStepListsEqual(serverModel.getTeardown(), updateModel.getTeardown())) {
+        if (areStepListsDifferent(serverModel.getTeardown(), updateModel.getTeardown())) {
             return true;
         }
         // Если дошли до этого места, модели идентичны
@@ -559,19 +559,18 @@ public class HttpWriter implements Writer {
     }
 
     /**
-     * Сравнивает два списка шагов авто-теста
+     * Сравнивает два списка шагов авто-теста.
      *
      * @param serverSteps шаги с сервера
      * @param updateSteps шаги для обновления
      * @return true, если списки отличаются
      */
-    private boolean areStepListsEqual(List<AutoTestStepApiResult> serverSteps, List<AutoTestStepApiModel> updateSteps) {
-
+    boolean areStepListsDifferent(List<AutoTestStepApiResult> serverSteps, List<AutoTestStepApiModel> updateSteps) {
         if (serverSteps == null && updateSteps == null) {
-            return false; // Если оба null, то они равны
+            return false;
         }
         if (serverSteps == null || updateSteps == null) {
-            return true; // Если один null, а другой нет, то они разные
+            return true;
         }
 
         if (serverSteps.size() != updateSteps.size()) {
@@ -593,10 +592,9 @@ public class HttpWriter implements Writer {
             // Compare nested steps as well.
             // Previously we compared only title/description for the top-level step list, which could
             // lead to skipping PUT when nested structure differs (e.g. missing setup/teardown details).
-            if (areStepListsEqual(serverStep.getSteps(), updateStep.getSteps())) {
+            if (areStepListsDifferent(serverStep.getSteps(), updateStep.getSteps())) {
                 return true;
             }
-
         }
 
         return false;
