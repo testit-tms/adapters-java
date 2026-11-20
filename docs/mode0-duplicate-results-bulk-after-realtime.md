@@ -20,8 +20,8 @@ Root cause: the adapter finalized the test twice — once at **test finish**, ag
 
 ## Current behaviour (fixed)
 
-**Rule:** with SyncStorage — cut (final) goes to sync-storage; Test IT at test finish gets **InProgress** only via `sendTestResults`. Work X finalizes later. Without SyncStorage — Test IT gets the final status as before.  
-**PUT** `/api/v2/testResults/{id}` is **not** used to finalize; if used at all (fixtures), status is sent **as on the server**.
+**Rule:** with SyncStorage — cut (final) goes to sync-storage; Test IT at test finish gets **InProgress** only via `sendTestResults`. Work X finalizes later via **send test result** (`SetAutoTestResultsForTestRun`). Without SyncStorage — Test IT gets the final status as before.  
+**Hard rule:** **never** finalize outcome/status via `PUT /api/v2/testResults/{id}`. PUT (if used at all for fixtures) must send status **as on the server**, not overwrite with final adapter status.
 
 ### End of test — `AdapterTestCaseHelper.stopTestCase`
 

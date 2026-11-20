@@ -1,0 +1,29 @@
+---
+description: Sync-storage / TMS test result status must be finalized via send test result, never PUT
+globs: "**/syncstorage/**/*,**/adapters-core/**/*,**/test_result_sender/**/*,**/core_service/**/*"
+alwaysApply: true
+---
+
+# Test result status finalization (sync-storage + adapters)
+
+## Hard rule
+
+**Do NOT update test result outcome/status via `PUT /api/v2/testResults/{id}`.**
+
+Final status (Passed / Failed / …) must be applied the same way as before sync-storage 0.4.x:
+
+1. Adapter (with SyncStorage): cut with **final** status → sync-storage; TMS at test finish gets **InProgress** only.
+2. Sync-storage **Work X**: search InProgress → get full result → **`SetAutoTestResultsForTestRun` / send test result** with the cut status.
+3. Without SyncStorage: adapter exports final status as before (`writeTest` / bulk).
+
+`PUT /testResults/{id}` may exist for fixtures / non-status fields only — **never** for outcome/statusCode/statusType finalization.
+
+## Why
+
+PUT-based finalization was explicitly rejected: contract is send-test-result. 0.4.x regressions must be fixed without changing this path.
+
+## Where
+
+- Go Work X: `CoreService.OnAllNodesCompletedOrOffline` → `TestResultSender.SetAutoTestResultForRun`
+- Java: `AdapterTestCaseHelper.stopTestCase` (InProgress to TMS after sync cut)
+- Docs: `docs/sync-storage-adapter-compat.md`, `docs/mode0-orphan-testpoint-inprogress.md`
