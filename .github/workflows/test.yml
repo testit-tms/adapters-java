@@ -222,9 +222,13 @@ jobs:
             curl -sf --max-time 100 \
               "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
               && echo "wait-completion: ok" \
-              || echo "wait-completion: sync-storage closed during wait (OK if Work X already finished)"
+              || echo "wait-completion: sync-storage closed during wait"
           else
-            echo "sync-storage already stopped on :49152 — skip wait-completion"
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
           fi
           
           cat service.log
@@ -270,9 +274,13 @@ jobs:
             curl -sf --max-time 100 \
               "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
               && echo "wait-completion: ok" \
-              || echo "wait-completion: sync-storage closed during wait (OK if Work X already finished)"
+              || echo "wait-completion: sync-storage closed during wait"
           else
-            echo "sync-storage already stopped on :49152 — skip wait-completion"
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
           fi
           
           cat service.log
@@ -297,9 +305,13 @@ jobs:
             curl -sf --max-time 100 \
               "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
               && echo "wait-completion: ok" \
-              || echo "wait-completion: sync-storage closed during wait (OK if Work X already finished)"
+              || echo "wait-completion: sync-storage closed during wait"
           else
-            echo "sync-storage already stopped on :49152 — skip wait-completion"
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
           fi
 
       - name: Validate Again
