@@ -31,7 +31,8 @@ env:
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
   JAVA_DISTRIBUTION: "temurin"
   JAVA_TOOL_OPTIONS: "-Dorg.slf4j.simpleLogger.defaultLogLevel=info"
-  JAVA_VERSION: 8
+  # Pin patch: Temurin 8.0.514 downloads were corrupt / checksum-mismatched on GH runners.
+  JAVA_VERSION: "8.0.512"
   PYTHON_VERSION: 3.12
   TEMP_FILE: tmp/output.txt
   TMS_ADAPTER_MODE: 1
@@ -169,7 +170,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Setup java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: jdk
@@ -205,7 +206,9 @@ jobs:
           
           sleep 1
           
-          curl -v http://127.0.0.1:49152/health || true
+          curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null \
+            && echo "sync-storage health: ok" \
+            || echo "sync-storage health: not ready yet"
 
           chmod +x ./gradlew
           ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
@@ -214,8 +217,20 @@ jobs:
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
 
           sleep 1
-          
-          curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} --max-time 100 || true
+
+          # SS may already exit after Work X ("no active workers") — Connection refused is success, not a failure.
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 300 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait"
+          else
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
+          fi
           
           cat service.log
           # cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/shutdown.log
@@ -244,7 +259,9 @@ jobs:
           
           sleep 1
           
-          curl -v http://127.0.0.1:49152/health || true
+          curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null \
+            && echo "sync-storage health: ok" \
+            || echo "sync-storage health: not ready yet"
 
           chmod +x ./gradlew
           ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
@@ -253,8 +270,19 @@ jobs:
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
 
           sleep 1
-          
-          curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} --max-time 100 || true
+
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 300 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait"
+          else
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
+          fi
           
           cat service.log
 
@@ -274,7 +302,18 @@ jobs:
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} \
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
 
-          curl -v http://127.0.0.1:49152/wait-completion --max-time 100 || true
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 300 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait"
+          else
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
+          fi
 
       - name: Validate Again
         run: |
