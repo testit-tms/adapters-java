@@ -1,10 +1,13 @@
 # Mode 0: orphan InProgress without testPoint — problem and cross-adapter fix
 
+> **HARD RULE (current):** do **not** finalize status via `PUT /api/v2/testResults/{id}`.  
+> Work X / adapters finalize with **send test result** (`SetAutoTestResultsForTestRun`), as before sync-storage 0.4.x.  
+> Sections below that recommend PUT for outcome are **historical / superseded**.
+
 **TMS:** 5.7  
 **Seen with:** Java adapter 3.1.0/3.1.1-TMS-5.7 + sync-storage `v0.3.7-tms-5.7` (fix in sources → `v0.3.8-*`)  
 **Also reproduced:** Python adapter (same symptom pattern)  
-**Scope:** all adapters that use sync-storage + `adapterMode=0` (run from test plan)  
-**sync-storage change log:** [`sync_storage/adapters-core/docs/WORK_X_PUT_MODE0_ORPHAN.md`](../sync_storage/adapters-core/docs/WORK_X_PUT_MODE0_ORPHAN.md)
+**Scope:** all adapters that use sync-storage + `adapterMode=0` (run from test plan)
 
 ---
 
