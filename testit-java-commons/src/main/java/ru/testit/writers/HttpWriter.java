@@ -64,7 +64,19 @@ public class HttpWriter implements Writer {
                         config.getProjectId()
                 );
 
-                apiClient.updateAutoTest(AutoTestUpdateApiModel);
+                try {
+                    apiClient.updateAutoTest(AutoTestUpdateApiModel);
+                } catch (ApiException e) {
+                    // TMS 6.0: metadata PUT can return AlreadyExists; still send the test result.
+                    if (!BulkAutotestHelper.isAlreadyExists(e)) {
+                        throw e;
+                    }
+                    LOGGER.warn(
+                            "updateAutoTest AlreadyExists for {}, continuing with sendTestResults: {}",
+                            testResult.getExternalId(),
+                            e.getMessage()
+                    );
+                }
                 autoTestId = autotest.getId().toString();
             } else {
                 AutoTestCreateApiModel model = Converter.prepareToCreateAutoTest(testResult, config.getProjectId());
@@ -355,7 +367,18 @@ public class HttpWriter implements Writer {
                             model.setSetup(beforeFinish);
                             model.setTeardown(afterFinish);
                             if (hasAutoTestChanged(autoTestApiResult, model)) {
-                                apiClient.updateAutoTest(model);
+                                try {
+                                    apiClient.updateAutoTest(model);
+                                } catch (ApiException e) {
+                                    if (!BulkAutotestHelper.isAlreadyExists(e)) {
+                                        throw e;
+                                    }
+                                    LOGGER.warn(
+                                            "Bulk skip-path updateAutoTest AlreadyExists for {}: {}",
+                                            test.getExternalId(),
+                                            e.getMessage()
+                                    );
+                                }
                             }
                         }
                         continue;
