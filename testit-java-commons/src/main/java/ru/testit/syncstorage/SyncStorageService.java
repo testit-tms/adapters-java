@@ -157,6 +157,9 @@ public class SyncStorageService {
             );
             runner.start();
             return runner;
+        } catch (IllegalStateException e) {
+            // Port occupied by incompatible sync-storage — fail loudly for diagnostics.
+            throw e;
         } catch (Exception e) {
             LOGGER.warn(
                     "Failed to initialize SyncStorage: {}",
