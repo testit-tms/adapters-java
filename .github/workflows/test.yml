@@ -205,7 +205,9 @@ jobs:
           
           sleep 1
           
-          curl -v http://127.0.0.1:49152/health || true
+          curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null \
+            && echo "sync-storage health: ok" \
+            || echo "sync-storage health: not ready yet"
 
           chmod +x ./gradlew
           ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
@@ -214,8 +216,16 @@ jobs:
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
 
           sleep 1
-          
-          curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} --max-time 100 || true
+
+          # SS may already exit after Work X ("no active workers") — Connection refused is success, not a failure.
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 100 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait (OK if Work X already finished)"
+          else
+            echo "sync-storage already stopped on :49152 — skip wait-completion"
+          fi
           
           cat service.log
           # cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/shutdown.log
@@ -244,7 +254,9 @@ jobs:
           
           sleep 1
           
-          curl -v http://127.0.0.1:49152/health || true
+          curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null \
+            && echo "sync-storage health: ok" \
+            || echo "sync-storage health: not ready yet"
 
           chmod +x ./gradlew
           ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
@@ -253,8 +265,15 @@ jobs:
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
 
           sleep 1
-          
-          curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} --max-time 100 || true
+
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 100 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait (OK if Work X already finished)"
+          else
+            echo "sync-storage already stopped on :49152 — skip wait-completion"
+          fi
           
           cat service.log
 
@@ -274,7 +293,14 @@ jobs:
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} \
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
 
-          curl -v http://127.0.0.1:49152/wait-completion --max-time 100 || true
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 100 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait (OK if Work X already finished)"
+          else
+            echo "sync-storage already stopped on :49152 — skip wait-completion"
+          fi
 
       - name: Validate Again
         run: |
