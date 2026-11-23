@@ -2,7 +2,9 @@ package ru.testit.syncstorage;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SyncStorageKeepAliveTest {
@@ -29,5 +31,17 @@ class SyncStorageKeepAliveTest {
         Thread.sleep(50);
         keepAlive.stop();
         assertTrue(true);
+    }
+
+    @Test
+    void extractJsonStringField_readsTestRunId() {
+        assertEquals(
+                "abc-123",
+                SyncStorageRunner.extractJsonStringField(
+                        "{\"status\":\"ok\",\"testRunId\":\"abc-123\",\"last_update\":\"x\"}",
+                        "testRunId"
+                )
+        );
+        assertNull(SyncStorageRunner.extractJsonStringField("{\"status\":\"ok\"}", "testRunId"));
     }
 }

@@ -162,7 +162,7 @@ public class AdapterTestCaseHelper {
         }
 
         // SyncStorage gets the final cut (above). Test IT gets InProgress only;
-        // Work X finalizes the result later. Without sync — export final status as before.
+        // Work X finalizes later via send test result (never PUT). Without sync — export final as before.
         if (syncAccepted) {
             ItemStatus finalStatus = testResult.getItemStatus();
             testResult.setItemStatus(ItemStatus.INPROGRESS);
