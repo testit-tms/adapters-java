@@ -324,8 +324,15 @@ public class BulkAutotestHelper {
 
     /** TMS 6.0 may return this on concurrent / conflicting autotest PUT; often retriable. */
     public static boolean isAlreadyExists(ApiException e) {
+        if (e == null) {
+            return false;
+        }
         String m = e.getMessage();
-        return m != null && m.contains("AlreadyExistsException");
+        if (m != null && m.contains("AlreadyExistsException")) {
+            return true;
+        }
+        String body = e.getResponseBody();
+        return body != null && body.contains("AlreadyExistsException");
     }
 
     private static boolean isRetriable(ApiException e) {

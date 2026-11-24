@@ -182,6 +182,10 @@ jobs:
       - name: Setup environment
         run: |
           ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
+          # java-examples use adapterVersion=[0,) which prefers Maven Central (e.g. 4.2.5) over local 4.2.2-TMS-6.0
+          ADAPTER_VERSION=$(grep -E '^version=' gradle.properties | cut -d= -f2 | tr -d '\r')
+          echo "ADAPTER_VERSION=${ADAPTER_VERSION}" >> "$GITHUB_ENV"
+          echo "Published and will force ru.testit:*:${ADAPTER_VERSION} in examples"
           dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
           
@@ -194,6 +198,7 @@ jobs:
         run: |
           export SYNC_STORAGE_VERSION=$(grep -o 'SYNC_STORAGE_VERSION = "[^"]*"' testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java | cut -d'"' -f2)
           # current location - /adapters-java/
+          INIT_SCRIPT="${GITHUB_WORKSPACE}/.github/ci-force-adapter-version.init.gradle"
           
           cd java-examples/${{ matrix.project_name }}
 
@@ -211,7 +216,8 @@ jobs:
             || echo "sync-storage health: not ready yet"
 
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          ./gradlew test --no-daemon --init-script "$INIT_SCRIPT" \
+          -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
@@ -247,6 +253,7 @@ jobs:
       - name: Test importRealtime=true
         run: |
           export TMS_IMPORT_REALTIME=true
+          INIT_SCRIPT="${GITHUB_WORKSPACE}/.github/ci-force-adapter-version.init.gradle"
           cd java-examples/${{ matrix.project_name }}
 
           SYNC_STORAGE_BIN=".caches/syncstorage-linux-amd64"
@@ -264,7 +271,8 @@ jobs:
             || echo "sync-storage health: not ready yet"
 
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          ./gradlew test --no-daemon --init-script "$INIT_SCRIPT" \
+          -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
@@ -294,10 +302,12 @@ jobs:
       - name: Test Adapter Mode 2
         run: |
           export TMS_ADAPTER_MODE=2
+          INIT_SCRIPT="${GITHUB_WORKSPACE}/.github/ci-force-adapter-version.init.gradle"
           cd java-examples/${{ matrix.project_name }}
           
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          ./gradlew test --no-daemon --init-script "$INIT_SCRIPT" \
+          -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} \
           -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
