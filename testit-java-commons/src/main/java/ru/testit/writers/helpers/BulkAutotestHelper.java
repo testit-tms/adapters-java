@@ -301,7 +301,13 @@ public class BulkAutotestHelper {
                 } catch (ExecutionException e) {
                     Throwable c = e.getCause();
                     if (c instanceof ApiException) {
-                        throw (ApiException) c;
+                        ApiException apiEx = (ApiException) c;
+                        // Do not abort the whole batch: other autotests / sendTestResults must continue.
+                        if (isAlreadyExists(apiEx)) {
+                            LOGGER.warn("Skipping AlreadyExists for one parallel autotest op: {}", apiEx.getMessage());
+                            continue;
+                        }
+                        throw apiEx;
                     }
                     throw new ApiException(e);
                 }
@@ -350,9 +356,14 @@ public class BulkAutotestHelper {
                 if (attempt < maxAttempts && isRetriable(e)) {
                     LOGGER.warn("TMS API conflict, retry {}/{}: {}", attempt, maxAttempts, e.getMessage());
                     sleepBackoff(attempt);
-                } else {
-                    throw e;
+                    continue;
                 }
+                // Autotest metadata PUT on TMS 6.0 can keep returning AlreadyExists; treat as non-fatal.
+                if (isAlreadyExists(e)) {
+                    LOGGER.warn("TMS API AlreadyExists after retries, continuing: {}", e.getMessage());
+                    return;
+                }
+                throw e;
             }
         }
     }
