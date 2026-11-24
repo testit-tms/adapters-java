@@ -3,7 +3,7 @@
 Документ для авторов адаптеров (Python, JS, .NET, Java и т.д.): что изменилось в sync-storage и что нужно сделать на стороне клиента.
 
 Референсная реализация: **adapters-java** (`testit-java-commons` → `ru.testit.syncstorage.*`).  
-Сервер: **adapters-core** / sync-storage (ветка с keep-alive + lifecycle fixes; после релиза — bump pin версии в адаптере).
+Сервер: **adapters-core** / sync-storage. Java: `SYNC_STORAGE_VERSION` — floor+канал; рантайм берёт последний патч в той же `major.minor` (`v0.4.4` → только numeric `v0.4.*`; `v0.4.3-tms-6.0` → только `v0.4.*-tms-6.0`).
 
 Связанные материалы на стороне сервера: `adapters-core/docs/KEEP_ALIVE.md`, `adapters-core/docs/ENV.md`.
 
@@ -188,7 +188,8 @@ else:
 
 | Тема | Где смотреть |
 |------|----------------|
-| Pin версии, start/reuse, health check | `SyncStorageRunner.java` |
+| Floor/канал + resolve latest release | `SyncStorageRunner`, `SyncStorageReleaseResolver` |
+| Start/reuse, health check | `SyncStorageRunner.java` |
 | Keep-alive HTTP | `ClientWrapper.sendKeepAlive`, `SyncStorageKeepAlive` |
 | Fail-fast mismatch | `SyncStorageService.initializeSyncStorage` (не глотать `IllegalStateException`) |
 | Сервер: keep-alive | `handlers/keep_alive_handler.go` |

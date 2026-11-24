@@ -196,7 +196,10 @@ jobs:
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
       - name: Test
         run: |
-          export SYNC_STORAGE_VERSION=$(grep -o 'SYNC_STORAGE_VERSION = "[^"]*"' testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java | cut -d'"' -f2)
+          FLOOR=$(grep -o 'SYNC_STORAGE_VERSION = "[^"]*"' testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java | cut -d'"' -f2)
+          chmod +x "${GITHUB_WORKSPACE}/.github/scripts/resolve-sync-storage-version.sh"
+          export SYNC_STORAGE_VERSION=$("${GITHUB_WORKSPACE}/.github/scripts/resolve-sync-storage-version.sh" "$FLOOR")
+          echo "Sync Storage floor=$FLOOR resolved=$SYNC_STORAGE_VERSION"
           # current location - /adapters-java/
           INIT_SCRIPT="${GITHUB_WORKSPACE}/.github/ci-force-adapter-version.init.gradle"
           
