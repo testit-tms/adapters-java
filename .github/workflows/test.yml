@@ -19,6 +19,7 @@ on:
       - "gradle.properties"
       - "settings.gradle.kts"
       - ".github/**/test.yml"
+      - ".github/scripts/**"
   workflow_dispatch:
     inputs:
       run_tests:
@@ -196,9 +197,20 @@ jobs:
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
       - name: Test
         run: |
-          FLOOR=$(grep -o 'SYNC_STORAGE_VERSION = "[^"]*"' testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java | cut -d'"' -f2)
+          RUNNER_JAVA="${GITHUB_WORKSPACE}/testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java"
+          FLOOR=$(sed -n 's/.*SYNC_STORAGE_VERSION = "\([^"]*\)".*/\1/p' "$RUNNER_JAVA" | head -n1 | tr -d '\r')
+          if [ -z "$FLOOR" ]; then
+            echo "FATAL: SYNC_STORAGE_VERSION floor not found in $RUNNER_JAVA" >&2
+            exit 1
+          fi
           chmod +x "${GITHUB_WORKSPACE}/.github/scripts/resolve-sync-storage-version.sh"
-          export SYNC_STORAGE_VERSION=$("${GITHUB_WORKSPACE}/.github/scripts/resolve-sync-storage-version.sh" "$FLOOR")
+          SYNC_STORAGE_VERSION=$("${GITHUB_WORKSPACE}/.github/scripts/resolve-sync-storage-version.sh" "$FLOOR" | tr -d '\r' | tail -n1)
+          if [ -z "$SYNC_STORAGE_VERSION" ]; then
+            echo "resolve failed, fallback to floor=$FLOOR" >&2
+            SYNC_STORAGE_VERSION="$FLOOR"
+          fi
+          export SYNC_STORAGE_VERSION
+          echo "SYNC_STORAGE_VERSION=$SYNC_STORAGE_VERSION" >> "$GITHUB_ENV"
           echo "Sync Storage floor=$FLOOR resolved=$SYNC_STORAGE_VERSION"
           # current location - /adapters-java/
           INIT_SCRIPT="${GITHUB_WORKSPACE}/.github/ci-force-adapter-version.init.gradle"
@@ -206,8 +218,10 @@ jobs:
           cd java-examples/${{ matrix.project_name }}
 
           mkdir -p .caches
-          wget -O .caches/syncstorage-linux-amd64 \
-          "https://github.com/testit-tms/sync-storage-public/releases/download/${SYNC_STORAGE_VERSION}/syncstorage-${SYNC_STORAGE_VERSION}-linux_amd64"
+          SS_URL="https://github.com/testit-tms/sync-storage-public/releases/download/${SYNC_STORAGE_VERSION}/syncstorage-${SYNC_STORAGE_VERSION}-linux_amd64"
+          echo "Downloading $SS_URL"
+          curl -fL --retry 5 --retry-delay 2 --retry-all-errors \
+            -o .caches/syncstorage-linux-amd64 "$SS_URL"
           chmod +x .caches/syncstorage-linux-amd64
           nohup .caches/syncstorage-linux-amd64 --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
           --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 & 
