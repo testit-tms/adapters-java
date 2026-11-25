@@ -144,8 +144,8 @@ Documented in detail: [cucumber-bulk-import-lifecycle.md](./cucumber-bulk-import
 | `beforeStory` (first call → `startAdapterLaunch`) | Reset run state; one shared `runMainUuid`; new `ClassContainer` per story file |
 | `beforeScenario` / `example` | Schedule/start test; `updateClassContainer` only |
 | `afterScenario` | `stopTestCase` only |
-| `afterStory` | `stopClassContainer` for that story; decrement in-flight story count |
-| quiesce after last story (`storiesInFlight==0` + short delay) | `finalizeRunMainContainers()` → single `writeTests` / SyncStorage `completed` (avoids empty/short story finishing before the next `beforeStory` and killing SyncStorage mid-run) |
+| `afterStory` | `stopClassContainer`; decrement in-flight story count |
+| last story (`storiesInFlight==0`) | **sync** ~500ms quiesce on that thread, then `finalizeRunMainContainers()` (async/daemon delay was skipped when Gradle JVM exited → nothing exported). Shutdown-hook flush as backup. |
 
 ### 6.3 Thread safety
 
