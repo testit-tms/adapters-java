@@ -159,13 +159,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: testit-tms/api-validator-dotnet
+          ref: main
           token: ${{ env.GITHUB_PAT }}
           path: api-validator-dotnet
       - name: Checkout java-examples
         uses: actions/checkout@v4
         with:
           repository: testit-tms/java-examples
+          ref: main
           path: java-examples
+      - name: Show validator/examples SHAs
+        run: |
+          echo "api-validator: $(git -C api-validator-dotnet rev-parse HEAD) $(git -C api-validator-dotnet log -1 --format=%s)"
+          echo "java-examples: $(git -C java-examples rev-parse HEAD) $(git -C java-examples log -1 --format=%s)"
+          grep -E '"name"|"externalId"' api-validator-dotnet/TestIT.ApiResponseValidator/Expected/serenity3-gradle-junit4/CheckAutoTests.json | head -20
+          sed -n '1,12p' java-examples/serenity3-gradle-junit4/src/test/resources/features/parameterized.feature
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
