@@ -82,23 +82,26 @@ public class SyncStorageService {
         );
     }
 
-    public void setWorkerStatus(String status) {
+    /** @return {@code true} if SyncStorage accepted the status update */
+    public boolean setWorkerStatus(String status) {
         LOGGER.debug("Set worker status to {}", status);
         if (syncStorageRunner == null) {
             LOGGER.warn("No runner");
-            return;
+            return false;
         }
         try {
-            setWorkerStatus(syncStorageRunner.getWorkerPid(), status);
+            return setWorkerStatus(syncStorageRunner.getWorkerPid(), status);
         } catch (RuntimeException e) {
             LOGGER.warn("Failed to set worker status {}, continue without sync-storage: {}", status, e.getMessage());
+            return false;
         }
     }
 
-    public void setWorkerStatus(String pid, String status) {
+    /** @return {@code true} if SyncStorage accepted the status update */
+    public boolean setWorkerStatus(String pid, String status) {
         if (syncStorageRunner == null || syncStorageRunner.isNotRunning()) {
             LOGGER.debug("not running!");
-            return;
+            return false;
         }
 
         LOGGER.debug("{}:{}", pid, status);
@@ -118,13 +121,14 @@ public class SyncStorageService {
                 if ("completed".equalsIgnoreCase(status)) {
                     syncStorageRunner.stopKeepAlive();
                 }
-            } else {
-                LOGGER.warn(
-                        "Failed to set status {} for worker with PID: {}, continue without sync-storage",
-                        status,
-                        pid
-                );
+                return true;
             }
+            LOGGER.warn(
+                    "Failed to set status {} for worker with PID: {}, continue without sync-storage",
+                    status,
+                    pid
+            );
+            return false;
         } catch (RuntimeException e) {
             LOGGER.warn(
                     "Unexpected error setting worker status {} for PID {}, continue without sync-storage: {}",
@@ -132,6 +136,7 @@ public class SyncStorageService {
                     pid,
                     e.getMessage()
             );
+            return false;
         }
     }
 

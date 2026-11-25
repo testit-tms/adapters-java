@@ -20,4 +20,11 @@ public interface Writer {
     /** Called once when the last main container of this process is finalized. */
     default void onAllMainContainersFinished() {
     }
+
+    /**
+     * SyncStorage {@code completed} failed / unavailable: finalize deferred InProgress cuts
+     * via sendTestResults (same path as Work X; never PUT outcome).
+     */
+    default void finalizeDeferredSyncCuts() {
+    }
 }

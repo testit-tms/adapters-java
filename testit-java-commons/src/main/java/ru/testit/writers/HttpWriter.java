@@ -8,6 +8,7 @@ import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.Converter;
 import ru.testit.models.ClassContainer;
+import ru.testit.models.ItemStatus;
 import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;
 import ru.testit.services.ResultStorage;
@@ -20,6 +21,8 @@ public class HttpWriter implements Writer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpWriter.class);
 
     private final Map<String, UUID> testResults;
+    /** UUIDs sent to TMS as InProgress after SyncStorage cut; Work X (or adapter fallback) finalizes. */
+    private final Set<String> deferredSyncCuts;
     private final ITmsApiClient apiClient;
     private final ResultStorage storage;
     private final ClientConfiguration config;
@@ -29,6 +32,7 @@ public class HttpWriter implements Writer {
         this.apiClient = client;
         this.storage = storage;
         this.testResults = new HashMap<>();
+        this.deferredSyncCuts = Collections.synchronizedSet(new HashSet<String>());
     }
 
     @Override
@@ -106,6 +110,9 @@ public class HttpWriter implements Writer {
                 Collections.singletonList(model)
         );
         testResults.put(testResult.getUuid(), ids.get(0));
+        if (testResult.getItemStatus() == ItemStatus.INPROGRESS) {
+            deferredSyncCuts.add(testResult.getUuid());
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(
                     "Exported test result via sendTestResults for {} (resultId={}, status={})",
@@ -115,6 +122,55 @@ public class HttpWriter implements Writer {
             );
         }
         return true;
+    }
+
+    @Override
+    public void finalizeDeferredSyncCuts() {
+        if (deferredSyncCuts.isEmpty()) {
+            return;
+        }
+        List<String> uuids = new ArrayList<String>(deferredSyncCuts);
+        LOGGER.warn(
+                "SyncStorage unavailable for completed; finalizing {} deferred cut(s) via sendTestResults",
+                uuids.size()
+        );
+        for (String uuid : uuids) {
+            Optional<TestResult> found = storage.getTestResult(uuid);
+            if (!found.isPresent()) {
+                LOGGER.warn("Fallback finalize: TestResult {} missing in storage", uuid);
+                continue;
+            }
+            TestResult test = found.get();
+            if (test.getItemStatus() == null || test.getItemStatus() == ItemStatus.INPROGRESS) {
+                LOGGER.warn(
+                        "Fallback finalize: skip {} — local status still InProgress",
+                        test.getExternalId()
+                );
+                continue;
+            }
+            try {
+                AutoTestResultsForTestRunModel model = Converter.prepareTestResultForTestRun(
+                        test,
+                        config.getConfigurationId()
+                );
+                apiClient.sendTestResults(
+                        config.getTestRunId(),
+                        Collections.singletonList(model)
+                );
+                deferredSyncCuts.remove(uuid);
+                LOGGER.info(
+                        "Fallback sendTestResults for {} status={}",
+                        test.getExternalId(),
+                        test.getItemStatus()
+                );
+            } catch (ApiException e) {
+                LOGGER.error(
+                        "Fallback finalize failed for {}: {}",
+                        test.getExternalId(),
+                        e.getMessage()
+                );
+            }
+        }
     }
 
     // TODO: use after refactoring
