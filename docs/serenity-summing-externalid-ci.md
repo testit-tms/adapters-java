@@ -20,8 +20,10 @@
 
 | Repo | Change |
 |------|--------|
-| **api-validator-dotnet** | Filter by `LastTestRunId == testRun.Id` (not name). |
-| **java-examples** | Temporarily drop `@ExternalId` / `@DisplayName` on Summing Outline so rows share the hash id again and match current Expected. |
+| **api-validator-dotnet** | Filter by `LastTestRunId == testRun.Id` (not name). **Merged to main** (PR #51). |
+| **java-examples** | Temporarily drop `@ExternalId` / `@DisplayName` on Summing Outline so rows share the hash id again and match current Expected. Branch: `fix/serenity-summing-externalid-align-expected` (not pushed). |
+
+After `LastTestRunId` alone (without examples fix): actual shows `Summing_*` extras and misses hash `Summing` — exactly the serenity2 CI failure.
 
 ## Proper follow-up (unique ExternalId)
 

@@ -186,7 +186,8 @@ jobs:
         run: |
           # Selenide 6.14+ no longer adds --no-sandbox; GHA needs headless + no-sandbox
           # or Chrome exits and validator sees SessionNotCreated instead of expected assert text.
-          echo "BROWSER_SYS_PROPS=-Dselenide.headless=true -Dchromeoptions.args=--no-sandbox,--disable-dev-shm-usage,--disable-gpu" >> "$GITHUB_ENV"
+          # Serenity uses chrome.switches / headless.mode (not selenide.*).
+          echo "BROWSER_SYS_PROPS=-Dselenide.headless=true -Dchromeoptions.args=--no-sandbox,--disable-dev-shm-usage,--disable-gpu -Dheadless.mode=true -Dchrome.switches=--headless,--no-sandbox,--disable-dev-shm-usage,--disable-gpu" >> "$GITHUB_ENV"
       - name: Setup python
         uses: actions/setup-python@v5
         with:
