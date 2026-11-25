@@ -13,3 +13,4 @@ Supplementary documentation for behaviour and performance changes that are not f
 | [bulk-import-autotest-tms.md](./bulk-import-autotest-tms.md) | `importRealtime=false`: bulk autotest create/update, `sendTestResults` batching, parallelism, dedupe, skipping unchanged autotests |
 | [cucumber-bulk-import-lifecycle.md](./cucumber-bulk-import-lifecycle.md) | Cucumber: one `stopMainContainer` per run, class container retention, deduped class list |
 | [jbehave-meta-external-id-and-parameters.md](./jbehave-meta-external-id-and-parameters.md) | JBehave: Meta key shapes (`@Key`, `Key=value`), Examples substitution, `ExternalId` |
+| [sync-storage-auto-resolve-cross-adapter.md](./sync-storage-auto-resolve-cross-adapter.md) | **Auto-resolve SS patch**: floor+канал (`tms-X.Y` / numeric), план раскатки на все адаптеры |

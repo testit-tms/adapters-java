@@ -44,6 +44,11 @@ public class SyncStorageRunner {
     private boolean isExternal = false;
 
 
+    /**
+     * Floor + channel for Sync Storage auto-resolve.
+     * {@code v0.4.2} → newest numeric {@code v0.4.*}; {@code v0.4.3-tms-6.0} → newest {@code v0.4.*-tms-6.0}.
+     * CI may grep this constant as the minimum; runtime downloads the latest matching release.
+     */
     private static final String SYNC_STORAGE_VERSION = "v0.4.2";
 
     private static final String SYNC_STORAGE_REPO_URL ="https://github.com/testit-tms/sync-storage-public/releases/download/";
@@ -51,6 +56,8 @@ public class SyncStorageRunner {
     private static final String ARM64 = "arm64";
     private final ClientWrapper clientWrapper = new ClientWrapper();
     private SyncStorageKeepAlive keepAlive;
+
+    private volatile String resolvedSyncStorageVersion;
 
     public SyncStorageRunner(
             String testRunId,
@@ -200,16 +207,28 @@ public class SyncStorageRunner {
      * @return URL для скачивания
      */
     private String getDownloadUrlForCurrentPlatform() {
+        String version = resolvedVersion();
         String fileName = getFileNameByArchAndOS();
-
-        // Returns URL for GitHub Releases
-        return (
-                SYNC_STORAGE_REPO_URL + SYNC_STORAGE_VERSION + "/" +
-                        fileName
-        );
+        return SYNC_STORAGE_REPO_URL + version + "/" + fileName;
     }
 
-    private static String makeFileName(String osArch, String osPart) {
+    /**
+     * Newest release on the floor's major.minor line and channel (numeric or {@code tms-X.Y}).
+     */
+    String resolvedVersion() {
+        String cached = resolvedSyncStorageVersion;
+        if (cached != null) {
+            return cached;
+        }
+        synchronized (this) {
+            if (resolvedSyncStorageVersion == null) {
+                resolvedSyncStorageVersion = SyncStorageReleaseResolver.resolveLatest(SYNC_STORAGE_VERSION);
+            }
+            return resolvedSyncStorageVersion;
+        }
+    }
+
+    private String makeFileName(String osArch, String osPart) {
         String archPart;
         if (osArch.contains(AMD64) || osArch.contains("x86_64")) {
             archPart = AMD64;
@@ -221,8 +240,7 @@ public class SyncStorageRunner {
             );
         }
 
-        // Формируем имя файла
-        String fileName = "syncstorage-" + SYNC_STORAGE_VERSION + "-" + osPart + "_" + archPart;
+        String fileName = "syncstorage-" + resolvedVersion() + "-" + osPart + "_" + archPart;
         if (osPart.equals("windows")) {
             fileName += ".exe";
         }
