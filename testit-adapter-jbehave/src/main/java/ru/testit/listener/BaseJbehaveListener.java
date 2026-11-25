@@ -14,12 +14,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.nonNull;
 
 public class BaseJbehaveListener extends NullStoryReporter {
     private static final Set<String> MAIN_UUIDS_PENDING_FINALIZE = ConcurrentHashMap.newKeySet();
+    /**
+     * Delay before treating "no stories in flight" as end of run.
+     * JBehave thread-pools often finish a short/empty story before the next story's
+     * {@code beforeStory} runs; immediate finalize marks the SyncStorage worker
+     * completed and the binary exits while other stories are still queued.
+     */
+    private static final long FINALIZE_QUIESCE_MS = 5_000L;
 
     private final AdapterManager adapterManager;
     private final ThreadLocal<ExecutableTest> executableTest = ThreadLocal.withInitial(ExecutableTest::new);
@@ -30,6 +42,13 @@ public class BaseJbehaveListener extends NullStoryReporter {
     private final List<String> exampleUuids = new ArrayList<>();
     private final ConcurrentHashMap<String, String> storyClassUuids = new ConcurrentHashMap<>();
     private final AtomicReference<String> runMainUuid = new AtomicReference<>();
+    private final AtomicInteger storiesInFlight = new AtomicInteger(0);
+    private final ScheduledExecutorService finalizeScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "testit-jbehave-finalize");
+        t.setDaemon(true);
+        return t;
+    });
+    private final AtomicReference<ScheduledFuture<?>> pendingFinalize = new AtomicReference<>();
     private boolean adapterLaunchIsStarted = false;
 
     public BaseJbehaveListener() {
@@ -37,9 +56,11 @@ public class BaseJbehaveListener extends NullStoryReporter {
     }
 
     private void startAdapterLaunch() {
+        cancelPendingFinalize();
         MAIN_UUIDS_PENDING_FINALIZE.clear();
         runMainUuid.set(null);
         storyClassUuids.clear();
+        storiesInFlight.set(0);
         adapterManager.startTests();
         adapterLaunchIsStarted = true;
     }
@@ -53,6 +74,23 @@ public class BaseJbehaveListener extends NullStoryReporter {
         storyClassUuids.clear();
     }
 
+    private void cancelPendingFinalize() {
+        ScheduledFuture<?> future = pendingFinalize.getAndSet(null);
+        if (future != null) {
+            future.cancel(false);
+        }
+    }
+
+    private void scheduleFinalizeWhenQuiesced() {
+        cancelPendingFinalize();
+        ScheduledFuture<?> future = finalizeScheduler.schedule(() -> {
+            if (storiesInFlight.get() == 0) {
+                finalizeRunMainContainers();
+            }
+        }, FINALIZE_QUIESCE_MS, TimeUnit.MILLISECONDS);
+        pendingFinalize.set(future);
+    }
+
     @Override
     public void beforeStory(final Story story, final boolean givenStory) {
         if (!adapterLaunchIsStarted) {
@@ -60,6 +98,8 @@ public class BaseJbehaveListener extends NullStoryReporter {
         }
 
         if (!givenStory) {
+            cancelPendingFinalize();
+            storiesInFlight.incrementAndGet();
             executableStory.set(story);
 
             final String mainUuid = runMainUuid.updateAndGet(
@@ -83,8 +123,8 @@ public class BaseJbehaveListener extends NullStoryReporter {
                 if (classUuid != null) {
                     adapterManager.stopClassContainer(classUuid);
                 }
-                if (storyClassUuids.isEmpty()) {
-                    finalizeRunMainContainers();
+                if (storiesInFlight.decrementAndGet() == 0) {
+                    scheduleFinalizeWhenQuiesced();
                 }
             }
             executableStory.remove();

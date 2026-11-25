@@ -176,6 +176,17 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: jdk
           java-version: ${{ matrix.java_version || env.JAVA_VERSION }}
+      - name: Setup Chrome
+        if: startsWith(matrix.project_name, 'selenide') || startsWith(matrix.project_name, 'serenity')
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+      - name: Browser CI flags
+        if: startsWith(matrix.project_name, 'selenide') || startsWith(matrix.project_name, 'serenity')
+        run: |
+          # Selenide 6.14+ no longer adds --no-sandbox; GHA needs headless + no-sandbox
+          # or Chrome exits and validator sees SessionNotCreated instead of expected assert text.
+          echo "BROWSER_SYS_PROPS=-Dselenide.headless=true -Dchromeoptions.args=--no-sandbox,--disable-dev-shm-usage,--disable-gpu" >> "$GITHUB_ENV"
       - name: Setup python
         uses: actions/setup-python@v5
         with:
@@ -237,7 +248,8 @@ jobs:
           -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
-          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} \
+          ${BROWSER_SYS_PROPS:-} || true # ignore error code
 
           sleep 1
 
@@ -288,11 +300,14 @@ jobs:
             || echo "sync-storage health: not ready yet"
 
           chmod +x ./gradlew
+          # Pass -DtmsImportRealtime explicitly: env alone is easy to miss vs job-level TMS_IMPORT_REALTIME=false.
           ./gradlew test --no-daemon --init-script "$INIT_SCRIPT" \
           -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
-          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} \
+          -DtmsImportRealtime=true \
+          ${BROWSER_SYS_PROPS:-} || true # ignore error code
 
           sleep 1
 
@@ -327,7 +342,8 @@ jobs:
           -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} \
-          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} \
+          ${BROWSER_SYS_PROPS:-} || true # ignore error code
 
           if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
             curl -sf --max-time 300 \
