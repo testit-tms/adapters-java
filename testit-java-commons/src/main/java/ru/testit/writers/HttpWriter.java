@@ -358,6 +358,9 @@ public class HttpWriter implements Writer {
                                 "Bulk import: skip sendTestResults for {} (already finalized at test finish)",
                                 test.getExternalId()
                         );
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Bulk import skip uuid={}", test.getUuid());
+                        }
                         if (autoTestApiResult != null) {
                             AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
                                     test,
@@ -442,10 +445,10 @@ public class HttpWriter implements Writer {
                             }
                         }
                     }
-                } catch (ApiException e) {
+                } catch (Exception e) {
                     bulkApiErrors.incrementAndGet();
                     LOGGER.error(
-                            "Bulk import API error for externalId={}, testUuid={}: {}",
+                            "Bulk import error for externalId={}, testUuid={}: {}",
                             test.getExternalId(),
                             test.getUuid(),
                             e.getMessage(),
