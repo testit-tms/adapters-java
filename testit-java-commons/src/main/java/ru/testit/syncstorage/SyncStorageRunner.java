@@ -44,13 +44,20 @@ public class SyncStorageRunner {
     private boolean isExternal = false;
 
 
-    private static final String SYNC_STORAGE_VERSION = "v0.3.12-tms-5.8";
+    /**
+     * Floor + channel for Sync Storage auto-resolve.
+     * {@code v0.4.4} → newest numeric {@code v0.4.*}; {@code v0.4.3-tms-6.0} → newest {@code v0.4.*-tms-6.0}.
+     * CI may grep this constant as the minimum; runtime downloads the latest matching release.
+     */
+    private static final String SYNC_STORAGE_VERSION = "v0.4.3-tms-6.0";
 
     private static final String SYNC_STORAGE_REPO_URL ="https://github.com/testit-tms/sync-storage-public/releases/download/";
     private static final String AMD64 = "amd64";
     private static final String ARM64 = "arm64";
     private final ClientWrapper clientWrapper = new ClientWrapper();
     private SyncStorageKeepAlive keepAlive;
+
+    private volatile String resolvedSyncStorageVersion;
 
     public SyncStorageRunner(
             String testRunId,
@@ -200,16 +207,28 @@ public class SyncStorageRunner {
      * @return URL для скачивания
      */
     private String getDownloadUrlForCurrentPlatform() {
+        String version = resolvedVersion();
         String fileName = getFileNameByArchAndOS();
-
-        // Returns URL for GitHub Releases
-        return (
-                SYNC_STORAGE_REPO_URL + SYNC_STORAGE_VERSION + "/" +
-                        fileName
-        );
+        return SYNC_STORAGE_REPO_URL + version + "/" + fileName;
     }
 
-    private static String makeFileName(String osArch, String osPart) {
+    /**
+     * Newest release on the floor's major.minor line and channel (numeric or {@code tms-X.Y}).
+     */
+    String resolvedVersion() {
+        String cached = resolvedSyncStorageVersion;
+        if (cached != null) {
+            return cached;
+        }
+        synchronized (this) {
+            if (resolvedSyncStorageVersion == null) {
+                resolvedSyncStorageVersion = SyncStorageReleaseResolver.resolveLatest(SYNC_STORAGE_VERSION);
+            }
+            return resolvedSyncStorageVersion;
+        }
+    }
+
+    private String makeFileName(String osArch, String osPart) {
         String archPart;
         if (osArch.contains(AMD64) || osArch.contains("x86_64")) {
             archPart = AMD64;
@@ -221,8 +240,7 @@ public class SyncStorageRunner {
             );
         }
 
-        // Формируем имя файла
-        String fileName = "syncstorage-" + SYNC_STORAGE_VERSION + "-" + osPart + "_" + archPart;
+        String fileName = "syncstorage-" + resolvedVersion() + "-" + osPart + "_" + archPart;
         if (osPart.equals("windows")) {
             fileName += ".exe";
         }
@@ -240,21 +258,19 @@ public class SyncStorageRunner {
 
         // check if SyncStorage running on selected port
         if (isSyncStorageAlreadyRunning()) {
+            ensureCompatibleExistingInstance();
             LOGGER.debug(
-                    "SyncStorage already started " +
-                            port +
-                            ". Connecting to existing one..."
+                    "SyncStorage already started on port {}. Connecting to existing one...",
+                    port
             );
             isRunning = true;
             isExternal = true;
-
-            try {
-                registerWorkerWithRetry();
+            if (!registerWorkerWithRetry()) {
+                throw new IllegalStateException(
+                        "Port " + port + " has sync-storage for testRunId " + testRunId +
+                                ", but worker registration failed. Check syncstorage.log."
+                );
             }
-            catch (Exception e) {
-                LOGGER.warn("Failed to register sync-storage worker: {}", e.getMessage());
-            }
-
             return;
         }
 
@@ -289,8 +305,7 @@ public class SyncStorageRunner {
             processBuilder.redirectErrorStream(true);
 
             syncStorageProcess = processBuilder.start();
-
-            // Read output as different thread
+            registerShutdownHook();
             startOutputReader();
         }
 
@@ -298,11 +313,8 @@ public class SyncStorageRunner {
             isRunning = true;
             LOGGER.debug("SyncStorage started successfully on port {}", port);
             Thread.sleep(2000);
-            try {
-                registerWorkerWithRetry();
-            }
-            catch (Exception e) {
-                LOGGER.warn("Failed to register sync-storage worker: {}", e.getMessage());
+            if (!registerWorkerWithRetry()) {
+                LOGGER.warn("Failed to register sync-storage worker after start");
             }
         } else {
             throw new RuntimeException(
@@ -366,13 +378,105 @@ public class SyncStorageRunner {
         return prepareBundledExecutableFile(path.toString());
     }
 
-    private void registerWorkerWithRetry() {
-        // Register current process as worker
-        // try 5 times in a row
+    private boolean registerWorkerWithRetry() {
         for (int i = 0; i < 5; i++) {
-            boolean isRegistered = registerWorker();
-            if (isRegistered) break;
+            if (registerWorker()) {
+                return true;
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
         }
+        return false;
+    }
+
+    /**
+     * Existing process on the port must serve the same testRunId (parallel workers),
+     * otherwise a stale orphan blocks the port and new runs never finalize.
+     */
+    private void ensureCompatibleExistingInstance() {
+        String runningTestRunId = fetchHealthTestRunId();
+        if (runningTestRunId == null || runningTestRunId.isEmpty()) {
+            LOGGER.warn(
+                    "Existing sync-storage on port {} does not report testRunId in /health; " +
+                            "compatibility cannot be verified. Prefer a sync-storage build that exposes testRunId. " +
+                            "Current testRunId: {}",
+                    port,
+                    testRunId
+            );
+            return;
+        }
+        if (!runningTestRunId.equals(testRunId)) {
+            throw new IllegalStateException(
+                    "Port " + port + " is occupied by sync-storage with another testRunId (" +
+                            runningTestRunId + "). Stop that process or change SYNC_STORAGE_PORT / syncStoragePort. " +
+                            "Current testRunId: " + testRunId
+            );
+        }
+    }
+
+    private String fetchHealthTestRunId() {
+        try {
+            URL url = new URL("http://localhost:" + port + "/health");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(1000);
+            connection.setReadTimeout(1000);
+            if (connection.getResponseCode() != 200) {
+                return null;
+            }
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream())
+            )) {
+                StringBuilder body = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    body.append(line);
+                }
+                return extractJsonStringField(body.toString(), "testRunId");
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    static String extractJsonStringField(String json, String field) {
+        if (json == null || field == null) {
+            return null;
+        }
+        String key = "\"" + field + "\"";
+        int keyIdx = json.indexOf(key);
+        if (keyIdx < 0) {
+            return null;
+        }
+        int colon = json.indexOf(':', keyIdx + key.length());
+        if (colon < 0) {
+            return null;
+        }
+        int startQuote = json.indexOf('"', colon + 1);
+        if (startQuote < 0) {
+            return null;
+        }
+        int endQuote = json.indexOf('"', startQuote + 1);
+        if (endQuote < 0) {
+            return null;
+        }
+        return json.substring(startQuote + 1, endQuote);
+    }
+
+    private void registerShutdownHook() {
+        if (syncStorageProcess == null) {
+            return;
+        }
+        final Process process = syncStorageProcess;
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (process.isAlive()) {
+                process.destroy();
+            }
+        }, "sync-storage-shutdown"));
     }
 
     private void startDetachedProcess(List<String> command, File workingDirectory)

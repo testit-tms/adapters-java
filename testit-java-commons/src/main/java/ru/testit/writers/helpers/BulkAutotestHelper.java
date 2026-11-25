@@ -161,12 +161,20 @@ public class BulkAutotestHelper {
                 n
         );
         Map<String, String> createdIdsByExternalId = new ConcurrentHashMap<>();
-        parallelAutoTestOps(unique, m -> () -> {
-            String id = apiClient.createAutoTest(m);
-            if (id != null && !id.isEmpty()) {
-                createdIdsByExternalId.put(externalIdKey(m.getExternalId()), id);
-            }
-        });
+        try {
+            parallelAutoTestOps(unique, m -> () -> {
+                String id = apiClient.createAutoTest(m);
+                if (id != null && !id.isEmpty()) {
+                    createdIdsByExternalId.put(externalIdKey(m.getExternalId()), id);
+                }
+            });
+        } catch (ApiException e) {
+            LOGGER.error(
+                    "Parallel createAutoTest failed (continuing with sendTestResults): {}",
+                    e.getMessage(),
+                    e
+            );
+        }
         List<List<AutoTestResultsForTestRunModel>> batches = partitionResultsUniqueAutotestPerBatch(resultsForAutotestsBeingCreated);
         LOGGER.info("sendTestResults: {} batch(es), {} result row(s)", batches.size(), n);
         for (List<AutoTestResultsForTestRunModel> batch : batches) {
@@ -195,7 +203,16 @@ public class BulkAutotestHelper {
                 unique.size(),
                 n
         );
-        parallelAutoTestOps(unique, m -> () -> apiClient.updateAutoTest(m));
+        // Metadata PUT must not block sendTestResults: TMS 6.0 can return AlreadyExistsException on update.
+        try {
+            parallelAutoTestOps(unique, m -> () -> apiClient.updateAutoTest(m));
+        } catch (ApiException e) {
+            LOGGER.error(
+                    "Parallel updateAutoTest failed (continuing with sendTestResults): {}",
+                    e.getMessage(),
+                    e
+            );
+        }
         List<List<AutoTestResultsForTestRunModel>> batches = partitionResultsUniqueAutotestPerBatch(resultsForAutotestsBeingUpdated);
         LOGGER.info("sendTestResults: {} batch(es), {} result row(s)", batches.size(), n);
         for (List<AutoTestResultsForTestRunModel> batch : batches) {
@@ -284,7 +301,13 @@ public class BulkAutotestHelper {
                 } catch (ExecutionException e) {
                     Throwable c = e.getCause();
                     if (c instanceof ApiException) {
-                        throw (ApiException) c;
+                        ApiException apiEx = (ApiException) c;
+                        // Do not abort the whole batch: other autotests / sendTestResults must continue.
+                        if (isAlreadyExists(apiEx)) {
+                            LOGGER.warn("Skipping AlreadyExists for one parallel autotest op: {}", apiEx.getMessage());
+                            continue;
+                        }
+                        throw apiEx;
                     }
                     throw new ApiException(e);
                 }
@@ -297,6 +320,23 @@ public class BulkAutotestHelper {
     private static boolean isDbConcurrency(ApiException e) {
         String m = e.getMessage();
         return m != null && m.contains("DbUpdateConcurrencyException");
+    }
+
+    /** TMS 6.0 may return this on concurrent / conflicting autotest PUT; often retriable. */
+    public static boolean isAlreadyExists(ApiException e) {
+        if (e == null) {
+            return false;
+        }
+        String m = e.getMessage();
+        if (m != null && m.contains("AlreadyExistsException")) {
+            return true;
+        }
+        String body = e.getResponseBody();
+        return body != null && body.contains("AlreadyExistsException");
+    }
+
+    private static boolean isRetriable(ApiException e) {
+        return isDbConcurrency(e) || isAlreadyExists(e);
     }
 
     private static void sleepBackoff(int attempt) throws ApiException {
@@ -320,12 +360,17 @@ public class BulkAutotestHelper {
                 call.run();
                 return;
             } catch (ApiException e) {
-                if (attempt < maxAttempts && isDbConcurrency(e)) {
-                    LOGGER.warn("TMS API concurrency, retry {}/{}: {}", attempt, maxAttempts, e.getMessage());
+                if (attempt < maxAttempts && isRetriable(e)) {
+                    LOGGER.warn("TMS API conflict, retry {}/{}: {}", attempt, maxAttempts, e.getMessage());
                     sleepBackoff(attempt);
-                } else {
-                    throw e;
+                    continue;
                 }
+                // Autotest metadata PUT on TMS 6.0 can keep returning AlreadyExists; treat as non-fatal.
+                if (isAlreadyExists(e)) {
+                    LOGGER.warn("TMS API AlreadyExists after retries, continuing: {}", e.getMessage());
+                    return;
+                }
+                throw e;
             }
         }
     }
@@ -337,8 +382,8 @@ public class BulkAutotestHelper {
                 apiClient.sendTestResults(config.getTestRunId(), models);
                 return;
             } catch (ApiException e) {
-                if (attempt < maxAttempts && isDbConcurrency(e)) {
-                    LOGGER.warn("sendTestResults concurrency, retry {}/{}: {}", attempt, maxAttempts, e.getMessage());
+                if (attempt < maxAttempts && isRetriable(e)) {
+                    LOGGER.warn("sendTestResults conflict, retry {}/{}: {}", attempt, maxAttempts, e.getMessage());
                     sleepBackoff(attempt);
                 } else {
                     throw e;

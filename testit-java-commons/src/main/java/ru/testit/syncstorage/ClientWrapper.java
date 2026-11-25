@@ -11,6 +11,8 @@ import ru.testit.syncstorage.model.RegisterResponse;
 import ru.testit.syncstorage.model.SetWorkerStatusRequest;
 import ru.testit.syncstorage.model.TestResultCutApiModel;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -94,7 +96,13 @@ public class ClientWrapper {
                 return true;
             }
             if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
-                LOGGER.warn("keep_alive: worker not found (pid={})", pid);
+                String errorBody = readErrorBody(connection);
+                // sync-storage returns "Worker not found"; a missing route is a generic 404.
+                if (errorBody != null && errorBody.contains("Worker not found")) {
+                    LOGGER.warn("keep_alive: worker not found (pid={})", pid);
+                } else {
+                    LOGGER.debug("keep_alive endpoint unavailable (HTTP 404, pid={})", pid);
+                }
             } else {
                 LOGGER.debug("keep_alive failed: HTTP {} (pid={})", responseCode, pid);
             }
@@ -109,6 +117,23 @@ public class ClientWrapper {
         return value
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"");
+    }
+
+    private static String readErrorBody(HttpURLConnection connection) {
+        try (InputStream stream = connection.getErrorStream()) {
+            if (stream == null) {
+                return null;
+            }
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            byte[] chunk = new byte[256];
+            int read;
+            while ((read = stream.read(chunk)) != -1) {
+                buffer.write(chunk, 0, read);
+            }
+            return buffer.toString(StandardCharsets.UTF_8.name()).trim();
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     public boolean sendTestResultToSyncStorage(

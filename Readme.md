@@ -106,9 +106,16 @@ nohup .caches/syncstorage-linux-amd64 --testRunId ${{ env.TMS_TEST_RUN_ID }} --p
     --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 & 
 ```
 3. Start the adapter using adapterMode=1 or adapterMode=0 for the selected testRunId.
-4. Wait for sync-storage to complete background jobs by calling:
+4. Wait for sync-storage to complete background jobs. If the process already exited after Work X, `/health` fails and that is OK — do not treat `Connection refused` as a job failure:
 ```bash
-curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} || true
+if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+  curl -sf --max-time 100 \
+    "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+    && echo "wait-completion: ok" \
+    || echo "wait-completion: sync-storage closed during wait (OK if Work X already finished)"
+else
+  echo "sync-storage already stopped — skip wait-completion"
+fi
 ```
 5. You can read the sync-storage logs from the service.log file.
 

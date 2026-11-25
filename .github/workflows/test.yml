@@ -19,6 +19,7 @@ on:
       - "gradle.properties"
       - "settings.gradle.kts"
       - ".github/**/test.yml"
+      - ".github/scripts/**"
   workflow_dispatch:
     inputs:
       run_tests:
@@ -31,7 +32,8 @@ env:
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
   JAVA_DISTRIBUTION: "temurin"
   JAVA_TOOL_OPTIONS: "-Dorg.slf4j.simpleLogger.defaultLogLevel=info"
-  JAVA_VERSION: 8
+  # Pin patch: Temurin 8.0.514 downloads were corrupt / checksum-mismatched on GH runners.
+  JAVA_VERSION: "8.0.512"
   PYTHON_VERSION: 3.12
   TEMP_FILE: tmp/output.txt
   TMS_ADAPTER_MODE: 1
@@ -157,23 +159,43 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: testit-tms/api-validator-dotnet
+          ref: main
           token: ${{ env.GITHUB_PAT }}
           path: api-validator-dotnet
       - name: Checkout java-examples
         uses: actions/checkout@v4
         with:
           repository: testit-tms/java-examples
+          ref: main
           path: java-examples
+      - name: Show validator/examples SHAs
+        run: |
+          echo "api-validator: $(git -C api-validator-dotnet rev-parse HEAD) $(git -C api-validator-dotnet log -1 --format=%s)"
+          echo "java-examples: $(git -C java-examples rev-parse HEAD) $(git -C java-examples log -1 --format=%s)"
+          grep -E '"name"|"externalId"' api-validator-dotnet/TestIT.ApiResponseValidator/Expected/serenity3-gradle-junit4/CheckAutoTests.json | head -20
+          sed -n '1,12p' java-examples/serenity3-gradle-junit4/src/test/resources/features/parameterized.feature
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Setup java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: jdk
           java-version: ${{ matrix.java_version || env.JAVA_VERSION }}
+      - name: Setup Chrome
+        if: startsWith(matrix.project_name, 'selenide') || startsWith(matrix.project_name, 'serenity')
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+      - name: Browser CI flags
+        if: startsWith(matrix.project_name, 'selenide') || startsWith(matrix.project_name, 'serenity')
+        run: |
+          # Selenide 6.14+ no longer adds --no-sandbox; GHA needs headless + no-sandbox
+          # or Chrome exits and validator sees SessionNotCreated instead of expected assert text.
+          # Serenity uses chrome.switches / headless.mode (not selenide.*).
+          echo "BROWSER_SYS_PROPS=-Dselenide.headless=true -Dchromeoptions.args=--no-sandbox,--disable-dev-shm-usage,--disable-gpu -Dheadless.mode=true -Dchrome.switches=--headless,--no-sandbox,--disable-dev-shm-usage,--disable-gpu" >> "$GITHUB_ENV"
       - name: Setup python
         uses: actions/setup-python@v5
         with:
@@ -181,6 +203,10 @@ jobs:
       - name: Setup environment
         run: |
           ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
+          # java-examples use adapterVersion=[0,) which prefers Maven Central (e.g. 4.2.5) over local 4.2.2-TMS-6.0
+          ADAPTER_VERSION=$(grep -E '^version=' gradle.properties | cut -d= -f2 | tr -d '\r')
+          echo "ADAPTER_VERSION=${ADAPTER_VERSION}" >> "$GITHUB_ENV"
+          echo "Published and will force ru.testit:*:${ADAPTER_VERSION} in examples"
           dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
           
@@ -191,31 +217,64 @@ jobs:
           echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
       - name: Test
         run: |
-          export SYNC_STORAGE_VERSION=$(grep -o 'SYNC_STORAGE_VERSION = "[^"]*"' testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java | cut -d'"' -f2)
+          RUNNER_JAVA="${GITHUB_WORKSPACE}/testit-java-commons/src/main/java/ru/testit/syncstorage/SyncStorageRunner.java"
+          FLOOR=$(sed -n 's/.*SYNC_STORAGE_VERSION = "\([^"]*\)".*/\1/p' "$RUNNER_JAVA" | head -n1 | tr -d '\r')
+          if [ -z "$FLOOR" ]; then
+            echo "FATAL: SYNC_STORAGE_VERSION floor not found in $RUNNER_JAVA" >&2
+            exit 1
+          fi
+          chmod +x "${GITHUB_WORKSPACE}/.github/scripts/resolve-sync-storage-version.sh"
+          SYNC_STORAGE_VERSION=$("${GITHUB_WORKSPACE}/.github/scripts/resolve-sync-storage-version.sh" "$FLOOR" | tr -d '\r' | tail -n1)
+          if [ -z "$SYNC_STORAGE_VERSION" ]; then
+            echo "resolve failed, fallback to floor=$FLOOR" >&2
+            SYNC_STORAGE_VERSION="$FLOOR"
+          fi
+          export SYNC_STORAGE_VERSION
+          echo "SYNC_STORAGE_VERSION=$SYNC_STORAGE_VERSION" >> "$GITHUB_ENV"
+          echo "Sync Storage floor=$FLOOR resolved=$SYNC_STORAGE_VERSION"
           # current location - /adapters-java/
+          INIT_SCRIPT="${GITHUB_WORKSPACE}/.github/ci-force-adapter-version.init.gradle"
           
           cd java-examples/${{ matrix.project_name }}
 
           mkdir -p .caches
-          wget -O .caches/syncstorage-linux-amd64 \
-          "https://github.com/testit-tms/sync-storage-public/releases/download/${SYNC_STORAGE_VERSION}/syncstorage-${SYNC_STORAGE_VERSION}-linux_amd64"
+          SS_URL="https://github.com/testit-tms/sync-storage-public/releases/download/${SYNC_STORAGE_VERSION}/syncstorage-${SYNC_STORAGE_VERSION}-linux_amd64"
+          echo "Downloading $SS_URL"
+          curl -fL --retry 5 --retry-delay 2 --retry-all-errors \
+            -o .caches/syncstorage-linux-amd64 "$SS_URL"
           chmod +x .caches/syncstorage-linux-amd64
           nohup .caches/syncstorage-linux-amd64 --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
           --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 & 
           
           sleep 1
           
-          curl -v http://127.0.0.1:49152/health || true
+          curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null \
+            && echo "sync-storage health: ok" \
+            || echo "sync-storage health: not ready yet"
 
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          ./gradlew test --no-daemon --init-script "$INIT_SCRIPT" \
+          -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
-          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} \
+          ${BROWSER_SYS_PROPS:-} || true # ignore error code
 
           sleep 1
-          
-          curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} --max-time 100 || true
+
+          # SS may already exit after Work X ("no active workers") — Connection refused is success, not a failure.
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 300 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait"
+          else
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
+          fi
           
           cat service.log
           # cat /home/runner/work/adapters-java/adapters-java/java-examples/gradle-junit5/build/.caches/shutdown.log
@@ -232,6 +291,7 @@ jobs:
       - name: Test importRealtime=true
         run: |
           export TMS_IMPORT_REALTIME=true
+          INIT_SCRIPT="${GITHUB_WORKSPACE}/.github/ci-force-adapter-version.init.gradle"
           cd java-examples/${{ matrix.project_name }}
 
           SYNC_STORAGE_BIN=".caches/syncstorage-linux-amd64"
@@ -244,17 +304,34 @@ jobs:
           
           sleep 1
           
-          curl -v http://127.0.0.1:49152/health || true
+          curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null \
+            && echo "sync-storage health: ok" \
+            || echo "sync-storage health: not ready yet"
 
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          # Pass -DtmsImportRealtime explicitly: env alone is easy to miss vs job-level TMS_IMPORT_REALTIME=false.
+          ./gradlew test --no-daemon --init-script "$INIT_SCRIPT" \
+          -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
-          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} \
+          -DtmsImportRealtime=true \
+          ${BROWSER_SYS_PROPS:-} || true # ignore error code
 
           sleep 1
-          
-          curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} --max-time 100 || true
+
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 300 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait"
+          else
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
+          fi
           
           cat service.log
 
@@ -266,15 +343,29 @@ jobs:
       - name: Test Adapter Mode 2
         run: |
           export TMS_ADAPTER_MODE=2
+          INIT_SCRIPT="${GITHUB_WORKSPACE}/.github/ci-force-adapter-version.init.gradle"
           cd java-examples/${{ matrix.project_name }}
           
           chmod +x ./gradlew
-          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          ./gradlew test --no-daemon --init-script "$INIT_SCRIPT" \
+          -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
           -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
           -DtmsAdapterMode=${{ env.TMS_ADAPTER_MODE }} \
-          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true # ignore error code
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} \
+          ${BROWSER_SYS_PROPS:-} || true # ignore error code
 
-          curl -v http://127.0.0.1:49152/wait-completion --max-time 100 || true
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 300 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait"
+          else
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
+          fi
 
       - name: Validate Again
         run: |

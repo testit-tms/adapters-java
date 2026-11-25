@@ -8,6 +8,7 @@ import ru.testit.clients.ITmsApiClient;
 import ru.testit.clients.ClientConfiguration;
 import ru.testit.clients.Converter;
 import ru.testit.models.ClassContainer;
+import ru.testit.models.ItemStatus;
 import ru.testit.models.MainContainer;
 import ru.testit.models.TestResult;
 import ru.testit.services.ResultStorage;
@@ -20,6 +21,8 @@ public class HttpWriter implements Writer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpWriter.class);
 
     private final Map<String, UUID> testResults;
+    /** UUIDs sent to TMS as InProgress after SyncStorage cut; Work X (or adapter fallback) finalizes. */
+    private final Set<String> deferredSyncCuts;
     private final ITmsApiClient apiClient;
     private final ResultStorage storage;
     private final ClientConfiguration config;
@@ -29,6 +32,7 @@ public class HttpWriter implements Writer {
         this.apiClient = client;
         this.storage = storage;
         this.testResults = new HashMap<>();
+        this.deferredSyncCuts = Collections.synchronizedSet(new HashSet<String>());
     }
 
     @Override
@@ -64,7 +68,19 @@ public class HttpWriter implements Writer {
                         config.getProjectId()
                 );
 
-                apiClient.updateAutoTest(AutoTestUpdateApiModel);
+                try {
+                    apiClient.updateAutoTest(AutoTestUpdateApiModel);
+                } catch (ApiException e) {
+                    // TMS 6.0: metadata PUT can return AlreadyExists; still send the test result.
+                    if (!BulkAutotestHelper.isAlreadyExists(e)) {
+                        throw e;
+                    }
+                    LOGGER.warn(
+                            "updateAutoTest AlreadyExists for {}, continuing with sendTestResults: {}",
+                            testResult.getExternalId(),
+                            e.getMessage()
+                    );
+                }
                 autoTestId = autotest.getId().toString();
             } else {
                 AutoTestCreateApiModel model = Converter.prepareToCreateAutoTest(testResult, config.getProjectId());
@@ -94,6 +110,9 @@ public class HttpWriter implements Writer {
                 Collections.singletonList(model)
         );
         testResults.put(testResult.getUuid(), ids.get(0));
+        if (testResult.getItemStatus() == ItemStatus.INPROGRESS) {
+            deferredSyncCuts.add(testResult.getUuid());
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(
                     "Exported test result via sendTestResults for {} (resultId={}, status={})",
@@ -103,6 +122,55 @@ public class HttpWriter implements Writer {
             );
         }
         return true;
+    }
+
+    @Override
+    public void finalizeDeferredSyncCuts() {
+        if (deferredSyncCuts.isEmpty()) {
+            return;
+        }
+        List<String> uuids = new ArrayList<String>(deferredSyncCuts);
+        LOGGER.warn(
+                "SyncStorage unavailable for completed; finalizing {} deferred cut(s) via sendTestResults",
+                uuids.size()
+        );
+        for (String uuid : uuids) {
+            Optional<TestResult> found = storage.getTestResult(uuid);
+            if (!found.isPresent()) {
+                LOGGER.warn("Fallback finalize: TestResult {} missing in storage", uuid);
+                continue;
+            }
+            TestResult test = found.get();
+            if (test.getItemStatus() == null || test.getItemStatus() == ItemStatus.INPROGRESS) {
+                LOGGER.warn(
+                        "Fallback finalize: skip {} — local status still InProgress",
+                        test.getExternalId()
+                );
+                continue;
+            }
+            try {
+                AutoTestResultsForTestRunModel model = Converter.prepareTestResultForTestRun(
+                        test,
+                        config.getConfigurationId()
+                );
+                apiClient.sendTestResults(
+                        config.getTestRunId(),
+                        Collections.singletonList(model)
+                );
+                deferredSyncCuts.remove(uuid);
+                LOGGER.info(
+                        "Fallback sendTestResults for {} status={}",
+                        test.getExternalId(),
+                        test.getItemStatus()
+                );
+            } catch (ApiException e) {
+                LOGGER.error(
+                        "Fallback finalize failed for {}: {}",
+                        test.getExternalId(),
+                        e.getMessage()
+                );
+            }
+        }
     }
 
     // TODO: use after refactoring
@@ -346,6 +414,9 @@ public class HttpWriter implements Writer {
                                 "Bulk import: skip sendTestResults for {} (already finalized at test finish)",
                                 test.getExternalId()
                         );
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Bulk import skip uuid={}", test.getUuid());
+                        }
                         if (autoTestApiResult != null) {
                             AutoTestUpdateApiModel model = Converter.prepareToUpdateAutoTest(
                                     test,
@@ -355,7 +426,18 @@ public class HttpWriter implements Writer {
                             model.setSetup(beforeFinish);
                             model.setTeardown(afterFinish);
                             if (hasAutoTestChanged(autoTestApiResult, model)) {
-                                apiClient.updateAutoTest(model);
+                                try {
+                                    apiClient.updateAutoTest(model);
+                                } catch (ApiException e) {
+                                    if (!BulkAutotestHelper.isAlreadyExists(e)) {
+                                        throw e;
+                                    }
+                                    LOGGER.warn(
+                                            "Bulk skip-path updateAutoTest AlreadyExists for {}: {}",
+                                            test.getExternalId(),
+                                            e.getMessage()
+                                    );
+                                }
                             }
                         }
                         continue;
@@ -419,10 +501,10 @@ public class HttpWriter implements Writer {
                             }
                         }
                     }
-                } catch (ApiException e) {
+                } catch (Exception e) {
                     bulkApiErrors.incrementAndGet();
                     LOGGER.error(
-                            "Bulk import API error for externalId={}, testUuid={}: {}",
+                            "Bulk import error for externalId={}, testUuid={}: {}",
                             test.getExternalId(),
                             test.getUuid(),
                             e.getMessage(),
@@ -523,7 +605,7 @@ public class HttpWriter implements Writer {
      * @param updateModel модель для обновления
      * @return true, если модели отличаются и нужно выполнить обновление
      */
-    private boolean hasAutoTestChanged(AutoTestApiResult serverModel, AutoTestUpdateApiModel updateModel) {
+    boolean hasAutoTestChanged(AutoTestApiResult serverModel, AutoTestUpdateApiModel updateModel) {
         if (serverModel == null || updateModel == null) {
             return true;
         }
@@ -547,11 +629,11 @@ public class HttpWriter implements Writer {
             return true;
         }
         // Сравниваем setup методы
-        if (!areStepListsEqual(serverModel.getSetup(), updateModel.getSetup())) {
+        if (areStepListsDifferent(serverModel.getSetup(), updateModel.getSetup())) {
             return true;
         }
         // Сравниваем teardown методы
-        if (!areStepListsEqual(serverModel.getTeardown(), updateModel.getTeardown())) {
+        if (areStepListsDifferent(serverModel.getTeardown(), updateModel.getTeardown())) {
             return true;
         }
         // Если дошли до этого места, модели идентичны
@@ -559,19 +641,18 @@ public class HttpWriter implements Writer {
     }
 
     /**
-     * Сравнивает два списка шагов авто-теста
+     * Сравнивает два списка шагов авто-теста.
      *
      * @param serverSteps шаги с сервера
      * @param updateSteps шаги для обновления
      * @return true, если списки отличаются
      */
-    private boolean areStepListsEqual(List<AutoTestStepApiResult> serverSteps, List<AutoTestStepApiModel> updateSteps) {
-
+    boolean areStepListsDifferent(List<AutoTestStepApiResult> serverSteps, List<AutoTestStepApiModel> updateSteps) {
         if (serverSteps == null && updateSteps == null) {
-            return false; // Если оба null, то они равны
+            return false;
         }
         if (serverSteps == null || updateSteps == null) {
-            return true; // Если один null, а другой нет, то они разные
+            return true;
         }
 
         if (serverSteps.size() != updateSteps.size()) {
@@ -593,10 +674,9 @@ public class HttpWriter implements Writer {
             // Compare nested steps as well.
             // Previously we compared only title/description for the top-level step list, which could
             // lead to skipping PUT when nested structure differs (e.g. missing setup/teardown details).
-            if (areStepListsEqual(serverStep.getSteps(), updateStep.getSteps())) {
+            if (areStepListsDifferent(serverStep.getSteps(), updateStep.getSteps())) {
                 return true;
             }
-
         }
 
         return false;
