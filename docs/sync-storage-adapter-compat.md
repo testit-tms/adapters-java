@@ -84,6 +84,8 @@
 4. При reuse регистрация воркера **обязательна**; провал после ретраев → ошибка.
 5. Shutdown-hook: `destroy()` дочернего процесса, если адаптер сам его породил (не Linux `setsid`-detached — там SS намеренно переживает воркер для параллели).
 
+> **Done in Java:** foreign `testRunId` → **port+1**; owned child → **`/wait-completion` before `destroy`**. Spec / porting: [sync-storage-port-bump-and-wait-completion.md](./sync-storage-port-bump-and-wait-completion.md).
+
 Pin версии: `SYNC_STORAGE_VERSION` в `SyncStorageRunner` — поднять после публикации релиза бинарника.
 
 ---
@@ -94,20 +96,21 @@ Pin версии: `SYNC_STORAGE_VERSION` в `SyncStorageRunner` — поднят
 
 ### 4.1 Обязательно: совместимость порта / testRunId
 
+**Было (TMS-43088):** mismatch → fail-fast.  
+**Сейчас (Java):** mismatch → `port+1` … `+maxBump` (см. [sync-storage-port-bump-and-wait-completion.md](./sync-storage-port-bump-and-wait-completion.md)).
+
 ```text
 if GET /health == 200:
   runningId = health.testRunId
   if runningId is present AND runningId != myTestRunId:
-    FAIL FAST with clear message:
-      "Port {port} is occupied by sync-storage with another testRunId ({runningId}).
-       Stop that process or change SYNC_STORAGE_PORT. Current testRunId: {myTestRunId}"
+    try port+1 .. preferred+maxBump; FAIL if none free
   else:
     attach / register on existing instance
 else:
   start new sync-storage --testRunId {myTestRunId} --port ...
 ```
 
-- Не логировать mismatch как debug и не продолжать «как будто всё ок».
+- Не логировать mismatch как debug и не **attach** к чужому `testRunId`.
 - После attach: `/register` должен **успеть**; иначе — ошибка, а не тихий прогон без воркера.
 - Ожидать **409** на `/register` при чужом `testRunId` (после обновления сервера) и показывать тот же смысл пользователю.
 
