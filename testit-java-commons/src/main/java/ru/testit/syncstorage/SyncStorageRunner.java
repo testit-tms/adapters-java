@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class SyncStorageRunner {
@@ -263,7 +264,7 @@ public class SyncStorageRunner {
 
     /**
      * Start SyncStorage process or connect to existing one.
-     * Foreign testRunId on preferred port → try port+1 .. +maxBump.
+     * Foreign testRunId / bind-register race → try port+1 .. +maxBump (never silent no-SS).
      */
     public void start() throws IOException, InterruptedException {
         if (isRunning) {
@@ -272,14 +273,15 @@ public class SyncStorageRunner {
         }
 
         int maxBump = resolvePortMaxBump();
-        boolean attach = false;
-        boolean startNew = false;
+        String preparedExecutablePath = null;
+
         for (int offset = 0; offset <= maxBump; offset++) {
             int candidate = preferredPort + offset;
             port = String.valueOf(candidate);
             boolean healthOk = isSyncStorageAlreadyRunning();
             String runningId = healthOk ? fetchHealthTestRunId() : null;
             PortAction action = resolvePortAction(healthOk, runningId, testRunId);
+
             if (action == PortAction.TRY_NEXT) {
                 LOGGER.info(
                         "Port {} busy with testRunId={}; trying {}",
@@ -289,6 +291,11 @@ public class SyncStorageRunner {
                 );
                 continue;
             }
+
+            if (candidate != preferredPort) {
+                LOGGER.info("syncStoragePort effective={} (preferred={})", port, preferredPort);
+            }
+
             if (action == PortAction.ATTACH) {
                 if (runningId == null || runningId.isEmpty()) {
                     LOGGER.warn(
@@ -299,54 +306,52 @@ public class SyncStorageRunner {
                             testRunId
                     );
                 }
-                attach = true;
-                break;
-            }
-            startNew = true;
-            break;
-        }
-
-        if (!attach && !startNew) {
-            throw new IllegalStateException(
-                    "No free sync-storage port in " + preferredPort + ".." +
-                            (preferredPort + maxBump) + " for testRunId " + testRunId +
-                            ". Stop occupying processes or raise SYNC_STORAGE_PORT_MAX_BUMP."
-            );
-        }
-
-        if (Integer.parseInt(port) != preferredPort) {
-            LOGGER.info("syncStoragePort effective={} (preferred={})", port, preferredPort);
-        }
-
-        if (attach) {
-            LOGGER.debug(
-                    "SyncStorage already started on port {}. Connecting to existing one...",
-                    port
-            );
-            isRunning = true;
-            isExternal = true;
-            if (!registerWorkerWithRetry()) {
-                throw new IllegalStateException(
-                        "Port " + port + " has sync-storage for testRunId " + testRunId +
-                                ", but worker registration failed. Check syncstorage.log."
+                LOGGER.debug(
+                        "SyncStorage already started on port {}. Connecting to existing one...",
+                        port
                 );
+                isRunning = true;
+                isExternal = true;
+                if (registerWorkerWithRetry()) {
+                    return;
+                }
+                isRunning = false;
+                isExternal = false;
+                LOGGER.info(
+                        "Attach/register failed on port {} (race or incompatible); trying next",
+                        candidate
+                );
+                continue;
             }
-            return;
+
+            if (preparedExecutablePath == null) {
+                String binaryPath = executablePath;
+                if (binaryPath == null || binaryPath.isEmpty()) {
+                    binaryPath = getFileNameByArchAndOS();
+                }
+                preparedExecutablePath = prepareExecutablePath(binaryPath);
+            }
+
+            if (tryStartOwnedProcess(preparedExecutablePath)) {
+                return;
+            }
+            cleanupFailedSpawn();
+            LOGGER.info("Could not claim port {} for testRunId={}; trying next", candidate, testRunId);
         }
 
-        String binaryPath = executablePath;
-        if (binaryPath == null || binaryPath.isEmpty()) {
-            binaryPath = getFileNameByArchAndOS();
-        }
+        throw new IllegalStateException(
+                "No free sync-storage port in " + preferredPort + ".." +
+                        (preferredPort + maxBump) + " for testRunId " + testRunId +
+                        ". Stop occupying processes or raise SYNC_STORAGE_PORT_MAX_BUMP."
+        );
+    }
 
-        List<String> command = getCommand(binaryPath);
-
-        String preparedExecutablePath = prepareExecutablePath(binaryPath);
+    private boolean tryStartOwnedProcess(String preparedExecutablePath)
+            throws IOException, InterruptedException {
+        List<String> command = getCommand(preparedExecutablePath);
         command.set(0, preparedExecutablePath);
 
-        LOGGER.debug(
-                "Starting SyncStorage with command: " + String.join(" ", command)
-        );
+        LOGGER.debug("Starting SyncStorage with command: " + String.join(" ", command));
 
         File workingDirectory = new File(new File(preparedExecutablePath).getParent());
         if (isLinux(System.getProperty("os.name").toLowerCase())) {
@@ -357,24 +362,56 @@ public class SyncStorageRunner {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.directory(workingDirectory);
             processBuilder.redirectErrorStream(true);
-
             syncStorageProcess = processBuilder.start();
-            registerShutdownHook();
             startOutputReader();
+            isExternal = false;
         }
 
-        if (waitForServerStartup(30)) {
-            isRunning = true;
-            LOGGER.debug("SyncStorage started successfully on port {}", port);
-            Thread.sleep(2000);
-            if (!registerWorkerWithRetry()) {
-                LOGGER.warn("Failed to register sync-storage worker after start");
-            }
-        } else {
-            throw new RuntimeException(
-                    "Cannot start the SyncStorage until timeout"
-            );
+        if (!waitForServerStartup(30)) {
+            LOGGER.warn("SyncStorage did not become healthy on port {}", port);
+            return false;
         }
+
+        String runningId = fetchHealthTestRunId();
+        if (runningId != null && !runningId.isEmpty() && !runningId.equals(testRunId)) {
+            LOGGER.info(
+                    "Port {} became sync-storage for other testRunId={} after start race",
+                    port,
+                    runningId
+            );
+            return false;
+        }
+
+        isRunning = true;
+        LOGGER.debug("SyncStorage started successfully on port {}", port);
+        Thread.sleep(2000);
+        if (!registerWorkerWithRetry()) {
+            LOGGER.warn("Failed to register sync-storage worker on port {}", port);
+            return false;
+        }
+        if (!isExternal) {
+            registerShutdownHook();
+        }
+        return true;
+    }
+
+    private void cleanupFailedSpawn() {
+        stopKeepAlive();
+        workerPid = null;
+        isMaster = false;
+        isRunning = false;
+        if (syncStorageProcess != null) {
+            if (syncStorageProcess.isAlive()) {
+                syncStorageProcess.destroy();
+                try {
+                    syncStorageProcess.waitFor(3, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            syncStorageProcess = null;
+        }
+        isExternal = false;
     }
 
     @Nonnull

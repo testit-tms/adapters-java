@@ -119,9 +119,9 @@ public class SyncStorageService {
                         pid
                 );
                 if ("completed".equalsIgnoreCase(status)) {
+                    // Work X wait is only in shutdown-hook (owned child) — not here:
+                    // sequential classes can hit completed between mains while the JVM continues.
                     syncStorageRunner.stopKeepAlive();
-                    // Owned child: wait Work X here so JVM exit does not leave InProgress
-                    syncStorageRunner.awaitWorkXIfOwned();
                 }
                 return true;
             }
