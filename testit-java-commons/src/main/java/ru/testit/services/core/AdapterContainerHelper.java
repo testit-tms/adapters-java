@@ -115,7 +115,9 @@ public class AdapterContainerHelper {
         logger.info("End of main container, remainingMainContainers={}", remaining);
         if (remaining == 0) {
             writer.onAllMainContainersFinished();
-            syncStorageService.setWorkerStatus("completed");
+            if (!syncStorageService.setWorkerStatus("completed")) {
+                writer.finalizeDeferredSyncCuts();
+            }
         }
     }
 
