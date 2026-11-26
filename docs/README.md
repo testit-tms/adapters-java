@@ -13,3 +13,8 @@ Supplementary documentation for behaviour and performance changes that are not f
 | [bulk-import-autotest-tms.md](./bulk-import-autotest-tms.md) | `importRealtime=false`: bulk autotest create/update, `sendTestResults` batching, parallelism, dedupe, skipping unchanged autotests |
 | [cucumber-bulk-import-lifecycle.md](./cucumber-bulk-import-lifecycle.md) | Cucumber: one `stopMainContainer` per run, class container retention, deduped class list |
 | [jbehave-meta-external-id-and-parameters.md](./jbehave-meta-external-id-and-parameters.md) | JBehave: Meta key shapes (`@Key`, `Key=value`), Examples substitution, `ExternalId` |
+| [sync-storage-adapter-compat.md](./sync-storage-adapter-compat.md) | **Sync-storage changelog + cross-adapter checklist**: keep-alive, `/health.testRunId`, port reuse, orphans |
+| [sync-storage-port-bump-and-wait-completion.md](./sync-storage-port-bump-and-wait-completion.md) | **Cross-ЯП:** port+1 / start-race bump; wait-completion **only** at process exit (not mid-run `completed`) |
+| [sync-storage-verification-checklist.md](./sync-storage-verification-checklist.md) | **QA checklist** for sync-storage on other adapters (port bump, race, multi-class, keep-alive) |
+
+**Also see:** Sync Storage Work X / search notes in this doc (shared binary). Other Sync Storage topics: `adapters-core/docs/` (`KEEP_ALIVE.md`, `ENV.md`).

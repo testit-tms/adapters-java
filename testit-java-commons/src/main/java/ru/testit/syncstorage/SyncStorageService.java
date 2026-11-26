@@ -119,6 +119,8 @@ public class SyncStorageService {
                         pid
                 );
                 if ("completed".equalsIgnoreCase(status)) {
+                    // Work X wait is only in shutdown-hook (owned child) — not here:
+                    // sequential classes can hit completed between mains while the JVM continues.
                     syncStorageRunner.stopKeepAlive();
                 }
                 return true;
@@ -163,7 +165,7 @@ public class SyncStorageService {
             runner.start();
             return runner;
         } catch (IllegalStateException e) {
-            // Port occupied by incompatible sync-storage — fail loudly for diagnostics.
+            // No usable port in preferred..+maxBump (or attach/register hard failure).
             throw e;
         } catch (Exception e) {
             LOGGER.warn(
