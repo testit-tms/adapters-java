@@ -119,6 +119,8 @@ The deployment is configured in `jreleaser.yml`:
 - **Signing**: Always enabled with armored output
 - **Retry**: 20s delay, 60 max retries
 - **GitHub Releases**: Disabled (Maven Central only)
+- **Gradle Module Metadata**: disabled (no `.module` artifacts)
+- **Checksums**: only `md5` + `sha1` (`org.gradle.internal.publish.checksums.insecure`; JReleaser `checksums: false`)
 
 ## GitHub Actions Integration
 

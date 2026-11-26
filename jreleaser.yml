@@ -39,6 +39,9 @@ deploy:
       sonatype:
         active: ALWAYS
         url: https://central.sonatype.com/api/v1/publisher
+        # Keep Central rules except full checksum set (md5+sha1 are staged by Gradle)
+        applyMavenCentralRules: true
+        checksums: false
         stagingRepositories:
           - "testit-adapter-cucumber4/build/staging-deploy"
           - "testit-adapter-cucumber5/build/staging-deploy"
@@ -53,4 +56,4 @@ deploy:
           - "testit-adapter-testng/build/staging-deploy"
           - "testit-java-commons/build/staging-deploy"
         retryDelay: 20
-        maxRetries: 60 
+        maxRetries: 60

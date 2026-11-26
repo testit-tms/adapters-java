@@ -1,4 +1,4 @@
-import java.time.Duration
+import org.gradle.api.publish.tasks.GenerateModuleMetadata
 
 plugins {
     java
@@ -83,6 +83,11 @@ configure(subprojects) {
         }
 
         onlyIf { !project.version.toString().endsWith("-SNAPSHOT") }
+    }
+
+    // Skip Gradle Module Metadata (.module) to cut Maven Central file count
+    tasks.withType<GenerateModuleMetadata>().configureEach {
+        enabled = false
     }
 
     java {
