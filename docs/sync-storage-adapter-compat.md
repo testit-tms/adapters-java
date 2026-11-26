@@ -84,7 +84,7 @@
 4. При reuse регистрация воркера **обязательна**; провал после ретраев → ошибка.
 5. Shutdown-hook: `destroy()` дочернего процесса, если адаптер сам его породил (не Linux `setsid`-detached — там SS намеренно переживает воркер для параллели).
 
-> **Done in Java:** foreign `testRunId` → **port+1**; owned child → **`/wait-completion` before `destroy`**. Spec / porting: [sync-storage-port-bump-and-wait-completion.md](./sync-storage-port-bump-and-wait-completion.md).
+> **Done in Java (port to other langs):** foreign/`register` race → **port+1**; owned child → **`/wait-completion` only at process exit** before `destroy` (not on mid-run `completed`). Full checklist: [sync-storage-port-bump-and-wait-completion.md](./sync-storage-port-bump-and-wait-completion.md).
 
 Pin версии: `SYNC_STORAGE_VERSION` в `SyncStorageRunner` — поднять после публикации релиза бинарника.
 
