@@ -13,9 +13,12 @@ import ru.testit.syncstorage.model.TestResultCutApiModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -133,6 +136,47 @@ public class ClientWrapper {
             return buffer.toString(StandardCharsets.UTF_8.name()).trim();
         } catch (Exception ignored) {
             return null;
+        }
+    }
+
+    /**
+     * Blocks until sync-storage Work X finishes for the run (or timeout / error).
+     */
+    public boolean waitCompletion(String url, String testRunId, int timeoutMs) {
+        if (url == null || url.isEmpty() || testRunId == null || testRunId.isEmpty()) {
+            return false;
+        }
+        try {
+            String endpoint = url + "/wait-completion?testRunId=" +
+                    URLEncoder.encode(testRunId, StandardCharsets.UTF_8.name());
+            HttpURLConnection connection = (HttpURLConnection) new URL(endpoint).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(Math.max(timeoutMs, 1000));
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                LOGGER.warn("wait-completion HTTP {} for testRunId={}", responseCode, testRunId);
+                return false;
+            }
+            StringBuilder body = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)
+            )) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    body.append(line);
+                }
+            }
+            Boolean completed = SyncStorageRunner.extractJsonBooleanField(body.toString(), "completed");
+            if (Boolean.TRUE.equals(completed)) {
+                LOGGER.debug("wait-completion: Work X finished for testRunId={}", testRunId);
+                return true;
+            }
+            LOGGER.warn("wait-completion: not completed for testRunId={}, body={}", testRunId, body);
+            return false;
+        } catch (Exception e) {
+            LOGGER.warn("wait-completion failed for testRunId={}: {}", testRunId, e.getMessage());
+            return false;
         }
     }
 

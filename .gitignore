@@ -12,3 +12,4 @@ keys/
 env.example
 out
 .user/
+dist/
