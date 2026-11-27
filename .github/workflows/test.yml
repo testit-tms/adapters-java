@@ -35,6 +35,7 @@ env:
   JAVA_VERSION: "8.0.512"
   PYTHON_VERSION: 3.12
   TEMP_FILE: tmp/output.txt
+  FILTER_FILE: tmp/filter.txt
   TMS_ADAPTER_MODE: 1
   TMS_CERT_VALIDATION: false
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
@@ -47,10 +48,11 @@ jobs:
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
-      - name: Check if run-e2e label is present
+      - name: Check run-e2e label or workflow_dispatch
         id: check
         run: |
-          if [ "${{ contains(github.event.pull_request.labels.*.name, 'run-e2e') }}" = "true" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || \
+             [ "${{ contains(github.event.pull_request.labels.*.name, 'run-e2e') }}" = "true" ]; then
             echo "should_run=true" >> $GITHUB_OUTPUT
           else
             echo "should_run=false" >> $GITHUB_OUTPUT
@@ -58,6 +60,7 @@ jobs:
 
   test-gradle:
     needs: check-label
+    if: needs.check-label.outputs.should_run == 'true'
     name: ${{ matrix.project_name }}
     runs-on: ubuntu-latest
     strategy:
@@ -151,6 +154,7 @@ jobs:
       TMS_CONFIGURATION_ID: ${{ secrets[matrix.configuration_id] }}
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
       TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
+      SUBSET_IDS_FILE: api-validator-dotnet/ci/mode0/${{ matrix.project_name }}/external-ids.txt
     steps:
       - name: Checkout adapters-java
         uses: actions/checkout@v4
@@ -160,7 +164,15 @@ jobs:
           repository: testit-tms/api-validator-dotnet
           ref: main
           token: ${{ env.GITHUB_PAT }}
+          ref: feat/TMS-38946   # temporary; drop after merge to main
           path: api-validator-dotnet
+      - name: Checkout testit-cli
+        uses: actions/checkout@v4
+        with:
+          repository: testit-tms/testit-cli
+          token: ${{ env.GITHUB_PAT }}
+          ref: fix/autotests-filter-project-scope   # temporary; drop after merge/PyPI
+          path: testit-cli
       - name: Checkout java-examples
         uses: actions/checkout@v4
         with:
@@ -191,7 +203,7 @@ jobs:
         run: |
           ./gradlew --no-daemon -DdisableSign=true publishToMavenLocal
           dotnet build --configuration Debug --property WarningLevel=0 api-validator-dotnet
-          pip install testit-cli
+          pip install ./testit-cli
           
 
       - name: Create TestRun
@@ -326,4 +338,157 @@ jobs:
       - name: Validate Again
         run: |
           export TMS_TEST_RUN_ID=skip
+          dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+
+      # --- Mode 0: full suite, adapter filters by filled test run ---
+      - name: Create filled TestRun Mode 0
+        run: |
+          pip install ./testit-cli
+          mkdir -p tmp
+          testit testrun create launch \
+            --url "${{ env.TMS_URL }}" \
+            --token "${{ env.TMS_PRIVATE_TOKEN }}" \
+            --project-id "${{ env.TMS_PROJECT_ID }}" \
+            --configuration-id "${{ env.TMS_CONFIGURATION_ID }}" \
+            --autotest-external-ids-file "${GITHUB_WORKSPACE}/${{ env.SUBSET_IDS_FILE }}" \
+            --testrun-name "${{ matrix.project_name }} Mode0" \
+            --output "${{ env.TEMP_FILE }}"
+          echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
+
+      - name: Test Adapter Mode 0
+        run: |
+          export TMS_ADAPTER_MODE=0
+          cd java-examples/${{ matrix.project_name }}
+
+          SYNC_STORAGE_BIN=".caches/syncstorage-linux-amd64"
+          pkill -f "syncstorage.*--port 49152" || true
+          pkill -f "syncstorage-linux-amd64" || true
+          sleep 1
+
+          nohup "$SYNC_STORAGE_BIN" --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
+          --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 &
+
+          sleep 1
+          curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null \
+            && echo "sync-storage health: ok" \
+            || echo "sync-storage health: not ready yet"
+
+          chmod +x ./gradlew
+          # Full suite — adapter keeps only tests present in the filled run
+          ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+          -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
+          -DtmsAdapterMode=0 -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
+          -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} || true
+
+          sleep 1
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 300 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait"
+          else
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
+          fi
+          cat service.log
+
+      - name: Validate Mode 0
+        run: |
+          export TMS_EXPECTED_EXTERNAL_IDS_FILE="${GITHUB_WORKSPACE}/${{ env.SUBSET_IDS_FILE }}"
+          dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
+
+      # --- autotests_filter + mode 1 (skip jbehave — no FilterFactory) ---
+      - name: Create filled TestRun Filter
+        if: ${{ !startsWith(matrix.project_name, 'jbehave') }}
+        run: |
+          pip install ./testit-cli
+          mkdir -p tmp
+          PN="${{ matrix.project_name }}"
+          case "$PN" in
+            gradle-junit4) FF=gradle-junit4 ;;
+            gradle-junit5) FF=gradle-junit5 ;;
+            gradle-junit6) FF=gradle-junit6 ;;
+            gradle-testng) FF=gradle-testng ;;
+            selenide*) FF=gradle-junit5 ;;
+            serenity*) FF=gradle-junit4 ;;
+            cucumber*) FF=gradle-cucumber ;;
+            *) echo "Unknown project for filter_framework: $PN" >&2; exit 1 ;;
+          esac
+          echo "FILTER_FRAMEWORK=$FF" >> $GITHUB_ENV
+          testit testrun create launch \
+            --url "${{ env.TMS_URL }}" \
+            --token "${{ env.TMS_PRIVATE_TOKEN }}" \
+            --project-id "${{ env.TMS_PROJECT_ID }}" \
+            --configuration-id "${{ env.TMS_CONFIGURATION_ID }}" \
+            --autotest-external-ids-file "${GITHUB_WORKSPACE}/${{ env.SUBSET_IDS_FILE }}" \
+            --testrun-name "${{ matrix.project_name }} Filter" \
+            --output "${{ env.TEMP_FILE }}"
+          echo "TMS_TEST_RUN_ID=$(<${{ env.TEMP_FILE }})" >> $GITHUB_ENV
+          testit autotests_filter \
+            --url "${{ env.TMS_URL }}" \
+            --token "${{ env.TMS_PRIVATE_TOKEN }}" \
+            --configuration-id "${{ env.TMS_CONFIGURATION_ID }}" \
+            --testrun-id "$(<${{ env.TEMP_FILE }})" \
+            --framework "$FF" \
+            --output "${{ env.FILTER_FILE }}"
+          echo "Filter file:" && cat "${{ env.FILTER_FILE }}"
+
+      - name: Test with autotests_filter
+        if: ${{ !startsWith(matrix.project_name, 'jbehave') }}
+        run: |
+          export TMS_ADAPTER_MODE=1
+          cd java-examples/${{ matrix.project_name }}
+
+          SYNC_STORAGE_BIN=".caches/syncstorage-linux-amd64"
+          pkill -f "syncstorage.*--port 49152" || true
+          pkill -f "syncstorage-linux-amd64" || true
+          sleep 1
+
+          nohup "$SYNC_STORAGE_BIN" --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
+          --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 &
+
+          sleep 1
+          curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null \
+            && echo "sync-storage health: ok" \
+            || echo "sync-storage health: not ready yet"
+
+          FILTER="$(cat ../../${{ env.FILTER_FILE }})"
+          chmod +x ./gradlew
+          if [[ "${{ env.FILTER_FRAMEWORK }}" == "gradle-cucumber" ]]; then
+            ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+            -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
+            -DtmsAdapterMode=1 -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
+            -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} \
+            -Dcucumber.filter.name="$FILTER" || true
+          else
+            # FILTER contains --tests args from CLI
+            ./gradlew test --no-daemon -DtmsUrl=${{ env.TMS_URL }} -DtmsPrivateToken=${{ env.TMS_PRIVATE_TOKEN }} \
+            -DtmsProjectId=${{ env.TMS_PROJECT_ID }} -DtmsConfigurationId=${{ env.TMS_CONFIGURATION_ID }} \
+            -DtmsAdapterMode=1 -DtmsTestRunId=${{ env.TMS_TEST_RUN_ID }} \
+            -DtmsCertValidation=${{ env.TMS_CERT_VALIDATION }} \
+            $FILTER || true
+          fi
+
+          sleep 1
+          if curl -sf --connect-timeout 2 --max-time 3 http://127.0.0.1:49152/health >/dev/null; then
+            curl -sf --max-time 300 \
+              "http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }}" \
+              && echo "wait-completion: ok" \
+              || echo "wait-completion: sync-storage closed during wait"
+          else
+            if grep -q "Work X completed successfully" service.log 2>/dev/null; then
+              echo "sync-storage already stopped — Work X marker found in service.log"
+            else
+              echo "WARNING: sync-storage stopped without Work X success marker"
+            fi
+          fi
+          cat service.log
+
+      - name: Validate Filter
+        if: ${{ !startsWith(matrix.project_name, 'jbehave') }}
+        run: |
+          export TMS_EXPECTED_EXTERNAL_IDS_FILE="${GITHUB_WORKSPACE}/${{ env.SUBSET_IDS_FILE }}"
           dotnet test --configuration Debug --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
